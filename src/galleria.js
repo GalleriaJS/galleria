@@ -3,25 +3,7 @@
 var initializing = false,
     fnTest = /xyz/.test(function(){xyz;}) ? /\b__super\b/ : /.*/,
     Class = function(){},
-    window = this,
-    _ = function() {
-        try { console.log.apply( console, Array.prototype.slice.call(arguments) ); } catch(e) {
-            var d = $('#console_log').length ? $('#console_log') : $('<div>').attr('id', 'console_log').appendTo('body');
-            d.css({
-                opacity:0.9,
-                background:'#000',
-                position: 'fixed',
-                top: 10,
-                right: 10,
-                width: 400,
-                height: 400,
-                color:'#fff',
-                overflow: 'auto',
-                zIndex: '1000'
-            });
-            d.html(d.html() + '<br>' + Array.prototype.join.call(arguments, '; ').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
-        }
-    };
+    window = this;
 
 Class.extend = function(prop) {
     var __super = this.prototype;
