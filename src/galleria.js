@@ -196,6 +196,31 @@ var Base = Class.extend({
             window.setTimeout(arguments.callee, 1);
         }, 1);
         return this;
+    },
+    getScript: function(url, callback) {
+       var head = document.getElementsByTagName("head")[0];
+       var script = document.createElement("script");
+       script.src = url;
+       callback = this.proxy(callback);
+
+       // Handle Script loading
+       {
+          var done = false;
+
+          // Attach handlers for all browsers
+          script.onload = script.onreadystatechange = function(){
+             if ( !done && (!this.readyState ||
+                   this.readyState == "loaded" || this.readyState == "complete") ) {
+                done = true;
+                callback();
+
+                // Handle memory leak in IE
+                script.onload = script.onreadystatechange = null;
+             }
+          };
+       }
+       head.appendChild(script);
+       return this;
     }
 });
 
@@ -338,7 +363,8 @@ var G = window.Galleria = Base.extend({
             data_image_selector: 'img',
             data_source: options.target,
             data_config : function( elem ) { return {}; },
-            queue: true
+            queue: true,
+            remove_original: true
         }, options);
         
         this.target = this.dom.target = this.getElements(this.options.target)[0];
@@ -348,8 +374,6 @@ var G = window.Galleria = Base.extend({
         
         this.stageWidth = 0;
         this.stageHeight = 0;
-        
-        //this.hideAll( this.target );
         
         var elems = 'container stage images image-nav image-nav-left image-nav-right ' + 
                     'info info-link info-text info-title info-description info-author info-close ' +
@@ -745,35 +769,6 @@ var G = window.Galleria = Base.extend({
         return this.data[index] || this.data[this.active];
     },
     
-    getScript: function(url, callback) {
-       var head = document.getElementsByTagName("head")[0];
-       var script = document.createElement("script");
-       script.src = url;
-
-       // Handle Script loading
-       {
-          var done = false;
-
-          // Attach handlers for all browsers
-          script.onload = script.onreadystatechange = function(){
-             if ( !done && (!this.readyState ||
-                   this.readyState == "loaded" || this.readyState == "complete") ) {
-                done = true;
-                if (callback)
-                   callback();
-
-                // Handle memory leak in IE
-                script.onload = script.onreadystatechange = null;
-             }
-          };
-       }
-
-       head.appendChild(script);
-
-       // We handle everything using the script element injection
-       return undefined;
-    },
-    
     play : function(delay) {
         this.playing = true;
         this.playtime = delay || this.playtime;
@@ -900,7 +895,9 @@ var G = window.Galleria = Base.extend({
             this.loop(images, function( elem ) {
                 loaded++;
                 this.push( getData( elem ), this.data );
-                elem.parentNode.removeChild(elem);
+                if (o.remove_original) {
+                    elem.parentNode.removeChild(elem);
+                }
                 if ( loaded == images.length ) {
                     this.trigger( G.DATA );
                 }
