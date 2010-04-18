@@ -2,12 +2,16 @@
 <html lang="sv">
     <head>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-        <script src="src/galleria-1.2.js"></script>
+        <script src="../src/galleria.js"></script>
+        <style>
+            html,body{background:#111}
+            #galleria{width:800px;margin:20px auto}
+        </style>
     </head>
 <body>
     <div id="galleria"></div>
     <script>
-    Galleria.loadTheme('themes/classic/galleria.classic.js');
+    Galleria.loadTheme('../src/themes/classic/galleria.classic.js');
     Galleria.flickr.search('fddd7bc223fe37295faace93a4f2d8fc', {
         text:'toys'
     }, function(data) {
