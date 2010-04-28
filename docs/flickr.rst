@@ -1,7 +1,5 @@
 .. _flickr:
 
-{% extends '_dev/docs/docs_base.html' %} {% block sub_title %}Flickr{% endblock %} {% block primary %}
-
 ======
 Flickr
 ======
