@@ -1,7 +1,7 @@
 ========
 Galleria
 ========
-A JavaScript image gallery for the fastidious
+A JavaScript image gallery for the fastidious.
 
 **Update 28/4 - 2010** - We're currently working on releasing Galleria 1.1, along with some comprehensive documentation. Stay tuned!
 
