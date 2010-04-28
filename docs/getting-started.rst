@@ -27,7 +27,7 @@ Just put the images inside any container on the site.::
     <div id="gallery>
         <img src="/img/pic1.jpg" alt="My description" title="My title">
         <img src="/img/pic2.jpg" alt="Another text" title="Another title">
-        </div>
+    </div>
 
 Activate Galleria
 -----------------
