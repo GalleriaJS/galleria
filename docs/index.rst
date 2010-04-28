@@ -9,8 +9,8 @@ Galleria Documentation
 Contents
 ========
 
-* :ref:`gettingStarted`
-* Options
+* :ref:`getting_started`
+* :ref:`options`
 * Customizing gallery data
 * Themes
 * DOM structure
