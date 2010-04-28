@@ -22,8 +22,8 @@ Galleria uses a convenient Theme API that makes gallery styling and customizatio
 
 Flickr fetcher included
 -----------------------------
-Use a custom feed from your Flickr account or any other external feed to display images on your web site.</p>
+Use a custom feed from your Flickr account or any other external feed to display images on your web site.
 
 Built for performance
 -----------------------------
-Galleria is built to perform at it's best regardless of browser environment using clever interpolation methods and jQuery's appraised animations.</p>
+Galleria is built to perform at it's best regardless of browser environment using clever interpolation methods and jQuery's appraised animations.
