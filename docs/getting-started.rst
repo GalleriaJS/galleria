@@ -1,8 +1,8 @@
 .. _getting_started:
 
-=============================
-Getting started with Galleria
-=============================
+===============
+Getting started
+===============
 
 Requirements
 ============
