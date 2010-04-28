@@ -33,7 +33,7 @@ Basic Usage
 =====
 Include jQuery and Galleria on your web page.
 
-Use the Galleria.loadTheme() to load a Galleria theme.::
+Use the Galleria.loadTheme() to load a Galleria theme::
 
     <script>
         Galleria.loadTheme('/js/galleria/themes/classic/galleria.classic.js');
@@ -43,7 +43,7 @@ Add images
 ----------
 There are several ways of adding image data to your gallery, but the simplets way is probably to add some HTML.
 
-Just put the images inside any container on the site.::
+Just put the images inside any container on the site::
 
     <div id="gallery>
         <img src="/img/pic1.jpg" alt="My description" title="My title">
