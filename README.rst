@@ -27,3 +27,35 @@ Use a custom feed from your Flickr account or any other external feed to display
 Built for performance
 -----------------------------
 Galleria is built to perform at it's best regardless of browser environment using clever interpolation methods and jQuery's appraised animations.
+
+
+Basic Usage
+=====
+Include jQuery and Galleria on your web page.
+
+Use the Galleria.loadTheme() to load a Galleria theme.::
+
+    <script>
+        Galleria.loadTheme('/js/galleria/themes/classic/galleria.classic.js');
+    </script>
+
+Add images
+----------
+There are several ways of adding image data to your gallery, but the simplets way is probably to add some HTML.
+
+Just put the images inside any container on the site.::
+
+    <div id="gallery>
+        <img src="/img/pic1.jpg" alt="My description" title="My title">
+        <img src="/img/pic2.jpg" alt="Another text" title="Another title">
+    </div>
+
+Activate Galleria
+-----------------
+When DOM is ready, you can run Galleria::
+
+    <script>
+        $('#gallery').galleria();
+    </script>
+
+The galleria function takes two arguments, *theme* and *options*. If no theme is specified, the last theme loaded is used. The options argument is an object with Galleria options that you can use. See the options documentation for a complete list.
