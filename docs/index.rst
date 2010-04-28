@@ -5,7 +5,7 @@ Everything you need to know about Galleria.
 
 Contents
 ========
-* :ref:`getting-started`.
+* :ref:`Getting started <getting-started>`
 * Options
 * Customizing gallery data
 * Themes
