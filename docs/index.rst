@@ -12,6 +12,4 @@ Contents
 * :ref:`getting_started`
 * :ref:`options`
 * :ref:`flickr`
-* Customizing gallery data
-* Themes
-* DOM structure
+* :ref:`dom`

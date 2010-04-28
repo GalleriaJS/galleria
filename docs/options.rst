@@ -1,8 +1,8 @@
 .. _options:
 
-================
-Galleria options
-================
+=======
+Options
+=======
 
 Galleria options are defined using a flat object during initialization.::
 
