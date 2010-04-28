@@ -5,7 +5,7 @@ Everything you need to know about Galleria.
 
 Contents
 ========
-* :ref:`Getting started <getting-started>`
+* :Example Queries:getting-started.rst
 * Options
 * Customizing gallery data
 * Themes
