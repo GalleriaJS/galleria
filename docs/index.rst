@@ -1,15 +1,15 @@
+.. _index:
+
 ========
 Galleria Documentation
 ========
-Everything you need to know about Galleria. 
+
+.. rubric:: Everything you need to know about Galleria.
 
 Contents
 ========
 
-:ref:`getting-started`
-
-
-* "Getting started":getting-started.rst
+* :ref:`getting-started`
 * Options
 * Customizing gallery data
 * Themes
