@@ -1,4 +1,4 @@
-.. _getting-started:
+.. _gettingStarted:
 
 =============================
 Getting started with Galleria

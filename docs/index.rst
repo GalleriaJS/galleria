@@ -9,7 +9,7 @@ Galleria Documentation
 Contents
 ========
 
-* :ref:`getting-started`
+* :ref:`gettingStarted`
 * Options
 * Customizing gallery data
 * Themes
