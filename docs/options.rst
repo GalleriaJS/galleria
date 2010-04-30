@@ -80,7 +80,7 @@ Default extractions from the image_target element:
 Example on how to alter the extraction logic:
 ..............................................
 
-:: html
+::
 
     <div id="galleria">
         <img src="myimg.jpg" rel="John Doe">
