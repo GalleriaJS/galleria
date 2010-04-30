@@ -25,6 +25,8 @@ carousel
 
 If **true**, this will activate the carousel when needed. **false** will force it to not appear t all.
 
+----------------------
+
 carousel_follow
 ---------------
 
