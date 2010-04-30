@@ -81,6 +81,7 @@ Example on how to alter the extraction logic:
 ..............................................
 
 :: html
+
     <div id="galleria">
         <img src="myimg.jpg" rel="John Doe">
         <span class="desc">My picture</span>
