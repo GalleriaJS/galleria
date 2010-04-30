@@ -81,20 +81,7 @@ Default extractions from the image_target element:
 Example on how to alter the extraction logic:
 ..............................................
 
-
     <div id="galleria">
         <img src="myimg.jpg" rel="John Doe">
         <span class="desc">My picture</span>
     </div>
-    <script>
-    $('#galleria').galleria({
-        data_config: function(img) {
-            // img is now the image element
-            // the function should return an object with the new data
-            return {
-                description: $(img).next('.desc'), // sets description to "My picture"
-                author: $(img).attr('rel') // sets author to "John Doe"
-            };
-        }
-    });
-    </script>
