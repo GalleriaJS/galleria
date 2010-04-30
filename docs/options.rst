@@ -98,3 +98,227 @@ Example on how to alter the extraction logic:
         }
     });
     </script>
+
+*****
+
+data_image_selector
+---------------
+
+    | type: **String**
+    | default: **'img'**
+
+The selector Galleria should look for in the HTML source. Defaults to <code>'img'</code> and there is rarely any reason to change this.
+
+*****
+
+data_type
+---------------
+
+    | type: **String**
+    | default: **'auto'**
+
+
+The dataType Galleria will use to extract data. Available options are 'json', 'html' or 'auto' (default). There is rarely any reason to change this from auto, but you might encounter a situation where you'd like to force a certain data type.
+
+* **'auto'** means that it will try to detect dataType automatially.
+* **'json'** will force Galleria to treat the source parameter as a JSON data String or Array
+* **'html'** will force Galleria to treat the source parameter as a selector in the DOM where the image data is found.
+
+Example:
+.........
+
+::
+
+    // Galleria will use some custom image data:
+    var data = [{
+        image: 'myimg.jpg'
+    }, {
+        image: 'myimg2.jpg'
+    }];
+    $('#galleria').galleria({data_source: data});
+
+*****
+
+data_source
+------------
+
+    | type: **String** or **Array**
+    | default: *jQuery target*
+
+This is where Galleria finds the data depending on data_type. It defaults to the target selector, which is the same element that was used in the jQuery plugin.
+
+Example:
+........
+
+::
+
+    // Galleria will look for images in '#galleria':
+    $('#galleria').galleria();
+
+    // Galleria will look for images in '#images' 
+    // but use '#galleria' as gallery container:
+    $('#galleria').galleria({data_source: '#images'});
+
+*****
+
+extend
+------
+
+    | type: **Function**
+    | default: **undefined**
+
+This function is used to extend the init function of the theme. Use this to quickly add minor customizations to the theme. The first argument is the options object, and the scope is always the Galleria gallery, just like the theme's init() function.
+
+Example on how to add a play link by extending the theme:
+..........................................................
+
+::
+
+    <script>
+        $('#galleria').galleria('classic', {
+            extend: function(options) {
+                $('<a>').text('play').click(this.proxy(function() {
+                    this.play(5000);
+                })).appendTo('body');
+            }
+        });
+    </script>
+ 
+*****
+   
+image_crop
+----------
+
+    | type: **Boolean**
+    | default: **false**
+
+Defines how the images will be cropped.
+
+* **true** means that all images will be scaled to fill the stage, centered and cropped.
+* **false** will scale down so the entire image fits.
+
+*****
+
+image_margin
+----------
+
+    | type: **Number**
+    | default: **0**
+
+Sets a margin between the image and stage.
+
+*****
+
+max_scale_ratio
+----------
+
+    | type: **Number**
+    | default: **undefined**
+
+Sets the maximum scale ratio for images. F.ex, if you don't want Galleria to upscale any images, set this to 1. undefined will allow any scaling of the images.
+
+*****
+
+popup_links
+----------
+
+    | type: **Boolean**
+    | default: **false**
+
+Setting this to **true** will open any image links in a new window.
+
+*****
+
+preload
+--------
+
+    | type: **String** or **Number**
+    | default: **2**
+
+Defines how many images Galleria should preload in advance. Please note that this only applies when you are using separate thumbnail files. Galleria always cache all preloaded images.
+
+* **2** preloads the next 2 images in line
+* **'all'** forces Galleria to start preloading all images. This may slow down client.
+* **0** will not preload any images
+
+*****
+
+queue
+-----
+
+    | type: **Boolean**
+    | default: **true**
+
+Galleria queues all activation clicks (next/prev & thumbnails). You can see this effect when f.ex clicking "next" many times. If you don't want Galleria to queue, set this to **false**.
+
+*****
+
+thumb_crop
+----------
+
+    | type: **Boolean**
+    | default: **true**
+
+Same as **image_crop** but for thumbnails.
+
+*****
+
+thumb_margin
+------------
+
+    | type: **Number**
+    | default: **0**
+
+Same as **image_margin** but for thumbnails.
+
+*****
+
+thumb_quality
+-------------
+    | type: **Boolean** or **String**
+    | default: **true**
+
+Defines if and how IE should use bicubic image rendering for thumbnails.
+
+* **'auto'** uses high quality if image scaling is moderate.
+* **false** will not use high quality (better performance).
+* **true** will force high quality renedring (can slow down performance)
+
+*****
+
+thumbnails
+----------
+
+    | type: **Boolean**
+    | default: **true**
+
+Sets the creation of thumbnails. If false, Galleria will create empty spans with the className *img* instead of thumbnails.
+
+*****
+
+transition
+----------
+
+    | type: **Function** or **String**
+    | default: **'fade'**
+
+The transition that is used when displaying the images. There are some built-in transitions in Galleria, but you can also create your own using our Transitions API
+
+Built-in transitions
+....................
+
+* **'fade'** fade betweens images
+* **'flash'** fades into background color between images
+* **'slide'** slides the images using the Galleria easing depending on image position
+* **'fadeslide'** fade between images and slide slightly at the same time
+
+*****
+
+transition_speed
+----------------
+
+    | type: **Number**
+    | default: **400**
+
+The milliseconds used when applying the transition.
+
