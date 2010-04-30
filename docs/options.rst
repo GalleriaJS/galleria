@@ -20,9 +20,11 @@ List of options
 carousel
 --------
 
-::
-    type: **Boolean**
-    default: **true**
+type: **Boolean**
+.................
+
+default: **true**
+.................
 
 If **true**, this will activate the carousel when needed. **false** will force it to not appear t all.
 
