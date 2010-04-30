@@ -1,0 +1,28 @@
+html,body{height:100%;margin:0;padding:0;overflow:hidden;}
+
+.galleria-container{height:100%;overflow:hidden;}
+.galleria-stage{height:100%;width:100%;position:absolute;}
+
+.galleria-thumbnails-container{position:absolute;bottom:0;z-index:5;left:10px;right:10px;padding-top:45px;*background:url(fix.gif);}
+.galleria-thumbnails-list{height:35px;border:10px solid #fff;border-width: 10px 0;background:#fff;}
+.galleria-carousel .galleria-thumbnails-list{border-left-width:25px;border-right-width:25px;}
+.galleria-thumbnails{background:#fff;overflow:hidden;}
+.galleria-thumbnails .galleria-image{width:50px;height:35px;float:left;cursor:pointer;margin-right:5px;}
+.galleria-thumbnails .active{cursor:default;}
+.galleria-border{border:10px solid #fff;position:absolute;top:0;bottom:0;left:0;right:0;z-index:3;}
+.galleria-image-nav{width:100%;height:100%;position:absolute;top:0;left:0;z-index:4;}
+.galleria-image-nav-right,
+.galleria-image-nav-left{width:150px;right:0;top:0;height:100%;background: url(r.gif) no-repeat 50% 50%;position:absolute;cursor:pointer;}
+.galleria-image-nav-left{left:0;right:auto;background-image:url(l.gif);}
+.galleria-loader{width:30px;height:30px;background:#fff url(loader.gif) no-repeat 50% 50%;position:absolute;top:50%;left:50%;margin-top:-15px;margin-left:-15px;z-index:3;}
+.galleria-info,
+.galleria-counter{position:absolute;bottom:45px;padding:10px;color:#fff;left:10px;right:10px;z-index:3;font:12px arial,sans-serif;}
+.galleria-counter{text-align:right;}
+.galleria-info-text{z-index:4;}
+.galleria-info-text *{display:inline;font-size:12px;}
+.galleria-info-title{font-weight:bold;margin-right:8px;}
+.galleria-thumb-nav-left,
+.galleria-thumb-nav-right{cursor:pointer;display:none;background:url(p.gif) no-repeat 0 50%;position:absolute;left:10px;top:57px;height:30px;width:12px;z-index:3;opacity:.8;}
+.galleria-thumb-nav-right{background:url(n.gif) no-repeat 100% 50%;right:10px;left:auto;}
+.galleria-carousel .galleria-thumb-nav-left,
+.galleria-carousel .galleria-thumb-nav-right{display:block;}
