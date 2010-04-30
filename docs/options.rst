@@ -71,17 +71,16 @@ This function configures how the data should be extracted from the source. It sh
 Default extractions from the image_target element:
 ..................................................
 
-* **image:** the <code>src</code> attribute OR parent <code>&lt;a&gt;</code> tag's <code>href</code> attribute (if exists and links to an image)
-* **thumb:** the <code>src</code> attribute
-* **title:** the <code>title</code> attribute
-* **description:** the <code>alt</code> attribute
-* **link:** the <code>longdsesc</code> attribute
+* **image:** the **src** attribute OR parent **<a>** tag's **href** attribute (if exists and links to an image)
+* **thumb:** the **src** attribute
+* **title:** the **title** attribute
+* **description:** the **alt** attribute
+* **link:** the **longdsesc** attribute
 
 
 Example on how to alter the extraction logic:
 ..............................................
 
-.. code:: text
 
     <div id="galleria">
         <img src="myimg.jpg" rel="John Doe">
