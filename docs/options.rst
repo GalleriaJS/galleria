@@ -81,8 +81,6 @@ Default extractions from the image_target element:
 Example on how to alter the extraction logic:
 ..............................................
 
-.. code:: html
-
     <div id="galleria">
         <img src="myimg.jpg" rel="John Doe">
         <span class="desc">My picture</span>
