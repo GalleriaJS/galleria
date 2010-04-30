@@ -57,3 +57,45 @@ carousel_steps
 
 The number of "steps" the carousel will slide when navigating between available thumbnails. 
 **'auto'** will move the carousel as many steps as there are visible thumbnails.
+
+*****
+
+data_config
+---------------
+
+    | type: **Function**
+    | default: **undefined**
+
+This function configures how the data should be extracted from the source. It should return an object that will blend in with the default extractions.
+
+Default extractions from the image_target element:
+..................................................
+
+* **image:** the <code>src</code> attribute OR parent <code>&lt;a&gt;</code> tag's <code>href</code> attribute (if exists and links to an image)
+* **thumb:** the <code>src</code> attribute
+* **title:** the <code>title</code> attribute
+* **description:** the <code>alt</code> attribute
+* **link:** the <code>longdsesc</code> attribute
+
+
+Example on how to alter the extraction logic:
+..............................................
+
+.. code:: html
+
+    <div id="galleria">
+        <img src="myimg.jpg" rel="John Doe">
+        <span class="desc">My picture</span>
+    </div>
+    <script>
+    $('#galleria').galleria({
+        data_config: function(img) {
+            // img is now the image element
+            // the function should return an object with the new data
+            return {
+                description: $(img).next('.desc'), // sets description to "My picture"
+                author: $(img).attr('rel') // sets author to "John Doe"
+            };
+        }
+    });
+    </script>
