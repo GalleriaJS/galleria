@@ -25,7 +25,7 @@ carousel
     | type: **Boolean**
     | default: **true**
 
-If **true**, this will activate the carousel when needed. **false** will force it to not appear t all.
+If ``true``, this will activate the carousel when needed. ``false`` will force it to not appear t all.
 
 *****
 
@@ -56,7 +56,7 @@ carousel_steps
     | default: **'auto'**
 
 The number of "steps" the carousel will slide when navigating between available thumbnails. 
-**'auto'** will move the carousel as many steps as there are visible thumbnails.
+``'auto'`` will move the carousel as many steps as there are visible thumbnails.
 
 *****
 
@@ -71,11 +71,11 @@ This function configures how the data should be extracted from the source. It sh
 Default extractions from the image_target element:
 ..................................................
 
-* **image:** the **src** attribute OR parent **<a>** tag's **href** attribute (if exists and links to an image)
-* **thumb:** the **src** attribute
-* **title:** the **title** attribute
-* **description:** the **alt** attribute
-* **link:** the **longdsesc** attribute
+    * **image:** the ``src`` attribute OR parent ``<a>`` tag's ``href`` attribute (if exists and links to an image)
+    * **thumb:** the ``src`` attribute
+    * **title:** the ``title`` attribute
+    * **description:** the ``alt`` attribute
+    * **link:** the ``longdsesc`` attribute
 
 Example on how to alter the extraction logic:
 ..............................................
