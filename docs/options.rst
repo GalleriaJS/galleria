@@ -14,6 +14,32 @@ Galleria options are defined using a flat object during initialization.::
 
 **Note:** You can define your own options and set defaults for each theme using the Theme builder API.
 
+Table of contents (in alphabetical order)
+=================
+
+- carousel
+- carousel_follow
+- carousel_speed
+- carousel_steps
+- data_config
+- data_image_selector
+- data_type
+- data_source
+- extend
+- image_crop
+- image_margin
+- max_scale_ratio
+- popup_links
+- preload
+- queue
+- thumb_crop
+- thumb_margin
+- thumb_quality
+- thumbnails
+- transition
+- transition_speed
+
+
 List of options
 ===============
 
@@ -71,11 +97,11 @@ This function configures how the data should be extracted from the source. It sh
 Default extractions from the image_target element:
 ..................................................
 
-    * **image:** the ``src`` attribute OR parent ``<a>`` tag's ``href`` attribute (if exists and links to an image)
-    * **thumb:** the ``src`` attribute
-    * **title:** the ``title`` attribute
-    * **description:** the ``alt`` attribute
-    * **link:** the ``longdsesc`` attribute
+- **image:** the ``src`` attribute OR parent ``<a>`` tag's ``href`` attribute (if exists and links to an image)
+- **thumb:** the ``src`` attribute
+- **title:** the ``title`` attribute
+- **description:** the ``alt`` attribute
+- **link:** the ``longdsesc`` attribute
 
 Example on how to alter the extraction logic:
 ..............................................
@@ -120,9 +146,9 @@ data_type
 
 The dataType Galleria will use to extract data. Available options are 'json', 'html' or 'auto' (default). There is rarely any reason to change this from auto, but you might encounter a situation where you'd like to force a certain data type.
 
-* **'auto'** means that it will try to detect dataType automatially.
-* **'json'** will force Galleria to treat the source parameter as a JSON data String or Array
-* **'html'** will force Galleria to treat the source parameter as a selector in the DOM where the image data is found.
+- **'auto'** means that it will try to detect dataType automatially.
+- **'json'** will force Galleria to treat the source parameter as a JSON data String or Array
+- **'html'** will force Galleria to treat the source parameter as a selector in the DOM where the image data is found.
 
 Example:
 .........
@@ -194,8 +220,8 @@ image_crop
 
 Defines how the images will be cropped.
 
-* **true** means that all images will be scaled to fill the stage, centered and cropped.
-* **false** will scale down so the entire image fits.
+- **true** means that all images will be scaled to fill the stage, centered and cropped.
+- **false** will scale down so the entire image fits.
 
 *****
 
@@ -237,9 +263,9 @@ preload
 
 Defines how many images Galleria should preload in advance. Please note that this only applies when you are using separate thumbnail files. Galleria always cache all preloaded images.
 
-* **2** preloads the next 2 images in line
-* **'all'** forces Galleria to start preloading all images. This may slow down client.
-* **0** will not preload any images
+- **2** preloads the next 2 images in line
+- **'all'** forces Galleria to start preloading all images. This may slow down client.
+- **0** will not preload any images
 
 *****
 
@@ -280,9 +306,9 @@ thumb_quality
 
 Defines if and how IE should use bicubic image rendering for thumbnails.
 
-* **'auto'** uses high quality if image scaling is moderate.
-* **false** will not use high quality (better performance).
-* **true** will force high quality renedring (can slow down performance)
+- **'auto'** uses high quality if image scaling is moderate.
+- **false** will not use high quality (better performance).
+- **true** will force high quality renedring (can slow down performance)
 
 *****
 
@@ -292,7 +318,7 @@ thumbnails
     | type: **Boolean**
     | default: **true**
 
-Sets the creation of thumbnails. If false, Galleria will create empty spans with the className *img* instead of thumbnails.
+Sets the creation of thumbnails. If false, Galleria will create empty spans with the className ``img`` instead of thumbnails.
 
 *****
 
@@ -307,10 +333,10 @@ The transition that is used when displaying the images. There are some built-in 
 Built-in transitions
 ....................
 
-* **'fade'** fade betweens images
-* **'flash'** fades into background color between images
-* **'slide'** slides the images using the Galleria easing depending on image position
-* **'fadeslide'** fade between images and slide slightly at the same time
+- **'fade'** fade betweens images
+- **'flash'** fades into background color between images
+- **'slide'** slides the images using the Galleria easing depending on image position
+- **'fadeslide'** fade between images and slide slightly at the same time
 
 *****
 
