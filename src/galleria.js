@@ -937,6 +937,7 @@ G.MAC = /mac/.test(navigator.platform.toLowerCase());
 
 var tempPath = ''; // we need to save this in a global private variable later
 var tempName = ''; // the last loaded theme
+var tempLoading = false; // we need to manually check if script has loaded
 
 G.themes = {
     create: function(obj) {
@@ -1004,8 +1005,11 @@ G.themes.create({
 });
 
 G.loadTheme = function(src) {
+    tempLoading = true;
     tempPath = src.replace(/[^\/]*$/, "");
-    Galleria.prototype.getScript(src);
+    Galleria.prototype.getScript(src, function() {
+        tempLoading = false;
+    });
 };
 
 jQuery.easing.galleria = function (x, t, b, c, d) {
@@ -1156,15 +1160,20 @@ G.flickr = {
 };
 
 jQuery.fn.galleria = function() {
+    var selector = this.selector;
     var a = arguments;
-    var hasTheme = typeof a[0] == 'string';
-    var theme = hasTheme ? a[0] : tempName;
-    var options = hasTheme ? a[1] || {} : a[0] || {};
-    if (typeof G.themes[theme] == 'undefined') {
-        throw Error('Theme '+theme+' not found.');
-    }
-    options = G.prototype.mix(options, { target: this.selector } );
-    return G.themes[theme].init(options);
+    G.prototype.wait(function() {
+        return !tempLoading;
+    }, function() {
+        var hasTheme = typeof a[0] == 'string';
+        var theme = hasTheme ? a[0] : tempName;
+        var options = hasTheme ? a[1] || {} : a[0] || {};
+        if (typeof G.themes[theme] == 'undefined') {
+            throw Error('Theme '+theme+' not found.');
+        }
+        options = G.prototype.mix(options, { target: selector } );
+        return G.themes[theme].init(options);
+    });
 };
 
 })();
