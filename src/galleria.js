@@ -553,7 +553,7 @@ var G = window.Galleria = Base.extend({
         jQuery(document).bind('keydown', {map: map, scope: this}, this.keyNav);
         return this;
     },
-    detachKeyboard : function(map) {
+    detachKeyboard : function() {
         jQuery(document).unbind('keydown', this.keyNav);
         return this;
     },

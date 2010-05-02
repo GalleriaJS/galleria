@@ -51,8 +51,6 @@ The theme object explained:
 
 The ``init`` function in your theme has access to a number of helpers, functions and events that you can use to customize your theme logic.
 
-*****
-
 Events
 ======
 
@@ -95,8 +93,6 @@ Triggers every time Galleria has finnished loading an image. Adds the following 
 - **cached** (boolean) is true if the image is cached (no loading required).
 - **imageTarget** (HTML element) The ``IMG`` element of the now active displayed image after transition.
 - **thumbTarget** (HTML element) The ``IMG`` element of the active thumbnail.
-
-*****
 
 Public methods
 ==============
@@ -194,117 +190,191 @@ Example:
 
     | returns **Galleria**
 
-Pauses the slideshow if playing. After pausing, you can resume the slideshow by calling ``.play()`` again (no need to re-state interval)`
+Pauses the slideshow if playing. After pausing, you can resume the slideshow by calling ``.play()`` again (no need to re-state interval)
 
-.attachKeyboard(map)
-returns Galleria
+.attachKeyboard( map )
+--------------------
+    | returns **Galleria**
 
-This helper method attaches keyboaard events to Galleria. The map object contains a map of functions to execute when a certain keyCode is pressed
+This helper method attaches keyboaard events to Galleria. The map object contains a map of functions to execute when a certain keyCode is pressed.
 
-You can use a number of helper keywords to identify common keys. The keywords are up, down, left, right, return, escape and backspace.
-Example: attaching some keyboard action to galleria:
+You can use a number of helper keywords to identify common keys. The keywords are **up**, **down**, **left**, **right**, **return**, **escape** and **backspace**.
 
-this.attachKeyboard({
-    left: this.prev, // applies the native prev() function
-    right: this.next,
-    up: function() {
-        // custom up action
-        Galleria.log('up pressed');
-    },
-    13: function() {
-        // start playing when return (keyCode 13) is pressed:
-        this.play(3000);
-    }
-})
+Example: attaching some keyboard action to galleria
+...................................................
 
-.detachKeyboard(map)
-returns Galleria
+::
 
-Removes the keyboard events attached using .attachKeyboard(). Useful when building lightboxes or overlays.
+    this.attachKeyboard({
+        left: this.prev, // applies the native prev() function
+        right: this.next,
+        up: function() {
+            // custom up action
+            Galleria.log('up pressed');
+        },
+        13: function() {
+            // start playing when return (keyCode 13) is pressed:
+            this.play(3000);
+        }
+    });
+
+
+.detachKeyboard( map )
+--------------------
+    
+    | returns **Galleria**
+
+Removes the keyboard events attached using ``.attachKeyboard()``. Useful when building lightboxes or overlays.
+
 .show( index, [rewind] )
-returns Galleria
+------------------------
 
-Shows an image. The index specifies what image to show, and rewind is a boolean that will be sent to the transition. If rewind is true, some transitions such as sliders will animate "backwards". You can call this.show(0)
+    | returns **Galleria**
+
+Shows an image. The ``index`` specifies what image to show, and ``rewind`` is a boolean that will be sent to the transition. If rewind is true, some transitions such as sliders will animate "backwards". You can call ``this.show(0)`` in the theme function if you like galleria to show the first image at init.
+
 .get( elemId )
-returns HTML Element
+--------------
+
+    returns **HTML Element**
 
 Grabs the element from the Galleria DOM structure.
-Example:
 
-var stage = this.get('stage');
-// stage is now the div.galleria-stage element
+Example:
+........
+
+::
+
+    var stage = this.get('stage');
+    // stage is now the div.galleria-stage element
+
 
 .getData( [ index ] )
-returns Object
+---------------------
+
+    | returns **Object**
 
 Grabs the data object for a specific index. If no index specified it returns the currently active data object.
+
 .$( elemIDs )
-returns jQuery
+-------------
+
+    | returns **jQuery**
 
 Fetches elements from the Galleria DOM structure and returns a jQuery object with all elements, very useful for theme development. You can specify a single element ID or multiple elements in a comma-separated list.
 
-this.$('images,thumbnails').click(function(e) {
-    Galleria.log('images or thumbnails clicked');
-});
+Example:
+........
+
+::
+
+    this.$('images,thumbnails').click(function(e) {
+        Galleria.log('images or thumbnails clicked');
+    });
+
 
 .addElement( elemID )
-returns Galleria
+---------------------
 
-Creates a new element into the Galleria DOM and becomes instantly available using .$() or .get()
+    | returns **Galleria**
+
+Creates a new element into the Galleria DOM and becomes instantly available using ``.$()`` or ``.get()``
+
 .appendChild( parentID, childID )
-returns Galleria
+---------------------------------
+
+    | returns **Galleria**
 
 Appends an element to another in the Galleria DOM structure using element IDs.
-Example
 
-// creates a new element with the id 'mystuff':
-this.addElement('mystuff');
+Example:
+........
 
-// appends the element to the container
-this.appendChild('container','mystuff');
+::
+
+    // creates a new element with the id 'mystuff':
+    this.addElement('mystuff');
+
+    // appends the element to the container
+    this.appendChild('container','mystuff');
 
 .toggleQuality( imageElement )
-returns Galleria
+------------------------------
 
-Toggles the image interpolation mode for IE7+. If mode is bicubic, it sets it to nearest neighbour and vice versa. Bicubic offers a higher quality when scaling images, but slower interactions.
+    | returns **Galleria**
 
-this.bind(Galleria.LOADFINISH, function(e) {
-    $(e.imageTarget).click(this.proxy(function(ev) {
-        this.toggleQuality( ev.target );
-    }));
-});
+Toggles the image interpolation mode for IE7+. If mode is ``bicubic``, it sets it to nearest neighbour and vice versa. Bicubic offers a higher quality when scaling images, but slower interactions.
+
+Example:
+........
+
+::
+
+    this.bind(Galleria.LOADFINISH, function(e) {
+        $(e.imageTarget).click(this.proxy(function(ev) {
+            this.toggleQuality( ev.target );
+        }));
+    });
+
 
 Static methods
+==============
+
 Galleria.log( msg )
-returns null
+-------------------
+    
+    | returns **null**
 
 A wrapper for logging in a cross-browser manner. Will trigger the console if available, otherwise it finds other options (postError or alert).
+
 Static variables
+==============
+
 Galleria.IE7
-type boolean
+------------
+
+    | type **Boolean**
 
 Returns true if IE7 is detected using object detection.
+
 Galleria.IE6
-type boolean
+------------
+
+    | type **Boolean**
 
 Returns true if IE6 is detected using object detection.
+
 Galleria.WEBKIT
-type boolean
+---------------
+
+    | type **Boolean**
 
 Returns true if the webkit engine (safari & chrome) is detected using browser sniffing.
+
 Galleria.CHROME
-type boolean
+---------------
+
+    | type **Boolean**
 
 Returns true if Chrome is detected using browser sniffing.
+
 Galleria.SAFARI
-type boolean
+---------------
+
+    | type **Boolean**
 
 Returns true if Safari is detected using browser sniffing.
+
 Galleria.MAC
-type boolean
+------------
+
+    | type **Boolean**
 
 Returns true if Apple OS is detected using browser sniffing.
+
 Galleria.QUIRK
-type boolean
+--------------
+
+    | type **Boolean**
 
 Returns true if IE / Quirks Mode is detected using object detection.
