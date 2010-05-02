@@ -74,9 +74,9 @@ This presentation of the Galleria HTML structure is good to have when building C
         <div class="galleria-info">
             <div class="galleria-info-link"></div>
             <div class="galleria-info-text">
-                <h2></h2>
-                <div class="galleria-description"></div>
-                <div class="galleria-author"></div>
+                <div class="galleria-info-title"></div>
+                <div class="galleria-info-description"></div>
+                <div class="galleria-info-author"></div>
             <div class="galleria-info-close"></div>
         </div>
     </div>
