@@ -4,7 +4,7 @@
 DOM
 ===
 
-Galleria builds a rich DOM structure for each Gallery. You can access them in the Theme API using this.get( ID ) or this.$( IDs ). Read more about DOM manipulation in the Theme Builder API.
+Galleria builds a rich DOM structure for each Gallery. You can access them in the Theme API using ``this.get( ID )`` or ``this.$( IDs )``. Read more about DOM manipulation in the Theme API.
 
 List of elements
 ================
