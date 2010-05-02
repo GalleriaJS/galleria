@@ -11,35 +11,31 @@ List of elements
 Here is a list of each element in the default Galleria DOM and their layout:
 
 * container
-
     * stage
-    
         * images
         * loader
         * counter
         * image-nav
-        
             * image-nav-right
             * image-nav-left
-            
-    * thumbnails-container
-    
-        * thumb-nav-left
-        * thumbnails-list
-        
-            * thumbnails
-            
-        * thumb-nav-right
+        * thumbnails-container
+            * thumb-nav-left
+            * thumbnails-list
+                * thumbnails
+            * thumb-nav-right
+        * info
+            * info-link
+            * info-text
+                * info-title
+                * info-description
+                * info-author
+            * info-close
 
-    * info
-        
-        * info-link
-        * info-text
-        * info-close
 
 HTML structure
 ==============
-The HTML structure is built with a galleria- prefix to all classes to ensure CSS encapsulation. The class .carousel is added to thumbnails-container if a carousel is present. The .disabled class is added to thumb-nav-left and thumb-nav-right if you are at the end/start of the carousel.
+
+The HTML structure is built with a ``galleria-`` prefix to all classes to ensure CSS encapsulation. The class ``.carousel`` is added to ``thumbnails-container``  if a carousel is present. The ``.disabled`` class is added to ``thumb-nav-left`` and ``thumb-nav-right`` if you are at the end/start of the carousel.
 
 This presentation of the Galleria HTML structure is good to have when building CSS for your custom theme::
 

@@ -45,7 +45,7 @@ Public methods
 
     | returns **Galleria.flickr**
 
-Modifies the default options for Galleria.flickr. options is an Object with your custom options that will override the defaults.
+Modifies the default options for ``Galleria.flickr``. **options** is an Object with your custom options that will override the defaults.
 
 .search(key, params, callback)
 ----------------------
@@ -73,12 +73,12 @@ max
 Sets the amount of images that will be fetched (max 100)
 
 use_original
----
+------------
 
     | type: **Boolean**
     | default: **false**
 
-If set to **true**, it forces Galleria to try to fetch the highest image resolution available from flickr. This will slow download time a lot, unless you know what you are fetching (f.ex images from your own account). Setting this to false will tell Galleria to fetch the 'medium' sized image from Flickr (680 x 480px). Please note that the ``.search()`` will fetch a smaller image for thumbnails per default.
+If set to ``true``, it forces Galleria to try to fetch the highest image resolution available from flickr. This will slow download time a lot, unless you know what you are fetching (f.ex images from your own account). Setting this to false will tell Galleria to fetch the 'medium' sized image from Flickr (680 x 480px). Please note that the ``.search()`` will fetch a smaller image for thumbnails per default.
 
 Read more about flickr sizes at the flickr.photos.getSizes() documentation.
 
@@ -88,7 +88,7 @@ data_config( data )
     | type: **Function**
     | default: **undefined**
 
-Use this function to modify the data conversion manually from flickr. **data** is the single photo object from Flickr (see the flickr documentaion for example responses)::
+Use this function to modify the data conversion manually from flickr. ``data`` is the single photo object from Flickr (see the flickr documentaion for example responses)::
 
     Galleria.flickr.search(api_key, {
         text: 'sweden',
