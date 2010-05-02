@@ -6,7 +6,7 @@
         <script src="../src/galleria.js"></script>
         <style>
             html,body{background:#111}
-            #galleria{width:800px;margin:20px auto}
+            #galleria{width:900px;margin:20px auto}
         </style>
     </head>
 <body>
@@ -21,6 +21,8 @@
     <script>
     Galleria.loadTheme('../src/themes/classic/galleria.classic.js');
     $('#galleria').galleria({
+        image_crop: true,
+        transition: 'fade',
         data_config: function(img) {
             return {
                 description: $(img).next('p').html()

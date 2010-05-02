@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="sv">
     <head>
-        <title>Galleria Fullscreen Theme Demo 01</title>
+        <title>Galleria Fullscreen Theme Demo 02</title>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <script src="../src/galleria.js"></script>
     </head>
@@ -9,11 +9,16 @@
     <div id="galleria"></div>
     <script>
     Galleria.loadTheme('../src/themes/fullscreen/galleria.fullscreen.js');
-    Galleria.flickr.search('fddd7bc223fe37295faace93a4f2d8fc', {
-        text:'wood'
+    Galleria.flickr.setOptions({
+        max: 20
+    }).search('fddd7bc223fe37295faace93a4f2d8fc', {
+        tags: 'radio'
     }, function(data) {
         $('#galleria').galleria({
-            data_source:data
+            data_source: data,
+            image_crop: false,
+            frame_color: '#000',
+            transition: 'slide'
         });
     });
     </script>
