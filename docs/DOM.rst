@@ -10,26 +10,26 @@ List of elements
 ================
 Here is a list of each element in the default Galleria DOM and their layout:
 
-* container
-    * stage
-        * images
-        * loader
-        * counter
-        * image-nav
-            * image-nav-right
-            * image-nav-left
-        * thumbnails-container
-            * thumb-nav-left
-            * thumbnails-list
-                * thumbnails
-            * thumb-nav-right
-        * info
-            * info-link
-            * info-text
-                * info-title
-                * info-description
-                * info-author
-            * info-close
+    * container
+        * stage
+            * images
+            * loader
+            * counter
+            * image-nav
+                * image-nav-right
+                * image-nav-left
+            * thumbnails-container
+                * thumb-nav-left
+                * thumbnails-list
+                    * thumbnails
+                * thumb-nav-right
+            * info
+                * info-link
+                * info-text
+                    * info-title
+                    * info-description
+                    * info-author
+                * info-close
 
 
 HTML structure
