@@ -148,6 +148,8 @@ The second argument specifies another scope (optional).
 Example:
 ........
 
+::
+
     this.$('container').click(this.proxy(function(e) {
         Galleria.log(e) // the jQuery event object
         Galleria.log(this) // the Galleria scope (not the target)
@@ -220,7 +222,7 @@ Example: attaching some keyboard action to galleria
     });
 
 
-.detachKeyboard( map )
+.detachKeyboard()
 --------------------
     
     | returns **Galleria**
