@@ -8,7 +8,7 @@ Galleria builds a rich DOM structure for each Gallery. You can access them in th
 
 List of elements
 ================
-Here is a list of each element in the default Galleria DOM and their layout:
+Here is a list of each element in the default Galleria DOM and their layout::
 
     container
         stage
