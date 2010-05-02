@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="sv">
+    <head>
+        <title>Galleria Classic Theme Demo 02</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+        <script src="../src/galleria.js"></script>
+        <style>
+            html,body{background:#111}
+            #galleria{width:800px;margin:20px auto}
+        </style>
+    </head>
+<body>
+    <div id="galleria">
+        <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/7/75/2010_Opening_Ceremony_-_Sweden_entering.jpg/800px-2010_Opening_Ceremony_-_Sweden_entering.jpg">
+        <p>The athletes from <strong>Sweden</strong> entering the stadium at the opening ceremonies of the 2010 Winter Olympics</p>
+        <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Swedish_Lion.jpg/792px-Swedish_Lion.jpg">
+        <p>The swedish <em>Lion</em></p>
+        <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Svenska_Grammofonstudion%2C_Gothenburg_Sweden%2C_Fender.jpg/800px-Svenska_Grammofonstudion%2C_Gothenburg_Sweden%2C_Fender.jpg">
+        <p><a href="http://www.svenskagrammofonstudion.com/">Svenska Grammofonstudion</a>, Gothenburg Sweden</p>
+    </div>
+    <script>
+    Galleria.loadTheme('../src/themes/classic/galleria.classic.js');
+    $('#galleria').galleria({
+        data_config: function(img) {
+            return {
+                description: $(img).next('p').html()
+            };
+        }
+    });
+    </script>
+    </body>
+</html>
