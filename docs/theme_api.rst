@@ -87,6 +87,7 @@ Triggers every time Galleria begins loading an image. Adds the following propert
 - **thumbTarget** (HTML element) The ``IMG`` element of the active thumbnail.
 
 Galleria.LOADFINISH
+-------------------
 
 Triggers every time Galleria has finnished loading an image. Adds the following properties to the event object:
 
