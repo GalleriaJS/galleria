@@ -1007,7 +1007,6 @@ G.loadTheme = function(src) {
     tempLoading = true;
     tempPath = src.replace(/[^\/]*$/, "");
     Galleria.prototype.getScript(src, function() {
-        console.log('loaded')
         tempLoading = false;
     });
 };
