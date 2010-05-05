@@ -185,7 +185,6 @@ var Base = Class.extend({
         });
     },
     wait : function(fn, callback, max) {
-        G.log('WAIT INIT')
         fn = this.proxy(fn);
         callback = this.proxy(callback);
         var ts = new Date().getTime() + (max || 3000);
@@ -469,7 +468,6 @@ var G = window.Galleria = Base.extend({
             this.stageHeight = this.height( this.get( 'stage' ));
             return this.stageHeight && this.stageWidth;
         }, function() {
-            G.log('NOT READY')
             var thumbWidth = this.thumbnails[0] ? this.width(this.thumbnails[0].elem, true) : 0;
             
             var thumbsWidth = thumbWidth * this.thumbnails.length;
@@ -980,7 +978,6 @@ G.themes = {
                 gallery.run();
             });
             gallery.bind(G.READY, function() {
-                G.log('CALLING INIT')
                 obj.init.call(gallery, o);
                 if (typeof o.extend == 'function') {
                     o.extend.call(gallery, o);
