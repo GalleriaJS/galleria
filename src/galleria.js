@@ -185,6 +185,7 @@ var Base = Class.extend({
         });
     },
     wait : function(fn, callback, max) {
+        G.log('WAIT INIT')
         fn = this.proxy(fn);
         callback = this.proxy(callback);
         var ts = new Date().getTime() + (max || 3000);
@@ -399,6 +400,7 @@ var G = window.Galleria = Base.extend({
         return this;
     },
     run : function() {
+        
         var o = this.options;
         if (!this.data.length) {
             throw Error('Data is empty.');
@@ -462,13 +464,12 @@ var G = window.Galleria = Base.extend({
         }
         this.build();
         this.target.appendChild(this.get('container'));
-        
         this.wait(function() {
             this.stageWidth = this.width(this.get( 'stage' ));
             this.stageHeight = this.height( this.get( 'stage' ));
-            return this.stageWidth && this.stageHeight;
+            return this.stageHeight && this.stageWidth;
         }, function() {
-
+            G.log('NOT READY')
             var thumbWidth = this.thumbnails[0] ? this.width(this.thumbnails[0].elem, true) : 0;
             
             var thumbsWidth = thumbWidth * this.thumbnails.length;
@@ -531,7 +532,7 @@ var G = window.Galleria = Base.extend({
                 this.prev();
             }));
             this.trigger( G.READY );
-        },100);
+        },500);
     },
     addElement : function() {
         this.loop(arguments, function(b) {
@@ -802,7 +803,7 @@ var G = window.Galleria = Base.extend({
         var set = this.proxy(function() {
             this.loop(arguments, function(type) {
                 var elem = this.get('info-'+type);
-                var fn = data[type].length ? 'reveal' : 'hide';
+                var fn = data[type] && data[type].length ? 'reveal' : 'hide';
                 this[fn](elem.innerHTML = data[type]);
             });
         });
@@ -979,6 +980,7 @@ G.themes = {
                 gallery.run();
             });
             gallery.bind(G.READY, function() {
+                G.log('CALLING INIT')
                 obj.init.call(gallery, o);
                 if (typeof o.extend == 'function') {
                     o.extend.call(gallery, o);
@@ -1008,6 +1010,7 @@ G.loadTheme = function(src) {
     tempLoading = true;
     tempPath = src.replace(/[^\/]*$/, "");
     Galleria.prototype.getScript(src, function() {
+        console.log('loaded')
         tempLoading = false;
     });
 };
