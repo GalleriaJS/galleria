@@ -802,7 +802,8 @@ var G = window.Galleria = Base.extend({
             this.loop(arguments, function(type) {
                 var elem = this.get('info-'+type);
                 var fn = data[type] && data[type].length ? 'reveal' : 'hide';
-                this[fn](elem.innerHTML = data[type]);
+                this[fn](elem);
+                elem.innerHTML = data[type];
             });
         });
         set('title','description','author');
@@ -1003,11 +1004,14 @@ G.themes.create({
     }
 });
 
-G.loadTheme = function(src) {
+G.loadTheme = function(src, callback) {
     tempLoading = true;
     tempPath = src.replace(/[^\/]*$/, "");
     Galleria.prototype.getScript(src, function() {
         tempLoading = false;
+        if (typeof callback == 'function') {
+            callback();
+        }
     });
 };
 
