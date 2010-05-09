@@ -955,6 +955,15 @@ G.themes = {
             }
         });
         if (obj.css) {
+            if (!tempPath.length) { // try to find the script in the head tag to determine tempPath
+                var theme_src = proto.getElements('script');
+                proto.loop(theme_src, function(el) {
+                    var reg = new RegExp('galleria.'+obj.name+'.js');
+                    if(reg.test(el.src)) {
+                        tempPath = el.src.replace(/[^\/]*$/, "");
+                    }
+                });
+            }
             obj.cssPath = tempPath + obj.css;
             tempPath = '';
         }
@@ -972,6 +981,9 @@ G.themes = {
                     proto.getElements('head')[0].appendChild(link);
                 }
                 link.href = obj.cssPath;
+            }
+            if (obj.cssText) {
+                proto.cssText(obj.cssText);
             }
             o = proto.mix( G.themes[obj.name].defaults, o );
             var gallery = new G( o );
@@ -995,11 +1007,10 @@ G.themes.create({
     author: 'Galleria',
     version: '1.0',
     defaults: {},
+    cssText: '.galleria-container{height:500px}' +
+              '.galleria-stage{height:450px}' + 
+              '.galleria-thumbnails .galleria-image{width:50px;height:50px;float:left;cursor:pointer;}',
     init: function(options) {
-        var css = '.galleria-container{height:500px}' +
-                  '.galleria-stage{height:450px}' + 
-                  '.galleria-thumbnails .galleria-image{width:50px;height:50px;float:left;cursor:pointer;}';
-        this.cssText(css);
         this.show(0);
     }
 });
