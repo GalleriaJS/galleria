@@ -39,7 +39,7 @@ Use the Galleria.loadTheme() to load a Galleria theme::
         Galleria.loadTheme('/js/galleria/themes/classic/galleria.classic.js');
     </script>
     
-You can also load it using the ``src``attribute::
+You can also load it using the ``src`` attribute::
 
     <script src="/js/galleria/themes/classic/galleria.classic.js"></script>
 
