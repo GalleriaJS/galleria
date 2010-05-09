@@ -530,7 +530,7 @@ var G = window.Galleria = Base.extend({
                 this.prev();
             }));
             this.trigger( G.READY );
-        },500);
+        }, 5000);
     },
     addElement : function() {
         this.loop(arguments, function(b) {

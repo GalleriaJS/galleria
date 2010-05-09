@@ -26,6 +26,8 @@ Galleria.themes.create({
         if (options.frame) {
             this.addElement('border');
             this.append({stage: 'border'});
+        } else {
+            options.frame_color = 'transparent';
         }
         
         this.$('thumbnails-list, border').css('border-color', options.frame_color);

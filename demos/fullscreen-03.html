@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="sv">
     <head>
-        <title>Galleria Fullscreen Theme Demo 02</title>
+        <title>Galleria Fullscreen Theme Demo 03</title>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <script src="../src/galleria.js"></script>
     </head>
@@ -10,16 +10,16 @@
     <script>
     Galleria.loadTheme('../src/themes/fullscreen/galleria.fullscreen.js');
     Galleria.flickr.setOptions({
-        max: 20,
+        max: 40,
         use_original: true
     }).search('fddd7bc223fe37295faace93a4f2d8fc', {
-        tags: 'party'
+        tags: 'beach'
     }, function(data) {
         $('#galleria').galleria({
             data_source: data,
-            image_crop: false,
-            frame_color: '#000',
-            transition: 'slide'
+            image_crop: true,
+            frame: false,
+            frame_color: 'transparent'
         });
     });
     </script>
