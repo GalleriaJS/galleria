@@ -25,6 +25,7 @@ Table of contents (in alphabetical order)
 - data_image_selector
 - data_type
 - data_source
+- debug
 - extend
 - image_crop
 - image_margin
@@ -184,6 +185,16 @@ Example:
     // Galleria will look for images in '#images' 
     // but use '#galleria' as gallery container:
     $('#galleria').galleria({data_source: '#images'});
+
+*****
+
+debug
+------------
+
+    | type: **Boolean**
+    | default: *false*
+
+Setting this to ``true`` will throw errors when something is not right. You can also set this globally using ``Galleria.debug = true``.
 
 *****
 

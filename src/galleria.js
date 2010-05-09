@@ -3,6 +3,11 @@
 var initializing = false,
     fnTest = /xyz/.test(function(){xyz;}) ? /\b__super\b/ : /.*/,
     Class = function(){},
+    Err = function(msg) {
+        if ( G.debug ) {
+            throw Error( msg );
+        }
+    };
     window = this;
 
 Class.extend = function(prop) {
@@ -36,7 +41,6 @@ Class.extend = function(prop) {
     Class.extend = arguments.callee;
     return Class;
 };
-
 
 var Base = Class.extend({
     loop : function( elem, fn) {
@@ -184,12 +188,18 @@ var Base = Class.extend({
             complete: options.complete || function(){}
         });
     },
-    wait : function(fn, callback, max) {
+    wait : function(fn, callback, err, max) {
         fn = this.proxy(fn);
         callback = this.proxy(callback);
+        err = this.proxy(err);
         var ts = new Date().getTime() + (max || 3000);
         window.setTimeout(function() {
-            if (fn() || new Date().getTime() >= ts) {
+            if (fn()) {
+                callback();
+                return false;
+            }
+            if (new Date().getTime() >= ts) {
+                err();
                 callback();
                 return false;
             }
@@ -280,7 +290,9 @@ var Picture = Base.extend({
                 w: this.image.width
             };
             callback( {target: this.image, scope: this} );
-        });
+        }, function() {
+            Err('image not loaded in 10 seconds: '+ src)
+        }, 10000);
         return this;
     },
     
@@ -322,7 +334,7 @@ var G = window.Galleria = Base.extend({
     
     __constructor : function(options) {
         if (typeof options.target === 'undefined' ) {
-            throw Error('No target.');
+            Err('No target.');
         }
         this.playing = false;
         this.playtime = 3000;
@@ -369,7 +381,7 @@ var G = window.Galleria = Base.extend({
         
         this.target = this.dom.target = this.getElements(this.options.target)[0];
         if (!this.target) {
-             throw Error('Target not found.');
+             Err('Target not found.');
         }
         
         this.stageWidth = 0;
@@ -402,7 +414,7 @@ var G = window.Galleria = Base.extend({
         
         var o = this.options;
         if (!this.data.length) {
-            throw Error('Data is empty.');
+            Err('Data is empty.');
         }
         this.target.innerHTML = '';
         this.loop(2, function() {
@@ -530,6 +542,8 @@ var G = window.Galleria = Base.extend({
                 this.prev();
             }));
             this.trigger( G.READY );
+        }, function() {
+            Err('Galleria could not load. Make sure stage has a height and width.');
         }, 5000);
     },
     addElement : function() {
@@ -938,6 +952,7 @@ G.MAC = /mac/.test(navigator.platform.toLowerCase());
 var tempPath = ''; // we need to save this in a global private variable later
 var tempName = ''; // the last loaded theme
 var tempLoading = false; // we need to manually check if script has loaded
+var tempFile = ''; // the theme file
 
 G.themes = {
     create: function(obj) {
@@ -945,7 +960,7 @@ G.themes = {
         var proto = G.prototype;
         proto.loop(orig, function(val) {
             if (!obj[ val ]) {
-                throw Error(val+' not specified in theme.');
+                Err(val+' not specified in theme.');
             }
             if ( typeof G.themes[obj.name] == 'undefined') {
                 G.themes[obj.name] = {};
@@ -1001,7 +1016,7 @@ G.themes = {
         };
     }
 };
-
+/*
 G.themes.create({
     name: 'default',
     author: 'Galleria',
@@ -1014,10 +1029,12 @@ G.themes.create({
         this.show(0);
     }
 });
+*/
 
 G.loadTheme = function(src, callback) {
     tempLoading = true;
     tempPath = src.replace(/[^\/]*$/, "");
+    tempFile = src;
     Galleria.prototype.getScript(src, function() {
         tempLoading = false;
         if (typeof callback == 'function') {
@@ -1166,7 +1183,7 @@ G.flickr = {
             if (data.stat == 'ok') {
                 callback.call(scope, data);
             } else {
-                throw Error('Flickr data failed. Check API Key.');
+                Err('Flickr data failed. Check API Key.');
             }
         });
         return this;
@@ -1182,11 +1199,17 @@ jQuery.fn.galleria = function() {
         var hasTheme = typeof a[0] == 'string';
         var theme = hasTheme ? a[0] : tempName;
         var options = hasTheme ? a[1] || {} : a[0] || {};
-        if (typeof G.themes[theme] == 'undefined') {
-            throw Error('Theme '+theme+' not found.');
-        }
         options = G.prototype.mix(options, { target: selector } );
-        return G.themes[theme].init(options);
+        G.debug = !!options.debug; 
+        if (typeof G.themes[theme] == 'undefined') {
+            var err = theme ? 'Theme '+theme+' not found.' : 'No theme specified';
+            Err(err);
+            return null;
+        } else {
+            return G.themes[theme].init(options);
+        }
+    }, function() {
+        Err('Theme file '+tempFile+' not found.');
     });
 };
 
