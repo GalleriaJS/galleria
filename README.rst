@@ -38,6 +38,10 @@ Use the Galleria.loadTheme() to load a Galleria theme::
     <script>
         Galleria.loadTheme('/js/galleria/themes/classic/galleria.classic.js');
     </script>
+    
+You can also load it using the ``src``attribute::
+
+    <script src="/js/galleria/themes/classic/galleria.classic.js"></script>
 
 Add images
 ----------
