@@ -63,3 +63,5 @@ When DOM is ready, you can run Galleria::
     </script>
 
 The galleria function takes two arguments, *theme* and *options*. If no theme is specified, the last theme loaded is used. The options argument is an object with Galleria options that you can use. See the options documentation for a complete list.
+
+If you run into problems, try passing ``debug: true`` as an option or set ``Galleria.debug = true`` to trace errors. Good luck!
