@@ -901,7 +901,7 @@ var G = window.Galleria = Base.extend({
                     thumb: elem.src,
                     image: i || elem.src,
                     description: elem.alt,
-                    link: j || elem.longdesc
+                    link: j || elem.getAttribute('longdesc')
                 });
                 return this.mix(obj, o.data_config( elem ) );
             });
