@@ -7,7 +7,7 @@ var initializing = false,
         if ( G.debug ) {
             throw Error( msg );
         }
-    };
+    },
     window = this;
 
 Class.extend = function(prop) {
