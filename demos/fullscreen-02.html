@@ -13,13 +13,19 @@
         max: 20,
         use_original: true
     }).search('fddd7bc223fe37295faace93a4f2d8fc', {
-        tags: 'party'
+        tags: 'lomo',
+        sort: 'relevance',
+        max: 60
     }, function(data) {
         $('#galleria').galleria({
             data_source: data,
             image_crop: false,
             frame_color: '#000',
-            transition: 'slide'
+            transition: 'slide',
+            hide_dock: false,
+            extend: function() {
+                this.$('info,counter').hide();
+            }
         });
     });
     </script>
