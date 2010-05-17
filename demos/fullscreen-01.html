@@ -4,19 +4,27 @@
         <title>Galleria Fullscreen Theme Demo 01</title>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <script src="../src/galleria.js"></script>
+        <script src="../src/plugins/galleria.flickr.js"></script>
     </head>
 <body>
     <div id="galleria"></div>
     <script>
+    Galleria.debug = true;
+    // Load theme
     Galleria.loadTheme('../src/themes/fullscreen/galleria.fullscreen.js');
-    Galleria.flickr.search('fddd7bc223fe37295faace93a4f2d8fc', {
-        tags:'cigarette',
-        use_original:true
+    
+    // initialize flickr plugin
+    var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
+    
+    // search for photos tagged 'cigarette' and apply galleria
+    flickr.getTags('cigarette', { 
+        use_original: true
     }, function(data) {
         $('#galleria').galleria({
             data_source:data
         });
     });
+    
     </script>
     </body>
 </html>

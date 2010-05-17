@@ -4,16 +4,23 @@
         <title>Galleria Fullscreen Theme Demo 03</title>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <script src="../src/galleria.js"></script>
+        <script src="../src/plugins/galleria.flickr.js"></script>
     </head>
 <body>
     <div id="galleria"></div>
     <script>
+    
+    // Load theme
     Galleria.loadTheme('../src/themes/fullscreen/galleria.fullscreen.js');
-    Galleria.flickr.setOptions({
+    
+    // initialize flickr plugin
+    var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
+    
+    // search for 'black white', edit options and apply galleria
+    flickr.search('black white', {
+        sort: 'date-posted-desc',
         max: 40,
         use_original: true
-    }).search('fddd7bc223fe37295faace93a4f2d8fc', {
-        tags: 'black white'
     }, function(data) {
         $('#galleria').galleria({
             data_source: data,

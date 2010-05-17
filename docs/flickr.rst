@@ -1,37 +1,36 @@
 .. _flickr:
 
 ======
-Flickr
+Flickr Plugin
 ======
 
-Galleria has a built-in flickr data fetcher that can be used to fetch images from flickr and display them in your Galleria gallery.
+Galleria comes with a flickr plugi that can be used to fetch images from flickr and display them in your Galleria gallery.
 
 Example usage
 =============
 
-The following code searches flickr for the string 'butterfly', fetches 40 images in the 'Medium' format and sorts them after "interestingness". When the data is ready, you can pass it into the Galleria constructor like this::
+**note:** You must include the flickr plugin script at ``src/plugins/galleria.flickr.js`` to use this plugin.
+
+The following code searches flickr for the string 'butterfly', fetches 40 images in the 'Medium' format and sorts them after "interestingness" (default). When the data is ready, you can pass it into the Galleria constructor like this::
 
     var api_key = 'abc123' // you must have a flickr API key
-    Galleria.flickr.setOptions({
-        max: 40,
-        use_original: false
-    });
-    Galleria.flickr.search(api_key, {
-        text: 'butterfly',
-        sort: 'interestingness-desc'
-    }, function(data) {
+    var flickr = new Galleria.Flickr(api_key); // initialize the plugin
+
+    flickr.search('butterfly', function(data) {
         $('#galleria').galleria({
-            source: data
+            data_source: data
         });
     });
+    
+You can set options using ``.setOptions()`` or as a second argument to the call:
 
-You can also chain the functions::
-
-    Galleria.flickr.setOptions({
-        max: 20
-    }).search(api_key, {
-        text: 'sweden',
-    }, function(data) {
+    flickr.setOptions({
+        max: 60,
+        use_original: true,
+        sort: 'date-posted-desc'
+    });
+    
+    flickr.getSet('72057594078378762', function(data) {
         $('#galleria').galleria({
             source: data
         });
@@ -43,21 +42,63 @@ Public methods
 .setOptions( options )
 ----------------------
 
-    | returns **Galleria.flickr**
+    | returns **Galleria.Flickr**
 
-Modifies the default options for ``Galleria.flickr``. **options** is an Object with your custom options that will override the defaults.
+Modifies the default options for ``Galleria.Flickr``. **options** is an Object with your custom options that will override the defaults.
 
-.search(key, params, callback)
+.search(search_string, options, callback)
 ----------------------
 
-    | returns **Galleria.flickr**
+    | returns **Galleria.Flickr**
 
-A helper function for searching Flickr and converting the data to a Galleria-friendly data object. You can use the data_config option to modify the data further.
+A helper function for searching Flickr and converting the data to a Galleria-friendly data object.
 
-The params object can contain any parameters available from the Flickr search API.
+- **search_string** (String) the term you want to search for.
+- **options** (Object) is the search options object passed to flickr (optional).
+- **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
 
-- **key** (String) is your Flickr API key.
-- **params** (Object) is the search options object passed to flickr.
+.getTags(tags, [options,] callback)
+----------------------
+
+    | returns **Galleria.Flickr**
+
+A helper function for searching Flickr for tags and converting the data to a Galleria-friendly data object.
+
+- **tags** (String) a comma-separated string with tags to search for, ex: 'purple,white'.
+- **options** (Object) is the search options object passed to flickr (optional).
+- **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
+
+.getUser(username, [options,] callback)
+----------------------
+
+    | returns **Galleria.Flickr**
+
+Get all pictures from a user's photostream. The username is the same name as in your flickr URL, f.ex if my URL is flickr.com/photos/johndoe/, the user name is 'johndoe'.
+
+- **user** (String) The username as displayed in your Flickr URL, ex: 'johndoe'.
+- **options** (Object) is the search options object passed to flickr (optional).
+- **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
+
+.getSet(set_id, [options,] callback)
+----------------------
+
+    | returns **Galleria.Flickr**
+
+Get all pictures from a specific photoset.
+
+- **set_id** (String) The ID of the photoset (you can grab it from the URL)
+- **options** (Object) is the search options object passed to flickr (optional).
+- **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
+
+.getGallery(gallery_id, [options,] callback)
+----------------------
+
+    | returns **Galleria.Flickr**
+
+Get all pictures from a specific gallery.
+
+- **gallery_id** (String) The ID of the gallery (you can grab it from the URL)
+- **options** (Object) is the search options object passed to flickr (optional).
 - **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
 
 
@@ -82,22 +123,10 @@ If set to ``true``, it forces Galleria to try to fetch the highest image resolut
 
 Read more about flickr sizes at the flickr.photos.getSizes() documentation.
 
-data_config( data )
--------------------
+sort
+------------
 
-    | type: **Function**
-    | default: **undefined**
+    | type: **String**
+    | default: **'interestingness-desc'**
 
-Use this function to modify the data conversion manually from flickr. ``data`` is the single photo object from Flickr (see the flickr documentaion for example responses)::
-
-    Galleria.flickr.search(api_key, {
-        text: 'sweden',
-        data_config: function(data) {
-            return {
-                description: data.id
-            }
-        }
-    }, function(data) {
-        // now the image description is the image ID for each image:
-        Galleria.log(data);
-    });
+How to sort the images. Available options are: date-posted-asc, date-posted-desc, date-taken-asc, date-taken-desc, interestingness-desc, interestingness-asc, and relevance.

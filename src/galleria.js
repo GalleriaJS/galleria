@@ -1,30 +1,16 @@
-/*
-
-Galleria — A JavaScript image gallery for the fastidious
-Copyright (C) 2010  Aino
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
+/*!
+ * Galleria v 1.1.2
+ * http://galleria.aino.se
+ *
+ * Copyright 2010, Aino
+ * Licensed under the MIT license.
+ */
 
 (function() {
 
 var initializing = false,
     fnTest = /xyz/.test(function(){xyz;}) ? /\b__super\b/ : /.*/,
     Class = function(){},
-    Err = function(msg) {
-        if ( G.debug ) {
-            throw Error( msg );
-        }
-    },
     window = this;
 
 Class.extend = function(prop) {
@@ -308,7 +294,7 @@ var Picture = Base.extend({
             };
             callback( {target: this.image, scope: this} );
         }, function() {
-            Err('image not loaded in 10 seconds: '+ src)
+            G.raise('image not loaded in 10 seconds: '+ src)
         }, 10000);
         return this;
     },
@@ -351,7 +337,7 @@ var G = window.Galleria = Base.extend({
     
     __constructor : function(options) {
         if (typeof options.target === 'undefined' ) {
-            Err('No target.');
+            G.raise('No target.');
         }
         this.playing = false;
         this.playtime = 3000;
@@ -398,7 +384,7 @@ var G = window.Galleria = Base.extend({
         
         this.target = this.dom.target = this.getElements(this.options.target)[0];
         if (!this.target) {
-             Err('Target not found.');
+             G.raise('Target not found.');
         }
         
         this.stageWidth = 0;
@@ -431,7 +417,7 @@ var G = window.Galleria = Base.extend({
         
         var o = this.options;
         if (!this.data.length) {
-            Err('Data is empty.');
+            G.raise('Data is empty.');
         }
         this.target.innerHTML = '';
         this.loop(2, function() {
@@ -560,7 +546,7 @@ var G = window.Galleria = Base.extend({
             }));
             this.trigger( G.READY );
         }, function() {
-            Err('Galleria could not load. Make sure stage has a height and width.');
+            G.raise('Galleria could not load. Make sure stage has a height and width.');
         }, 5000);
     },
     addElement : function() {
@@ -977,7 +963,7 @@ G.themes = {
         var proto = G.prototype;
         proto.loop(orig, function(val) {
             if (!obj[ val ]) {
-                Err(val+' not specified in theme.');
+                G.raise(val+' not specified in theme.');
             }
             if ( typeof G.themes[obj.name] == 'undefined') {
                 G.themes[obj.name] = {};
@@ -1033,26 +1019,18 @@ G.themes = {
         };
     }
 };
-/*
-G.themes.create({
-    name: 'default',
-    author: 'Galleria',
-    version: '1.0',
-    defaults: {},
-    cssText: '.galleria-container{height:500px}' +
-              '.galleria-stage{height:450px}' + 
-              '.galleria-thumbnails .galleria-image{width:50px;height:50px;float:left;cursor:pointer;}',
-    init: function(options) {
-        this.show(0);
+
+G.raise = function(msg) {
+    if ( G.debug ) {
+        throw Error( msg );
     }
-});
-*/
+},
 
 G.loadTheme = function(src, callback) {
     tempLoading = true;
     tempPath = src.replace(/[^\/]*$/, "");
     tempFile = src;
-    Galleria.prototype.getScript(src, function() {
+    G.prototype.getScript(src, function() {
         tempLoading = false;
         if (typeof callback == 'function') {
             callback();
@@ -1148,6 +1126,10 @@ G.transitions = {
     }
 };
 
+/* The flickr method is deprecated. Use Flickr plugin instead. */
+
+
+
 G.flickr = {
     key: null,
     options: {
@@ -1200,7 +1182,7 @@ G.flickr = {
             if (data.stat == 'ok') {
                 callback.call(scope, data);
             } else {
-                Err('Flickr data failed. Check API Key.');
+                G.raise('Flickr data failed. Check API Key.');
             }
         });
         return this;
@@ -1220,13 +1202,13 @@ jQuery.fn.galleria = function() {
         G.debug = !!options.debug; 
         if (typeof G.themes[theme] == 'undefined') {
             var err = theme ? 'Theme '+theme+' not found.' : 'No theme specified';
-            Err(err);
+            G.raise(err);
             return null;
         } else {
             return G.themes[theme].init(options);
         }
     }, function() {
-        Err('Theme file '+tempFile+' not found.');
+        G.raise('Theme file '+tempFile+' not found.');
     });
 };
 
