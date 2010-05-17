@@ -22,7 +22,7 @@ The following code searches flickr for the string 'butterfly', fetches 40 images
         });
     });
     
-You can set options using ``.setOptions()`` or as a second argument to the call:
+You can set options using ``.setOptions()`` or as a second argument to the call::
 
     flickr.setOptions({
         max: 60,
