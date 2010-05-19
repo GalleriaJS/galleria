@@ -29,6 +29,7 @@ Table of contents (in alphabetical order)
 - extend
 - image_crop
 - image_margin
+- keep_source
 - max_scale_ratio
 - popup_links
 - preload
@@ -246,6 +247,17 @@ Sets a margin between the image and stage.
 
 *****
 
+keep_source
+----------
+
+    | type: **Boolean**
+    | default: **false**
+
+This sets if the source HTML should be left intact. Setting this to ``true`` will also create clickable images of each image inside the source.
+Useful for building custom thumbnails and still have galleria control the gallery.
+
+*****
+
 max_scale_ratio
 ----------
 
@@ -326,10 +338,11 @@ Defines if and how IE should use bicubic image rendering for thumbnails.
 thumbnails
 ----------
 
-    | type: **Boolean**
+    | type: **Boolean** or **String**
     | default: **true**
 
-Sets the creation of thumbnails. If false, Galleria will create empty spans with the className ``img`` instead of thumbnails.
+Sets the creation of thumbnails. If false, Galleria will not create thumbnails. 
+If you set this to 'empty', Galleria will create empty spans with the className ``img`` instead of thumbnails.
 
 *****
 
