@@ -19,7 +19,8 @@
     // Get my photostream
     flickr.getUser('davidhellsing', function(data) {
         $('#galleria').galleria({
-            data_source: data
+            data_source: data,
+            debug: true
         });
     });
     </script>

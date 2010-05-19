@@ -294,7 +294,7 @@ var Picture = Base.extend({
             };
             callback( {target: this.image, scope: this} );
         }, function() {
-            G.raise('image not loaded in 10 seconds: '+ src)
+            G.raise('image not loaded in 10 seconds: '+ src);
         }, 10000);
         return this;
     },
@@ -371,9 +371,11 @@ var G = window.Galleria = Base.extend({
             carousel_speed: 200,
             carousel_steps: 'auto',
             carousel_follow: true,
+            keep_source: true,
             popup_links: false,
             max_scale_ratio: undefined,
             thumbnails: true,
+            link_source_images: true,
             data_type: 'auto',
             data_image_selector: 'img',
             data_source: options.target,
@@ -419,7 +421,9 @@ var G = window.Galleria = Base.extend({
         if (!this.data.length) {
             G.raise('Data is empty.');
         }
-        this.target.innerHTML = '';
+        if (!o.keep_source) {
+            this.target.innerHTML = '';
+        }
         this.loop(2, function() {
             var image = new Picture();
             this.setStyle( image.elem, {
@@ -440,13 +444,13 @@ var G = window.Galleria = Base.extend({
         
         for( var i=0; this.data[i]; i++ ) {
             var thumb;
-            if (o.thumbnails) {
+            if (o.thumbnails === true) {
                 thumb = new Picture(i);
                 var src = this.data[i].thumb || this.data[i].image;
                 this.get( 'thumbnails' ).appendChild( thumb.elem );
                 thumb.load(src, this.proxy(function(e) {
                     var orig = this.width(e.target);
-                    e.scope.scale(null, null, o.thumb_crop, o.max_scale_ratio, o.thumb_margin, this.proxy(function() {
+                    e.scope.scale(null, null, o.thumb_crop, null, o.thumb_margin, this.proxy(function() {
                         // set high quality if downscale is moderate
                         this.toggleQuality(e.target, o.thumb_quality === true || ( o.thumb_quality == 'auto' && orig < e.target.width * 3 ));
                         this.trigger({
@@ -459,21 +463,34 @@ var G = window.Galleria = Base.extend({
                 if (o.preload == 'all') {
                     thumb.add(this.data[i].image);
                 }
-            } else {
+            } else if (o.thumbnails == 'empty') {
                 thumb = {
                     elem:  this.create('div','galleria-image'),
                     image: this.create('span','img')
                 };
                 thumb.elem.appendChild(thumb.image);
                 this.get( 'thumbnails' ).appendChild( thumb.elem );
+            } else {
+                thumb = {
+                    elem: false,
+                    image: false
+                }
             }
-            thumb.elem.rel = i;
-            this.listen(thumb.elem, 'click', this.proxy(function(e) {
+            this.data[i].elem.rel = i;
+            var activate = this.proxy(function(e) {
+                e.preventDefault();
                 var ind = e.currentTarget.rel;
                 if (this.active !== ind) {
                     this.show( ind );
                 }
-            }));
+            });
+            if (o.thumbnails !== false) {
+                thumb.elem.rel = i;
+                this.listen(thumb.elem, 'click', activate);
+            }
+            if (o.link_source_images && o.keep_source) {
+                this.listen(this.data[i].elem, 'click', activate);
+            }
             this.push(thumb, this.thumbnails );
         }
         this.build();
@@ -768,12 +785,16 @@ var G = window.Galleria = Base.extend({
     },
     
     next : function() {
-        this.show(this.getNext(), false);
+        if (this.data.length > 1) {
+            this.show(this.getNext(), false);
+        }
         return this;
     },
     
     prev : function() {
-        this.show(this.getPrev(), true);
+        if (this.data.length > 1) {
+            this.show(this.getPrev(), true);
+        }
         return this;
     },
     
@@ -893,7 +914,7 @@ var G = window.Galleria = Base.extend({
             var getData = this.proxy(function( elem ) {
                 var i,j,anchor = elem.parentNode;
                 if (anchor && anchor.nodeName == 'A') {
-                    if (anchor.href.match(/\.(png|gif|jpg)/)) {
+                    if (anchor.href.match(/\.(png|gif|jpg)/i)) {
                         i = anchor.href;
                     } else {
                         j = anchor.href;
@@ -904,7 +925,8 @@ var G = window.Galleria = Base.extend({
                     thumb: elem.src,
                     image: i || elem.src,
                     description: elem.alt,
-                    link: j || elem.getAttribute('longdesc')
+                    link: j || elem.getAttribute('longdesc'),
+                    elem: elem
                 });
                 return this.mix(obj, o.data_config( elem ) );
             });
@@ -912,7 +934,7 @@ var G = window.Galleria = Base.extend({
             this.loop(images, function( elem ) {
                 loaded++;
                 this.push( getData( elem ), this.data );
-                if (o.remove_original) {
+                if (!o.keep_source) {
                     elem.parentNode.removeChild(elem);
                 }
                 if ( loaded == images.length ) {

@@ -24,8 +24,9 @@
     }, function(data) {
         $('#galleria').galleria({
             data_source: data,
-            image_crop: true,
-            frame: false
+            extend: function(options) {
+                this.$('thumbnails-container').remove();
+            }
         });
     });
     </script>

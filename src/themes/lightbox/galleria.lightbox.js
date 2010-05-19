@@ -60,7 +60,7 @@ Galleria.themes.create({
                 this.$('info').hide();
                 t = window.setTimeout(this.proxy(function() {
                     var d = this.getDimensions(img);
-                    this.$('info').fadeIn(this.options.transition_spee).css({
+                    this.$('info').fadeIn(this.options.transition_speed).css({
                         bottom: d.top - 8
                     });
                 }), 200);
