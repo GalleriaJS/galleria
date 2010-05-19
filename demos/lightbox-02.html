@@ -39,6 +39,17 @@
         <h2>A mini-gallery anywhere</h2>
         <p>If you don't pass <code>thumbnails: false</code> you can collect the images and let galleria create a mini-gallery with thumbnails like the one below.
         <div id="galleria"></div>
+        <h2>Code for this gallery:</h2>
+        <pre><code>Galleria.loadTheme('../src/themes/lightbox/galleria.lightbox.js');
+$('#galleria').galleria({
+    data_source: '#content',
+    keep_source: true,
+    data_config: function(img) {
+        return {
+            description: $(img).next('.caption').html()
+        }
+    }
+});</code></pre>
         <p><a href="/">← back to galleria</a></p>
     </div>
     <script>
