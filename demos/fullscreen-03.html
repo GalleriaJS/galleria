@@ -23,10 +23,7 @@
         use_original: true
     }, function(data) {
         $('#galleria').galleria({
-            data_source: data,
-            extend: function(options) {
-                this.$('thumbnails-container').remove();
-            }
+            data_source: data
         });
     });
     </script>
