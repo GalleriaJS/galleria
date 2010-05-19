@@ -476,7 +476,6 @@ var G = window.Galleria = Base.extend({
                     image: false
                 }
             }
-            this.data[i].elem.rel = i;
             var activate = this.proxy(function(e) {
                 e.preventDefault();
                 var ind = e.currentTarget.rel;
@@ -488,7 +487,8 @@ var G = window.Galleria = Base.extend({
                 thumb.elem.rel = i;
                 this.listen(thumb.elem, 'click', activate);
             }
-            if (o.link_source_images && o.keep_source) {
+            if (o.link_source_images && o.keep_source && this.data[i].elem) {
+                this.data[i].elem.rel = i;
                 this.listen(this.data[i].elem, 'click', activate);
             }
             this.push(thumb, this.thumbnails );
