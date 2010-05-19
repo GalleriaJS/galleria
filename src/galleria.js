@@ -371,7 +371,7 @@ var G = window.Galleria = Base.extend({
             carousel_speed: 200,
             carousel_steps: 'auto',
             carousel_follow: true,
-            keep_source: true,
+            keep_source: false,
             popup_links: false,
             max_scale_ratio: undefined,
             thumbnails: true,
