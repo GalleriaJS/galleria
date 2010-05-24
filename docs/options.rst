@@ -45,6 +45,17 @@ Table of contents (in alphabetical order)
 List of options
 ===============
 
+autoplay
+--------
+
+    | type: **Boolean** or **Number**
+    | default: **false**
+
+If ``true``, this will start playing the slideshow with 3 seconds interval (default).
+If you set this to any number, f.ex 4000, it will start playing with that interval (in milliseconds)
+
+*****
+
 *****
 
 carousel
@@ -139,6 +150,28 @@ The selector Galleria should look for in the HTML source. Defaults to <code>'img
 
 *****
 
+data_source
+------------
+
+    | type: **String** or **Array**
+    | default: *jQuery target*
+
+This is where Galleria finds the data depending on data_type. It defaults to the target selector, which is the same element that was used in the jQuery plugin.
+
+Example:
+........
+
+::
+
+    // Galleria will look for images in '#galleria':
+    $('#galleria').galleria();
+
+    // Galleria will look for images in '#images' 
+    // but use '#galleria' as gallery container:
+    $('#galleria').galleria({data_source: '#images'});
+
+*****
+
 data_type
 ---------------
 
@@ -164,28 +197,6 @@ Example:
         image: 'myimg2.jpg'
     }];
     $('#galleria').galleria({data_source: data});
-
-*****
-
-data_source
-------------
-
-    | type: **String** or **Array**
-    | default: *jQuery target*
-
-This is where Galleria finds the data depending on data_type. It defaults to the target selector, which is the same element that was used in the jQuery plugin.
-
-Example:
-........
-
-::
-
-    // Galleria will look for images in '#galleria':
-    $('#galleria').galleria();
-
-    // Galleria will look for images in '#images' 
-    // but use '#galleria' as gallery container:
-    $('#galleria').galleria({data_source: '#images'});
 
 *****
 
@@ -222,6 +233,17 @@ Example on how to add a play link by extending the theme:
         });
     </script>
  
+*****
+
+height
+------------
+
+    | type: **Number**
+    | default: *undefined*
+
+This will set a height to the gallery, unless you sepcified one in the CSS.
+If you set this to 'undefined' and no CSS height is set, it will automatically add a 16/9 ratio comapred to the width as a fallback.
+
 *****
    
 image_crop
@@ -299,6 +321,16 @@ queue
     | default: **true**
 
 Galleria queues all activation clicks (next/prev & thumbnails). You can see this effect when f.ex clicking "next" many times. If you don't want Galleria to queue, set this to **false**.
+
+*****
+
+show
+-----
+
+    | type: **Number**
+    | default: **0**
+
+This defines what image index to show at first. If you use the history plugin, a permalink will override this number.
 
 *****
 

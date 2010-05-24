@@ -4,7 +4,7 @@
 Flickr Plugin
 ======
 
-Galleria comes with a flickr plugi that can be used to fetch images from flickr and display them in your Galleria gallery.
+Galleria comes with a flickr plugin that can be used to fetch images from flickr and display them in your Galleria gallery.
 
 Example usage
 =============

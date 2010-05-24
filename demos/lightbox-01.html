@@ -17,7 +17,9 @@
     var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
     
     // Get my photostream
-    flickr.getUser('davidhellsing', function(data) {
+    flickr.setOptions({
+        size: 'big'
+    }).getUser('davidhellsing', function(data) {
         $('#galleria').galleria({
             data_source: data,
             debug: true

@@ -1,3 +1,11 @@
+/*!
+ * Galleria Flickr Plugin v 1.0
+ * http://galleria.aino.se
+ *
+ * Copyright 2010, Aino
+ * Licensed under the MIT license.
+ */
+
 (function() {
    
 var G = window.Galleria; 
@@ -13,7 +21,7 @@ var F = G.Flickr = function(api_key) {
 	this.api_key = api_key;
 	this.options = {
 		max: 40,
-		use_original: false,
+		size: 'big',
 		sort: 'interestingness-desc'
 	}
 }
@@ -101,10 +109,21 @@ F.prototype = {
 			var obj = { length: 0 };
 			var photos = data.photos ? data.photos.photo : data.photoset.photo;
 			var len = Math.min(this.options.max, photos.length);
+		    
 			for (var i=0; i<len; i++) {
+    		    var photo = photos[i];
+    		    var img = photo.url_m;
+    		    if (photos.url_o) {
+    		        if (this.options.size == 'big') {
+    		            // there is a "secret" size
+    		            var img = 'http://farm'+photo['farm']+'.static.flickr.com/'+photo['server']+'/'+photo['id']+'_' + photo['secret'] + '_b.jpg';
+    		        } else if (this.options.size == 'original') {
+    		            var img = photo.url_o;
+    		        }
+    		    }
 				var item = {
 					thumb: photos[i].url_t,
-					image: (photos[i].url_o && this.options.use_original) ? photos[i].url_o : photos[i].url_m,
+					image: img,
 					title: photos[i].title
 				};
 				Array.prototype.push.call(obj, item);

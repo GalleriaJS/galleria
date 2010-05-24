@@ -17,9 +17,7 @@ Galleria.themes.create({
                 $(this).fadeTo(400, 1);
             });
         }
-        
-        this.$('container').height(this.stageHeight = ( this.options.height || Math.round(this.stageWidth*9/16) ));
-        this.rescale();
+
         this.$('loader').show().fadeTo(200, 0.4);
         this.$('counter').show().fadeTo(200, 0.4);
         
@@ -52,7 +50,5 @@ Galleria.themes.create({
         this.bind(Galleria.LOADFINISH, function(e) {
             this.$('loader').fadeOut(200);
         });
-        
-        this.show(0);
     }
 });

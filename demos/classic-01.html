@@ -12,6 +12,7 @@
     </head>
 <body>
     <div id="galleria"></div>
+    
     <script>
     
     // Load theme
@@ -21,7 +22,9 @@
     var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
     
     // inject a photset into galleria
-    flickr.getSet('72057594078378762', function(data) {
+    flickr.getSet('72057594078378762', { 
+        size: 'medium'
+    }, function(data) {
         $('#galleria').galleria({
             data_source:data
         });

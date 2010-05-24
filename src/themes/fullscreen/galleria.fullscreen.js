@@ -39,7 +39,7 @@ Galleria.themes.create({
             this.rescale(w,h);
         }));
         
-        if (options.hide_dock) {
+        if (options.hide_dock && options.thumbnails) {
             var ic = this.$('info,counter').css({
                 opacity: .7,
                 bottom: 10
@@ -55,6 +55,9 @@ Galleria.themes.create({
                 $(e.currentTarget).animate({bottom: -45}, {queue:false, duration: 400});
                 open = false;
             }).css('bottom', -45);
+        }
+        if (!options.thumbnails) {
+           this.$('info,counter').css('bottom',10); 
         }
 
         this.$('image-nav-left, image-nav-right').css('opacity',0.01).hover(function() {
@@ -88,7 +91,5 @@ Galleria.themes.create({
                 e.preventDefault();
             }
         });
-        
-        this.show(0);
     }
 });
