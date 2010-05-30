@@ -1,5 +1,5 @@
 /*!
- * Galleria v 1.1.3 2010-05-24
+ * Galleria v 1.1.4 2010-05-30
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -91,7 +91,7 @@ var Base = Class.extend({
         link.media = 'all';
         link.rel = 'stylesheet';
         link.href = src;
-        this.getElements('head')[0].appendChild(link);
+        document.getElementsByTagName('head')[0].appendChild(link);
     },
     moveOut : function( elem ) {
         return this.setStyle(elem, {
@@ -232,8 +232,10 @@ var Base = Class.extend({
              }
           };
        }
-       var ex = document.getElementsByTagName('script')[0];
-       ex.parentNode.insertBefore(script, ex);
+       
+       var ex = document.getElementsByTagName('script');
+       ex = ex[ex.length-1];
+       ex.parentNode.insertBefore(script, ex.nextSibling);
        return this;
     }
 });
@@ -1013,7 +1015,7 @@ G.themes = {
             }
         });
         if (obj.css) {
-            if (!tempPath.length) { // try to find the script in the head tag to determine tempPath
+            if (!tempPath.length) { // try to find the script tag to determine tempPath
                 var theme_src = proto.getElements('script');
                 proto.loop(theme_src, function(el) {
                     var reg = new RegExp('galleria.'+obj.name+'.js');
@@ -1035,8 +1037,14 @@ G.themes = {
                     link = proto.create('link');
                     link.id = 'galleria-styles';
                     link.rel = 'stylesheet';
-                    link.media = 'screen';
-                    proto.getElements('head')[0].appendChild(link);
+                    link.media = 'all';
+                    var li = document.getElementsByTagName('link').length ?
+                        document.getElementsByTagName('link') : document.getElementsByTagName('style');
+                    if (li[0]) {
+                        li[0].parentNode.insertBefore(link, li[0]);
+                    } else {
+                        document.getElementsByTagName('head')[0].appendChild(link);
+                    }
                 }
                 link.href = obj.cssPath;
             }
@@ -1190,12 +1198,17 @@ G.transitions = {
 jQuery.fn.galleria = function() {
     var selector = this.selector;
     var a = arguments;
+    var hasTheme = typeof a[0] == 'string';
+    var options = hasTheme ? a[1] || {} : a[0] || {};
+
+    if ( !options.keep_source ) {
+        jQuery(this).find('*').hide();
+    }
+
     G.prototype.wait(function() {
         return !tempLoading;
     }, function() {
-        var hasTheme = typeof a[0] == 'string';
         var theme = hasTheme ? a[0] : tempName;
-        var options = hasTheme ? a[1] || {} : a[0] || {};
         options = G.prototype.mix(options, { target: selector } );
         G.debug = !!options.debug; 
         if (typeof G.themes[theme] == 'undefined') {

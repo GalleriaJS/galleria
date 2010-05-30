@@ -19,7 +19,8 @@
     // search for photos tagged 'lomo', edit options and apply galleria
     flickr.setOptions({
         max: 20,
-        sort: 'relevance'
+        sort: 'relevance',
+        size: 'big'
     }).getTags('lomo', function(data) {
         $('#galleria').galleria({
             data_source: data,

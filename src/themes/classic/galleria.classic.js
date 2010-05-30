@@ -1,25 +1,15 @@
 Galleria.themes.create({
     name: 'classic',
     author: 'Galleria',
-    version: '1.0',
+    version: '1.1',
     css: 'galleria.classic.css',
     defaults: {
         transition: 'slide'
     },
     init: function(options) {
-        
-        var mc = Galleria.MAC && Galleria.CHROME;
-        
-        if (!mc) {
-            this.$('thumbnails').children().hover(function() {
-                $(this).not('.active').fadeTo(200, .4);
-            }, function() {
-                $(this).fadeTo(400, 1);
-            });
-        }
 
-        this.$('loader').show().fadeTo(200, 0.4);
-        this.$('counter').show().fadeTo(200, 0.4);
+        this.$('loader').show().fadeTo(200, .4);
+        this.$('counter').show().fadeTo(200, .4);
         
         this.$('container').hover(this.proxy(function() {
             this.$('image-nav-left,image-nav-right,counter').fadeIn(200);
@@ -33,6 +23,18 @@ Galleria.themes.create({
             elms.toggle();
         });
         
+        this.bind(Galleria.THUMBNAIL, function(e) {
+            $(e.thumbTarget).css('opacity',0).fadeTo(200,.4).hover(function() {
+                if (!$(this).parent().hasClass('active')) {
+                    $(this).fadeTo(200, 1);
+                }
+            }, function() {
+                if (!$(this).parent().hasClass('active')) {
+                    $(this).fadeTo(400, .4);
+                }
+            });
+        })
+        
         this.bind(Galleria.LOADSTART, function(e) {
             if (!e.cached) {
                 this.$('loader').show().fadeTo(200, .4);
@@ -42,13 +44,13 @@ Galleria.themes.create({
             } else {
                 this.$('info').hide();
             }
-            if (!mc) {
-                $(e.thumbTarget).parent().css('opacity',1).addClass('active').siblings().removeClass('active');
-            }
+            $(e.thumbTarget).parent().addClass('active')
+                .siblings('.active').removeClass('active').children().fadeTo(400,.4);
         });
 
         this.bind(Galleria.LOADFINISH, function(e) {
             this.$('loader').fadeOut(200);
+            $(e.thumbTarget).css('opacity',1)
         });
     }
 });

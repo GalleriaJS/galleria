@@ -1,5 +1,5 @@
 /*!
- * Galleria Flickr Plugin v 1.0
+ * Galleria Flickr Plugin v 1.1
  * http://galleria.aino.se
  *
  * Copyright 2010, Aino
@@ -101,7 +101,7 @@ F.prototype = {
 	_find: function(params) {
 		params = jQuery.extend({
 			method: 'flickr.photos.search',
-		    extras: 'o_dims, url_t, url_m, url_o',
+		    extras: 'o_dims, url_t, url_m, url_o, url_s, o_dims',
 		    sort: this.options.sort
 		}, params);
 		
@@ -111,15 +111,26 @@ F.prototype = {
 			var len = Math.min(this.options.max, photos.length);
 		    
 			for (var i=0; i<len; i++) {
-    		    var photo = photos[i];
-    		    var img = photo.url_m;
-    		    if (photos.url_o) {
-    		        if (this.options.size == 'big') {
-    		            // there is a "secret" size
-    		            var img = 'http://farm'+photo['farm']+'.static.flickr.com/'+photo['server']+'/'+photo['id']+'_' + photo['secret'] + '_b.jpg';
-    		        } else if (this.options.size == 'original') {
-    		            var img = photo.url_o;
-    		        }
+    		    var photo = photos[i],
+    		        img = photo.url_m;
+    		    switch(this.options.size) {
+    		        case 'small':
+    		            img = photo.url_s;
+    		            break;
+    		        case 'big':
+    		            if (parseInt(photo.width_o) > 1280) {
+    		                img = 'http://farm'+photo['farm']+'.static.flickr.com/'+photo['server']+
+    		                      '/'+photo['id']+'_' + photo['secret'] + '_b.jpg';
+                            
+    		            } else if(photo.url_o) {
+    		                img = photo.url_o;
+    		            }
+    		            break;
+    		        case 'original':
+    		            if(photo.url_o) {
+    		                img = photo.url_o;
+    		            }
+    		            break;    
     		    }
 				var item = {
 					thumb: photos[i].url_t,

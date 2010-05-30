@@ -5,6 +5,7 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <script src="../src/galleria.js"></script>
         <script src="../src/plugins/galleria.flickr.js"></script>
+        <!-- including the history plugin below will enable the backbutton and permalinks -->
         <script src="../src/plugins/galleria.history.js"></script>
     </head>
 <body>
@@ -21,7 +22,7 @@
     flickr.search('black white', {
         sort: 'date-posted-desc',
         max: 40,
-        use_original: true
+        size: 'big'
     }, function(data) {
         $('#galleria').galleria({
             data_source: data,

@@ -5,11 +5,17 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <script src="../src/galleria.js"></script>
         <script src="../src/plugins/galleria.flickr.js"></script>
+        <style>
+        /* any custom CSS will override the theme. Here I will enlarge the thumbnails: */
+        .galleria-thumbnails .galleria-image{width:90px;height:60px;}
+        .galleria-thumbnails-list{height:60px;}
+        .galleria-thumb-nav-left,
+        .galleria-thumb-nav-right{height:55px;}
+        </style>
     </head>
 <body>
     <div id="galleria"></div>
     <script>
-    Galleria.debug = true;
     // Load theme
     Galleria.loadTheme('../src/themes/fullscreen/galleria.fullscreen.js');
     
@@ -18,10 +24,11 @@
     
     // search for photos tagged 'cigarette' and apply galleria
     flickr.getTags('cigarette', { 
-        use_original: true
+        size: 'big'
     }, function(data) {
         $('#galleria').galleria({
-            data_source:data
+            data_source:data,
+            carousel_steps: 3 // will advance the carousel 3 steps when clicking the arrow
         });
     });
     

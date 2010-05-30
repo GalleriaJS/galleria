@@ -1,7 +1,7 @@
 Galleria.themes.create({
     name: 'fullscreen',
     author: 'Galleria',
-    version: '1.0',
+    version: '1.1',
     css: 'galleria.fullscreen.css',
     defaults: {
         transition: 'none',
@@ -12,16 +12,13 @@ Galleria.themes.create({
     },
     init: function(options) {
         var speed = Galleria.IE ? 0 : 200;
-        var mc = Galleria.MAC && Galleria.CHROME;
         var open = false;
         
-        if (!mc) {
-            this.$('thumbnails').children().hover(function() {
-                $(this).not('.active').fadeTo(speed, .4);
-            }, function() {
-                $(this).fadeTo(speed, 1);
-            });
-        }
+        this.$('thumbnails').children().hover(function() {
+            $(this).not('.active').fadeTo(speed, .4);
+        }, function() {
+            $(this).not('.active').fadeTo(speed, 1);
+        });
         
         if (options.frame) {
             this.addElement('border');
@@ -45,16 +42,17 @@ Galleria.themes.create({
                 bottom: 10
             });
             var tc = this.$('thumbnails-container');
-            var b = 55;
+            var b = this.$('thumbnails').find('.galleria-image').css('height').replace('px','');
+            b = (parseInt(b) + 10) * -1;
             tc.hover(function(e) {
-                ic.css('bottom',10).animate({bottom: b, opacity:1},{queue:false, duration:200});
+                ic.css('bottom',10).animate({bottom: b*-1+10, opacity:1},{queue:false, duration:200});
                 $(e.currentTarget).animate({bottom: 0}, {queue:false, duration: 200});
                 open = true;
             }, function(e) {
                 ic.animate({bottom: 10, opacity:.7},{queue:false, duration:400});
-                $(e.currentTarget).animate({bottom: -45}, {queue:false, duration: 400});
+                $(e.currentTarget).animate({bottom: b}, {queue:false, duration: 400});
                 open = false;
-            }).css('bottom', -45);
+            }).css('bottom', b);
         }
         if (!options.thumbnails) {
            this.$('info,counter').css('bottom',10); 
@@ -70,7 +68,7 @@ Galleria.themes.create({
             if (!e.cached) {
                 this.$('loader').show().fadeTo(100, 1);
             }
-            $(e.thumbTarget).parent().addClass('active').css({opacity:0.5}).siblings('.active').removeClass('active').fadeTo(speed,1);
+            $(e.thumbTarget).parent().addClass('active').css('opacity',.5).siblings('.active').removeClass('active').css('opacity',1);
         });
 
         this.bind(Galleria.LOADFINISH, function(e) {
