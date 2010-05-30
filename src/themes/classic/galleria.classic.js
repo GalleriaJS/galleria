@@ -11,6 +11,8 @@ Galleria.themes.create({
         this.$('loader').show().fadeTo(200, .4);
         this.$('counter').show().fadeTo(200, .4);
         
+        this.$('thumbnails').find('.galleria-image').css('opacity',.4);
+        
         this.$('container').hover(this.proxy(function() {
             this.$('image-nav-left,image-nav-right,counter').fadeIn(200);
         }), this.proxy(function() {
