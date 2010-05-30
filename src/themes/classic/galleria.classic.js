@@ -11,7 +11,11 @@ Galleria.themes.create({
         this.$('loader').show().fadeTo(200, .4);
         this.$('counter').show().fadeTo(200, .4);
         
-        this.$('thumbnails').find('.galleria-image').css('opacity',.4);
+        this.$('thumbnails').children().hover(function() {
+            $(this).not('.active').fadeTo(200, 1);
+        }, function() {
+            $(this).not('.active').fadeTo(400, .4);
+        }).not('.active').css('opacity',.4);
         
         this.$('container').hover(this.proxy(function() {
             this.$('image-nav-left,image-nav-right,counter').fadeIn(200);
@@ -24,14 +28,6 @@ Galleria.themes.create({
         var elms = this.$('info-link,info-close,info-text').click(function() {
             elms.toggle();
         });
-        
-        this.bind(Galleria.THUMBNAIL, function(e) {
-            $(e.thumbTarget).parent().hover(function() {
-                $(this).not('.active').fadeTo(200, 1);
-            }, function() {
-                $(this).not('.active').fadeTo(400, .4);
-            }).not('.active').css('opacity',0).fadeTo(200,.4);
-        })
         
         this.bind(Galleria.LOADSTART, function(e) {
             if (!e.cached) {
