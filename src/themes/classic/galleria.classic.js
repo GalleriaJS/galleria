@@ -24,15 +24,11 @@ Galleria.themes.create({
         });
         
         this.bind(Galleria.THUMBNAIL, function(e) {
-            $(e.thumbTarget).css('opacity',0).fadeTo(200,.4).hover(function() {
-                if (!$(this).parent().hasClass('active')) {
-                    $(this).fadeTo(200, 1);
-                }
+            $(e.thumbTarget).parent().hover(function() {
+                $(this).not('.active').fadeTo(200, 1);
             }, function() {
-                if (!$(this).parent().hasClass('active')) {
-                    $(this).fadeTo(400, .4);
-                }
-            });
+                $(this).not('.active').fadeTo(400, .4);
+            }).not('.active').css('opacity',0).fadeTo(200,.4);
         })
         
         this.bind(Galleria.LOADSTART, function(e) {
@@ -44,8 +40,8 @@ Galleria.themes.create({
             } else {
                 this.$('info').hide();
             }
-            $(e.thumbTarget).parent().addClass('active')
-                .siblings('.active').removeClass('active').children().fadeTo(400,.4);
+            $(e.thumbTarget).parent().addClass('active').css('opacity',1)
+                .siblings('.active').removeClass('active').fadeTo(400,.4);
         });
 
         this.bind(Galleria.LOADFINISH, function(e) {
