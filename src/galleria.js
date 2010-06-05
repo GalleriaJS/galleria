@@ -96,7 +96,8 @@ var Base = Class.extend({
     moveOut : function( elem ) {
         return this.setStyle(elem, {
             position: 'absolute',
-            left: '-10000px'
+            left: '-10000px',
+            display: 'block'
         });
     },
     moveIn : function( elem ) {
@@ -325,8 +326,8 @@ var Picture = Base.extend({
             this.image.height = Math.ceil(this.orig.h * ratio) - margin*2;
             this.setStyle(this.image, {
                 position : 'relative',
-                top :  Math.round(this.image.height * -1 / 2 + (height / 2)) - margin,
-                left : Math.round(this.image.width * -1 / 2 + (width / 2)) - margin
+                top :  Math.floor(this.image.height * -1 / 2 + (height / 2)) - margin,
+                left : Math.floor(this.image.width * -1 / 2 + (width / 2)) - margin
             });
             complete.call(this);
         });
@@ -423,12 +424,11 @@ var G = window.Galleria = Base.extend({
         return this;
     },
     run : function() {
-        
         var o = this.options;
         if (!this.data.length) {
             G.raise('Data is empty.');
         }
-        if (!o.keep_source) {
+        if (!o.keep_source && !Galleria.IE) {
             this.target.innerHTML = '';
         }
         this.loop(2, function() {
@@ -723,16 +723,13 @@ var G = window.Galleria = Base.extend({
         var active = this.controls.getActive();
         var next = this.controls.getNext();
         var cached = next.isCached(src);
-        if (active.image) {
-            this.toggleQuality(active.image, false);
-        }
         var complete = this.proxy(function() {
             this.queue.stalled = false;
             this.toggleQuality(next.image, o.image_quality);
             this.setStyle( active.elem, { zIndex : 0 } );
             this.setStyle( next.elem, { zIndex : 1 } );
-            this.moveOut( active.image );
             this.controls.swap();
+            this.moveOut( active.image );
             if (this.getData( index ).link) {
                 this.setStyle( next.image, { cursor: 'pointer' } );
                 this.listen( next.image, 'click', this.proxy(function() {
@@ -767,6 +764,9 @@ var G = window.Galleria = Base.extend({
         } );
         next.load( src, this.proxy(function(e) {
             next.scale(this.stageWidth, this.stageHeight, o.image_crop, o.max_scale_ratio, o.image_margin, this.proxy(function(e) {
+                if (active.image) {
+                    this.toggleQuality(active.image, false);
+                }
                 this.toggleQuality(next.image, false);
                 this.trigger({
                     type: G.LOADFINISH,
@@ -869,8 +869,13 @@ var G = window.Galleria = Base.extend({
     
     hasInfo : function(index) {
         var d = this.getData(index);
-        var l = d.title + d.description + d.author;
-        return !!l.length;
+        var check = 'title description author'.split(' ');
+        for ( var i=0; check[i]; i++ ) {
+            if ( d[ check[i] ] && d[ check[i] ].length ) {
+                return true;
+            }
+        }
+        return false;
     },
     
     getDataObject : function(o) {
@@ -953,7 +958,7 @@ var G = window.Galleria = Base.extend({
             this.loop(images, function( elem ) {
                 loaded++;
                 this.push( getData( elem ), this.data );
-                if (!o.keep_source) {
+                if (!o.keep_source && !Galleria.IE) {
                     elem.parentNode.removeChild(elem);
                 }
                 if ( loaded == images.length ) {

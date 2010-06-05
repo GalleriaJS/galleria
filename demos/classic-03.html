@@ -7,29 +7,34 @@
         <script src="../src/themes/classic/galleria.classic.js"></script>
         <style>
             html,body{background:#111}
-            #galleria{width:900px;margin:20px auto}
+            #galleria{width:700px;margin:20px auto}
         </style>
     </head>
 <body>
     <div id="galleria">
-        <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/7/75/2010_Opening_Ceremony_-_Sweden_entering.jpg/800px-2010_Opening_Ceremony_-_Sweden_entering.jpg">
-        <p>The athletes from <strong>Sweden</strong> entering the stadium at the opening ceremonies of the 2010 Winter Olympics</p>
-        <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Swedish_Lion.jpg/792px-Swedish_Lion.jpg">
-        <p>The swedish <em>Lion</em></p>
-        <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Svenska_Grammofonstudion%2C_Gothenburg_Sweden%2C_Fender.jpg/800px-Svenska_Grammofonstudion%2C_Gothenburg_Sweden%2C_Fender.jpg">
-        <p><a href="http://www.svenskagrammofonstudion.com/">Svenska Grammofonstudion</a>, Gothenburg Sweden</p>
+        <img src="http://galleria.aino.se/media/i/demo/01.jpg" title="A test image" alt="A lorem caption">
+        <img src="http://galleria.aino.se/media/i/demo/02.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/03.jpg" longdesc="http://aino.se" alt="Click this image to visit Aino">
+        <img src="http://galleria.aino.se/media/i/demo/04.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/05.jpg">
+
+        <img src="http://galleria.aino.se/media/i/demo/06.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/07.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/08.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/09.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/10.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/11.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/12.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/13.jpg">
+        <img src="http://galleria.aino.se/media/i/demo/14.jpg">
+        
     </div>
     <script>
     // Classic theme is now loaded using <script> instead
     // You can still use loadTheme if you like, either works.
     $('#galleria').galleria({
         image_crop: true,
-        transition: 'fade',
-        data_config: function(img) {
-            return {
-                description: $(img).next('p').html()
-            };
-        }
+        transition: 'fade'
     });
     </script>
     </body>

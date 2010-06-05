@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="sv">
+    <head>
+        <title>Galleria Classic Theme Demo 01</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+        <script src="../src/galleria.js"></script>
+        <script src="../src/plugins/galleria.ssp.js"></script>
+        <link href="http://devkick.com/lab/tripoli/tripoli.simple.css" rel="stylesheet">
+        <style>
+            html,body{background:#111}
+            #galleria{width:700px;margin:20px auto}
+        </style>
+    </head>
+<body>
+    <div id="galleria"></div>
+    
+    <script>
+    
+    // Load theme
+    Galleria.loadTheme('../src/themes/classic/galleria.classic.js');
+    
+    // intiialize slieshowpro plugin and add the XML
+    var ssp = new Galleria.SSP('http://www.elmrin.se/ssp_director/index.php?/site/data/6/0/804_556_0_80_1_80_60_0_50_1_50_50_1');
+    
+    // inject an album into galleria
+    ssp.getAlbum(0, function(data) {
+        $('#galleria').galleria({
+            data_source:data,
+            thumb_crop: false
+        });
+    })
+    
+    </script>
+    </body>
+</html>
