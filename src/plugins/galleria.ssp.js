@@ -41,6 +41,7 @@ S.prototype = {
             var data = this.parseData(index);
             callback.call(this, data);
         });
+        return this;
     },
     getAbsoluteUrl: function(path) {
         if (path.substr(0,7) != 'http://') {
