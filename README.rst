@@ -54,6 +54,17 @@ Just put the images inside any container on the site::
         <img src="/img/pic2.jpg" alt="Another text" title="Another title">
     </div>
 
+If you want separate thumbnails, just add them as a link::
+
+    <div id="gallery>
+        <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
+        <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" alt="Another text" title="Another title"></a>
+    </div>
+    
+You can also define the images as a JSON array. See the "getting started" doc for more info.
+    
+Galleria also provides plugins to fetch image data from other sources like Flickr & SlideShowPro.
+
 Activate Galleria
 -----------------
 When DOM is ready, you can run Galleria::

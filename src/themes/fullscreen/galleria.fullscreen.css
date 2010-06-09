@@ -7,7 +7,7 @@ html,body{height:100%;margin:0;padding:0;overflow:hidden;}
 .galleria-carousel .galleria-thumbnails-list{border-left-width:25px;border-right-width:25px;}
 .galleria-thumbnails{background:#fff;overflow:hidden;}
 .galleria-thumbnails .galleria-image{width:50px;height:35px;float:left;cursor:pointer;margin-right:5px;}
-.galleria-thumbnails .active{cursor:default;background:#000;}
+.galleria-thumbnails .active{cursor:default;}
 .galleria-border{border:10px solid #fff;position:absolute;top:0;bottom:0;left:0;right:0;z-index:3;}
 .galleria-image-nav{width:100%;height:100%;position:absolute;top:0;left:0;z-index:4;}
 .galleria-image-nav-right,

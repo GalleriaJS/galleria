@@ -26,7 +26,7 @@ You can set options using ``.setOptions()`` or as a second argument to the call:
 
     flickr.setOptions({
         max: 60,
-        use_original: true,
+        size: 'medium',
         sort: 'date-posted-desc'
     });
     
@@ -113,15 +113,13 @@ max
 
 Sets the amount of images that will be fetched (max 100)
 
-use_original
+size
 ------------
 
-    | type: **Boolean**
-    | default: **false**
+    | type: **String**
+    | default: **'medium'**
 
-If set to ``true``, it forces Galleria to try to fetch the highest image resolution available from flickr. This will slow download time a lot, unless you know what you are fetching (f.ex images from your own account). Setting this to false will tell Galleria to fetch the 'medium' sized image from Flickr (680 x 480px). Please note that the ``.search()`` will fetch a smaller image for thumbnails per default.
-
-Read more about flickr sizes at the flickr.photos.getSizes() documentation.
+This options defines what size the plugin will fetch from flickr. Possible values are 'small', 'medium','big' and 'original'. Note that the 'big' size (1024px wide) is only available if the original size exceeds 1280px wide. If not, 'big' will return the biggest size available. 'original' will always return the biggest image available, but this can slow down performance significantly.
 
 sort
 ------------
