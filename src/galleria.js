@@ -1207,7 +1207,7 @@ jQuery.fn.galleria = function() {
     var options = hasTheme ? a[1] || {} : a[0] || {};
 
     if ( !options.keep_source ) {
-        jQuery(this).find('*').hide();
+        jQuery(this).children().hide();
     }
 
     G.prototype.wait(function() {
