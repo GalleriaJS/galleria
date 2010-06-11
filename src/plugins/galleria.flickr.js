@@ -101,7 +101,7 @@ F.prototype = {
 	_find: function(params) {
 		params = jQuery.extend({
 			method: 'flickr.photos.search',
-		    extras: 'o_dims, url_t, url_m, url_o, url_s, o_dims',
+		    extras: 'url_t, url_m, url_o, url_s, url_l',
 		    sort: this.options.sort
 		}, params);
 		
@@ -118,7 +118,9 @@ F.prototype = {
     		            img = photo.url_s;
     		            break;
     		        case 'big':
-    		            if (parseInt(photo.width_o) > 1280) {
+    		            if (photo.url_l) {
+    		                img = photo.url_l;
+    		            } else if (parseInt(photo.width_o) > 1280) {
     		                img = 'http://farm'+photo['farm']+'.static.flickr.com/'+photo['server']+
     		                      '/'+photo['id']+'_' + photo['secret'] + '_b.jpg';
                             
