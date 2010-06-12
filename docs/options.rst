@@ -17,6 +17,7 @@ Galleria options are defined using a flat object during initialization.::
 Table of contents (in alphabetical order)
 =================
 
+- autoplay
 - carousel
 - carousel_follow
 - carousel_speed
@@ -31,6 +32,7 @@ Table of contents (in alphabetical order)
 - image_margin
 - keep_source
 - max_scale_ratio
+- on_image
 - popup_links
 - preload
 - queue
@@ -53,8 +55,6 @@ autoplay
 
 If ``true``, this will start playing the slideshow with 3 seconds interval (default).
 If you set this to any number, f.ex 4000, it will start playing with that interval (in milliseconds)
-
-*****
 
 *****
 
@@ -238,11 +238,11 @@ Example on how to add a play link by extending the theme:
 height
 ------------
 
-    | type: **Number**
+    | type: **Number** or **String**
     | default: *undefined*
 
 This will set a height to the gallery, unless you sepcified one in the CSS.
-If you set this to 'undefined' and no CSS height is set, it will automatically add a 16/9 ratio comapred to the width as a fallback.
+If you set this to 'undefined' or leave it as it is and no CSS height is set, Galleria will automatically add a 16/9 ratio comapred to the width as a fallback.
 
 *****
    
@@ -287,6 +287,19 @@ max_scale_ratio
     | default: **undefined**
 
 Sets the maximum scale ratio for images. F.ex, if you don't want Galleria to upscale any images, set this to 1. undefined will allow any scaling of the images.
+
+*****
+
+on_image(image, thumbnail)
+----------
+
+    | type: **Function**
+    | default: **undefined**
+
+Helper event function that triggers when an image is loaded and about to enter the stage.
+This function simplifies the process of adding extra functionality when showing an image without using the extend method och manipulating the theme.
+
+**image** is the main image and **thumbnail** is the active thumbnail.
 
 *****
 

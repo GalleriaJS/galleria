@@ -380,6 +380,7 @@ var G = window.Galleria = Base.extend({
             keep_source: false,
             link_source_images: true,
             max_scale_ratio: undefined,
+            on_image: function(img,thumb) {},
             popup_links: false,
             preload: 2,
             queue: true,
@@ -505,6 +506,7 @@ var G = window.Galleria = Base.extend({
         this.wait(function() {
             this.stageWidth = this.width(this.get( 'stage' ));
             this.stageHeight = this.height( this.get( 'stage' ));
+            
             if (!this.stageHeight && this.stageWidth) { // no height in css, set reasonable ratio (16/9)
                 this.setStyle( this.get( 'container' ),  { 
                     height: this.options.height || Math.round( this.stageWidth*9/16 ) 
@@ -1061,6 +1063,9 @@ G.themes = {
             o = gallery.options;
             gallery.bind(G.DATA, function() {
                 gallery.run();
+            });
+            gallery.bind(G.LOADFINISH, function(e) {
+                 o.on_image.call(this, e.imageTarget, e.thumbTarget);
             });
             gallery.bind(G.READY, function() {
                 if (G.History) {
