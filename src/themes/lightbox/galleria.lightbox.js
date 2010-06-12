@@ -39,8 +39,7 @@ Galleria.themes.create({
         max_scale_ratio: 1,
         thumb_quality: true,
         opacity: .8,
-        show: false,
-        height: 'auto'
+        show: false
     },
     init: function(options) {
         var showing = false;

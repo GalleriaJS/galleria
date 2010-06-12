@@ -75,6 +75,14 @@ var Base = Class.extend({
         jQuery(elem).css(css);
         return this;
     },
+    getStyle : function( elem, styleProp ) {
+    	var val;
+    	if (elem.currentStyle)
+    		val = elem.currentStyle[styleProp];
+    	else if (window.getComputedStyle)
+    		val = document.defaultView.getComputedStyle(elem, null).getPropertyValue(styleProp);
+    	return val;
+    },
     cssText : function( string ) {
         var style = document.createElement('style');
         this.getElements('head')[0].appendChild(style);
@@ -503,20 +511,30 @@ var G = window.Galleria = Base.extend({
         }
         this.build();
         this.target.appendChild(this.get('container'));
+        var threshold = 0;
+        
+        if (o.height && o.height.toLowerCase() != 'auto') {
+            this.setStyle( this.get( 'container' ),  { 
+                height: o.height
+            } );
+        }
+        
         this.wait(function() {
+            // the most sensitive piece of code in Galleria, we need a height to continue
+            threshold++;
+            var cssHeight = parseFloat(this.getStyle( this.get( 'container' ), 'height' ));
             this.stageWidth = this.width(this.get( 'stage' ));
             this.stageHeight = this.height( this.get( 'stage' ));
-            
-            if (!this.stageHeight && this.stageWidth) { // no height in css, set reasonable ratio (16/9)
+            if (!this.stageHeight && !cssHeight && threshold > 5 && !o.height) {
+                // no height detected for sure, set reasonable ratio (16/9)
                 this.setStyle( this.get( 'container' ),  { 
-                    height: this.options.height || Math.round( this.stageWidth*9/16 ) 
+                    height: Math.round( this.stageWidth*9/16 ) 
                 } );
                 this.stageHeight = this.height( this.get( 'stage' ));
             }
             return this.stageHeight && this.stageWidth;
         }, function() {
-            var thumbWidth = this.thumbnails[0] ? this.width(this.thumbnails[0].elem, true) : 0;
-            
+            var thumbWidth  = this.thumbnails[0] ? this.width(this.thumbnails[0].elem, true) : 0;
             var thumbsWidth = thumbWidth * this.thumbnails.length;
             if (thumbsWidth < this.stageWidth) {
                 o.carousel = false;
