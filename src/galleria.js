@@ -513,7 +513,7 @@ var G = window.Galleria = Base.extend({
         this.target.appendChild(this.get('container'));
         var threshold = 0;
         
-        if (o.height && o.height.toLowerCase() != 'auto') {
+        if (o.height && o.height != 'auto') {
             this.setStyle( this.get( 'container' ),  { 
                 height: o.height
             } );
