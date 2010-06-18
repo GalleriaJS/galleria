@@ -239,10 +239,10 @@ height
 ------------
 
     | type: **Number** or **String**
-    | default: *undefined*
+    | default: **'auto'**
 
-This will set a height to the gallery, unless you sepcified one in the CSS.
-If you set this to 'undefined' or leave it as it is and no CSS height is set, Galleria will automatically add a 16/9 ratio comapred to the width as a fallback.
+This will set a height to the gallery.
+If you set this to 'auto' and no CSS height is found, Galleria will automatically add a 16/9 ratio as a fallback.
 
 *****
    
@@ -266,6 +266,16 @@ image_margin
     | default: **0**
 
 Sets a margin between the image and stage.
+
+*****
+
+image_position
+----------
+
+    | type: **String**
+    | default: **'center**
+
+Positions the main image. Works like the CSS background-position property, f.ex 'top right' or '20% 100%'. You can use keywords, percents or pixels. The first value is the horizontal position and the second is the vertical. Read more at http://www.w3.org/TR/REC-CSS1/#background-position
 
 *****
 

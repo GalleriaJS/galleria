@@ -1,3 +1,13 @@
+/*!
+ * Galleria Fullscreen Theme
+ * http://galleria.aino.se
+ *
+ * Copyright (c) 2010, Aino
+ * Licensed under the MIT license.
+ */
+
+(function($) {
+
 Galleria.themes.create({
     name: 'fullscreen',
     author: 'Galleria',
@@ -91,3 +101,5 @@ Galleria.themes.create({
         });
     }
 });
+
+})(jQuery);

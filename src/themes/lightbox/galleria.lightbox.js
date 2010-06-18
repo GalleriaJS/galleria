@@ -1,3 +1,13 @@
+/*!
+ * Galleria Lightbox Theme
+ * http://galleria.aino.se
+ *
+ * Copyright (c) 2010, Aino
+ * Licensed under the MIT license.
+ */
+
+(function($) {
+
 Galleria.transitions.add('lightbox', function(params, complete) {
     var sq = this.$('square');
     var anim = function() {
@@ -40,7 +50,7 @@ Galleria.themes.create({
         thumb_quality: true,
         opacity: .8,
         show: false,
-        height: 'auto'
+        height: false
     },
     init: function(options) {
         var showing = false;
@@ -140,3 +150,5 @@ Galleria.themes.create({
         });
     }
 });
+
+})(jQuery);

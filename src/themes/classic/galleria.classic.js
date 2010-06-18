@@ -1,13 +1,22 @@
+/*!
+ * Galleria Classic Theme
+ * http://galleria.aino.se
+ *
+ * Copyright (c) 2010, Aino
+ * Licensed under the MIT license.
+ */
+
+(function($) {
+
 Galleria.themes.create({
     name: 'classic',
     author: 'Galleria',
-    version: '1.1',
+    version: '1.2',
     css: 'galleria.classic.css',
     defaults: {
         transition: 'slide'
     },
     init: function(options) {
-
         this.$('loader').show().fadeTo(200, .4);
         this.$('counter').show().fadeTo(200, .4);
         
@@ -48,3 +57,5 @@ Galleria.themes.create({
         });
     }
 });
+
+})(jQuery);
