@@ -13,7 +13,7 @@ A sample theme
 
 A simple theme can be created using ``Galleria.theme.create()`` like this::
 
-    Galleria.theme.create({
+    Galleria.themes.create({
         name: 'my theme',
         author: 'John Doe, http://example.com',
         version: 1,
