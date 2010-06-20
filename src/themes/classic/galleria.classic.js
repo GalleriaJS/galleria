@@ -14,7 +14,8 @@ Galleria.themes.create({
     version: '1.2',
     css: 'galleria.classic.css',
     defaults: {
-        transition: 'slide'
+        transition: 'slide',
+        show_caption: false
     },
     init: function(options) {
         this.$('loader').show().fadeTo(200, .4);
@@ -37,6 +38,10 @@ Galleria.themes.create({
         var elms = this.$('info-link,info-close,info-text').click(function() {
             elms.toggle();
         });
+        
+        if (options.show_caption) {
+            elms.trigger('click');
+        }
         
         this.bind(Galleria.LOADSTART, function(e) {
             if (!e.cached) {

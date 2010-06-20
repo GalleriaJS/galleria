@@ -1,5 +1,5 @@
 /*!
- * Galleria v 1.1.7 2010-06-18
+ * Galleria v 1.1.7.1 2010-06-20
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -94,12 +94,24 @@ var Base = Class.extend({
         }
         return this;
     },
-    cssFile : function(src) {
-        var link = document.createElement('link');
-        link.media = 'all';
+    loadCSS : function(href) {
+        link = this.create('link');
         link.rel = 'stylesheet';
-        link.href = src;
-        document.getElementsByTagName('head')[0].appendChild(link);
+        link.media = 'all';
+        if (href) {
+            link.href = href;
+        }
+        var get = function(tag) {
+            return document.getElementsByTagName(tag);
+        }
+        var li = get('link').length ?
+            get('link') : get('style');
+        if (li[0]) {
+            li[0].parentNode.insertBefore(link, li[0]);
+        } else {
+            get('head')[0].appendChild(link);
+        }
+        return link;
     },
     moveOut : function( elem ) {
         return this.setStyle(elem, {
@@ -219,28 +231,25 @@ var Base = Class.extend({
         }, 1);
         return this;
     },
-    getScript: function(url, callback) {
+    loadScript: function(url, callback) {
        var script = document.createElement('script');
        script.src = url;
        script.async = true; // HTML5
+
+       var done = false;
        callback = this.proxy(callback);
 
-       // Handle Script loading
-       {
-          var done = false;
+       // Attach handlers for all browsers
+       script.onload = script.onreadystatechange = function() {
+           if ( !done && (!this.readyState ||
+               this.readyState == "loaded" || this.readyState == "complete") ) {
+               done = true;
+               callback();
 
-          // Attach handlers for all browsers
-          script.onload = script.onreadystatechange = function(){
-             if ( !done && (!this.readyState ||
-                   this.readyState == "loaded" || this.readyState == "complete") ) {
-                done = true;
-                callback();
-
-                // Handle memory leak in IE
-                script.onload = script.onreadystatechange = null;
-             }
-          };
-       }
+               // Handle memory leak in IE
+               script.onload = script.onreadystatechange = null;
+           }
+       };
        
        var ex = document.getElementsByTagName('script');
        ex = ex[ex.length-1];
@@ -440,7 +449,7 @@ var G = window.Galleria = Base.extend({
             G.raise('No target.');
         }
         
-        this.options = this.mix(this.theme.defaults, this.options);
+        this.options = this.mix(G.theme.defaults, this.options);
         this.options = this.mix({
             autoplay: false,
             carousel: true,
@@ -501,7 +510,7 @@ var G = window.Galleria = Base.extend({
                 }));
             }
 
-            this.theme.init.call(this, o);
+            G.theme.init.call(this, o);
             o.extend.call(this, o);
             
             if (/^[0-9]{1,4}$/.test(hash) && G.History) {
@@ -1139,6 +1148,7 @@ G.READY = 'ready';
 G.THUMBNAIL = 'thumbnail';
 G.LOADSTART = 'loadstart';
 G.LOADFINISH = 'loadfinish';
+G.THEMELOAD = 'themeload';
 
 var nav = navigator.userAgent.toLowerCase();
 
@@ -1151,68 +1161,45 @@ G.CHROME = /chrome/.test( nav );
 G.QUIRK = (G.IE && document.compatMode && document.compatMode == "BackCompat");
 G.MAC = /mac/.test(navigator.platform.toLowerCase());
 
-var tempPath = ''; // we need to save this in a global private variable later
-var tempName = ''; // the last loaded theme
-var tempLoading = false; // we need to manually check if script has loaded
-var tempFile = ''; // the theme file
 var hash = window.location.hash.replace(/#\//,'');
 
-G.themes = {
-    create: function(obj) {
-        var orig = ['name','author','version','defaults','init'];
-        var proto = G.prototype;
-        proto.loop(orig, function(val) {
-            if (!obj[ val ]) {
-                G.raise(val+' not specified in theme.');
-            }
-            if ( typeof G.themes[obj.name] == 'undefined') {
-                G.themes[obj.name] = {};
-            }
-            if (val != 'name' && val != 'init') {
-                G.themes[obj.name][val] = obj[val];
-            }
-        });
-        if (obj.css) {
-            if (!tempPath.length) { // try to find the script tag to determine tempPath
-                var theme_src = proto.getElements('script');
-                proto.loop(theme_src, function(el) {
-                    var reg = new RegExp('galleria.'+obj.name+'.js');
-                    if(reg.test(el.src)) {
-                        tempPath = el.src.replace(/[^\/]*$/, "");
-                    }
-                });
-            }
-            obj.cssPath = tempPath + obj.css;
-            tempPath = '';
+G.themes = {};
+G.themes.create = G.addTheme = function(obj) {
+    var theme = {};
+    var orig = ['name','author','version','defaults','init'];
+    var proto = G.prototype;
+    proto.loop(orig, function(val) {
+        if (!obj[ val ]) {
+            G.raise(val+' not specified in theme.');
         }
-        tempName = obj.name;
-        G.themes[obj.name].load = function() {
-            if (obj.cssPath) {
+        if (val != 'name' && val != 'init') {
+            theme[val] = obj[val];
+        }
+    });
+    theme.init = obj.init;
+    if (obj.css) {
+        proto.loop(proto.getElements('script'), function(el) {
+            var reg = new RegExp('galleria.' + obj.name.toLowerCase() + '.js');
+            if(reg.test(el.src)) {
+                var css = el.src.replace(/[^\/]*$/, "") + obj.css;
                 var link = proto.getElements('#galleria-styles');
                 if (link.length) {
                     link = link[0];
                 } else {
-                    link = proto.create('link');
+                    link = proto.loadCSS();
                     link.id = 'galleria-styles';
-                    link.rel = 'stylesheet';
-                    link.media = 'all';
-                    var li = document.getElementsByTagName('link').length ?
-                        document.getElementsByTagName('link') : document.getElementsByTagName('style');
-                    if (li[0]) {
-                        li[0].parentNode.insertBefore(link, li[0]);
-                    } else {
-                        document.getElementsByTagName('head')[0].appendChild(link);
-                    }
                 }
-                link.href = obj.cssPath;
+                link.href = css;
+                jQuery(function() {
+                    G.theme = theme;
+                    jQuery(document).trigger( G.THEMELOAD );
+                });
+            } else {
+                G.raise('No theme CSS loaded');
             }
-            if (obj.cssText) {
-                proto.cssText(obj.cssText);
-            }
-            G.themes[obj.name].init = obj.init;
-            return G.themes[obj.name];
-        };
+        });  
     }
+    return theme;
 };
 
 G.raise = function(msg) {
@@ -1221,16 +1208,8 @@ G.raise = function(msg) {
     }
 };
 
-G.loadTheme = function(src, callback) {
-    tempLoading = true;
-    tempPath = src.replace(/[^\/]*$/, "");
-    tempFile = src;
-    G.prototype.getScript(src, function() {
-        tempLoading = false;
-        if (typeof callback == 'function') {
-            callback();
-        }
-    });
+G.loadTheme = function(src) {
+    G.prototype.loadScript(src);
 };
 
 jQuery.easing.galleria = function (x, t, b, c, d) {
@@ -1321,12 +1300,10 @@ G.transitions = {
     }
 };
 
-jQuery.fn.galleria = function() {
-    var selector = this.selector;
-    var a = arguments;
-    var hasTheme = typeof a[0] == 'string';
-    var options = hasTheme ? a[1] || {} : a[0] || {};
+jQuery.fn.galleria = function(options) {
+    options = options || {};
     
+    var selector = this.selector;
     if ( !options.keep_source ) {
         jQuery(this).children().hide();
     }
@@ -1340,22 +1317,13 @@ jQuery.fn.galleria = function() {
     G.debug = !!options.debug;
     
     var gallery = new G(options);
-
-    G.prototype.wait(function() {
-        return !tempLoading;
-    }, function() {
-        var theme = hasTheme ? a[0] : tempName;
-        if (typeof G.themes[theme] == 'undefined') {
-            var err = theme ? 'Theme '+theme+' not found.' : 'No theme specified';
-            G.raise(err);
-            return null;
-        }
-        gallery.theme = G.themes[theme].load();
+    if (typeof G.theme == 'undefined') {
+        jQuery(document).bind(G.THEMELOAD, function() {
+            gallery.init();
+        });
+    } else {
         gallery.init();
-    }, function() {
-        G.raise('Theme file '+tempFile+' not found.');
-    });
-    
+    }
     return gallery;
     
 };
