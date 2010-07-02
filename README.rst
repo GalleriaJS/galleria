@@ -3,30 +3,13 @@ Galleria
 ========
 A JavaScript image gallery for the fastidious.
 
-**Update 28/4 - 2010** - We're currently working on releasing Galleria 1.2, along with some comprehensive documentation. Stay tuned!
+For more and working demos visit: http://galleria.aino.se/
 
-Features
-========
+Support
+=======
+Please don't post any support related issues on Github.
 
-Creates thumbnails on the fly
------------------------------
-Galleria can create, scale and crop images on the fly, making your gallery layout flexible towards any existing design.
-
-Degrades gracefully
--------------------
-Galleria can use almost any exiting markup to fetch gallery data. If the client does not meet the necessary requirements, the gallery will degrade to it's initial state.
-
-Themed galleries
-----------------
-Galleria uses a convenient Theme API that makes gallery styling and customization a breeze.
-
-Flickr fetcher included
------------------------------
-Use a custom feed from your Flickr account or any other external feed to display images on your web site.
-
-Built for performance
------------------------------
-Galleria is built to perform at it's best regardless of browser environment using clever interpolation methods and jQuery's appraised animations.
+If you need help we have a small support community over at: http://getsatisfaction.com/galleria.
 
 
 Basic Usage
@@ -49,14 +32,14 @@ There are several ways of adding image data to your gallery, but the simplets wa
 
 Just put the images inside any container on the site::
 
-    <div id="gallery>
+    <div id="gallery">
         <img src="/img/pic1.jpg" alt="My description" title="My title">
         <img src="/img/pic2.jpg" alt="Another text" title="Another title">
     </div>
 
 If you want separate thumbnails, just add them as a link::
 
-    <div id="gallery>
+    <div id="gallery">
         <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
         <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" alt="Another text" title="Another title"></a>
     </div>
