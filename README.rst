@@ -3,8 +3,6 @@ Galleria
 ========
 A JavaScript image gallery for the fastidious.
 
-**Update 28/4 - 2010** - We're currently working on releasing Galleria 1.2, along with some comprehensive documentation. Stay tuned!
-
 Features
 ========
 
@@ -27,6 +25,13 @@ Use a custom feed from your Flickr account or any other external feed to display
 Built for performance
 -----------------------------
 Galleria is built to perform at it's best regardless of browser environment using clever interpolation methods and jQuery's appraised animations.
+
+
+Support
+=======
+Please don't post any support related issues on Github.
+
+If you need help we have a small support community over at: http://getsatisfaction.com/galleria.
 
 
 Basic Usage
