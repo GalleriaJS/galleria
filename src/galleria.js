@@ -1,5 +1,5 @@
 /*!
- * Galleria v 1.1.8 2010-07-02
+ * Galleria v 1.1.8.1 2010-07-02
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -686,6 +686,7 @@ var G = window.Galleria = Base.extend({
             var cssHeight = parseFloat(this.getStyle( this.get( 'container' ), 'height' ));
             this.stageWidth = this.width(this.get( 'stage' ));
             this.stageHeight = this.height( this.get( 'stage' ));
+            
             if (!this.stageHeight && !cssHeight && o.height == 'auto') {
                 // no height detected for sure, set reasonable ratio (16/9)
                 this.setStyle( this.get( 'container' ),  { 
@@ -693,9 +694,11 @@ var G = window.Galleria = Base.extend({
                 } );
                 this.stageHeight = this.height( this.get( 'stage' ));
             }
-            return this.stageHeight && this.stageWidth && threshold > 5;
+
+            var thumb = this.width(this.get('thumbnails').childNodes[0]);
+            return this.stageHeight && this.stageWidth && thumb < this.stageWidth;
         }, function() {
-            
+
             var thumbWidth  = this.width( this.get('thumbnails').childNodes[0], true );
             var thumbsWidth = thumbWidth * this.thumbnails.length;
             
