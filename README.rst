@@ -49,14 +49,14 @@ There are several ways of adding image data to your gallery, but the simplets wa
 
 Just put the images inside any container on the site::
 
-    <div id="gallery>
+    <div id="gallery">
         <img src="/img/pic1.jpg" alt="My description" title="My title">
         <img src="/img/pic2.jpg" alt="Another text" title="Another title">
     </div>
 
 If you want separate thumbnails, just add them as a link::
 
-    <div id="gallery>
+    <div id="gallery">
         <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
         <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" alt="Another text" title="Another title"></a>
     </div>
