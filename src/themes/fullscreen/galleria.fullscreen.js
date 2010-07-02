@@ -8,7 +8,7 @@
 
 (function($) {
 
-Galleria.themes.create({
+Galleria.addTheme({
     name: 'fullscreen',
     author: 'Galleria',
     version: '1.1',
@@ -64,6 +64,7 @@ Galleria.themes.create({
                 open = false;
             }).css('bottom', b);
         }
+        this.$('thumbnails-container').show();
         if (!options.thumbnails) {
            this.$('info,counter').css('bottom',10); 
         }

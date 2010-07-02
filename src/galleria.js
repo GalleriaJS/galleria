@@ -1,5 +1,5 @@
 /*!
- * Galleria v 1.1.7.1 2010-06-20
+ * Galleria v 1.1.8 2010-07-02
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -94,22 +94,54 @@ var Base = Class.extend({
         }
         return this;
     },
-    loadCSS : function(href) {
-        link = this.create('link');
+    touch : function(el) {
+        var sibling = el.nextSibling;
+        if ( sibling ) {
+          sibling.parentNode.removeChild(el);
+          sibling.parentNode.insertBefore(el,sibling);
+        } else {
+          sibling = el.parentNode;
+          sibling.removeChild(el);
+          sibling.appendChild(el);
+        }
+    },
+    loadCSS : function(href, callback) {
+        var exists = this.getElements('link[href="'+href+'"]').length;
+        if (exists) {
+            callback.call(null);
+            return;
+        }
+        var link = this.create('link');
         link.rel = 'stylesheet';
-        link.media = 'all';
-        if (href) {
-            link.href = href;
+        link.href = href;
+        if (typeof callback == 'function') {
+            // experimental callback
+            var frame = this.create('iframe');
+            G.__temp = function() {
+                callback.call(link);
+                G.__temp = null;
+                frame.parentNode.removeChild(frame);
+            }
+            jQuery(function() {
+                document.body.appendChild(frame);
+                frame.contentWindow.document.write('<html><head><link rel="stylesheet" src="'+
+                href+'"></head><body><s'+'cript>window.top.Galleria.__temp();</s'+'cript></body></html>');
+            });
         }
         var get = function(tag) {
             return document.getElementsByTagName(tag);
         }
-        var li = get('link').length ?
-            get('link') : get('style');
-        if (li[0]) {
-            li[0].parentNode.insertBefore(link, li[0]);
+        var styles = this.getElements('link[rel="stylesheet"],style');
+        if (styles.length) {
+            styles[0].parentNode.insertBefore(link, styles[0]);
         } else {
-            get('head')[0].appendChild(link);
+            this.getElements('head')[0].appendChild(link);
+        }
+        // IE needs a manual touch to re-order the cascade
+        if (G.IE) {
+            this.loop(styles, function(el) {
+                this.touch(el);
+            })
         }
         return link;
     },
@@ -231,29 +263,42 @@ var Base = Class.extend({
         }, 1);
         return this;
     },
-    loadScript: function(url, callback) {
+    cacheScript: function(url, callback) {
+        this.loadScript(url, callback, false);
+    },
+    loadScript: function(url, callback, insert) {
        var script = document.createElement('script');
        script.src = url;
        script.async = true; // HTML5
 
        var done = false;
-       callback = this.proxy(callback);
+       var scope = this;
+       insert = typeof insert == 'undefined' ? true : insert;
 
        // Attach handlers for all browsers
        script.onload = script.onreadystatechange = function() {
            if ( !done && (!this.readyState ||
                this.readyState == "loaded" || this.readyState == "complete") ) {
                done = true;
-               callback();
+               
+               if (typeof callback == 'function') {
+                   callback.call(scope, this);
+               }
+               if (!insert) {
+                   //this.parentNode.removeChild(this);
+               }
 
                // Handle memory leak in IE
                script.onload = script.onreadystatechange = null;
            }
        };
-       
+       if (!insert) {
+           script.type = "css";
+       }
        var ex = document.getElementsByTagName('script');
-       ex = ex[ex.length-1];
+       ex = ex[ex.length-1]
        ex.parentNode.insertBefore(script, ex.nextSibling);
+       
        return this;
     }
 });
@@ -333,12 +378,13 @@ var Picture = Base.extend({
         if (!this.image) {
             return this;
         }
+        var width,height;
         this.wait(function() {
             width  = o.width || this.width(this.elem);
             height = o.height || this.height(this.elem);
             return width && height;
         }, function() {
-            var ratio = Math[ (o.crop ? 'max' : 'min') ](width / this.orig.w, height / this.orig.h);
+            var ratio = Math[ (o.crop ? 'max' : 'min') ]((width - o.margin*2) / this.orig.w, (height-o.margin*2) / this.orig.h);
             if (o.max) {
                 ratio = Math.min(o.max, ratio);
             }
@@ -349,8 +395,8 @@ var Picture = Base.extend({
                 width: width,
                 height: height
             });
-            this.image.width = Math.ceil(this.orig.w * ratio) - o.margin*2;
-            this.image.height = Math.ceil(this.orig.h * ratio) - o.margin*2;
+            this.image.width = Math.ceil(this.orig.w * ratio);
+            this.image.height = Math.ceil(this.orig.h * ratio);
             
             var getPosition = this.proxy(function(value, img, m) {
                 var result = 0;
@@ -608,6 +654,7 @@ var G = window.Galleria = Base.extend({
                 }
             }
             var activate = this.proxy(function(e) {
+                this.pause();
                 e.preventDefault();
                 var ind = e.currentTarget.rel;
                 if (this.active !== ind) {
@@ -639,7 +686,7 @@ var G = window.Galleria = Base.extend({
             var cssHeight = parseFloat(this.getStyle( this.get( 'container' ), 'height' ));
             this.stageWidth = this.width(this.get( 'stage' ));
             this.stageHeight = this.height( this.get( 'stage' ));
-            if (!this.stageHeight && !cssHeight && threshold > 100 && o.height == 'auto') {
+            if (!this.stageHeight && !cssHeight && o.height == 'auto') {
                 // no height detected for sure, set reasonable ratio (16/9)
                 this.setStyle( this.get( 'container' ),  { 
                     height: Math.round( this.stageWidth*9/16 ) 
@@ -659,9 +706,11 @@ var G = window.Galleria = Base.extend({
                 this.addCarousel(thumbWidth, thumbsWidth);
             }
             this.listen(this.get('image-nav-right'), 'click', this.proxy(function() {
+                this.pause();
                 this.next();
             }));
             this.listen(this.get('image-nav-left'), 'click', this.proxy(function() {
+                this.pause();
                 this.prev();
             }));
             this.setStyle( this.get('thumbnails'), { opacity: 1 } );
@@ -1143,16 +1192,16 @@ G.log = function() {
     }
 };
 
+var nav = navigator.userAgent.toLowerCase();
+var hash = window.location.hash.replace(/#\//,'');
+
 G.DATA = 'data';
 G.READY = 'ready';
 G.THUMBNAIL = 'thumbnail';
 G.LOADSTART = 'loadstart';
 G.LOADFINISH = 'loadfinish';
 G.THEMELOAD = 'themeload';
-
-var nav = navigator.userAgent.toLowerCase();
-
-G.IE7 = (window.XMLHttpRequest && document.expando);
+G.IE7 = !!(window.XMLHttpRequest && document.expando);
 G.IE6 = (!window.XMLHttpRequest);
 G.IE = !!(G.IE6 || G.IE7);
 G.WEBKIT = /webkit/.test( nav );
@@ -1160,8 +1209,6 @@ G.SAFARI = /safari/.test( nav );
 G.CHROME = /chrome/.test( nav );
 G.QUIRK = (G.IE && document.compatMode && document.compatMode == "BackCompat");
 G.MAC = /mac/.test(navigator.platform.toLowerCase());
-
-var hash = window.location.hash.replace(/#\//,'');
 
 G.themes = {};
 G.themes.create = G.addTheme = function(obj) {
@@ -1177,20 +1224,13 @@ G.themes.create = G.addTheme = function(obj) {
         }
     });
     theme.init = obj.init;
+    
     if (obj.css) {
         proto.loop(proto.getElements('script'), function(el) {
             var reg = new RegExp('galleria.' + obj.name.toLowerCase() + '.js');
             if(reg.test(el.src)) {
                 var css = el.src.replace(/[^\/]*$/, "") + obj.css;
-                var link = proto.getElements('#galleria-styles');
-                if (link.length) {
-                    link = link[0];
-                } else {
-                    link = proto.loadCSS();
-                    link.id = 'galleria-styles';
-                }
-                link.href = css;
-                jQuery(function() {
+                proto.loadCSS(css, function() {
                     G.theme = theme;
                     jQuery(document).trigger( G.THEMELOAD );
                 });
@@ -1317,15 +1357,18 @@ jQuery.fn.galleria = function(options) {
     G.debug = !!options.debug;
     
     var gallery = new G(options);
-    if (typeof G.theme == 'undefined') {
+    
+    if (G.theme) {
+        gallery.init();
+    } else {
         jQuery(document).bind(G.THEMELOAD, function() {
             gallery.init();
         });
-    } else {
-        gallery.init();
     }
+    
     return gallery;
     
 };
+
 
 })();

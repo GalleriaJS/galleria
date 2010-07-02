@@ -109,6 +109,7 @@ F.prototype = {
 			var obj = { length: 0 };
 			var photos = data.photos ? data.photos.photo : data.photoset.photo;
 			var len = Math.min(this.options.max, photos.length);
+			var loaded = 0;
 		    
 			for (var i=0; i<len; i++) {
     		    var photo = photos[i],
@@ -134,12 +135,12 @@ F.prototype = {
     		            }
     		            break;    
     		    }
-				var item = {
-					thumb: photos[i].url_t,
-					image: img,
-					title: photos[i].title
-				};
-				Array.prototype.push.call(obj, item);
+                var item = {
+    				thumb: photos[i].url_t,
+    				image: img,
+    				title: photos[i].title
+    			};
+    			Array.prototype.push.call(obj, item);
 			}
 			this.callback.call(this, obj);
 		});

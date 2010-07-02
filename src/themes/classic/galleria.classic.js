@@ -8,7 +8,7 @@
 
 (function($) {
 
-Galleria.themes.create({
+Galleria.addTheme({
     name: 'classic',
     author: 'Galleria',
     version: '1.2',

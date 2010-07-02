@@ -11,7 +11,7 @@
 Galleria.transitions.add('lightbox', function(params, complete) {
     var sq = this.$('square');
     var anim = function() {
-        var img = $(params.next).show().css('visibility','hidden');
+        var img = $(params.next).css('opacity',0);
         var w = params.next.width + 20;
         var h = params.next.height + 20;
         sq.show().animate({
@@ -24,8 +24,13 @@ Galleria.transitions.add('lightbox', function(params, complete) {
             duration: params.speed,
             complete: function() {
                 complete();
-                img.hide().css('visibility','visible').fadeIn(params.speed, function() {
-                    sq.hide();
+                img.animate({
+                    opacity:1
+                },{
+                    duration:params.speed,
+                    complete:function() {
+                        sq.hide();
+                    }
                 });
             }
         });
@@ -36,10 +41,10 @@ Galleria.transitions.add('lightbox', function(params, complete) {
     anim();
 });
 
-Galleria.themes.create({
+Galleria.addTheme({
     name: 'lightbox',
     author: 'Galleria',
-    version: '1.0',
+    version: '1.1',
     css: 'galleria.lightbox.css',
     defaults: {
         carousel: false,

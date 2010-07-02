@@ -8,7 +8,7 @@
 
 (function($) {
 
-Galleria.themes.create({
+Galleria.addTheme({
     name: 'dots',
     author: 'Galleria',
     version: '1.1',
@@ -22,13 +22,11 @@ Galleria.themes.create({
         autoplay: 5000
     },
     init: function(options) {
-        this.$('thumbnails').find('.galleria-image').css('opacity',0.5).click(this.proxy(function() {
-            this.pause();
-        })).hover(function() {
+        this.$('thumbnails').find('.galleria-image').css('opacity',0.5).hover(function() {
             $(this).fadeTo(200,1);
         }, function() {
             $(this).not('.active').fadeTo(200,.5);
-        })
+        });
         this.$('info').insertAfter(this.target);
         this.rescale();
         this.bind(Galleria.LOADSTART, function(e) {

@@ -58,14 +58,23 @@ $('#galleria').galleria({
     Galleria.loadTheme('../src/themes/lightbox/galleria.lightbox.js');
     
     $('#galleria').galleria({
-        data_source: '#content',
-        keep_source: true,
-        data_config: function(img) {
-            return {
-                description: $(img).next('.caption').html()
-            }
-        }
-    });
+           data_source: '#content',
+    	   extend: function() {
+    	        this.bind(Galleria.LOADFINISH, function(e) {
+    	            $(e.imageTarget).click(this.proxy(function(e) {
+    	                e.preventDefault();
+    	                this.next();
+    	            }))
+    	        })
+    	    },
+           keep_source: true,
+           data_config: function(img) {
+               return {
+                   description: $(img).next('.caption').html()
+               }
+           }
+       });
+
     </script>
     </body>
 </html>
