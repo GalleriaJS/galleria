@@ -21,11 +21,11 @@ Galleria.addTheme({
         hide_dock: true
     },
     init: function(options) {
-        var speed = Galleria.IE ? 100 : 200;
+        var speed = 200;
         var open = false;
         
         this.$('thumbnails').children().hover(function() {
-            $(this).not('.active').children().fadeTo(speed, .4);
+            $(this).not('.active').children().css('opacity', .4);
         }, function() {
             $(this).not('.active').children().fadeTo(speed, 1);
         });

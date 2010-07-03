@@ -125,7 +125,7 @@ var Base = Class.extend({
             jQuery(function() {
                 document.body.appendChild(frame);
                 frame.contentWindow.document.write('<html><head><link rel="stylesheet" src="'+
-                href+'"></head><body><s'+'cript>window.top.Galleria.__temp();</s'+'cript></body></html>');
+                href+'"></head><body><script>window.top.Galleria.__temp()</script></body></html>');
             });
         }
         var get = function(tag) {
