@@ -11,7 +11,7 @@
 Galleria.addTheme({
     name: 'fullscreen',
     author: 'Galleria',
-    version: '1.1',
+    version: '1.2',
     css: 'galleria.fullscreen.css',
     defaults: {
         transition: 'none',
@@ -21,13 +21,13 @@ Galleria.addTheme({
         hide_dock: true
     },
     init: function(options) {
-        var speed = Galleria.IE ? 0 : 200;
+        var speed = Galleria.IE ? 100 : 200;
         var open = false;
         
         this.$('thumbnails').children().hover(function() {
-            $(this).not('.active').fadeTo(speed, .4);
+            $(this).not('.active').children().fadeTo(speed, .4);
         }, function() {
-            $(this).not('.active').fadeTo(speed, 1);
+            $(this).not('.active').children().fadeTo(speed, 1);
         });
         
         if (options.frame) {
@@ -79,7 +79,7 @@ Galleria.addTheme({
             if (!e.cached) {
                 this.$('loader').show().fadeTo(100, 1);
             }
-            $(e.thumbTarget).parent().addClass('active').css('opacity',.5).siblings('.active').removeClass('active').css('opacity',1);
+            $(e.thumbTarget).css('opacity',.5).parent().addClass('active').siblings('.active').removeClass('active').children().css('opacity',1);
         });
 
         this.bind(Galleria.LOADFINISH, function(e) {

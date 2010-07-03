@@ -1,5 +1,5 @@
 /*!
- * Galleria v 1.1.8.1 2010-07-02
+ * Galleria v 1.1.8.2 2010-07-02
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -263,17 +263,13 @@ var Base = Class.extend({
         }, 1);
         return this;
     },
-    cacheScript: function(url, callback) {
-        this.loadScript(url, callback, false);
-    },
-    loadScript: function(url, callback, insert) {
+    loadScript: function(url, callback) {
        var script = document.createElement('script');
        script.src = url;
        script.async = true; // HTML5
 
        var done = false;
        var scope = this;
-       insert = typeof insert == 'undefined' ? true : insert;
 
        // Attach handlers for all browsers
        script.onload = script.onreadystatechange = function() {
@@ -284,20 +280,13 @@ var Base = Class.extend({
                if (typeof callback == 'function') {
                    callback.call(scope, this);
                }
-               if (!insert) {
-                   //this.parentNode.removeChild(this);
-               }
 
                // Handle memory leak in IE
                script.onload = script.onreadystatechange = null;
            }
        };
-       if (!insert) {
-           script.type = "css";
-       }
-       var ex = document.getElementsByTagName('script');
-       ex = ex[ex.length-1]
-       ex.parentNode.insertBefore(script, ex.nextSibling);
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(script, s);
        
        return this;
     }
@@ -674,7 +663,6 @@ var G = window.Galleria = Base.extend({
         this.setStyle( this.get('thumbnails'), { opacity: 0 } );
         this.build();
         this.target.appendChild(this.get('container'));
-        var threshold = 0;
         
         if (o.height && o.height != 'auto') {
             this.setStyle( this.get('container'), { height: o.height })
@@ -682,7 +670,6 @@ var G = window.Galleria = Base.extend({
         
         this.wait(function() {
             // the most sensitive piece of code in Galleria, we need to have all the meassurements right to continue
-            threshold++;
             var cssHeight = parseFloat(this.getStyle( this.get( 'container' ), 'height' ));
             this.stageWidth = this.width(this.get( 'stage' ));
             this.stageHeight = this.height( this.get( 'stage' ));
@@ -695,7 +682,7 @@ var G = window.Galleria = Base.extend({
                 this.stageHeight = this.height( this.get( 'stage' ));
             }
 
-            var thumb = this.width(this.get('thumbnails').childNodes[0]);
+            thumb = this.width(this.get('thumbnails').childNodes[0]);
             return this.stageHeight && this.stageWidth && thumb < this.stageWidth;
         }, function() {
 
