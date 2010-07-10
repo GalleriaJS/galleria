@@ -146,18 +146,20 @@ var Base = Class.extend({
                 }, 2000);
             });
         }
-        var styles = this.getElements('link[rel="stylesheet"],style');
-        if (styles.length) {
-            styles[0].parentNode.insertBefore(link, styles[0]);
-        } else {
-            this.getElements('head')[0].appendChild(link);
-        }
-        // IE needs a manual touch to re-order the cascade
-        if (G.IE) {
-            this.loop(styles, function(el) {
-                this.touch(el);
-            })
-        }
+        window.setTimeout(this.proxy(function() {
+            var styles = this.getElements('link[rel="stylesheet"],style');
+            if (styles.length) {
+                styles[0].parentNode.insertBefore(link, styles[0]);
+            } else {
+                this.getElements('head')[0].appendChild(link);
+            }
+            // IE needs a manual touch to re-order the cascade
+            if (G.IE) {
+                this.loop(styles, function(el) {
+                    this.touch(el);
+                })
+            }
+        }), 2);
         return link;
     },
     moveOut : function( elem ) {
@@ -178,8 +180,8 @@ var Base = Class.extend({
     hide : function( elem ) {
         return jQuery( elem ).hide();
     },
-    mix : function( obj, ext ) {
-        return jQuery.extend(obj, ext);
+    mix : function() {
+        return jQuery.extend.apply(null, arguments);
     },
     proxy : function( fn, scope ) {
         if ( typeof fn !== 'function' ) {
@@ -310,7 +312,7 @@ var Base = Class.extend({
             return val;
         } else if (typeof val == 'string') {
             var arr = val.match(/\-?\d/g);
-            return arr.constructor == Array ? arr.join('')*1 : 0;
+            return arr && arr.constructor == Array ? arr.join('')*1 : 0;
         } else {
             return 0;
         }
@@ -1024,20 +1026,7 @@ var G = window.Galleria = Base.extend({
         var index = args[0];
         var rewind = !!args[1];
         if (o.carousel && this.carousel && o.carousel_follow) {
-            this.proxy(function(c) {
-                c.follow(index);
-                /*
-                if (index <= Math.abs(c.pos)) {
-                    c.pos = Math.max(0, (index-1))*-1;
-                    c.animate();
-                } else if ( index >= this.thumbnails.length + c.overflow + Math.abs(c.pos)) {
-                    c.pos = this.thumbnails.length + c.overflow - index - 1 + (index == this.thumbnails.length-1 ? 1 : 0);
-                    c.animate();
-                }
-                */
-                //c.current = index;
-                //c.animate();
-            })(this.carousel);
+            this.carousel.follow(index);
         }
         
         var src = this.getData(index).image;

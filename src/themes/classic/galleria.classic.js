@@ -22,9 +22,9 @@ Galleria.addTheme({
         this.$('counter').show().fadeTo(200, .4);
         
         this.$('thumbnails').children().hover(function() {
-            $(this).not('.active').children().fadeTo(100, 1);
+            $(this).not('.active').children().stop().fadeTo(100, 1);
         }, function() {
-            $(this).not('.active').children().fadeTo(400, .4);
+            $(this).not('.active').children().stop().fadeTo(400, .4);
         }).not('.active').children().css('opacity',.4);
         
         this.$('container').hover(this.proxy(function() {

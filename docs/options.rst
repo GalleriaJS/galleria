@@ -38,6 +38,7 @@ Table of contents (in alphabetical order)
 - preload
 - queue
 - thumb_crop
+- thumb_fit
 - thumb_margin
 - thumb_quality
 - thumbnails
@@ -250,13 +251,15 @@ If you set this to 'auto' and no CSS height is found, Galleria will automaticall
 image_crop
 ----------
 
-    | type: **Boolean**
+    | type: **Boolean** or **String**
     | default: **false**
 
 Defines how the images will be cropped.
 
 - **true** means that all images will be scaled to fill the stage, centered and cropped.
 - **false** will scale down so the entire image fits.
+- **'height'** will scale the image to fill the height of the stage.
+- **'width'** will scale the image to fill the width of the stage.
 
 *****
 
@@ -371,10 +374,22 @@ This defines what image index to show at first. If you use the history plugin, a
 thumb_crop
 ----------
 
-    | type: **Boolean**
+    | type: **Boolean** or **String**
     | default: **true**
 
 Same as **image_crop** but for thumbnails.
+
+*****
+
+thumb_fit
+----------
+
+    | type: **Boolean**
+    | default: **true**
+
+If this is set to 'true', all thumbnail containers will be shrinked to fit the actual thumbnail size.
+This is only relevant if thumb_crop is set to anything else but 'true'. 
+If you want all thumbnails to fit inside a conainer with predefined width & height, set this to 'false'.
 
 *****
 

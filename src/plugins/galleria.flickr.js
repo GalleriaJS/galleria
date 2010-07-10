@@ -118,7 +118,7 @@ F.prototype = {
     		        case 'small':
     		            img = photo.url_s;
     		            break;
-    		        case 'big':
+    		        case ( 'big' || 'large' ):
     		            if (photo.url_l) {
     		                img = photo.url_l;
     		            } else if (parseInt(photo.width_o) > 1280) {

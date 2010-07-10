@@ -7,7 +7,7 @@
 .galleria-counter{position:absolute;bottom:10px;left:10px;text-align:right;color:#fff;font:normal 11px/1 arial,sans-serif;z-index:2;}
 .galleria-loader{background:#000;width:20px;height:20px;position:absolute;top:10px;right:10px;z-index:2;display:none;background:url(classic-loader.gif) no-repeat 2px 2px;}
 .galleria-info{width:50%;top:15px;left:15px;z-index:2;position:absolute;}
-.galleria-info-text{background-color:rgba(0,0,0,.9);*background-color:#000;padding: 12px;display:none;}
+.galleria-info-text{background-color:#000;background-color:rgba(0,0,0,.9);padding: 12px;display:none;}
 .galleria-info-title{font:bold 12px/1.1 arial,sans-serif;margin:0;color:#fff;}
 .galleria-info-description{font:italic 12px/1.4 georgia,serif;margin:0;color:#bbb;}
 .galleria-info-title+.galleria-info-description{margin-top:7px;}
