@@ -2,41 +2,34 @@
 <html lang="sv">
     <head>
         <title>Galleria Classic Theme Demo 03</title>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+        <script src="../src/jquery-1.4.2.js"></script>
         <script src="../src/galleria.js"></script>
-        <script src="../src/themes/classic/galleria.classic.js"></script>
+        <script src="../src/plugins/galleria.ssp.js"></script>
         <style>
             html,body{background:#111}
             #galleria{width:700px;margin:20px auto}
         </style>
     </head>
 <body>
-    <div id="galleria">
-        <img src="http://galleria.aino.se/media/i/demo/01.jpg" title="A test image" alt="A lorem caption">
-        <img src="http://galleria.aino.se/media/i/demo/02.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/03.jpg" longdesc="http://aino.se" alt="Click this image to visit Aino">
-        <img src="http://galleria.aino.se/media/i/demo/04.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/05.jpg">
-
-        <img src="http://galleria.aino.se/media/i/demo/06.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/07.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/08.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/09.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/10.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/11.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/12.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/13.jpg">
-        <img src="http://galleria.aino.se/media/i/demo/14.jpg">
-        
-    </div>
+    <div id="galleria"></div>
+    
     <script>
-    // Classic theme is now loaded using <script> instead
-    // You can still use loadTheme if you like, either works.
-    $('#galleria').galleria({
-        image_crop: true,
-        transition: 'fade',
-        autoplay: true
-    });
+    
+    // Load theme
+    Galleria.loadTheme('../src/themes/classic/galleria.classic.js');
+    
+    // initialize slieshowpro plugin and add the XML
+    var xml = 'http://www.elmrin.se/ssp_director/index.php?/site/data/6/0/804_556_0_80_1_80_60_0_50_1_50_50_1';
+    var ssp = new Galleria.SSP(xml);
+    
+    // inject an album into galleria
+    ssp.getAlbum(0, function(data) {
+        $('#galleria').galleria({
+            data_source:data,
+            thumb_crop: 'height'
+        });
+    })
+    
     </script>
     </body>
 </html>

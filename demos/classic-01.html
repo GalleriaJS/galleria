@@ -7,7 +7,7 @@
         <script src="../src/plugins/galleria.flickr.js"></script>
         <style>
             html,body{background:#111}
-            #galleria{width:700px;height:500px;margin:20px auto}
+            #galleria{width:700px;height:400px;margin:20px auto}
         </style>
     </head>
 <body>
@@ -22,11 +22,13 @@
     var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
     
     // inject a photset into galleria
-    flickr.getSet('72157604743096775', { 
+    flickr.getSet('72157614808139502', { 
         size: 'medium'
     }, function(data) {
         $('#galleria').galleria({
-            data_source:data
+            data_source:data,
+            thumb_crop: 'height',
+            image_crop: 'height'
         });
     });
     

@@ -22,7 +22,8 @@
     }).getUser('davidhellsing', function(data) {
         $('#galleria').galleria({
             data_source: data,
-            debug: true
+            debug: true,
+            thumb_crop: 'height'
         });
     });
     </script>

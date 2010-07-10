@@ -15,7 +15,7 @@ html,body{height:100%;margin:0;padding:0;overflow:hidden;}
 .galleria-image-nav-left{left:0;right:auto;background-image:url(l.gif);}
 .galleria-loader{width:30px;height:30px;background:#fff url(loader.gif) no-repeat 50% 50%;position:absolute;top:50%;left:50%;margin-top:-15px;margin-left:-15px;z-index:3;}
 .galleria-info,
-.galleria-counter{position:absolute;bottom:45px;padding:10px;color:#fff;left:10px;right:10px;z-index:3;font:12px arial,sans-serif;}
+.galleria-counter{position:absolute;bottom:55px;padding:10px;color:#fff;left:10px;right:10px;z-index:3;font:12px arial,sans-serif;}
 .galleria-counter{text-align:right;}
 .galleria-info-text{z-index:4;}
 .galleria-info-text *{display:inline;font-size:12px;}

@@ -56,9 +56,11 @@ Galleria.addTheme({
 
         this.bind(Galleria.LOADFINISH, function(e) {
             this.$('loader').fadeOut(200);
+        });
+        this.bind(Galleria.LOADSTART, function(e) {
             $(e.thumbTarget).css('opacity',1).parent().addClass('active')
                 .siblings('.active').removeClass('active').children().css('opacity',.4);
-        });
+        })
     }
 });
 

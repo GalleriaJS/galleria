@@ -52,10 +52,10 @@ Galleria.addTheme({
                 bottom: 10
             });
             var tc = this.$('thumbnails-container');
-            var b = this.$('thumbnails').find('.galleria-image').css('height').replace('px','');
-            b = (parseInt(b) + 10) * -1;
+            var b = this.height(this.get('thumbnails-container'));
+            b = b * -1;
             tc.hover(function(e) {
-                ic.css('bottom',10).animate({bottom: b*-1+10, opacity:1},{queue:false, duration:200});
+                ic.css('bottom',10).animate({bottom: b*-1, opacity:1},{queue:false, duration:200});
                 $(e.currentTarget).animate({bottom: 0}, {queue:false, duration: 200});
                 open = true;
             }, function(e) {
@@ -64,9 +64,11 @@ Galleria.addTheme({
                 open = false;
             }).css('bottom', b);
         }
-        this.$('thumbnails-container').show();
         if (!options.thumbnails) {
+            this.$('thumbnails-container').hide();
            this.$('info,counter').css('bottom',10); 
+        } else {
+            this.$('thumbnails-container').show();
         }
 
         this.$('image-nav-left, image-nav-right').css('opacity',0.01).hover(function() {

@@ -2,7 +2,7 @@
 <html lang="sv">
     <head>
         <title>Galleria Classic Theme Demo 02</title>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+        <script src="../src/jquery-1.4.2.js"></script>
         <script src="../src/galleria.js"></script>
         <style>
             html,body{background:#111}
@@ -12,28 +12,38 @@
     </head>
 <body>
     <div id="galleria">
-        <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/7/75/2010_Opening_Ceremony_-_Sweden_entering.jpg/800px-2010_Opening_Ceremony_-_Sweden_entering.jpg">
-        <p>The athletes from <strong>Sweden</strong> entering the stadium at the opening ceremonies of the 2010 Winter Olympics</p>
-        <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Swedish_Lion.jpg/792px-Swedish_Lion.jpg">
-        <p>The swedish <em>Lion</em></p>
-        <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Svenska_Grammofonstudion%2C_Gothenburg_Sweden%2C_Fender.jpg/800px-Svenska_Grammofonstudion%2C_Gothenburg_Sweden%2C_Fender.jpg">
-        <p><a href="http://www.svenskagrammofonstudion.com/">Svenska Grammofonstudion</a>, Gothenburg Sweden</p>
+        <a href="../../images/IMG_2668.jpg"><img src="../../images/IMG_2668_t.jpg"></a>
+        <a href="../../images/IMG_2614.jpg"><img src="../../images/IMG_2614_t.jpg"></a>
+        <a href="../../images/IMG_2663.jpg"><img src="../../images/IMG_2663_t.jpg"></a>
+        <a href="../../images/IMG_2870.jpg"><img src="../../images/IMG_2870_t.jpg"></a>
+        <a href="../../images/IMG_2569.jpg"><img src="../../images/IMG_2569_t.jpg"></a>
+        <a href="../../images/IMG_2795.jpg"><img src="../../images/IMG_2795_t.jpg"></a>
+        <a href="../../images/IMG_2591.jpg"><img src="../../images/IMG_2591_t.jpg"></a>
+        <a href="../../images/IMG_2744.jpg"><img src="../../images/IMG_2744_t.jpg"></a>
+        <a href="../../images/IMG_2907.jpg"><img src="../../images/IMG_2907_t.jpg"></a>
+        <a href="../../images/IMG_2823.jpg"><img src="../../images/IMG_2823_t.jpg"></a> 
+        <a href="../../images/IMG_2668.jpg"><img src="../../images/IMG_2668_t.jpg"></a>
+        <a href="../../images/IMG_2614.jpg"><img src="../../images/IMG_2614_t.jpg"></a>
+        <a href="../../images/IMG_2663.jpg"><img src="../../images/IMG_2663_t.jpg"></a>
+        <a href="../../images/IMG_2870.jpg"><img src="../../images/IMG_2870_t.jpg"></a>
+        <a href="../../images/IMG_2569.jpg"><img src="../../images/IMG_2569_t.jpg"></a>
+        <a href="../../images/IMG_2795.jpg"><img src="../../images/IMG_2795_t.jpg"></a>
+        <a href="../../images/IMG_2591.jpg"><img src="../../images/IMG_2591_t.jpg"></a>
+        <a href="../../images/IMG_2744.jpg"><img src="../../images/IMG_2744_t.jpg"></a>
+        <a href="../../images/IMG_2907.jpg"><img src="../../images/IMG_2907_t.jpg"></a>
+        <a href="../../images/IMG_2823.jpg"><img src="../../images/IMG_2823_t.jpg"></a>
     </div>
  
     <script>
     
     // Load theme
-    Galleria.loadTheme('../src/themes/classic/galleria.classic.js');
+    Galleria.loadTheme('../src/themes/dots/galleria.dots.js');
     
     // run galleria and add some options
     $('#galleria').galleria({
-        image_crop: true,
-        transition: 'fade',
-        data_config: function(img) {
-            return {
-                description: $(img).next('p').html()
-            };
-        }
+        image_crop: 'width',
+        thumb_crop:'height',
+        debug:true
     });
     </script>
     </body>
