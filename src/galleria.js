@@ -1005,7 +1005,7 @@ var G = window.Galleria = Base.extend({
         }
         rewind = typeof rewind != 'undefined' ? !!rewind : index < this.active;
         history = history || false;
-        index = parseInt(index);
+        index = Math.max(0, Math.min(parseInt(index), this.data.length - 1));
         if (!history && G.History) {
             G.History.value(index.toString());
             return;
