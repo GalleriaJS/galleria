@@ -181,7 +181,7 @@ var Base = Class.extend({
         return jQuery( elem ).hide();
     },
     mix : function() {
-        return jQuery.extend.apply(null, arguments);
+        return jQuery.extend.apply(jQuery, arguments);
     },
     proxy : function( fn, scope ) {
         if ( typeof fn !== 'function' ) {
