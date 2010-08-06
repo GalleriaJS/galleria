@@ -22,7 +22,8 @@ var F = G.Flickr = function(api_key) {
 	this.options = {
 		max: 40,
 		size: 'big',
-		sort: 'interestingness-desc'
+		sort: 'interestingness-desc',
+		description: false
 	}
 }
 
@@ -101,7 +102,7 @@ F.prototype = {
 	_find: function(params) {
 		params = jQuery.extend({
 			method: 'flickr.photos.search',
-		    extras: 'url_t, url_m, url_o, url_s, url_l',
+		    extras: 'url_t, url_m, url_o, url_s, url_l, description',
 		    sort: this.options.sort
 		}, params);
 		
@@ -138,7 +139,8 @@ F.prototype = {
                 var item = {
     				thumb: photos[i].url_t,
     				image: img,
-    				title: photos[i].title
+    				title: photos[i].title,
+    				description: this.options.description && photos[i].description ? photos[i].description._content : ''
     			};
     			Array.prototype.push.call(obj, item);
 			}

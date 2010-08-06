@@ -6,13 +6,7 @@
         <script src="../src/galleria.js"></script>
         <script src="../src/plugins/galleria.flickr.js"></script>
         <style>
-        /* any custom CSS will override the theme. Here I will enlarge the thumbnails: */
-        .galleria-thumbnails .galleria-image{width:90px;height:60px;}
-        .galleria-thumbnails-list{height:60px;}
-        .galleria-thumb-nav-left,
-        .galleria-thumb-nav-right{height:55px;}
-        .galleria-info,
-        .galleria-counter{bottom:80px;}
+        body{background:#000;}
         </style>
     </head>
 <body>
@@ -22,20 +16,20 @@
     Galleria.loadTheme('../src/themes/fullscreen/galleria.fullscreen.js');
     
     // initialize flickr plugin
-    var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
+    var flickr = new Galleria.Flickr('334ac5bd5a031919846a3aa6bfcb429f');
     
-    // search for photos tagged 'sail' and apply galleria
-    flickr.getTags('sail', { 
+    // search for photos tagged 'vintage', edit options and apply galleria
+    flickr.setOptions({
+        max: 20,
+        sort: 'date-posted-desc',
         size: 'big'
-    }, function(data) {
+    }).getTags('vintage', function(data) {
         $('#galleria').galleria({
-            data_source:data,
-            thumb_crop:'height',
-            image_position: '50% 0', // will position the images on top
-            carousel_steps: 3 // will advance the carousel 3 steps when clicking the arrow
+            data_source: data,
+            image_crop: true,
+            image_pan: true
         });
     });
-    
     </script>
     </body>
 </html>

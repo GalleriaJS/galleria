@@ -14,7 +14,8 @@
     Galleria.loadTheme('../src/themes/fullscreen/galleria.fullscreen.js');
     
     // initialize flickr plugin
-    var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
+    var api_key = 'fddd7bc223fe37295faace93a4f2d8fc'; // get your API key at Flickr
+    var flickr = new Galleria.Flickr(api_key);
     
     // search for photos tagged 'lomo', edit options and apply galleria
     flickr.setOptions({
@@ -23,14 +24,11 @@
         size: 'big'
     }).getTags('lomo', function(data) {
         $('#galleria').galleria({
-            data_source: data,
-            image_crop: false,
-            frame_color: '#000',
-            transition: 'slide',
-            hide_dock: false,
-            extend: function() {
-                this.$('info,counter').hide();
-            }
+            data_source: data, // load the flickr data
+            image_crop: false, // don’t crop images
+            transition: 'slide', // sliding transition
+            show_info: false, // don’t show captions
+            thumbnails: false // hide the thumbnails
         });
     });
     </script>

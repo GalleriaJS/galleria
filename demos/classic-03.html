@@ -1,34 +1,75 @@
 <!DOCTYPE html>
 <html lang="sv">
     <head>
-        <title>Galleria Classic Theme Demo 03</title>
-        <script src="../src/jquery-1.4.2.js"></script>
+        <meta charset="utf-8">
+        <title>Galleria Classic Theme Demo 01</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <script src="../src/galleria.js"></script>
-        <script src="../src/plugins/galleria.ssp.js"></script>
+        <script src="../src/plugins/galleria.flickr.js"></script>
         <style>
             html,body{background:#111}
-            #galleria{width:700px;margin:20px auto}
+            .content{color:#ccc;font:14px/1.4 arial,sans-serif;width:600px;margin:20px auto}
+            h1{line-height:1.1;letter-spacing:-1px;}
+            #galleria{height:400px;}
         </style>
     </head>
 <body>
-    <div id="galleria"></div>
+    <div class="content">
+        <h1>A classic Galleria gallery using Flickr images</h1>
+        <div id="galleria"></div>
+        <p id="nav">
+            <a id="g_prev" href="#">Previous</a> 
+            <a id="g_next" href="#">Next</a> 
+            <a id="g_play" href="#">Play</a> 
+            <a id="g_pause" href="#">Pause</a> 
+            <a id="g_fullscreen" href="#">Fullscreen</a>
+        </p> 
+        <p>This example is a classic gallery that fetches images from a Flickr user stream using the Flickr plugin.
+            We also added external links to navigate, pause, play and enter fullscreen mode.</p>
+        <p>View source for comments and code.</p>
+    </div>
     
     <script>
     
     // Load theme
     Galleria.loadTheme('../src/themes/classic/galleria.classic.js');
     
-    // initialize slieshowpro plugin and add the XML
-    var xml = 'http://www.elmrin.se/ssp_director/index.php?/site/data/6/0/804_556_0_80_1_80_60_0_50_1_50_50_1';
-    var ssp = new Galleria.SSP(xml);
+    // intiialize flickr plugin
+    var api_key = 'fddd7bc223fe37295faace93a4f2d8fc'; // get your API key at Flickr
+    var flickr = new Galleria.Flickr(api_key);
     
-    // inject an album into galleria
-    ssp.getAlbum(0, function(data) {
+    // inject a user's photostrem photset into galleria
+    flickr.getUser('lukewoodford', { 
+        size: 'big',
+        description: true // set this to true to fetch flickr descriptions
+    }, function(data) {
         $('#galleria').galleria({
-            data_source:data,
-            thumb_crop: 'height'
+            data_source: data, // add the flickr data
+            show_imagenav: false, // remove the prev/next arrows
+            extend: function() {
+                var gallery = this; // save the scope
+                $('#nav a').click(function(e) {
+                    e.preventDefault(); // prevent default actions on the links
+                })
+                // attach gallery methods to links:
+                $('#g_prev').click(function() {
+                    gallery.prev();
+                });
+                $('#g_next').click(function() {
+                    gallery.next();
+                });
+                $('#g_play').click(function() {
+                    gallery.play();
+                });
+                $('#g_pause').click(function() {
+                    gallery.pause();
+                });
+                $('#g_fullscreen').click(function() {
+                    gallery.enterFullscreen();
+                });
+            }
         });
-    })
+    });
     
     </script>
     </body>

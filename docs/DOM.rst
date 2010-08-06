@@ -1,5 +1,3 @@
-.. _dom:
-
 ===
 DOM
 ===
@@ -24,12 +22,10 @@ Here is a list of each element in the default Galleria DOM and their layout::
                     thumbnails
                 thumb-nav-right
             info
-                info-link
                 info-text
                     info-title
                     info-description
                     info-author
-                info-close
 
 
 HTML structure
@@ -72,11 +68,10 @@ This presentation of the Galleria HTML structure is good to have when building C
             <div class="galleria-thumb-nav-right [ disabled ]"></div>
         </div>
         <div class="galleria-info">
-            <div class="galleria-info-link"></div>
             <div class="galleria-info-text">
                 <div class="galleria-info-title"></div>
                 <div class="galleria-info-description"></div>
                 <div class="galleria-info-author"></div>
-            <div class="galleria-info-close"></div>
+            </div>
         </div>
     </div>

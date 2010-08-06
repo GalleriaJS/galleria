@@ -15,9 +15,16 @@ Galleria.addTheme({
     css: 'galleria.classic.css',
     defaults: {
         transition: 'slide',
-        show_caption: false
+        show_caption: false,
+        thumb_crop: 'height'
     },
     init: function(options) {
+        
+        this.addElement('info-link','info-close');
+        this.append({
+            'info' : ['info-link','info-close']
+        });
+        
         this.$('loader').show().fadeTo(200, .4);
         this.$('counter').show().fadeTo(200, .4);
         

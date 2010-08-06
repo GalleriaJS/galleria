@@ -19,15 +19,15 @@
     var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
     
     // search for 'black white', edit options and apply galleria
+    // we also added the history plugin by including the plugin in the head to enable permalinks and browser back button
     flickr.search('black white', {
-        sort: 'date-posted-desc',
+        sort: 'relevance',
         max: 40,
         size: 'big'
     }, function(data) {
         $('#galleria').galleria({
             data_source: data,
-            frame: false,
-            thumbnails: false
+            image_pan: true
         });
     });
     </script>
