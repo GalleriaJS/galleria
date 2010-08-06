@@ -1,6 +1,6 @@
-======
+==================
 Extending Galleria
-======
+==================
 
 Once you fiddled around with the Galleria options and styles, you might come to a point when you want to do some more advanced customizations.
 Galleria makes this possible with a bunch of public methods and events that makes customization easy.
