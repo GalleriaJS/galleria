@@ -2,8 +2,7 @@
 Extending Galleria
 ==================
 
-Once you fiddled around with the Galleria options and styles, you might come to a point when you want to do some more advanced customizations.
-Galleria makes this possible with a bunch of public methods and events that makes customization easy.
+Once you fiddled around with the Galleria options and styles, you might come to a point when you want to do some more advanced customizations. Galleria makes this possible with a bunch of public methods and events that makes customization easy.
 
 There are several ways you can access the methods:
 
@@ -157,55 +156,3 @@ The theme object explained:
 - **init** (Function) contains all theme-specific logic. The function takes one argument, options, and the this keyword is the gallery instance. The function gets called after the data is fetched and the gallery is fully prepared to run.
 
 The ``init`` function in your theme has access to a number of helpers, functions and events that you can use to customize your theme logic.
-
-Static variables
-==============
-
-Galleria.IE7
-------------
-
-    | type **Boolean**
-
-Returns true if IE7 is detected using object detection.
-
-Galleria.IE6
-------------
-
-    | type **Boolean**
-
-Returns true if IE6 is detected using object detection.
-
-Galleria.WEBKIT
----------------
-
-    | type **Boolean**
-
-Returns true if the webkit engine (safari & chrome) is detected using browser sniffing.
-
-Galleria.CHROME
----------------
-
-    | type **Boolean**
-
-Returns true if Chrome is detected using browser sniffing.
-
-Galleria.SAFARI
----------------
-
-    | type **Boolean**
-
-Returns true if Safari is detected using browser sniffing.
-
-Galleria.MAC
-------------
-
-    | type **Boolean**
-
-Returns true if Apple OS is detected using browser sniffing.
-
-Galleria.QUIRK
---------------
-
-    | type **Boolean**
-
-Returns true if IE / Quirks Mode is detected using object detection.
