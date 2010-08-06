@@ -98,7 +98,7 @@ A simple theme can be created like this:
 
 - 1. create a directory in your galleria theme directory called 'my_theme'
 - 2. create a new css file called galleria.my_theme.css. Save in the folder you just created.
-- 3. create a new js file called galleria.my_theme.js ad save in the same directory. Add the following example code:
+- 3. create a new js file called galleria.my_theme.js ad save in the same directory. Add the following example code::
 
     Galleria.addTheme({
         name: 'my theme',
