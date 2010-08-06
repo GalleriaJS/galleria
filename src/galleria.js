@@ -185,7 +185,7 @@ var Base = Class.extend({
         return jQuery( elem ).hide();
     },
     mix : function() {
-        return jQuery.extend.apply(null, arguments);
+        return jQuery.extend.apply(jQuery, arguments);
     },
     proxy : function( fn, scope ) {
         if ( typeof fn !== 'function' ) {
@@ -1858,7 +1858,7 @@ var G = window.Galleria = Base.extend({
             var getData = this.proxy(function( elem ) {
                 var i,j,anchor = elem.parentNode;
                 if (anchor && anchor.nodeName == 'A') {
-                    if (anchor.href.match(/\.(png|gif|jpg)/i)) {
+                    if (anchor.href.match(/\.(png|gif|jpg|jpeg)/i)) {
                         i = anchor.href;
                     } else {
                         j = anchor.href;
