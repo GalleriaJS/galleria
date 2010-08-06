@@ -8,9 +8,14 @@ Example usage:
 ..............
 
 ::
+    <script>
     if (Galleria.OPERA) {
         Galleria.log('you are using opera!');
     }
+    </script>
+
+List of static variables:
+=========================
 
 Galleria.IE
 -----------

@@ -1,5 +1,3 @@
-.. _extending Galleria:
-
 ======
 Extending Galleria
 ======

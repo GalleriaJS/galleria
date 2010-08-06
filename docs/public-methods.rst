@@ -160,12 +160,14 @@ Method for grabbing the currently displayed image.
 
 
 .getData( [index] )
+-------------------
 
     | returns **Object**
 
 Returns the data object for the image. You can specify index or it will assume the currently active image.
 
 .getIndex()
+-----------
 
     | returns **Number**
 
