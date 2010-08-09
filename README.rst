@@ -15,6 +15,23 @@ General information
 ===================
 Galleria is a image gallery framework that is very easy to use, yet loaded with advanced customization options. With more than 5k daily downloads, it's one of the most popular javascript image galleries available today. Galleria 1.2 is still in beta development, stable release is set sometime in late August 2010. Galleria and some of the themes provided here are free to use under the MIT license. More advanced themes, better licensing options, support, integrations and more extras will soon be available as a premium membership. Stay tuned at http://galleria.aino.se/ for the latest updates.
 
-A good way to get started is to read the 'Geting started' section and check out the demos in the repository. Make sure you view the source as well as there are some useful comments for each theme.
+A good way to get started is to read the <a href="http://github.com/aino/galleria/blob/master/docs/getting-started.rst">Getting started</a> section and check out the demos in the repository. Make sure you view the source as well as there are some useful comments for each theme.
 
 Good luck!
+
+Documentation
+=============
+
+Documentation is currently available in <a href="http://en.wikipedia.org/wiki/ReStructuredText">reST</a> format in the repository. Links to sections at gitHub:
+
+- <a href="http://github.com/aino/galleria/blob/master/docs/getting-started.rst">Getting started</a>
+- <a href="http://github.com/aino/galleria/blob/master/docs/extending-galleria.rst">Extending Galleria</a>
+- <a href="http://github.com/aino/galleria/blob/master/docs/options.rst">Options</a>
+- <a href="http://github.com/aino/galleria/blob/master/docs/events.rst">Events</a>
+- <a href="http://github.com/aino/galleria/blob/master/docs/public-methods.rst">Public methods</a>
+- <a href="http://github.com/aino/galleria/blob/master/docs/public-static-methods.rst">Public Static methods</a>
+- <a href="http://github.com/aino/galleria/blob/master/docs/public-variables.rst">Public variables</a>
+- <a href="http://github.com/aino/galleria/blob/master/docs/plugin-flickr.rst">Flickr Plugin</a>
+- <a href="http://github.com/aino/galleria/blob/master/docs/plugin-history.rst">History Plugin</a>
+- <a href="http://github.com/aino/galleria/blob/master/docs/plugin-slideshowpro.rst">SlideShowPro Plugin</a>
+<a href="http://github.com/aino/galleria/blob/master/docs/dom.rst">DOM structure</a>
