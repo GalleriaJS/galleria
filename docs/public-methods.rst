@@ -47,19 +47,21 @@ Shows the image specified as index. You can call this method anytime and the ima
 Display extras
 ==============
 
-.enterFullscreen()
+.enterFullscreen( [callback] )
 ------------------
 
     | returns **Galleria**
 
 This will set the gallery in fullscreen mode. It will temporary manipulate some document styles and blow up the gallery to cover the browser screen. Note that it will only fill the browser window, not the client screen (javascript can't do that).
 
-.exitFullscreen()
+The callback is called when the fullscreen mode has initialized (it takes around 40 ms before everything is rescaled)
+
+.exitFullscreen( [callback] )
 ------------------
 
     | returns **Galleria**
 
-This will exit fullscreen mode and revert the gallery to it's normal size and also revert the document styles.
+This will exit fullscreen mode and revert the gallery to it's normal size and also revert the document styles. The callback is called when the fullscreen mode is turned off (it takes around 40 ms before everything is rescaled)
 
 .showLightbox( [index] )
 ------------------
@@ -98,6 +100,20 @@ Example:
     | returns **Galleria**
 
 Removes an elements idle state set using the ``addIdleState`` method.
+
+.addPan( [image] )
+------------------
+
+    | returns **Galleria**
+
+Manually applies a panning effect that revealse cropped areas on mousemove. If no image specified, it will assume the currently displayed image. You can set this to automatically add pan on each image using the ``image_pan`` option.
+
+.removePan()
+------------------
+
+    | returns **Galleria**
+
+Removes all panning effects set by ``addPan()``.
 
 
 Retrieving
