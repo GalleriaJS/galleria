@@ -1,5 +1,5 @@
 /*
- * Galleria v 1.2 prerelease 1.1 2010-11-18
+ * Galleria v 1.2 prerelease 1.1 2010-11-23
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -639,7 +639,6 @@ Galleria = function() {
                     h = Math.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
                 }
             });
-            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > self._stageWidth );
 
             self.$( 'thumbnails' ).css({
                 width: w,
@@ -650,6 +649,8 @@ Galleria = function() {
             carousel.hooks = hooks;
             carousel.width = self.$( 'thumbnails-list' ).width();
             carousel.setClasses();
+
+            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > carousel.width );
 
             // todo: fix so the carousel moves to the left
         },
@@ -763,8 +764,6 @@ Galleria = function() {
 
         initialized : false,
 
-        active: null,
-
         open: false,
 
         init: function() {
@@ -792,13 +791,13 @@ Galleria = function() {
                 width = $elem.outerWidth( true ),
                 limitY = height + 15;
 
-            var maxX = self._stageWidth - width,
-                maxY = self._stageHeight - height;
+            var maxX = self.$( 'container').width() - width - 2,
+                maxY = self.$( 'container').height() - height - 2;
 
             if ( !isNaN(x) && !isNaN(y) ) {
 
-                x += 15;
-                y -= 35;
+                x += 10;
+                y -= 30;
 
                 x = Math.max( 0, Math.min( maxX, x ) );
                 y = Math.max( 0, Math.min( maxY, y ) );
@@ -826,7 +825,6 @@ Galleria = function() {
 
                 $( elem ).hover(function() {
 
-                    tooltip.active = elem;
                     Utils.clearTimer('switch_tooltip');
                     self.$('container').unbind( 'mousemove', tooltip.move ).bind( 'mousemove', tooltip.move ).trigger( 'mousemove' );
                     tooltip.show( elem );
@@ -840,11 +838,11 @@ Galleria = function() {
 
                 }, function() {
 
-                    tooltip.active = null;
-
                     self.$( 'container' ).unbind( 'mousemove', tooltip.move );
                     Utils.clearTimer( 'tooltip' );
-
+                    
+                    self.$( 'tooltip' ).stop();
+                    
                     Utils.hide( self.get( 'tooltip' ), 200, function() {
                         Utils.addTimer('switch_tooltip', function() {
                             tooltip.open = false;
@@ -864,15 +862,33 @@ Galleria = function() {
         },
 
         show: function( elem ) {
-            var text = $(elem).data('tt');
+            
+            elem = $( elem in self._dom ? self.get(elem) : elem );
+            
+            var text = elem.data( 'tt' );
+            
             if ( ! text ) {
                 return;
             }
+            
             text = typeof text == 'function' ? text() : text;
+            
             self.$( 'tooltip' ).html( text.replace(/\s/, '&nbsp;') );
+            
+            // trigger mousemove on mouseup in case of click
+            elem.bind( 'mouseup', function( e ) {
+                
+                // attach a tiny settimeout to make sure the new tooltip is filled
+                window.setTimeout( (function( ev ) {
+                    return function() {
+                        tooltip.move( ev );
+                    }
+                })( e ), 10);
+                
+                elem.unbind( 'mouseup', arguments.callee );
+            });
         },
 
-        // redefine the tooltip here
         define: function( elem, value ) {
 
             // we store functions, not strings
@@ -883,22 +899,10 @@ Galleria = function() {
                 };
             }
 
-            if ( elem in self._dom ) {
-                elem = self.get( elem );
-            }
-
-            $(elem).data('tt', value);
+            elem = $( elem in self._dom ? self.get(elem) : elem ).data('tt', value);
 
             tooltip.show( elem );
 
-        },
-
-        refresh: function() {
-            $.each( arguments, function(i, elem) {
-                if ( tooltip.active == elem ) {
-                    tooltip.show( elem );
-                }
-            });
         }
     };
 
@@ -1338,6 +1342,10 @@ Galleria = function() {
 // end Galleria constructor
 
 Galleria.prototype = {
+    
+    // bring back the constructor reference
+    
+    constructor: Galleria,
 
     /**
         Use this function to initialize the gallery and start loading.
@@ -2183,8 +2191,10 @@ Galleria.prototype = {
     },
 
     /**
-        Redefine a tooltip
-        Use this if you want to change the tooltip value at runtime
+        Note: this method is deprecated. Use refreshTooltip() instead.
+        
+        Redefine a tooltip.
+        Use this if you want to re-apply a tooltip value to an already bound tooltip element.
 
         @param {HTML Element} elem The DOM Node to attach the event to
         @param {String or Function} value The tooltip message. Can also be a function that returns a string.
@@ -2197,10 +2207,17 @@ Galleria.prototype = {
         return this;
     },
 
-    // leave this out of the API for now
+    /**
+        Refresh a tooltip value.
+        Use this if you want to change the tooltip value at runtime, f.ex if you have a play/pause toggle.
+
+        @param {HTML Element} elem The DOM Node that has a tooltip that should be refreshed
+
+        @returns {Galleria}
+    */
 
     refreshTooltip: function() {
-        this._tooltip.refresh.apply( this._tooltip, Utils.array(arguments) );
+        this._tooltip.show.apply( this._tooltip, Utils.array(arguments) );
         return this;
     },
 
@@ -2264,8 +2281,8 @@ $(document).mousemove(function(e) {
 
     getMousePosition : function(e) {
         return {
-            x: e.pageX - this.$( 'stage' ).offset().left,
-            y: e.pageY - this.$( 'stage' ).offset().top
+            x: e.pageX - this.$( 'container' ).offset().left,
+            y: e.pageY - this.$( 'container' ).offset().top
         };
     },
 
@@ -3002,13 +3019,14 @@ this.prependChild( 'info', 'myElement' );
     */
 
     play : function( delay ) {
-
-        this.trigger( Galleria.PLAY );
-
+        
         this._playing = true;
+        
         this._playtime = delay || this._playtime;
 
         this._playCheck();
+        
+        this.trigger( Galleria.PLAY );
 
         return this;
     },
@@ -3020,8 +3038,11 @@ this.prependChild( 'info', 'myElement' );
     */
 
     pause : function() {
-        this.trigger( Galleria.PAUSE );
+        
         this._playing = false;
+        
+        this.trigger( Galleria.PAUSE );
+        
         return this;
     },
 
@@ -3035,6 +3056,16 @@ this.prependChild( 'info', 'myElement' );
 
     playToggle : function( delay ) {
         return ( this._playing ) ? this.pause() : this.play( delay );
+    },
+    
+    /**
+        Checks if the gallery is currently playing
+
+        @returns {Boolean}
+    */
+    
+    isPlaying : function() {
+        return this._playing;
     },
 
     _playCheck : function() {
@@ -3296,6 +3327,9 @@ Galleria.addTheme = function( theme ) {
         if ( !css ) {
             Galleria.raise('No theme CSS loaded');
         }
+    } else {
+        Galleria.theme = theme;
+        $doc.trigger( Galleria.THEMELOAD );
     }
     return theme;
 };
