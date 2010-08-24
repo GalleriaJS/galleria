@@ -1,6 +1,6 @@
-======
+=============
 Flickr Plugin
-======
+=============
 
 Galleria comes with a flickr plugin that can be used to fetch images from flickr and display them in your Galleria gallery.
 
@@ -45,7 +45,7 @@ Reference API
 Modifies the default options for ``Galleria.Flickr``. **options** is an Object with your custom options that will override the defaults.
 
 .search(search_string, options, callback)
-----------------------
+-----------------------------------------
 
     | returns **Galleria.Flickr**
 
@@ -56,7 +56,7 @@ A helper function for searching Flickr and converting the data to a Galleria-fri
 - **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
 
 .getTags(tags, [options,] callback)
-----------------------
+-----------------------------------
 
     | returns **Galleria.Flickr**
 
@@ -67,7 +67,7 @@ A helper function for searching Flickr for tags and converting the data to a Gal
 - **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
 
 .getUser(username, [options,] callback)
-----------------------
+---------------------------------------
 
     | returns **Galleria.Flickr**
 
@@ -78,7 +78,7 @@ Get all pictures from a user's photostream. The username is the same name as in 
 - **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
 
 .getSet(set_id, [options,] callback)
-----------------------
+------------------------------------
 
     | returns **Galleria.Flickr**
 
@@ -89,7 +89,7 @@ Get all pictures from a specific photoset.
 - **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
 
 .searchGroup(search_string, callback)
-----------------------
+-------------------------------------
 
     | returns **Galleria.Flickr**
 
@@ -109,7 +109,7 @@ example::
 - **callback(groups)** (Function) gets called when the search is complete. The first argument is the array of matches.
 
 .getGroup(nsid, [options,] callback)
-----------------------
+------------------------------------
 
     | returns **Galleria.Flickr**
 
@@ -120,7 +120,7 @@ Get all pictures from a specific group/pool.
 - **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
 
 .getGallery(gallery_id, [options,] callback)
-----------------------
+--------------------------------------------
 
     | returns **Galleria.Flickr**
 
@@ -143,7 +143,7 @@ max
 Sets the amount of images that will be fetched (max 100)
 
 size
-------------
+----
 
     | type: **String**
     | default: **'medium'**
@@ -151,7 +151,7 @@ size
 This options defines what size the plugin will fetch from flickr. Possible values are 'small', 'medium','big' and 'original'. Note that the 'big' size (1024px wide) is only available if the original size exceeds 1280px wide. If not, 'big' will return the biggest size available. 'original' will always return the biggest image available, but this can slow down performance significantly.
 
 sort
-------------
+----
 
     | type: **String**
     | default: **'interestingness-desc'**
@@ -159,7 +159,7 @@ sort
 How to sort the images. Available options are: date-posted-asc, date-posted-desc, date-taken-asc, date-taken-desc, interestingness-desc, interestingness-asc, and relevance.
 
 description
-------------
+-----------
 
     | type: **Boolean**
     | default: **false**

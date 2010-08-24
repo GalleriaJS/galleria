@@ -1,6 +1,6 @@
-===
-DOM
-===
+=============
+DOM Structure
+=============
 
 Galleria builds a rich DOM structure for each Gallery. You can access them using ``this.get( ID )`` or ``this.$( IDs )``. 
 Read more about DOM manipulation in the reference API.

@@ -17,20 +17,16 @@ Use ``.bind()`` to listen to the Galleria events. In the callback, the this keyw
         }
     });
     
-    
-List of public events
-=====================
-
-Galleria.THUMBNAIL
-------------------
+THUMBNAIL
+---------
 
 Triggers when a thumbnail is loaded and displayed in Galleria. Adds the following properties to the event object:
 
 - **thumbTarget** (HTML element) The thumbnail IMG element
 - **thumbOrder** (int) the index of the thumbnail, starting at 0
 
-Galleria.LOADSTART
-------------------
+LOADSTART
+---------
 
 Triggers every time Galleria begins loading an image. Adds the following properties to the event object:
 
@@ -39,8 +35,8 @@ Triggers every time Galleria begins loading an image. Adds the following propert
 - **thumbTarget** (HTML element) The ``IMG`` element of the thumbnail that belongs to the imageTarget.
 - **index** (Number) The galleria index of the image about to load.
 
-Galleria.LOADFINISH
--------------------
+LOADFINISH
+----------
 
 Triggers every time Galleria has finnished loading an image. Adds the following properties to the event object:
 
@@ -49,8 +45,8 @@ Triggers every time Galleria has finnished loading an image. Adds the following 
 - **thumbTarget** (HTML element) The ``IMG`` element of the thumbnail that belongs to the imageTarget.
 - **index** (Number) The galleria index of the image loaded.
 
-Galleria.IMAGE
--------------------
+IMAGE
+-----
 
 Triggers when the gallery image is displayed after loading and transition. Adds the following properties to the event object:
 
@@ -58,18 +54,18 @@ Triggers when the gallery image is displayed after loading and transition. Adds 
 - **thumbTarget** (HTML element) The ``IMG`` element of the active thumbnail.
 - **index** (Number) The galleria index of the image loaded.
 
-Galleria.PLAY
--------------------
+PLAY
+----
 
 Triggers when the galleria slideshow starts playing.
 
-Galleria.PAUSE
--------------------
+PAUSE
+-----
 
 Triggers when the galleria slideshow stops playing.
 
-Galleria.PROGRESS
--------------------
+PROGRESS
+--------
 
 Triggers every x milliseconds during slideshow. You can listen to this if you want to create a progress bar for slideshows. Adds the following properties to the event object:
 
@@ -77,43 +73,43 @@ Triggers every x milliseconds during slideshow. You can listen to this if you wa
 - **seconds** (Number) prints the seconds elapsed since the last image during slideshow.
 - **milliseconds** (Number) prints the milliseconds elapsed since the last image during slideshow.
 
-Galleria.FULLSCREEN_ENTER
--------------------
+FULLSCREEN_ENTER
+----------------
 
 Triggers when the gallery goes into fullscreen mode.
 
-Galleria.FULLSCREEN_EXIT
--------------------
+FULLSCREEN_EXIT
+---------------
 
 Triggers when the gallery exits the fullscreen mode.
 
-Galleria.IDLE_ENTER
--------------------
+IDLE_ENTER
+----------
 
 Triggers when the gallery goes into idle mode.
 
-Galleria.IDLE_EXIT
--------------------
+IDLE_EXIT
+---------
 
 Triggers when the gallery exists idle mode.
 
-Galleria.RESCALE
--------------------
+RESCALE
+-------
 
 Triggers every time the rescale() method is used and completed for rescaling the gallery.
 
-Galleria.LIGHTBOX_OPEN
--------------------
+LIGHTBOX_OPEN
+-------------
 
 Triggers every time the lightbox is opened.
 
-Galleria.LIGHTBOX_CLOSE
--------------------
+LIGHTBOX_CLOSE
+--------------
 
 Triggers every time the lightbox is closed.
 
-Galleria.LIGHTBOX_IMAGE
--------------------
+LIGHTBOX_IMAGE
+--------------
 
 Triggers when the lightbox image is displayed after loading and transition. Adds the following properties to the event object:
 

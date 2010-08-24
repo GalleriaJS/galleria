@@ -4,8 +4,8 @@ Broswer detection
 
 These static variables are mainly used to detect browsers.
 
-Example usage:
-..............
+Example usage
+-------------
 
 ::
 
@@ -14,66 +14,63 @@ Example usage:
         Galleria.log('you are using opera!');
     }
     </script>
-
-List of static variables:
-=========================
-
-Galleria.IE
------------
+    
+IE
+---
 Detects IE6+ using object detection.
 
-Galleria.IE6
-------------
+IE6
+----
 Detects IE6 using object detection.
 
-Galleria.IE7
-------------
+IE7
+----
 Detects IE7 using object detection.
 
-Galleria.IE8
-------------
+IE8
+----
 Detects IE8 using object detection.
 
-Galleria.IE9
-------------
+IE9
+----
 Detects IE9 using object detection.
 
-Galleria.WEBKIT
-------------
+WEBKIT
+------
 Detects webkit using browser sniffing.
 
-Galleria.SAFARI
-------------
+SAFARI
+------
 Detects safari using browser sniffing.
 
-Galleria.CHROME
-------------
+CHROME
+------
 Detects chrome using browser sniffing.
 
-Galleria.OPERA
-------------
+OPERA
+-----
 Detects opera using object detection.
 
-Galleria.MAC
-------------
+MAC
+---
 Detects macintosh platform using navigator.platform sniffing.
 
-Galleria.QUIRK
-------------
+QUIRK
+-----
 Detects quirkcs mode using object detection.
 
-Galleria.IPHONE
-------------
+IPHONE
+------
 Detects iphone using browser sniffing.
 
-Galleria.IPAD
-------------
+IPAD
+----
 Detects ipad using browser sniffing.
 
-Galleria.ANDROID
-------------
+ANDROID
+-------
 Detects android using browser sniffing.
 
-Galleria.TOUCH
-------------
+TOUCH
+-----
 Detects touch devices using browser sniffing.
