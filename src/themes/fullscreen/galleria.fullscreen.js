@@ -16,22 +16,24 @@ Galleria.addTheme({
     defaults: {
         transition: 'none',
         image_crop: true,
-        thumb_crop: 'height'
+        thumb_crop: 'height',
+        
+        _hide_dock: true
     },
     init: function(options) {
         
         this.addElement('thumbnails-tab');
         this.appendChild('thumbnails-container','thumbnails-tab');
         
-        var tab = this.$('thumbnails-tab');
-        var loader = this.$('loader');
-        var thumbs = this.$('thumbnails-container');
-        var list = this.$('thumbnails-list');
-        var infotext = this.$('info-text');
-        var info = this.$('info');
-        
-        var OPEN = false;
-        var POS = 0;
+        var tab      = this.$('thumbnails-tab'),
+            loader   = this.$('loader'),
+            thumbs   = this.$('thumbnails-container'),
+            list     = this.$('thumbnails-list'),
+            infotext = this.$('info-text'),
+            info     = this.$('info'),
+            
+            OPEN = !options._hide_dock,
+            POS = 0;
 
         if (Galleria.IE) {
             this.addElement('iefix');
@@ -44,7 +46,7 @@ Galleria.addTheme({
             })
         }
         
-        if (options.thumbnails === false) {
+        if ( options.thumbnails === false ) {
             thumbs.hide();
         }
         
@@ -54,7 +56,7 @@ Galleria.addTheme({
             }
             var w = Math.min(img.width, $(window).width());
             infotext.width(w-40);
-            if (Galleria.IE && this.options.show_caption) {
+            if (Galleria.IE && this.options.show_info) {
                 this.$('iefix').width(info.outerWidth()).height(info.outerHeight());
             }
         });
@@ -122,19 +124,27 @@ Galleria.addTheme({
             $(this).animate({opacity:0});
         }).show();
         
-        tab.click(this.proxy(function() {
-            tab.toggleClass('open', !OPEN);
-            if (!OPEN) {
-                thumbs.animate({
-                    top: POS - list.outerHeight() + 2
-                },400,'galleria');
-            } else {
-                thumbs.animate({
-                    top: POS
-                },400,'galleria');
-            }
-            OPEN = !OPEN;
-        }));
+        if (options._hide_dock) {
+            tab.click(this.proxy(function() {
+                tab.toggleClass('open', !OPEN);
+                if (!OPEN) {
+                    thumbs.animate({
+                        top: POS - list.outerHeight() + 2
+                    },400,'galleria');
+                } else {
+                    thumbs.animate({
+                        top: POS
+                    },400,'galleria');
+                }
+                OPEN = !OPEN;
+            }));
+        } else {
+            Galleria.log(OPEN)
+            this.bind(Galleria.THUMBNAIL, function() {
+                thumbs.css('top', POS - list.outerHeight() + 2);
+            });
+            tab.css('visibility','hidden');
+        }
         
         this.$('thumbnails').children().hover(function() {
             $(this).not('.active').children().css('opacity', 1);
