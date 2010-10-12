@@ -1,4 +1,4 @@
-/*!
+/*
  * Galleria Classic Theme
  * http://galleria.aino.se
  *
