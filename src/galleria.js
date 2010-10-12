@@ -11,7 +11,8 @@
  // some references
 var undef,
     window = this,
-    doc = document;
+    doc    = document,
+    $doc   = $( doc );
     
 // internal constants
 var DEBUG = false,
@@ -773,13 +774,13 @@ var Galleria = function() {
             }
             if ( !this.bound ) {
                 this.bound = true;
-                $( doc ).bind('keydown', this.press);
+                $doc.bind('keydown', this.press);
             }
         },
         
         detach: function() {
             this.bound = false;
-            $( doc ).unbind('keydown', this.press);
+            $doc.unbind('keydown', this.press);
         }
     };
         
@@ -1594,7 +1595,7 @@ Galleria.prototype = {
                 raise( 'No theme found. ');
             }, 2000)
             
-            $( doc ).one( Galleria.THEMELOAD, function() {
+            $doc.one( Galleria.THEMELOAD, function() {
                 Utils.clearTimer( 'themeload' );
                 self._init.call( self );
             });
@@ -2233,8 +2234,8 @@ Galleria.prototype = {
     
     getMousePosition : function(e) {
         return {
-            x: e.pageX - this.$( 'stage' ).offset().left + $( doc ).scrollLeft(),
-            y: e.pageY - this.$( 'stage' ).offset().top + $( doc ).scrollTop()
+            x: e.pageX - this.$( 'stage' ).offset().left + $doc.scrollLeft(),
+            y: e.pageY - this.$( 'stage' ).offset().top  + $doc.scrollTop()
         };
     },
     
@@ -2972,7 +2973,7 @@ $.extend( Galleria, {
                     Utils.addTimer( "css", function() {
                         Utils.loadCSS( css, 'galleria-theme', function() {
                             Galleria.theme = theme;
-                            $( doc ).trigger( Galleria.THEMELOAD );
+                            $doc.trigger( Galleria.THEMELOAD );
                         });
                     }, 1);
 
