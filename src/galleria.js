@@ -537,9 +537,9 @@ Picture.prototype = {
             },
             error: function() {
                 callback.call( self, self );
-                Galleria.raise('image not loaded in 2 seconds: '+ src);
+                Galleria.raise('image not loaded in 5 seconds: '+ src);
             },
-            timeout: 2000
+            timeout: 5000
         });
         
         // return the container
@@ -2097,7 +2097,7 @@ Galleria.prototype = {
         
         // use the data_config set by option
         config = config || this._options.data_config;
-
+        
         // check if the data is an array already
         if ( source.constructor == Array ) {
             if ( this.validate( source) ) {

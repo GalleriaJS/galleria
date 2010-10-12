@@ -107,7 +107,7 @@ F.prototype = {
 		}, params);
 		
 		return this._call(params, function(data) {
-			var obj = { length: 0 };
+			var obj = [];
 			var photos = data.photos ? data.photos.photo : data.photoset.photo;
 			var len = Math.min(this.options.max, photos.length);
 			var loaded = 0;
@@ -142,7 +142,7 @@ F.prototype = {
     				title: photos[i].title,
     				description: this.options.description && photos[i].description ? photos[i].description._content : ''
     			};
-    			Array.prototype.push.call(obj, item);
+    			obj.push(item);
 			}
 			this.callback.call(this, obj);
 		});
