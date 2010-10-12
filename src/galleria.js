@@ -289,7 +289,7 @@ var DEBUG = false,
             // a loadscript method that works for local scripts
             loadScript: function( url, callback ) {
                 var done = false, 
-                    script = $('<script>').attr({
+                    script = $('<scr'+'ipt>').attr({
                         src: url,
                         async: true
                     }).get(0);
@@ -2964,7 +2964,7 @@ $.extend( Galleria, {
             $('script').each(function( i, script ) {
                 
                 // look for the theme script
-                var reg = new RegExp( 'galleria.' + theme.name.toLowerCase() + '.' );
+                var reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
                 if( reg.test( script.src )) {
                     
                     // we have a match
