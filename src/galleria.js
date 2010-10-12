@@ -11,7 +11,8 @@
  // some references
 var undef,
     window = this,
-    doc = document;
+    doc    = document,
+    $doc   = $( doc );
     
 // internal constants
 var DEBUG = false,
@@ -23,7 +24,7 @@ var DEBUG = false,
     },
     IE    = (function(){
         var v = 3, 
-            div = document.createElement( 'div' );
+            div = doc.createElement( 'div' );
         while (
             div.innerHTML = '<!--[if gt IE '+(++v)+']><i></i><![endif]-->',
             div.getElementsByTagName('i')[0]
@@ -32,9 +33,9 @@ var DEBUG = false,
     }() ),
     DOM   = function() {
         return {
-            html: doc.documentElement,
-            body: doc.body,
-            head: document.getElementsByTagName('head')[0],
+            html:  doc.documentElement,
+            body:  doc.body,
+            head:  doc.getElementsByTagName('head')[0],
             title: doc.title
         }
     },
@@ -149,7 +150,7 @@ var DEBUG = false,
         
             create : function( className, nodeName ) {
                 nodeName = nodeName || 'div';
-                var elem = document.createElement( nodeName );
+                var elem = doc.createElement( nodeName );
                 elem.className = className;
                 return elem;
             },
@@ -274,12 +275,13 @@ var DEBUG = false,
             },
             
             insertStyleTag : function( styles ) {
-                var style = document.createElement('style');
-                DOM().head.appendChild(style);
-                if (style.styleSheet) { // IE
+                var style = doc.createElement( 'style' );
+                DOM().head.appendChild( style );
+                
+                if ( style.styleSheet ) { // IE
                     style.styleSheet.cssText = styles;
                 } else {
-                    var cssText = document.createTextNode( styles );
+                    var cssText = doc.createTextNode( styles );
                     style.appendChild( cssText );
                 }
             },
@@ -308,7 +310,7 @@ var DEBUG = false,
                };
            
            
-               var s = document.getElementsByTagName( 'script' )[0];
+               var s = doc.getElementsByTagName( 'script' )[0];
                s.parentNode.insertBefore( script, s );
             },
         
@@ -772,13 +774,13 @@ var Galleria = function() {
             }
             if ( !this.bound ) {
                 this.bound = true;
-                $(document).bind('keydown', this.press);
+                $doc.bind('keydown', this.press);
             }
         },
         
         detach: function() {
             this.bound = false;
-            $(document).unbind('keydown', this.press);
+            $doc.unbind('keydown', this.press);
         }
     };
         
@@ -1593,7 +1595,7 @@ Galleria.prototype = {
                 raise( 'No theme found. ');
             }, 2000)
             
-            $(document).one( Galleria.THEMELOAD, function() {
+            $doc.one( Galleria.THEMELOAD, function() {
                 Utils.clearTimer( 'themeload' );
                 self._init.call( self );
             });
@@ -2161,7 +2163,7 @@ Galleria.prototype = {
     },
     
     unbind : function(type) {
-        this.forget( 'container', type );
+        this.$( 'container' ).unbind( type );
     },
     
     trigger : function( type ) {
@@ -2232,8 +2234,8 @@ Galleria.prototype = {
     
     getMousePosition : function(e) {
         return {
-            x: e.pageX - this.$( 'stage' ).offset().left + $(document).scrollLeft(),
-            y: e.pageY - this.$( 'stage' ).offset().top + $(document).scrollTop()
+            x: e.pageX - this.$( 'stage' ).offset().left + $doc.scrollLeft(),
+            y: e.pageY - this.$( 'stage' ).offset().top  + $doc.scrollTop()
         };
     },
     
@@ -2934,7 +2936,7 @@ $.extend( Galleria, {
     WEBKIT:  /webkit/.test( NAV ),
     SAFARI:  /safari/.test( NAV ),
     CHROME:  /chrome/.test( NAV ),
-    QUIRK:   ( IE && document.compatMode && document.compatMode == "BackCompat" ),
+    QUIRK:   ( IE && doc.compatMode && doc.compatMode == "BackCompat" ),
     MAC:     /mac/.test( navigator.platform.toLowerCase() ),
     OPERA:   !!window.opera,
     IPHONE:  /iphone/.test( NAV ),
@@ -2971,7 +2973,7 @@ $.extend( Galleria, {
                     Utils.addTimer( "css", function() {
                         Utils.loadCSS( css, 'galleria-theme', function() {
                             Galleria.theme = theme;
-                            $(document).trigger( Galleria.THEMELOAD );
+                            $doc.trigger( Galleria.THEMELOAD );
                         });
                     }, 1);
 
