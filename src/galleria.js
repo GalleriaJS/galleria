@@ -533,7 +533,7 @@ Picture.prototype = {
             },
             success: function() {
                 // call success
-                callback.call( self, self );
+                window.setTimeout(function() { callback.call( self, self ) }, 1 );
             },
             error: function() {
                 callback.call( self, self );
@@ -986,14 +986,22 @@ var Galleria = function() {
         
         // move handler
         move: function( e ) {
-            return;
-            var x = self.getMousePosition(e).x;
-            var y = self.getMousePosition(e).y;
-            if (!isNaN(x) && !isNaN(y)) {
-                self.$('tooltip').css({
-                    top: x,
-                    left: y
-                });
+            var x = self.getMousePosition(e).x,
+                y = self.getMousePosition(e).y,
+                $elem = self.$( 'tooltip' );
+            
+            var maxX = self._stageWidth - $elem.outerWidth( true );
+            var maxY = self._stageHeight - $elem.outerHeight( true ) - 1;
+            
+            if ( !isNaN(x) && !isNaN(y) ) {
+                
+                x += 20;
+                y -= 20;
+                
+                x = Math.max( 0, Math.min( maxX, x ) );
+                y = Math.max( 0, Math.min( maxY, y ) );
+                
+                $elem.css({ left: x, top: y });
             }
         },
         
@@ -1051,9 +1059,11 @@ var Galleria = function() {
         
         show: function( elem ) {
             var text = $(elem).data('tt');
-            if (typeof text == 'function') {
-                self.$( 'tooltip' ).html( text().replace(/\s/,'&nbsp;') );
+            if (! text ) {
+                return;
             }
+            text = typeof text == 'function' ? text() : text;
+            self.$( 'tooltip' ).html( text.replace(/\s/,'&nbsp;') );
         },
         
         // redefine the tooltip here
@@ -1067,7 +1077,13 @@ var Galleria = function() {
                 }
             }
             
-            ( elem in self._dom ? self.$(elem) : $(elem) ).data('tt', value);
+            if ( elem in self._dom ) {
+                elem = self.get( elem );
+            }
+            
+            $(elem).data('tt', value);
+            
+            self._tooltip.show( elem );
 
         },
         
@@ -1322,22 +1338,24 @@ var Galleria = function() {
             this.initialized = true;
             
             // create some elements to work with
-            var elems = 'overlay box content shadow title info close prev next counter image',
+            var elems = 'overlay box content shadow title info close prevholder prev nextholder next counter image',
                 el = {},
                 op = self._options,
                 css = '',
                 cssMap = {
-                    overlay: 'position:fixed;display:none;opacity:'+op.overlay_opacity+';top:0;left:0;width:100%;height:100%;background:'+op.overlay_background+';z-index:99990',
-                    box:     'position:fixed;display:none;width:400px;height:400px;top:50%;left:50%;margin-top:-200px;margin-left:-200px;z-index:99991',
-                    shadow:  'position:absolute;background:#000;width:100%;height:100%;',
-                    content: 'position:absolute;background-color:#fff;top:10px;left:10px;right:10px;bottom:10px;overflow:hidden',
-                    info:    'position:absolute;bottom:10px;left:10px;right:10px;color:#444;font:11px/13px arial,sans-serif;height:13px',
-                    close:   'position:absolute;top:10px;right:10px;height:20px;width:20px;background:#fff;text-align:center;cursor:pointer;color:#444;font:16px/22px arial,sans-serif;z-index:99999',
-                    image:   'position:absolute;top:10px;left:10px;right:10px;bottom:30px',
-                    prev:    'float:right;cursor:pointer',
-                    next:    'float:right;cursor:pointer',
-                    title:   'float:left',
-                    counter: 'float:right;margin-left:8px'
+                    overlay:    'position:fixed;display:none;opacity:'+op.overlay_opacity+';top:0;left:0;width:100%;height:100%;background:'+op.overlay_background+';z-index:99990',
+                    box:        'position:fixed;display:none;width:400px;height:400px;top:50%;left:50%;margin-top:-200px;margin-left:-200px;z-index:99991',
+                    shadow:     'position:absolute;background:#000;width:100%;height:100%;',
+                    content:    'position:absolute;background-color:#fff;top:10px;left:10px;right:10px;bottom:10px;overflow:hidden',
+                    info:       'position:absolute;bottom:10px;left:10px;right:10px;color:#444;font:11px/13px arial,sans-serif;height:13px',
+                    close:      'position:absolute;top:10px;right:10px;height:20px;width:20px;background:#fff;text-align:center;cursor:pointer;color:#444;font:16px/22px arial,sans-serif;z-index:99999',
+                    image:      'position:absolute;top:10px;left:10px;right:10px;bottom:30px;overflow:hidden',
+                    prevholder: 'position:absolute;width:50%;height:100%;cursor:pointer',
+                    nextholder: 'position:absolute;width:50%;height:100%;right:0;cursor:pointer',
+                    prev:       'position:absolute;top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;left:20px;display:none;line-height:40px;text-align:center;color:#000',
+                    next:       'position:absolute;top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;right:20px;left:auto;display:none;line-height:40px;text-align:center;color:#000',
+                    title:      'float:left',
+                    counter:    'float:right;margin-left:8px'
                 },
                 hover = function(elem) {
                     return elem.hover(
@@ -1364,9 +1382,11 @@ var Galleria = function() {
 
             // append the elements
             self.append({
-                'lightbox-box': ['lightbox-shadow','lightbox-content', 'lightbox-close'],
-                'lightbox-info': ['lightbox-title','lightbox-counter','lightbox-next','lightbox-prev'],
-                'lightbox-content': ['lightbox-info', 'lightbox-image']
+                'lightbox-box': ['lightbox-shadow','lightbox-content', 'lightbox-close','lightbox-prevholder','lightbox-nextholder'],
+                'lightbox-info': ['lightbox-title','lightbox-counter'],
+                'lightbox-content': ['lightbox-info', 'lightbox-image'],
+                'lightbox-prevholder': 'lightbox-prev',
+                'lightbox-nextholder': 'lightbox-next'
             });
             
             $( el.image ).append( this.image.container );
@@ -1374,9 +1394,22 @@ var Galleria = function() {
             $( DOM().body ).append( el.overlay, el.box );
             
             // add the prev/next nav and bind some controls
-            hover( $( el.next ).bind( CLICK(), this.showNext ).html('&#9654;') );
-            hover( $( el.prev ).bind( CLICK(), this.showPrev ).html('&#9664;') );
+
             hover( $( el.close ).bind( CLICK(), this.hide ).html('&#215;') );
+            
+            $.each( ['Prev','Next'], function(i, dir) {
+                
+                var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '‹&nbsp;' : '&nbsp;›' );
+                
+                $( el[ dir.toLowerCase()+'holder'] ).hover(function() {
+                    $d.show();
+                }, function() {
+                    $d.fadeOut(200);
+                }).bind( CLICK(), function() {
+                    self._lightbox[ 'show' + dir ]()
+                });
+                
+            })
             $( el.overlay ).bind( CLICK(), this.hide );
             
             // clicknext helper
@@ -1704,7 +1737,7 @@ Galleria.prototype = {
         this.bind( Galleria.READY, function() {
             
             // show counter
-            this.$('counter').show();
+            Utils.show( this.get('counter') );
             
             // bind clicknext
             if ( this._options.clicknext ) {
@@ -1798,11 +1831,11 @@ Galleria.prototype = {
                 ['stage', 'thumbnails-container', 'info', 'tooltip']
         });
         
-        this.$( 'counter' ).append(
+        Utils.hide( this.$( 'counter' ).append(
             this.get( 'current' ),
             ' / ',
             this.get( 'total' )
-        ).hide();
+        ) );
         
         this.setCounter('&#8211;');
         
