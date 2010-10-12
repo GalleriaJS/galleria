@@ -2161,7 +2161,7 @@ Galleria.prototype = {
     },
     
     unbind : function(type) {
-        this.forget( 'container', type );
+        this.$( 'container' ).unbind( type );
     },
     
     trigger : function( type ) {
