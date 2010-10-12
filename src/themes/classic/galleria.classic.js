@@ -28,9 +28,9 @@ Galleria.addTheme({
         });
         
         // cache some stuff
-        var toggle = this.$('image-nav-left,image-nav-right,counter'),
-            info   = this.$('info-link,info-close,info-text'),
-            click  = Galleria.MOBILE ? 'touchstart' : 'click';
+        var toggle   = this.$('image-nav-left,image-nav-right,counter'),
+            info     = this.$('info-link,info-close,info-text'),
+            click    = Galleria.MOBILE ? 'touchstart' : 'click';
         
         // show loader & counter with opacity
         this.$('loader,counter').show().css('opacity',.4)
@@ -45,11 +45,9 @@ Galleria.addTheme({
                 $(this).not('.active').children().stop().fadeTo(400, .6);
             });
             
-            this.$('container').hover(function() {
-                controls.fadeIn(200);
-            }, function() {
-                controls.fadeOut(500);
-            });
+            this.addIdleState( this.get('image-nav-left'), { left:-50 });
+            this.addIdleState( this.get('image-nav-right'), { right:-50 });
+            this.addIdleState( this.get('counter'), { opacity:0 });
         }
         
         // toggle info
