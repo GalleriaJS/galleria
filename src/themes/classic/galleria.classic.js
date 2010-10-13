@@ -1,7 +1,5 @@
 /*
  * Galleria Classic Theme
- * http://galleria.aino.se
- *
  * Copyright (c) 2010, Aino
  * Licensed under the MIT license.
  */
