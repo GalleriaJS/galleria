@@ -1411,11 +1411,6 @@ var Galleria = function() {
                 
             })
             $( el.overlay ).bind( CLICK(), this.hide );
-            
-            // clicknext helper
-            if ( op.lightbox_clicknext ) {
-                $( el.image ).css('cursor', 'pointer').bind( CLICK(), this.showNext );
-            }
 
         },
         
@@ -1581,7 +1576,6 @@ Galleria.prototype = {
             image_pan_smoothness: 12,
             image_position: '50%',
             keep_source: false,
-            lightbox_clicknext: true,
             lightbox_fade_speed: 200,
             lightbox_transition_speed: 300,
             link_source_images: true,
