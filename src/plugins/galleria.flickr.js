@@ -1,5 +1,5 @@
 /*!
- * Galleria Flickr Plugin v 1.1
+ * Galleria Flickr Plugin v 1.2
  * http://galleria.aino.se
  *
  * Copyright 2010, Aino
@@ -67,6 +67,27 @@ F.prototype = {
 			method: 'flickr.galleries.getPhotos'
 		});
 	},
+	
+	// searchGroup() added in 1.2
+	searchGroup: function(str, callback) {
+	    callback = callback || function(){};
+	    this._call({
+            text: str,
+            method: 'flickr.groups.search'
+        }, function(data) {
+            callback.call( window, data.groups.group)
+        });
+	},
+	
+	// getGroup() added in 1.2
+    getGroup: function ( group_id ) {
+		this._set(arguments);
+		return this._find({
+			group_id: group_id,
+			method: 'flickr.groups.pools.getPhotos'
+		});
+    },
+    
 	setOptions: function(options) {
 		jQuery.extend(this.options, options);
 		return this;
