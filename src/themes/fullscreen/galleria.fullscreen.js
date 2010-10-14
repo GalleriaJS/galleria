@@ -21,7 +21,7 @@ Galleria.addTheme({
         _hide_dock: true
     },
     init: function(options) {
-        
+
         this.addElement('thumbnails-tab');
         this.appendChild('thumbnails-container','thumbnails-tab');
         
@@ -38,43 +38,44 @@ Galleria.addTheme({
         if (Galleria.IE) {
             this.addElement('iefix');
             this.appendChild('container','iefix');
-            this.setStyle(this.get('iefix'), {
+            this.$('iefix').css({
                 zIndex:3,
                 position:'absolute',
                 backgroundColor: '#000',
                 opacity:.4
-            })
+            });
         }
-        
+
         if ( options.thumbnails === false ) {
             thumbs.hide();
         }
         
         var fixCaption = this.proxy(function(img) {
+
             if (!(img || img.width)) {
                 return;
             }
             var w = Math.min(img.width, $(window).width());
             infotext.width(w-40);
-            if (Galleria.IE && this.options.show_info) {
+            if (Galleria.IE && this.getOptions('show_info')) {
                 this.$('iefix').width(info.outerWidth()).height(info.outerHeight());
             }
         });
-        
         this.bind(Galleria.RESCALE, function() {
-            POS = this.stageHeight - tab.height()-2;
+            
+            POS = this.getStageHeight() - tab.height()-2;
             thumbs.css('top', OPEN ? POS - list.outerHeight() + 2 : POS);
             var img = this.getActiveImage();
             if (img) {
                 fixCaption(img);
             }
         });
-        
+
         this.bind(Galleria.LOADSTART, function(e) {
             if (!e.cached) {
                 loader.show().fadeTo(100, 1);
             }
-            $(e.thumbTarget).css('opacity',1).parent().siblings('.active').children().css('opacity',.5);
+            $(e.thumbTarget).css('opacity',1).parent().siblings().children().css('opacity',.6);
         });
 
         this.bind(Galleria.LOADFINISH, function(e) {
@@ -87,6 +88,7 @@ Galleria.addTheme({
         });
         
         this.bind(Galleria.THUMBNAIL, function(e) {
+            $(e.thumbTarget).parent(':not(.active)').children().css('opacity',.6)
             $(e.thumbTarget).click(function() {
                 if (OPEN) {
                     tab.click();
@@ -139,7 +141,6 @@ Galleria.addTheme({
                 OPEN = !OPEN;
             }));
         } else {
-            Galleria.log(OPEN)
             this.bind(Galleria.THUMBNAIL, function() {
                 thumbs.css('top', POS - list.outerHeight() + 2);
             });
@@ -147,10 +148,10 @@ Galleria.addTheme({
         }
         
         this.$('thumbnails').children().hover(function() {
-            $(this).not('.active').children().css('opacity', 1);
+            $(this).not('.active').children().stop().fadeTo(100, 1);
         }, function() {
-            $(this).not('.active').children().fadeTo(200, .5);
-        }).children().css('opacity',.5)
+            $(this).not('.active').children().stop().fadeTo(400, .6);
+        });
         
         this.enterFullscreen();
     }

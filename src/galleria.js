@@ -79,26 +79,26 @@ var DEBUG = false,
         
         },
         
-        log: function() {
+        log: function( msg ) {
             
             if ( !this.initialized ) {
                 this.init();
             }
-            
+
             var now = ( new Date().getTime() - _tracer.ts );
+            _tracer.elem.html( 
+                _tracer.elem.html() + now.toString() + ' ms: <strong>' + msg + '</strong><br>'
+            );
             
-            $.each( Utils.array( arguments ), function( i, msg ) {
-                _tracer.elem.html( 
-                    _tracer.elem.html() + now.toString() + ' ms: <strong>' + msg + '</strong><br>'
-                );
-                // keep scroll in bottom
-                _tracer.elem[0].scrollTop = _tracer.elem[0].scrollHeight;
-            });
+            // keep scroll in bottom
+            _tracer.elem[0].scrollTop = _tracer.elem[0].scrollHeight;
         }
     },
     
     trace = function() {
-        _tracer.log.apply( _tracer, Utils.array( arguments ) );
+        $.each( Utils.array( arguments ), function(i, msg) {
+            _tracer.log.apply( _tracer, msg );
+        })
     },
 
     // the internal timeouts object
@@ -474,6 +474,17 @@ Picture.prototype = {
         
         // force a block display
         $( image ).css( 'display', 'block');
+        
+        if ( self.cache[ src ] ) {
+            // no need to onload if the image is cached
+            image.src = src;
+            self.loaded = true;
+            self.original = {
+                height: image.height,
+                width: image.width
+            };
+            return image;
+        }
 
         // begin preload and insert in cache when done
         image.onload = function() {
