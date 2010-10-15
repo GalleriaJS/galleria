@@ -2,6 +2,9 @@
 Options
 =======
 
+**Before you read:** We are currently re-organizing our docs for the 1.2 release. 
+Some of these options are deprecated or invalid.
+
 Galleria options are defined using a flat object during initialization.::
 
     $('#galleria').galleria({

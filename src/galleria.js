@@ -1576,7 +1576,6 @@ Galleria.prototype = {
             data_config : function( elem ) { return {}; },
             data_image_selector: 'img',
             data_source: this._target,
-            data_type: 'auto',
             debug: undef,
             easing: 'galleria',
             extend: function(options) {},
@@ -2402,18 +2401,6 @@ Galleria.prototype = {
         });
         
         return this;
-    },
-    
-    // deprecate this:
-    getDimensions: function(i) {
-        return {
-            w: i.width,
-            h: i.height,
-            cw: this.stageWidth,
-            ch: this.stageHeight,
-            top: (this.stageHeight - i.height) / 2,
-            left: (this.stageWidth - i.width) / 2
-        };
     },
     
     attachKeyboard : function() {
