@@ -1611,6 +1611,7 @@ Galleria.prototype = {
             thumb_quality: 'auto',
             thumbnails: true,
             transition: 'fade',
+            transition_initial: undef,
             transition_speed: 400,
             width: 'auto'
         };
@@ -2696,8 +2697,13 @@ Galleria.prototype = {
                         thumbTarget: self._thumbnails[ queue.index ].image
                     });
                     
+                    var transition = active.image === null && self._options.transition_initial ? 
+                        self._options.transition_initial : self._options.transition;
+                        
+                    log(transition)
+                    
                     // validate the transition
-                    if ( self._options.transition in Galleria.transitions === false ) {
+                    if ( transition in Galleria.transitions === false ) {
                         
                         complete();
                     
@@ -2710,7 +2716,7 @@ Galleria.prototype = {
                         };
                         
                         // call the transition function and send some stuff
-                        Galleria.transitions[ self._options.transition ].call(self, params, complete );
+                        Galleria.transitions[ transition ].call(self, params, complete );
                         
                     }
                 }
