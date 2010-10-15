@@ -964,7 +964,7 @@ var Galleria = function() {
                 left: num
             },{
                 duration: self._options.carousel_speed,
-                easing: 'galleria',
+                easing: self._options.easing,
                 queue: false
             });
         }
@@ -1449,7 +1449,7 @@ var Galleria = function() {
                 $( lightbox.elems.box ).animate(
                     to, 
                     self._options.lightbox_transition_speed, 
-                    'galleria', 
+                    self._options.easing, 
                     function() {
                         var image = lightbox.image,
                             speed = self._options.lightbox_fade_speed;
@@ -1578,6 +1578,7 @@ Galleria.prototype = {
             data_source: this._target,
             data_type: 'auto',
             debug: undef,
+            easing: 'galleria',
             extend: function(options) {},
             height: 'auto',
             idle_time: 3000,
@@ -1588,7 +1589,7 @@ Galleria.prototype = {
             image_position: '50%',
             keep_source: false,
             lightbox_fade_speed: 200,
-            lightbox_transition_speed: 300,
+            lightbox_transition_speed: 500,
             link_source_images: true,
             max_scale_ratio: undef,
             min_scale_ratio: undef,
@@ -3143,7 +3144,8 @@ $.extend( Galleria, {
         slide:     function(params, complete) {
             var image  = $(params.next).parent(),
                 images = this.$('images'), // ??
-                width  = this._stageWidth;
+                width  = this._stageWidth,
+                easing = this.getOptions( 'easing' );
                 
             image.css({
                 left: width * ( params.rewind ? -1 : 1 )
@@ -3153,7 +3155,7 @@ $.extend( Galleria, {
             }, {
                 duration: params.speed,
                 queue: false,
-                easing: 'galleria',
+                easing: easing,
                 complete: function() {
                     images.css('left',0);
                     image.css('left',0);
@@ -3163,7 +3165,8 @@ $.extend( Galleria, {
         },
         fadeslide: function(params, complete) {
             
-            var x = 0;
+            var x = 0,
+                easing = this.getOptions("easing");
             
             if (params.prev) {
                 x = Utils.parseValue( $(params.prev).css("left") );
@@ -3176,7 +3179,7 @@ $.extend( Galleria, {
                 },{
                     duration: params.speed,
                     queue: false,
-                    easing: 'swing'
+                    easing: easing
                 });
             }
             
@@ -3192,7 +3195,7 @@ $.extend( Galleria, {
                 duration: params.speed,
                 complete: complete,
                 queue: false,
-                easing: 'swing'
+                easing: easing
             });
         }
     },
@@ -3216,13 +3219,21 @@ $.extend( Galleria, {
     
 });
 
-// our own easing
-$.easing.galleria = function (x, t, b, c, d) {
-    if ((t/=d/2) < 1) { 
-        return c/2*t*t*t*t + b;
-    }
-    return -c/2 * ((t-=2)*t*t*t - 2) + b;
-};
+// our own easings
+$.extend( $.easing, {
+    galleria: function (_, t, b, c, d) {
+        if ((t/=d/2) < 1) { 
+            return c/2*t*t*t*t + b;
+        }
+        return -c/2 * ((t-=2)*t*t*t - 2) + b;
+    },
+    galleriaIn: function (_, t, b, c, d) {
+		return c*(t/=d)*t*t*t + b;
+	},
+	galleriaOut: function (_, t, b, c, d) {
+		return -c * ((t=t/d-1)*t*t*t - 1) + b;
+	}
+});
 
 // the plugin initializer
 $.fn.galleria = function( options ) {
