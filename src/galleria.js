@@ -1574,7 +1574,7 @@ Galleria.prototype = {
             carousel_steps: 'auto',
             clicknext: false,
             data_config : function( elem ) { return {}; },
-            data_image_selector: 'img',
+            data_selector: 'img',
             data_source: this._target,
             debug: undef,
             easing: 'galleria',
@@ -2132,7 +2132,7 @@ Galleria.prototype = {
         source = source || this._options.data_source;
         
         // use selector set by option
-        selector = selector || this._options.data_image_selector;
+        selector = selector || this._options.data_selector;
         
         // use the data_config set by option
         config = config || this._options.data_config;
@@ -2686,8 +2686,6 @@ Galleria.prototype = {
                     
                     var transition = active.image === null && self._options.transition_initial ? 
                         self._options.transition_initial : self._options.transition;
-                        
-                    log(transition)
                     
                     // validate the transition
                     if ( transition in Galleria.transitions === false ) {
