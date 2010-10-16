@@ -1,9 +1,9 @@
 ===========
-data_config
-===========
+data_config( [HTML element] )
+==============================
 
     | type: **Function**
-    | default: **undefined**
+    | arguments: **HTML element**
 
 This very useful function configures how the data should be extracted from the source. 
 It should return an object that will blend in with the default extractions.
@@ -12,7 +12,12 @@ Use this option to control how your data should be interpreted.
 A common case is when you have HTML markup that you would like to implement as captions.
 This option can tell Galleria how to interpret your HTML code so it collects the right data.
 
-Default extractions from the image_target element:
+The argument is a HTML element selected from the HTML source ( most often an Image element ). 
+Use this to traverse the source and return the right data into Galleria.
+
+If you are using other elements than Images as source, you can change the selctor using the data_selector option.
+
+Default extractions from the HTML element:
 ..................................................
 
 - **image:** the ``src`` attribute OR parent ``<a>`` tag's ``href`` attribute (if exists and links to an image)
@@ -36,7 +41,7 @@ Example on how to alter the extraction logic:
             // img is now the image element
             // the function should return an object with the new data
             return {
-                title: $(img).attr('rel') // sets author to "John Doe",
+                title: $(img).attr('rel') // sets title to "John Doe",
                 description: $(img).next('.desc').html(), // sets description to "My picture"
             };
         }
