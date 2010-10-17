@@ -34,7 +34,7 @@ You can set options using ``.setOptions()`` or as a second argument to the call:
         });
     });
 
-Public methods
+Reference API
 ==============
 
 .setOptions( options )
@@ -85,6 +85,37 @@ Get all pictures from a user's photostream. The username is the same name as in 
 Get all pictures from a specific photoset.
 
 - **set_id** (String) The ID of the photoset (you can grab it from the URL)
+- **options** (Object) is the search options object passed to flickr (optional).
+- **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
+
+.searchGroup(search_string, callback)
+----------------------
+
+    | returns **Galleria.Flickr**
+
+Searches for groups and runs a callback with an arry of matches. Each array items contains an object with **name** and **nsid**.
+
+example::
+
+    flickr.searchGroup( 'sweden', function( groups ) { // search for sweden
+        flickr.getGroup( groups[0].nsid, function(data) { // get the first group from the matches
+            $('#galleria').galleria({
+                data_source: data;
+            })
+        })
+    })
+
+- **search_string** (String) the term you want to search for.
+- **callback(groups)** (Function) gets called when the search is complete. The first argument is the array of matches.
+
+.getGroup(nsid, [options,] callback)
+----------------------
+
+    | returns **Galleria.Flickr**
+
+Get all pictures from a specific group/pool.
+
+- **nsid** (String) The NSID of the gallery (you can search for it using searchGroup)
 - **options** (Object) is the search options object passed to flickr (optional).
 - **callback(data)** (Function) gets called when the data is ready. The first argument is the Galleria-friendly image data object.
 

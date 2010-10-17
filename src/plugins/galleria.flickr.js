@@ -96,6 +96,7 @@ F.prototype = {
         }, function(data) {
             callback.call( window, data.groups.group)
         });
+        return this;
     },
 
     // get photos from a group ID

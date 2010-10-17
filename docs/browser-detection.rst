@@ -1,5 +1,5 @@
 =====================
-Public Static variables
+Broswer detection
 =====================
 
 These static variables are mainly used to detect browsers.
@@ -33,6 +33,10 @@ Galleria.IE8
 ------------
 Detects IE8 using object detection.
 
+Galleria.IE9
+------------
+Detects IE9 using object detection.
+
 Galleria.WEBKIT
 ------------
 Detects webkit using browser sniffing.
@@ -56,3 +60,19 @@ Detects macintosh platform using navigator.platform sniffing.
 Galleria.QUIRK
 ------------
 Detects quirkcs mode using object detection.
+
+Galleria.IPHONE
+------------
+Detects iphone using browser sniffing.
+
+Galleria.IPAD
+------------
+Detects ipad using browser sniffing.
+
+Galleria.ANDROID
+------------
+Detects android using browser sniffing.
+
+Galleria.MOBILE
+------------
+Detects mobile devices using browser sniffing.
