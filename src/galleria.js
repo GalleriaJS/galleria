@@ -997,20 +997,25 @@ var Galleria = function() {
         
         // move handler
         move: function( e ) {
-            var x = self.getMousePosition(e).x,
-                y = self.getMousePosition(e).y,
-                $elem = self.$( 'tooltip' );
+            var mouseX = self.getMousePosition(e).x,
+                mouseY = self.getMousePosition(e).y,
+                $elem = self.$( 'tooltip' ),
+				x = mouseX,
+				y = mouseY,
+				height = $elem.outerHeight( true ) + 1,
+				width = $elem.outerWidth( true ),
+				limitY = height + 15;
             
-            var maxX = self._stageWidth - $elem.outerWidth( true );
-            var maxY = self._stageHeight - $elem.outerHeight( true ) - 1;
+            var maxX = self._stageWidth - width;
+            var maxY = self._stageHeight - height;
             
             if ( !isNaN(x) && !isNaN(y) ) {
                 
-                x += 20;
-                y -= 20;
-                
+                x += 15;
+                y -= 35;
+
                 x = Math.max( 0, Math.min( maxX, x ) );
-                y = Math.max( 0, Math.min( maxY, y ) );
+                y = Math.max( limitY, Math.min( maxY, y ) );
                 
                 $elem.css({ left: x, top: y });
             }
@@ -2273,8 +2278,8 @@ Galleria.prototype = {
     
     getMousePosition : function(e) {
         return {
-            x: e.pageX - this.$( 'stage' ).offset().left + $doc.scrollLeft(),
-            y: e.pageY - this.$( 'stage' ).offset().top  + $doc.scrollTop()
+            x: e.pageX - this.$( 'stage' ).offset().left,
+            y: e.pageY - this.$( 'stage' ).offset().top
         };
     },
     
