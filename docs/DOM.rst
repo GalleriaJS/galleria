@@ -2,7 +2,8 @@
 DOM
 ===
 
-Galleria builds a rich DOM structure for each Gallery. You can access them in the Theme API using ``this.get( ID )`` or ``this.$( IDs )``. Read more about DOM manipulation in the Theme API.
+Galleria builds a rich DOM structure for each Gallery. You can access them using ``this.get( ID )`` or ``this.$( IDs )``. 
+Read more about DOM manipulation in the reference API.
 
 List of elements
 ================
@@ -13,25 +14,30 @@ Here is a list of each element in the default Galleria DOM and their layout::
             images
             loader
             counter
+                current
+                total
             image-nav
                 image-nav-right
                 image-nav-left
-            thumbnails-container
-                thumb-nav-left
-                thumbnails-list
-                    thumbnails
-                thumb-nav-right
-            info
-                info-text
-                    info-title
-                    info-description
-                    info-author
+        thumbnails-container
+            thumb-nav-left
+            thumbnails-list
+                thumbnails
+            thumb-nav-right
+        info
+            info-text
+                info-title
+                info-description
+                info-author
+        tooltip
 
 
 HTML structure
 ==============
 
-The HTML structure is built with a ``galleria-`` prefix to all classes to ensure CSS encapsulation. The class ``.carousel`` is added to ``thumbnails-container``  if a carousel is present. The ``.disabled`` class is added to ``thumb-nav-left`` and ``thumb-nav-right`` if you are at the end/start of the carousel.
+The HTML structure is built with a ``galleria-`` prefix to all classes to ensure CSS encapsulation. 
+The class ``.carousel`` is added to ``thumbnails-container``  if a carousel is present. 
+The ``.disabled`` class is added to ``thumb-nav-left`` and ``thumb-nav-right`` if you are at the end/start of the carousel.
 
 This presentation of the Galleria HTML structure is good to have when building CSS for your custom theme::
 
@@ -74,4 +80,5 @@ This presentation of the Galleria HTML structure is good to have when building C
                 <div class="galleria-info-author"></div>
             </div>
         </div>
+        <div class="galleria-tooltip"></div>
     </div>

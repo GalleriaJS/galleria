@@ -24,16 +24,7 @@ Good luck!
 Documentation
 =============
 
-Documentation is currently available in reST (http://en.wikipedia.org/wiki/ReStructuredText) format in the repository. Direct links to sections at gitHub:
+Documentation is currently available in reST (http://en.wikipedia.org/wiki/ReStructuredText) format in the repository.
 
-- Getting started: http://github.com/aino/galleria/blob/master/docs/getting-started.rst
-- Extending Galleria: http://github.com/aino/galleria/blob/master/docs/extending-galleria.rst
-- Options: http://github.com/aino/galleria/blob/master/docs/options.rst
-- Events: http://github.com/aino/galleria/blob/master/docs/events.rst
-- Public methods: http://github.com/aino/galleria/blob/master/docs/public-methods.rst
-- Public Static methods: http://github.com/aino/galleria/blob/master/docs/public-static-methods.rst
-- Public variables: http://github.com/aino/galleria/blob/master/docs/public-variables.rst
-- Flickr Plugin: http://github.com/aino/galleria/blob/master/docs/plugin-flickr.rst
-- History Plugin: http://github.com/aino/galleria/blob/master/docs/plugin-history.rst
-- SlideShowPro Plugin: http://github.com/aino/galleria/blob/master/docs/plugin-slideshowpro.rst
-- DOM structure: http://github.com/aino/galleria/blob/master/docs/dom.rst
+**Note:** We are currently re-organizing our docs for the 1.2 release. 
+The options documentation is ready, but the Reference API is still under construction.

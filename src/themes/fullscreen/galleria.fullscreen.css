@@ -13,6 +13,7 @@ html,body{background:#000;}
 .galleria-thumbnails{background:#000;overflow:hidden;}
 .galleria-thumbnails-list{background:#000;padding-top:5px;padding-bottom:5px;overflow:hidden;}
 .galleria-thumbnails .galleria-image{width:80px;height:50px;float:left;cursor:pointer;margin-right:5px;}
+.galleria-thumbnails .galleria-image img{background:#000;}
 .galleria-thumbnails .active{cursor:default;}
 .galleria-carousel .galleria-thumbnails-list{border-left:30px solid #000;border-right:30px solid #000;}
 .galleria-image-nav{width:100%;height:100%;position:absolute;top:0;left:0;}
