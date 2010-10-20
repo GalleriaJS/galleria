@@ -1,5 +1,7 @@
 /*
- * Galleria Classic Theme
+ * Galleria Classic Theme v. 1.4 2010-10-20
+ * http://galleria.aino.se
+ *
  * Copyright (c) 2010, Aino
  * Licensed under the MIT license.
  */
@@ -9,12 +11,13 @@
 Galleria.addTheme({
     name: 'classic',
     author: 'Galleria',
-    version: '1.3',
+    version: '1.4',
     css: 'galleria.classic.css',
     defaults: {
         transition: 'slide',
         thumb_crop: 'height',
         
+		// set this to false if you want to show the caption all the time:
         _toggle_info: true
     },
     init: function(options) {

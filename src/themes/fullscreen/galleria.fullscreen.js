@@ -1,5 +1,5 @@
-/*!
- * Galleria Fullscreen Theme
+/*
+ * Galleria Fullscreen Theme v. 2.1 2010-10-20
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -11,13 +11,14 @@
 Galleria.addTheme({
     name: 'fullscreen',
     author: 'Galleria',
-    version: '2.0',
+    version: '2.1',
     css: 'galleria.fullscreen.css',
     defaults: {
         transition: 'none',
         image_crop: true,
         thumb_crop: 'height',
         
+		// set this to false if you want to keep the thumbnails
         _hide_dock: true
     },
     init: function(options) {

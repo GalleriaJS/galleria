@@ -1,5 +1,5 @@
-/*!
- * Galleria v 1.1.99 2010-10-11
+/*
+ * Galleria v 1.2 prerelease 1.0 2010-10-20
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
