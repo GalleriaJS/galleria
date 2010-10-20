@@ -2,7 +2,9 @@
 DOM
 ===
 
-Galleria builds a rich DOM structure for each Gallery. You can access them in the Theme API using ``this.get( ID )`` or ``this.$( IDs )``. Read more about DOM manipulation in the Theme API.
+Galleria builds a rich DOM structure for each Gallery. You can access them in
+the Theme API using ``this.get( ID )`` or ``this.$( IDs )``. Read more about
+DOM manipulation in the Theme API.
 
 List of elements
 ================
@@ -30,10 +32,14 @@ Here is a list of each element in the default Galleria DOM and their layout::
 
 HTML structure
 ==============
+The HTML structure is built with a ``galleria-`` prefix to all classes to
+ensure CSS encapsulation. The class ``.carousel`` is added to
+``thumbnails-container``  if a carousel is present. The ``.disabled`` class is
+added to ``thumb-nav-left`` and ``thumb-nav-right`` if you are at the end/start
+of the carousel.
 
-The HTML structure is built with a ``galleria-`` prefix to all classes to ensure CSS encapsulation. The class ``.carousel`` is added to ``thumbnails-container``  if a carousel is present. The ``.disabled`` class is added to ``thumb-nav-left`` and ``thumb-nav-right`` if you are at the end/start of the carousel.
-
-This presentation of the Galleria HTML structure is good to have when building CSS for your custom theme::
+This presentation of the Galleria HTML structure is good to have when building
+CSS for your custom theme::
 
     <div class="galleria-container">
         <div class="galleria-stage">

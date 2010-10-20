@@ -4,9 +4,9 @@ Getting started
 
 Requirements
 ============
+- Get the latest and greatest version of Galleria and jQuery
 
-* Get the latest and greatest version of Galleria and jQuery
-* Place the galleria src folder in your project.
+- Place the galleria src folder in your project.
 
 Usage
 =====
@@ -25,9 +25,9 @@ You can also load the theme manually in your ``<head>`` tag::
 
 Add images
 ----------
-There are several ways of adding image data to your gallery, but the simplets way is probably to add some HTML.
-
-Just put the images inside any container on the site::
+There are several ways of adding image data to your gallery, but the simplets
+way is probably to add some HTML.Just put the images inside any container on
+the site::
 
     <div id="gallery">
         <img src="/img/pic1.jpg" alt="My description" title="My title">
@@ -68,19 +68,24 @@ You can also define the images as a JSON array::
     
     </script>
     
-Galleria also provides plugins to fetch image data from other sources like Flickr & SlideShowPro.
+Galleria also provides plugins to fetch image data from other sources like
+Flickr & SlideShowPro.
 
 Activate Galleria
 -----------------
-When DOM is ready, you can run Galleria. The best way to do this is to put the following code before closing the body tag::
+When DOM is ready, you can run Galleria. The best way to do this is to put the
+following code before closing the body tag::
 
     <script>
         $('#gallery').galleria();
     </script>
 
-The galleria function takes one arguments, *options*. The options argument is an object with Galleria options that you can use, please view the options documentation for a complete list.
+The galleria function takes one arguments, *options*. The options argument is
+an object with Galleria options that you can use, please view the options
+documentation for a complete list.
 
-If you run into problems, try passing ``debug: true`` as an option or set ``Galleria.debug = true`` to trace errors.
+If you run into problems, try passing ``debug: true`` as an option or set
+``Galleria.debug = true`` to trace errors.
         
 More examples
 -------------
@@ -99,4 +104,6 @@ With extra options::
 
 Customize
 --------- 
-If you wish to add alternative sources of image data, try the flickr and ssp documentation. If you would like to add more advanced cunstomizations, read the **Extending Galleria** section. *Good luck!*
+If you wish to add alternative sources of image data, try the flickr and ssp
+documentation. If you would like to add more advanced cunstomizations, read the
+**Extending Galleria** section. *Good luck!*
