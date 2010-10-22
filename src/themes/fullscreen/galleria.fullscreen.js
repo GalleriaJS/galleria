@@ -142,7 +142,6 @@ Galleria.addTheme({
         });
         
         this.enterFullscreen();
-        this.detachKeyboard();
         this.attachKeyboard({
             escape: function(e) {
                 return false;
