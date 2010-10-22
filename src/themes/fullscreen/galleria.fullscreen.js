@@ -18,8 +18,10 @@ Galleria.addTheme({
         image_crop: true,
         thumb_crop: 'height',
         
-		// set this to false if you want to keep the thumbnails
-        _hide_dock: true
+		// set this to false if you want to keep the thumbnails:
+        _hide_dock: true,
+        // set this to true if you want to shrink the carousel when clicking a thumbnail:
+        _close_on_click: false
     },
     init: function(options) {
 
@@ -91,7 +93,7 @@ Galleria.addTheme({
         this.bind(Galleria.THUMBNAIL, function(e) {
             $(e.thumbTarget).parent(':not(.active)').children().css('opacity',.6)
             $(e.thumbTarget).click(function() {
-                if (OPEN) {
+                if (OPEN && options._close_on_click) {
                     tab.click();
                 }
             });
@@ -105,21 +107,6 @@ Galleria.addTheme({
         if (Galleria.IE) {
             this.addIdleState(this.get('iefix'), { opacity:0 });
         }
-        
-        this.attachKeyboard({
-            up: function(e) {
-                if (!OPEN) {
-                    tab.click();
-                }
-                e.preventDefault();
-            },
-            down: function(e) {
-                if (OPEN) {
-                    tab.click();
-                }
-                e.preventDefault();
-            }
-        });
         
         this.$('image-nav-left, image-nav-right').css('opacity',0.01).hover(function() {
             $(this).animate({opacity:1},100);
@@ -155,6 +142,24 @@ Galleria.addTheme({
         });
         
         this.enterFullscreen();
+        this.detachKeyboard();
+        this.attachKeyboard({
+            escape: function(e) {
+                return false;
+            },
+            up: function(e) {
+                if (!OPEN) {
+                    tab.click();
+                }
+                e.preventDefault();
+            },
+            down: function(e) {
+                if (OPEN) {
+                    tab.click();
+                }
+                e.preventDefault();
+            }
+        });
     }
 });
 

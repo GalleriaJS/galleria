@@ -69,12 +69,20 @@ var DEBUG = false,
         
         initialized : false,
         
+        open: true,
+        
         init : function() {
             this.initialized = true;
             this.elem = $('<div id="log">').css({
-                background: '#fff', opacity: .8, padding: '20px', width: 300, height: '100%',
+                background: '#fff', opacity: .8, padding: '20px', width: 300, height: '80%',
                 position: 'fixed', top:10, left:10, zIndex: 100000,
                 color:'#000', overflow:'auto', font: '11px/1.2 arial,sans-serif'
+            }).click(function() {
+                $(this).css({
+                    height: _tracer.open ? 0 : '80%',
+                    opacity: _tracer.open ? .1 : .8
+                });
+                _tracer.open = !_tracer.open;
             }).appendTo( DOM().body );
         
         },
@@ -97,10 +105,10 @@ var DEBUG = false,
     
     trace = function() {
         $.each( Utils.array( arguments ), function(i, msg) {
-            _tracer.log.apply( _tracer, msg );
+            _tracer.log.call( _tracer, msg );
         })
     },
-
+    
     // the internal timeouts object
     // provides helper methods for controlling timeouts
     _timeouts = {
@@ -263,7 +271,7 @@ var DEBUG = false,
         
             toggleQuality : function( img, force ) {
                 
-                if ( !( Galleria.IE7 || Galleria.IE8 ) || !!img === false ) {
+                if ( !( IE == 7 || IE == 8 ) || !!img === false ) {
                     return;
                 }
             
@@ -340,10 +348,10 @@ var DEBUG = false,
                     ready = false,
                     length;
                     
-                
                 // look for manual css
                 $('link[rel=stylesheet]').each(function() {
                     if ( new RegExp( href ).test( this.href ) ) {
+                        log(this)
                         link = this;
                         return false;
                     }
@@ -374,6 +382,7 @@ var DEBUG = false,
                 if( $('#'+id).length ) {
                     $('#'+id).attr('href', href);
                     length--;
+                    ready = true;
                 } else {
                     link = $( '<link>' ).attr({
                         rel: 'stylesheet',
@@ -389,8 +398,7 @@ var DEBUG = false,
                             DOM().head.appendChild( link );
                         }
                         
-                        // attach additional handler for IE
-                        if ( Galleria.IE7 ) {
+                        if ( IE ) {
                             link.attachEvent( 'onreadystatechange', function(e) {
                                 if( link.readyState == 'complete' ) {
                                     ready = true;
@@ -1015,7 +1023,11 @@ var Galleria = function() {
                 y -= 35;
 
                 x = Math.max( 0, Math.min( maxX, x ) );
-                y = Math.max( limitY, Math.min( maxY, y ) );
+                y = Math.max( 0, Math.min( maxY, y ) );
+                
+                if( mouseY < limitY ) {
+                    y = limitY;
+                }
                 
                 $elem.css({ left: x, top: y });
             }
@@ -1285,6 +1297,10 @@ var Galleria = function() {
                 
                 var data = elem.data('idle');
                 
+                if (! data) {
+                    return;
+                }
+                
                 data.complete = false;
                 
                 elem.stop().animate(data.to, {
@@ -1547,7 +1563,7 @@ Galleria.prototype = {
     
     // the public init() is used to assign target, options and a THEMELOAD event
     init: function( target, options ) {
-        
+
         var self = this;
         
         // save the instance
@@ -1627,7 +1643,7 @@ Galleria.prototype = {
         
         // hide all content
         $( this._target ).children().hide();
-        
+
         // now we just have to wait for the theme...
         if ( Galleria.theme ) {
             
@@ -1650,7 +1666,6 @@ Galleria.prototype = {
     // this method should only be called once per instance
     // for manipulation of data, use the .load method
     _init: function() {
-        
         var self = this;
         
         if ( this._initialized ) {
@@ -1916,7 +1931,7 @@ Galleria.prototype = {
         
         // now it's usually safe to remove the content
         // IE will never stop loading if we remove it, so let's keep it hidden for IE (it's usually fast enough anyway)
-        if ( !this._options.keep_source && !Galleria.IE ) {
+        if ( !this._options.keep_source && !IE ) {
             this._target.innerHTML = '';
         }
         
@@ -2313,7 +2328,7 @@ Galleria.prototype = {
                         
                         cache = move;
                         
-                        if ( Galleria.IE8 ) { // scroll is faster for IE
+                        if ( IE == 8 ) { // scroll is faster for IE
                             img.parent()[ 'scroll' + pos ]( move * -1 );
                         } else {
                             var css = {};
@@ -2354,7 +2369,7 @@ Galleria.prototype = {
             };
         
         // we need to use scroll in IE8 to speed things up
-        if ( Galleria.IE8 ) {
+        if ( IE == 8 ) {
             
             img.parent().scrollTop( curY * -1 ).scrollLeft( curX * -1 );
             img.css({ 
@@ -2385,7 +2400,7 @@ Galleria.prototype = {
     
     removePan: function() {
         
-        if ( Galleria.IE8 ) {
+        if ( IE == 8 ) {
             // todo: doublecheck this
         }
         this.$( 'stage' ).unbind( 'mousemove' );
@@ -2861,7 +2876,7 @@ Galleria.prototype = {
 
         this.get( 'current' ).innerHTML = index;
         
-        if ( Galleria.IE8 ) { // weird IE8 bug
+        if ( IE == 8 ) { // weird IE8 bug
             
             var opacity = this.$( 'counter' ).css( 'opacity' );
             this.$( 'counter' ).css( 'opacity', opacity );
@@ -2981,7 +2996,7 @@ $.extend( Galleria, {
     
     // addTheme
     addTheme: function( theme ) {
-        
+
         // make sure we have a name
         if ( !!theme['name'] === false ) {
             raise('No theme name specified');
@@ -3001,10 +3016,10 @@ $.extend( Galleria, {
                 // look for the theme script
                 var reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
                 if( reg.test( script.src )) {
-                    
+
                     // we have a match
                     css = script.src.replace(/[^\/]*$/, "") + theme.css;
-                    
+
                     Utils.addTimer( "css", function() {
                         Utils.loadCSS( css, 'galleria-theme', function() {
                             Galleria.theme = theme;
@@ -3102,6 +3117,7 @@ $.extend( Galleria, {
     
     // transitions object
     transitions: {
+        
         fade:      function(params, complete) {
             jQuery(params.next).css('opacity',0).show().animate({
                 opacity: 1
@@ -3113,6 +3129,7 @@ $.extend( Galleria, {
                 }, params.speed);
             }
         },
+        
         flash:     function(params, complete) {
             jQuery(params.next).css('opacity',0);
             if (params.prev) {
@@ -3129,6 +3146,7 @@ $.extend( Galleria, {
                 }, params.speed, complete);
             }
         },
+        
         pulse:     function(params, complete) {
             if (params.prev) {
                 $(params.prev).hide();
@@ -3137,6 +3155,7 @@ $.extend( Galleria, {
                 opacity:1
             }, params.speed, complete);
         },
+        
         slide:     function(params, complete) {
             var image  = $(params.next).parent(),
                 images = this.$('images'), // ??
@@ -3159,6 +3178,7 @@ $.extend( Galleria, {
                 }
             });
         },
+        
         fadeslide: function(params, complete) {
             
             var x = 0,
