@@ -1,5 +1,5 @@
 /*
- * Galleria Fullscreen Theme v. 2.1 2010-10-20
+ * Galleria Fullscreen Theme v. 2.2 2010-10-28
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -11,7 +11,7 @@
 Galleria.addTheme({
     name: 'fullscreen',
     author: 'Galleria',
-    version: '2.1',
+    version: '2.2',
     css: 'galleria.fullscreen.css',
     defaults: {
         transition: 'none',

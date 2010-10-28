@@ -1,5 +1,5 @@
 /*
- * Galleria Classic Theme v. 1.4 2010-10-20
+ * Galleria Classic Theme v. 1.5 2010-10-28
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -11,7 +11,7 @@
 Galleria.addTheme({
     name: 'classic',
     author: 'Galleria',
-    version: '1.4',
+    version: '1.5',
     css: 'galleria.classic.css',
     defaults: {
         transition: 'slide',
