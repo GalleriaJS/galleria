@@ -1,4 +1,4 @@
-/*!
+/**
  * Galleria Flickr Plugin v 1.2
  * http://galleria.aino.se
  *
@@ -8,13 +8,13 @@
 
 (function($) {
 
-// If no Galleria, fail silently
+// If no Galleria, fail silently.
 var G = window.Galleria;
-if (typeof G == 'undefined') {
+if ( typeof G === 'undefined' ) {
     return;
 }
 
-var F = G.Flickr = function(api_key) {
+var F = G.Flickr = function( api_key ) {
 
     if (!api_key) {
         G.raise('No API key found');

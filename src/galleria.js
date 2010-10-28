@@ -1,4 +1,4 @@
-/*
+/**
  * Galleria v 1.2 prerelease 1.1 2010-10-28
  * http://galleria.aino.se
  *
@@ -26,7 +26,7 @@ var DEBUG = false,
         var v = 3,
             div = doc.createElement( 'div' );
         while (
-            div.innerHTML = '<!--[if gt IE '+(++v)+']><i></i><![endif]-->',
+            div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
             div.getElementsByTagName('i')[0]
         );
         return v > 4 ? v : undef;
@@ -231,7 +231,7 @@ var DEBUG = false,
                 elem = $(elem);
 
                 // save the value if not exist
-                if (! elem.data('opacity') ) {
+                if ( !elem.data('opacity') ) {
                     elem.data('opacity', elem.css('opacity') );
                 }
 
@@ -565,7 +565,7 @@ Galleria = function() {
         },
 
         attach: function(map) {
-            for( var key in map ) {
+            for ( var key in map ) {
                 var up = key.toUpperCase();
                 if ( up in keyboard.keys ) {
                     keyboard.map[ keyboard.keys[up] ] = map[key];
@@ -775,7 +775,7 @@ Galleria = function() {
 
             Utils.insertStyleTag(css);
 
-            self.$( 'tooltip' ).css('opacity', .8);
+            self.$( 'tooltip' ).css('opacity', 0.8);
             Utils.hide( self.get('tooltip') );
 
         },
@@ -815,7 +815,7 @@ Galleria = function() {
         // you can also bind single DOM elements using bind(elem, string)
         bind: function( elem, value ) {
 
-            if (! tooltip.initialized ) {
+            if ( !tooltip.initialized ) {
                 tooltip.init();
             }
 
@@ -864,7 +864,7 @@ Galleria = function() {
 
         show: function( elem ) {
             var text = $(elem).data('tt');
-            if ( ! text ) {
+            if ( !text ) {
                 return;
             }
             text = typeof text == 'function' ? text() : text;
@@ -928,8 +928,8 @@ Galleria = function() {
             var htmlbody = {
                 height: '100%',
                 overflow: 'hidden',
-                margin:0,
-                padding:0
+                margin: 0,
+                padding: 0
             };
 
             Utils.forceStyles( DOM().html, htmlbody );
@@ -949,10 +949,11 @@ Galleria = function() {
             self.rescale(function() {
 
                 Utils.addTimer('fullscreen_enter', function() {
+
                     // show the image after 50 ms
                     Utils.show( self.getActiveImage() );
 
-                    if (typeof callback == 'function') {
+                    if ( typeof callback === 'function' ) {
                         callback.call( self );
                     }
 
@@ -1077,7 +1078,7 @@ Galleria = function() {
 
                 var data = elem.data('idle');
 
-                if (! data) {
+                if ( !data ) {
                     return;
                 }
 
@@ -1398,7 +1399,7 @@ Galleria.prototype = {
             max_scale_ratio: undef,
             min_scale_ratio: undef,
             on_image: function(img,thumb) {},
-            overlay_opacity: .85,
+            overlay_opacity: 0.85,
             overlay_background: '#0b0b0b',
             pause_on_interaction: true, // 1.9.96
             popup_links: false,
