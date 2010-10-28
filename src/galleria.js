@@ -549,7 +549,8 @@ Galleria = function() {
             'RIGHT': 39,
             'RETURN': 13,
             'ESCAPE': 27,
-            'BACKSPACE': 8
+            'BACKSPACE': 8,
+            'SPACE': 32
         },
 
         map : {},
@@ -938,7 +939,8 @@ Galleria = function() {
             self.attachKeyboard({
                 escape: self.exitFullscreen,
                 right: self.next,
-                left: self.prev
+                left: self.prev,
+                space: self.playToggle
             });
 
             // init the first rescale and attach callbacks
@@ -2401,7 +2403,7 @@ $(document).mousemove(function(e) {
         Attach keyboard events to Galleria
 
         @param {Object} map The map object of events.
-        Possible keys are 'UP', 'DOWN', 'LEFT', 'RIGHT', 'RETURN', 'ESCAPE' and 'BACKSPACE'.
+        Possible keys are 'UP', 'DOWN', 'LEFT', 'RIGHT', 'RETURN', 'ESCAPE', 'BACKSPACE', and 'SPACE'.
 
         @example
 
