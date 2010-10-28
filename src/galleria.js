@@ -937,10 +937,12 @@ Galleria = function() {
 
             // attach some keys
             self.attachKeyboard({
-                escape: self.exitFullscreen,
-                right: self.next,
-                left: self.prev,
-                space: self.playToggle
+                escape : self.exitFullscreen,
+                right : self.next,
+                left : self.prev,
+                space : function() {
+                  self.playToggle();
+                }
             });
 
             // init the first rescale and attach callbacks
