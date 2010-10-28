@@ -3,174 +3,82 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - Galleria</title>
+		<title>Galleria API Reference - Galleria</title>
 
 		<style type="text/css">
-			/* default.css */
-body
-{
-	font: 12px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
-	width: 800px;
-}
+		html{background:#eee;}
+body{width:960px;margin:30px;border:1px solid #ddd;padding:20px;
+    background:#fff;font:12px/16px arial,sans-serif;color:#444;}
+a{color:#579CC7;}
+hr{display:none!important;}
+th{text-align:left;background:#eee;}
+th:first-child,
+td:first-child{width:100px;}
+td,th{border-left:1px solid #ddd;border-bottom:1px solid #ddd;padding:6px;vertical-align:top;}
+table{border-right:1px solid #ddd;border-top:1px solid #ddd;}
+caption{text-align:left;font:normal 16px/1.1 georgia,serif;margin:18px 0 9px;}
 
-.header
-{
-	clear: both;
-	background-color: #ccc;
-	padding: 8px;
-}
+#index *{text-align:left!important;}
 
-h1
-{
-	font-size: 150%;
-	font-weight: bold;
-	padding: 0;
-	margin: 1em 0 0 .3em;
-}
+tr.active th,
+tr.active td{background:#eee;color:#000;}
 
-hr
-{
-	border: none 0;
-	border-top: 1px solid #7F8FB1;
-	height: 1px;
-}
+tr.hover th,
+tr.hover td{background:#ffc;color:#000;}
 
-pre.code
-{
-	display: block;
-	padding: 8px;
-	border: 1px dashed #ccc;
-}
+.summaryTable{width:400px;}
 
-#index
-{
-	margin-top: 24px;
-	float: left;
-	width: 160px;
-	position: absolute;
-	left: 8px;
-	background-color: #F3F3F3;
-	padding: 8px;
-}
+.nameDescription .fixedFont{font-size:16px;margin-bottom:6px;display:block;color:#000;}
+.nameDescription{color:#888;}
+.nameDescription a{color:#000;text-decoration:none;}
 
-#content
-{
-	margin-left: 190px;
-	width: 600px;
-}
+.attributes{text-align:right;color:#888;}
 
-.classList
-{
-	list-style-type: none;
-	padding: 0;
-	margin: 0 0 0 8px;
-	font-family: arial, sans-serif;
-	font-size: 1em;
-	overflow: auto;
-}
+#detail-view{position:fixed;top:40px;left:470px;
+width:500px;border:1px solid #ddd;padding:20px;}
 
-.classList li
-{
-	padding: 0;
-	margin: 0 0 8px 0;
-}
+#detail-view .fixedFont{color:#888;margin-bottom:12px;font-size:18px;color:#000;}
+#detail-view .fixedFont .light{display:none;}
+#detail-view .fixedFont.light{font-size:12px;color:#888;}
+dt{margin-top:4px;}
+#detail-view dt.heading{border-top:1px solid #ddd;padding-top:8px;
+    margin:12px 0 6px;font-weight:bold;color:#000;}
+#detail-view dd{margin:0;}
 
-.summaryTable { width: 100%; }
-
-h1.classTitle
-{
-	font-size:170%;
-	line-height:130%;
-}
-
-h2 { font-size: 110%; }
-caption, div.sectionTitle
-{
-	background-color: #7F8FB1;
-	color: #fff;
-	font-size:130%;
-	text-align: left;
-	padding: 2px 6px 2px 6px;
-	border: 1px #7F8FB1 solid;
-}
-
-div.sectionTitle { margin-bottom: 8px; }
-.summaryTable thead { display: none; }
-
-.summaryTable td
-{
-	vertical-align: top;
-	padding: 4px;
-	border-bottom: 1px #7F8FB1 solid;
-	border-right: 1px #7F8FB1 solid;
-}
-
-/*col#summaryAttributes {}*/
-.summaryTable td.attributes
-{
-	border-left: 1px #7F8FB1 solid;
-	width: 140px;
-	text-align: right;
-}
-
-td.attributes, .fixedFont
-{
-	line-height: 15px;
-	color: #002EBE;
-	font-family: "Courier New",Courier,monospace;
-	font-size: 13px;
-}
-
-.summaryTable td.nameDescription
-{
-	text-align: left;
-	font-size: 13px;
-	line-height: 15px;
-}
-
-.summaryTable td.nameDescription, .description
-{
-	line-height: 15px;
-	padding: 4px;
-	padding-left: 4px;
-}
-
-.summaryTable { margin-bottom: 8px; }
-
-ul.inheritsList
-{
-	list-style: square;
-	margin-left: 20px;
-	padding-left: 0;
-}
-
-.detailList {
-	margin-left: 20px; 
-	line-height: 15px;
-}
-.detailList dt { margin-left: 20px; }
-
-.detailList .heading
-{
-	font-weight: bold;
-	padding-bottom: 6px;
-	margin-left: 0;
-}
-
-.light, td.attributes, .light a:link, .light a:visited
-{
-	color: #777;
-	font-style: italic;
-}
-
-.fineprint
-{
-	text-align: right;
-	font-size: 10px;
-}
+.sectionTitle{display:none!important;}
 		</style>
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<script>
+		$(function() {
+    
+    var sections = {};
+    var container = $('<div>').attr('id','detail-view').appendTo(document.body)
+    var showSection = function( id ) {
+        container.empty();
+        sections[ id.replace(/\#/,'') ].appendTo(container).show();
+    }
+    
+    $('a[name]').each(function() {
+        sections[ this.name ] = $(this).nextUntil('a[name]').hide();
+    });
+    
+    $('.summaryTable .nameDescription').each(function() {
+        $(this).css('cursor','pointer').click(function(e) {
+            e.preventDefault();
+            $('tr.active').removeClass('active')
+            $(this).closest('tr').addClass('active');
+            showSection($(this).find('a').attr('href').replace(/[^\#]+/,''));
+        }).hover(function() {
+            $(this).closest('tr').addClass('hover');
+        }, function() {
+            $(this).closest('tr').removeClass('hover');
+        })
+    })
+
+});
+		</script>
 	</head>
 
 	<body>
@@ -189,7 +97,7 @@ ul.inheritsList
 <h2>Classes</h2>
 <ul class="classList">
 	
-	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
 	
 	<li><a href="../symbols/Galleria.html">Galleria</a></li>
 	
@@ -245,34 +153,6 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
-				
-				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Galleria.">
-					<caption>Field Summary</caption>
-					<thead>
-						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
-						</tr>
-					</thead>
-					<tbody>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								Galleria.<b><a href="../symbols/Galleria.html#.utils">utils</a></b>
-								</div>
-								<div class="description">The Galleria utils provides generic helper methods</div>
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
-				
-				
-				
-			
 
 <!-- ============================== methods summary ======================== -->
 			
@@ -310,7 +190,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/Galleria.html#addIdleState">addIdleState</a></b>(elem, elem, styles)
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#addIdleState">addIdleState</a></b>(elem, styles)
 								</div>
 								<div class="description">Assign an "idle state" to any element.</div>
 							</td>
@@ -373,9 +253,9 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/Galleria.html#bindTooltip">bindTooltip</a></b>(elem, elem, value, value)
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#bindTooltip">bindTooltip</a></b>(elem, value)
 								</div>
-								<div class="description">Adds a tooltip to any element</div>
+								<div class="description">Adds a tooltip to any element.</div>
 							</td>
 						</tr>
 					
@@ -391,7 +271,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/Galleria.html#defineTooltip">defineTooltip</a></b>(elem, value, value)
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#defineTooltip">defineTooltip</a></b>(elem, value)
 								</div>
 								<div class="description">Redefine a tooltip
         Use this if you want to change the tooltip value at runtime</div>
@@ -421,7 +301,7 @@ ul.inheritsList
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/Galleria.html#enterIdleMode">enterIdleMode</a></b>()
 								</div>
-								<div class="description">Force Galleria to enter idle mode</div>
+								<div class="description">Force Galleria to enter idle mode.</div>
 							</td>
 						</tr>
 					
@@ -439,7 +319,7 @@ ul.inheritsList
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/Galleria.html#exitIdleMode">exitIdleMode</a></b>()
 								</div>
-								<div class="description">Force Galleria to exit idle mode</div>
+								<div class="description">Force Galleria to exit idle mode.</div>
 							</td>
 						</tr>
 					
@@ -581,7 +461,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/Galleria.html#load">load</a></b>(source, source, selector, config)
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#load">load</a></b>(source, selector, config)
 								</div>
 								<div class="description">Loads data into the gallery.</div>
 							</td>
@@ -689,9 +569,9 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/Galleria.html#removeIdleState">removeIdleState</a></b>(elem, elem)
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#removeIdleState">removeIdleState</a></b>(elem)
 								</div>
-								<div class="description">Removes any idle state previousle set using addIdleState()</div>
+								<div class="description">Removes any idle state previously set using addIdleState()</div>
 							</td>
 						</tr>
 					
@@ -836,33 +716,6 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
-				<div class="sectionTitle">
-					Field Detail
-				</div>
-				
-					<a name=".utils"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">Galleria.</span><b>utils</b>
-					
-					</div>
-					<div class="description">
-						The Galleria utils provides generic helper methods
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					
-				
-			
 
 <!-- ============================== method details ========================= -->		
 			
@@ -972,7 +825,7 @@ ul.inheritsList
 					<div class="fixedFont">
 					
 					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
-					<b>addIdleState</b>(elem, elem, styles)
+					<b>addIdleState</b>(elem, styles)
 					
 					</div>
 					<div class="description">
@@ -987,6 +840,8 @@ ul.inheritsList
 					
 					<pre class="code">addIdleState( this.get('image-nav'), { opacity: 0 });</pre>
 					
+					<pre class="code">addIdleState( '.galleria-image-nav', { top: -200 });</pre>
+					
 					
 					
 						
@@ -994,16 +849,10 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{HTML Element}</span> <b>elem</b>
+									<span class="light fixedFont">{HTML Element or String}</span> <b>elem</b>
 									
 								</dt>
-								<dd>The Dom node to apply the idle state to</dd>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>elem</b>
-									
-								</dt>
-								<dd>selector to apply the idle state to</dd>
+								<dd>The Dom node or selector to apply the idle state to</dd>
 							
 								<dt>
 									<span class="light fixedFont">{Object}</span> <b>styles</b>
@@ -1333,11 +1182,12 @@ this.attachKeyboard({
 					<div class="fixedFont">
 					
 					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
-					<b>bindTooltip</b>(elem, elem, value, value)
+					<b>bindTooltip</b>(elem, value)
 					
 					</div>
 					<div class="description">
-						Adds a tooltip to any element
+						Adds a tooltip to any element. 
+        You can also call this method with an object as argument with elemID:value pairs to apply tooltips to (see examples)
 						
 						
 					</div>
@@ -1363,22 +1213,10 @@ this.attachKeyboard({
 								<dd>The DOM Node to attach the event to</dd>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>elem</b>
+									<span class="light fixedFont">{String or Function}</span> <b>value</b>
 									
 								</dt>
-								<dd>An object with elemID:value pairs to apply tooltips to</dd>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>value</b>
-									
-								</dt>
-								<dd>The tooltip message</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Function}</span> <b>value</b>
-									
-								</dt>
-								<dd>A function that returns the tooltip message</dd>
+								<dd>The tooltip message. Can also be a function that returns a string.</dd>
 							
 							</dl>
 						
@@ -1434,7 +1272,7 @@ this.attachKeyboard({
 					<div class="fixedFont">
 					
 					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
-					<b>defineTooltip</b>(elem, value, value)
+					<b>defineTooltip</b>(elem, value)
 					
 					</div>
 					<div class="description">
@@ -1457,16 +1295,10 @@ this.attachKeyboard({
 								<dd>The DOM Node to attach the event to</dd>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>value</b>
+									<span class="light fixedFont">{String or Function}</span> <b>value</b>
 									
 								</dt>
-								<dd>The tooltip message</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Function}</span> <b>value</b>
-									
-								</dt>
-								<dd>A function that returns the tooltip message</dd>
+								<dd>The tooltip message. Can also be a function that returns a string.</dd>
 							
 							</dl>
 						
@@ -1569,7 +1401,7 @@ this.attachKeyboard({
 					
 					</div>
 					<div class="description">
-						Force Galleria to enter idle mode
+						Force Galleria to enter idle mode.
 						
 						
 					</div>
@@ -1644,7 +1476,7 @@ this.attachKeyboard({
 					
 					</div>
 					<div class="description">
-						Force Galleria to exit idle mode
+						Force Galleria to exit idle mode.
 						
 						
 					</div>
@@ -2269,7 +2101,7 @@ $(document).mousemove(function(e) {
 					<div class="fixedFont">
 					
 					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
-					<b>load</b>(source, source, selector, config)
+					<b>load</b>(source, selector, config)
 					
 					</div>
 					<div class="description">
@@ -2286,18 +2118,11 @@ $(document).mousemove(function(e) {
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Array}</span> <b>source</b>
+									<span class="light fixedFont">{Array or String}</span> <b>source</b>
 									
 								</dt>
-								<dd>Optional JSON array of data.
-        Defaults to the data_source option</dd>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>source</b>
-									
-								</dt>
-								<dd>Optional selector of DOM nodes that contains the data. 
-        Defaults to the Gallery target</dd>
+								<dd>Optional JSON array of data or selector of where to find data in the document.
+        Defaults to the Galleria target or data_source option.</dd>
 							
 								<dt>
 									<span class="light fixedFont">{String}</span> <b>selector</b>
@@ -2775,11 +2600,11 @@ this.prependChild( 'info', 'myElement' );</pre>
 					<div class="fixedFont">
 					
 					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
-					<b>removeIdleState</b>(elem, elem)
+					<b>removeIdleState</b>(elem)
 					
 					</div>
 					<div class="description">
-						Removes any idle state previousle set using addIdleState()
+						Removes any idle state previously set using addIdleState()
 						
 						
 					</div>
@@ -2791,16 +2616,10 @@ this.prependChild( 'info', 'myElement' );</pre>
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{HTML Element}</span> <b>elem</b>
+									<span class="light fixedFont">{HTML Element or String}</span> <b>elem</b>
 									
 								</dt>
-								<dd>The Dom node to apply the idle state to</dd>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>elem</b>
-									
-								</dt>
-								<dd>The selector to apply the idle state to</dd>
+								<dd>The Dom node or selector to remove the idle state from.</dd>
 							
 							</dl>
 						
@@ -2974,7 +2793,7 @@ this.prependChild( 'info', 'myElement' );</pre>
 									<span class="light fixedFont">{Number}</span> <b>index</b>
 									
 								</dt>
-								<dd>Optional data index to fectch, 
+								<dd>Optional data index to fectch and apply as caption, 
         if no index found it assumes the currently active index</dd>
 							
 							</dl>
@@ -3235,9 +3054,5 @@ this.prependChild( 'info', 'myElement' );</pre>
 
 		
 <!-- ============================== footer ================================= -->
-		<div class="fineprint" style="clear:both">
-			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Oct 28 2010 15:51:29 GMT+0200 (CEST)
-		</div>
 	</body>
 </html>

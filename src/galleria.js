@@ -1920,11 +1920,8 @@ Galleria.prototype = {
         Loads data into the gallery.
         You can call this method on an existing gallery to reload the gallery with new data.
         
-        @param {Array} source Optional JSON array of data.
-        Defaults to the data_source option
-        
-        @param {String} source Optional selector of DOM nodes that contains the data. 
-        Defaults to the Gallery target
+        @param {Array or String} source Optional JSON array of data or selector of where to find data in the document.
+        Defaults to the Galleria target or data_source option.
         
         @param {String} selector Optional element selector of what elements to parse. 
         Defaults to 'img'.
@@ -1934,6 +1931,7 @@ Galleria.prototype = {
         
         @returns {Galleria}
     */
+    
     load : function( source, selector, config ) {
         
         var self = this;
@@ -2069,11 +2067,11 @@ Galleria.prototype = {
         The idle state will be applied after a certain amount of idle time
         Useful to hide f.ex navigation when the gallery is inactive
     
-        @param {HTML Element} elem The Dom node to apply the idle state to
-        @param {String} elem selector to apply the idle state to
+        @param {HTML Element or String} elem The Dom node or selector to apply the idle state to
         @param {Object} styles the CSS styles to apply
         
         @example addIdleState( this.get('image-nav'), { opacity: 0 });
+        @example addIdleState( '.galleria-image-nav', { top: -200 });
     
         @returns {Galleria}
     */
@@ -2084,10 +2082,9 @@ Galleria.prototype = {
     },
     
     /**
-        Removes any idle state previousle set using addIdleState()
+        Removes any idle state previously set using addIdleState()
     
-        @param {HTML Element} elem The Dom node to apply the idle state to
-        @param {String} elem The selector to apply the idle state to
+        @param {HTML Element or String} elem The Dom node or selector to remove the idle state from.
     
         @returns {Galleria}
     */
@@ -2098,7 +2095,7 @@ Galleria.prototype = {
     },
 
     /**
-        Force Galleria to enter idle mode
+        Force Galleria to enter idle mode.
         
         @returns {Galleria}
     */
@@ -2109,7 +2106,7 @@ Galleria.prototype = {
     },
 
     /**
-        Force Galleria to exit idle mode
+        Force Galleria to exit idle mode.
         
         @returns {Galleria}
     */
@@ -2146,12 +2143,11 @@ Galleria.prototype = {
     },
     
     /**
-        Adds a tooltip to any element
+        Adds a tooltip to any element. 
+        You can also call this method with an object as argument with elemID:value pairs to apply tooltips to (see examples)
         
         @param {HTML Element} elem The DOM Node to attach the event to
-        @param {Object} elem An object with elemID:value pairs to apply tooltips to
-        @param {String} value The tooltip message
-        @param {Function} value A function that returns the tooltip message
+        @param {String or Function} value The tooltip message. Can also be a function that returns a string.
         
         @example this.bindTooltip( this.get('thumbnails'), 'My thumbnails');
         @example this.bindTooltip( this.get('thumbnails'), function() { return 'My thumbs' });
@@ -2170,8 +2166,7 @@ Galleria.prototype = {
         Use this if you want to change the tooltip value at runtime
         
         @param {HTML Element} elem The DOM Node to attach the event to
-        @param {String} value The tooltip message
-        @param {Function} value A function that returns the tooltip message
+        @param {String or Function} value The tooltip message. Can also be a function that returns a string.
         
         @returns {Galleria}
     */
@@ -3060,7 +3055,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Manually set captions
         
-        @param {Number} index Optional data index to fectch, 
+        @param {Number} index Optional data index to fectch and apply as caption, 
         if no index found it assumes the currently active index
         
         @returns {Galleria}
@@ -3354,10 +3349,6 @@ Galleria.get = function( index ) {
 Galleria.addTransition = function( name, fn ) {
     _transitions[name] = fn;
 };
-
-/**
-    The Galleria utils provides generic helper methods
-*/
 
 Galleria.utils = Utils;
 
