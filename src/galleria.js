@@ -2990,6 +2990,17 @@ this.prependChild( 'info', 'myElement' );
         return this;
     },
 
+    /**
+     * Toggle between play and pause events.
+     *
+     * @param {Number} delay Sets the slideshow interval in milliseconds.
+     *
+     * @returns {Galleria}
+     */
+    playToggle : function( delay ) {
+        return ( this._playing ) ? this.pause() : this.play( delay );
+    },
+
     _playCheck : function() {
         var self = this,
             played = 0,
