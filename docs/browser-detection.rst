@@ -8,6 +8,7 @@ Example usage:
 ..............
 
 ::
+
     <script>
     if (Galleria.OPERA) {
         Galleria.log('you are using opera!');
