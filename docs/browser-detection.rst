@@ -73,6 +73,6 @@ Galleria.ANDROID
 ------------
 Detects android using browser sniffing.
 
-Galleria.MOBILE
+Galleria.TOUCH
 ------------
-Detects mobile devices using browser sniffing.
+Detects touch devices using browser sniffing.
