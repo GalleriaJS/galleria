@@ -1,5 +1,5 @@
 /*
- * Galleria v 1.2 prerelease 1.0 2010-10-20
+ * Galleria v 1.2 prerelease 1.1 2010-10-28
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -19,8 +19,8 @@ var DEBUG = false,
     NAV   = navigator.userAgent.toLowerCase(),
     HASH  = window.location.hash.replace(/#\//,''),
     CLICK = function() {
-        // use this to make mobile devices snappier
-        return Galleria.MOBILE ? 'touchstart' : 'click';
+        // use this to make touch devices snappier
+        return Galleria.TOUCH ? 'touchstart' : 'click';
     },
     IE    = (function(){
         var v = 3, 
@@ -38,75 +38,6 @@ var DEBUG = false,
             head:  doc.getElementsByTagName('head')[0],
             title: doc.title
         }
-    },
-    
-    // Debug TOOLS
-    
-    // log wrapper
-    log = function() {
-        try { 
-            window.console.log.apply( window.console, Utils.array(arguments) ); 
-        } catch( e ) {
-            try {
-                opera.postError.apply( opera, arguments ); 
-            } catch( er ) { 
-                  trace( arguments ); 
-            } 
-        }
-    },
-    
-    // raise errors
-    raise = function( msg, force ) {
-        if ( DEBUG || force ) {
-            throw new Error( msg );
-        }
-    },
-    
-    // cross-browser tracer
-    _tracer = {
-        
-        ts : new Date().getTime(),
-        
-        initialized : false,
-        
-        open: true,
-        
-        init : function() {
-            this.initialized = true;
-            this.elem = $('<div id="log">').css({
-                background: '#fff', opacity: .8, padding: '20px', width: 300, height: '80%',
-                position: 'fixed', top:10, left:10, zIndex: 100000,
-                color:'#000', overflow:'auto', font: '11px/1.2 arial,sans-serif'
-            }).click(function() {
-                $(this).css({
-                    height: _tracer.open ? 0 : '80%',
-                    opacity: _tracer.open ? .1 : .8
-                });
-                _tracer.open = !_tracer.open;
-            }).appendTo( DOM().body );
-        
-        },
-        
-        log: function( msg ) {
-            
-            if ( !this.initialized ) {
-                this.init();
-            }
-
-            var now = ( new Date().getTime() - _tracer.ts );
-            _tracer.elem.html( 
-                _tracer.elem.html() + now.toString() + ' ms: <strong>' + msg + '</strong><br>'
-            );
-            
-            // keep scroll in bottom
-            _tracer.elem[0].scrollTop = _tracer.elem[0].scrollHeight;
-        }
-    },
-    
-    trace = function() {
-        $.each( Utils.array( arguments ), function(i, msg) {
-            _tracer.log.call( _tracer, msg );
-        })
     },
     
     // the internal timeouts object
@@ -143,6 +74,110 @@ var DEBUG = false,
                     del.call( _timeouts, i );
                 }
             }
+        }
+    },
+    
+    // the internal gallery holder
+    _galleries = [],
+    
+    // the transitions holder
+    _transitions = {
+
+        fade: function(params, complete) {
+            $(params.next).css('opacity',0).show().animate({
+                opacity: 1
+            }, params.speed, complete);
+
+            if (params.prev) {
+                $(params.prev).css('opacity',1).show().animate({
+                    opacity: 0
+                }, params.speed);
+            }
+        },
+
+        flash: function(params, complete) {
+            $(params.next).css('opacity',0);
+            if (params.prev) {
+                $(params.prev).animate({
+                    opacity: 0
+                }, (params.speed/2), function() {
+                    $(params.next).animate({
+                        opacity: 1
+                    }, params.speed, complete);
+                });
+            } else {
+                $(params.next).animate({
+                    opacity: 1
+                }, params.speed, complete);
+            }
+        },
+
+        pulse: function(params, complete) {
+            if (params.prev) {
+                $(params.prev).hide();
+            }
+            $(params.next).css('opacity',0).animate({
+                opacity:1
+            }, params.speed, complete);
+        },
+
+        slide: function(params, complete) {
+            var image  = $(params.next).parent(),
+                images = this.$('images'), // ??
+                width  = this._stageWidth,
+                easing = this.getOptions( 'easing' );
+
+            image.css({
+                left: width * ( params.rewind ? -1 : 1 )
+            });
+            images.animate({
+                left: width * ( params.rewind ? 1 : -1 )
+            }, {
+                duration: params.speed,
+                queue: false,
+                easing: easing,
+                complete: function() {
+                    images.css('left',0);
+                    image.css('left',0);
+                    complete();
+                }
+            });
+        },
+
+        fadeslide: function(params, complete) {
+
+            var x = 0,
+                easing = this.getOptions("easing");
+
+            if (params.prev) {
+                x = Utils.parseValue( $(params.prev).css("left") );
+                $(params.prev).css({
+                    opacity: 1,
+                    left: x
+                }).animate({
+                    opacity: 0,
+                    left: x + ( 50 * ( params.rewind ? 1 : -1 ) )
+                },{
+                    duration: params.speed,
+                    queue: false,
+                    easing: easing
+                });
+            }
+
+            x = Utils.parseValue( $(params.next).css("left") );
+
+            $(params.next).css({
+                left: x + ( 50 * ( params.rewind ? -1 : 1 ) ), 
+                opacity: 0
+            }).animate({
+                opacity: 1,
+                left: x
+            }, {
+                duration: params.speed,
+                complete: complete,
+                queue: false,
+                easing: easing
+            });
         }
     },
     
@@ -245,7 +280,7 @@ var DEBUG = false,
                 options = $.extend({
                     until : function() { return false; },
                     success : function() {},
-                    error : function() { raise('Could not complete wait function.'); },
+                    error : function() { Galleria.raise('Could not complete wait function.'); },
                     timeout: 3000
                 }, options);
             
@@ -351,7 +386,6 @@ var DEBUG = false,
                 // look for manual css
                 $('link[rel=stylesheet]').each(function() {
                     if ( new RegExp( href ).test( this.href ) ) {
-                        log(this)
                         link = this;
                         return false;
                     }
@@ -423,7 +457,7 @@ var DEBUG = false,
                             }, 100);
                         },
                         error: function() {
-                            raise( 'Theme CSS could not load' );
+                            Galleria.raise( 'Theme CSS could not load' );
                         },
                         timeout: 1000
                     });
@@ -434,272 +468,21 @@ var DEBUG = false,
     })();
 
 
-// The private Picture class
-// Adds preload, cache and scale functionality
-var Picture = function( id ) {
+/**
+    The main Galleria class
     
-        // save the id
-        this.id = id || null;
+    @class
     
-        // the image should be null until loaded
-        this.image = null;
+    @example var gallery = new Galleria();
     
-        // Create a new container
-        this.container = Utils.create('galleria-image');
+    @author http://aino.se
     
-        // add container styles
-        $( this.container ).css({
-            overflow: 'hidden',
-            position: 'relative' // for IE Standards mode
-        });
+    @requires jQuery
     
-        // saves the original meassurements
-        this.original = {
-            width: 0,
-            height: 0
-        };
-    
-        // flag when the image is ready
-        this.ready = false;
-        
-        // flag when the image is loaded
-        this.loaded = false;
-        
-    };
+    @returns {Galleria}
+*/
 
-Picture.prototype = {
-    
-    // the inherited cache object
-    cache: {},
-    
-    // creates a new image and adds it to cache when loaded
-    add: function( src ) {
-        
-        var self = this;
-
-        // create the image
-        var image = new Image();
-        
-        // force a block display
-        $( image ).css( 'display', 'block');
-        
-        if ( self.cache[ src ] ) {
-            // no need to onload if the image is cached
-            image.src = src;
-            self.loaded = true;
-            self.original = {
-                height: image.height,
-                width: image.width
-            };
-            return image;
-        }
-
-        // begin preload and insert in cache when done
-        image.onload = function() {
-            self.original = {
-                height: this.height,
-                width: this.width
-            };
-            self.cache[ src ] = src; // will override old cache
-            self.loaded = true;
-        }
-        
-        image.src = src;
-        return image;
-        
-    },
-    
-    // show the image on stage
-    show: function() {
-        Utils.show( this.image );
-    },
-    
-    // hide the image
-    hide: function() {
-        Utils.moveOut( this.image );
-    },
-    
-    clear: function() {
-        this.image = null;
-    },
-    
-    // checks if the image is cached
-    isCached: function(src) {
-        return !!this.cache[src];
-    },
-    
-    // the load function
-    // returns the jquery container object
-    load: function(src, callback) {
-        
-        // save the instance
-        var self = this;
-
-        $( this.container ).empty(true);
-        
-        // add the image to cache and hide it
-        this.image = this.add( src );
-        Utils.hide( this.image );
-        
-        // append the image into the container
-        $( this.container ).append( this.image );
-        
-        // check for loaded image using a timeout
-        Utils.wait({
-            until: function() {
-                // TODO this should be properly tested in Opera
-                return self.loaded && self.image.complete && self.image.width;
-            },
-            success: function() {
-                // call success
-                window.setTimeout(function() { callback.call( self, self ) }, 1 );
-            },
-            error: function() {
-                callback.call( self, self );
-                Galleria.raise('image not loaded in 5 seconds: '+ src);
-            },
-            timeout: 5000
-        });
-        
-        // return the container
-        return this.container;
-    },
-    
-    // scales the image into it's container
-    scale: function(options) {
-        
-        // extend some defaults
-        options = $.extend({
-            width: 0,
-            height: 0,
-            min: undef,
-            max: undef,
-            margin: 0,
-            complete: function(){},
-            position: 'center',
-            crop: false
-        }, options);
-        
-        // return the element if no image found
-        if (!this.image) {
-            return this.container;
-        }
-        
-        // store locale variables of width & height
-        var width,
-            height,
-            self = this,
-            $container = $( self.container );
-        
-        // wait for the width/height
-        Utils.wait({
-            until: function() {
-                
-                width  = options.width
-                    || $container.width()
-                    || Utils.parseValue( $container.css('width') );
-                    
-                height = options.height
-                    || $container.height()
-                    || Utils.parseValue( $container.css('height') );
-
-                return width && height;
-            },
-            success: function() {
-                // calculate some cropping
-                var newWidth = ( width - options.margin*2 ) / self.original.width,
-                    newHeight = ( height- options.margin*2 ) / self.original.height,
-                    cropMap = {
-                        'true'  : Math.max( newWidth, newHeight ),
-                        'width' : newWidth,
-                        'height': newHeight,
-                        'false' : Math.min( newWidth, newHeight )
-                    },
-                    ratio = cropMap[ options.crop.toString() ];
-
-                // allow max_scale_ratio
-                if ( options.max ) {
-                    ratio = Math.min( options.max, ratio );
-                }
-                
-                // allow min_scale_ratio
-                if ( options.min ) {
-                    ratio = Math.max( options.min, ratio );
-                }
-                
-                $( self.container ).width( width ).height( height );
-                
-                // round up the width / height
-                $.each( ['width','height'], function( i, m ) {
-                    $( self.image )[ m ]( self[ m ] = Math.ceil( self.original[ m ] * ratio ) );
-                });
-                
-                // calculate image_position
-                var pos = {},
-                    mix = {},
-                    getPosition = function(value, meassure, margin) {
-                        var result = 0;
-                        if (/\%/.test(value)) {
-                            var flt = parseInt(value) / 100;
-                            result = Math.ceil( $( self.image )[ meassure ]() * -1 * flt + margin * flt );
-                        } else {
-                            result = Utils.parseValue( value );
-                        }
-                        return result;
-                    },
-                    positionMap = {
-                        'top': { top: 0 },
-                        'left': { left: 0 },
-                        'right': { left: '100%' },
-                        'bottom': { top: '100%' }
-                    };
-                
-                $.each( options.position.toLowerCase().split(' '), function( i, value ) {
-                    if ( value == 'center' ) {
-                        value = '50%';
-                    }
-                    pos[i ? 'top' : 'left'] = value;
-                });
-                
-                $.each( pos, function( i, value ) {
-                    if ( positionMap.hasOwnProperty( value ) ) {
-                        $.extend( mix, positionMap[ value ] );
-                    }
-                });
-                
-                pos = pos.top ? $.extend( pos, mix ) : mix;
-            
-                pos = $.extend({
-                    top: '50%',
-                    left: '50%'
-                }, pos);
-                
-                // apply position
-                $( self.image ).css({
-                    position : 'relative',
-                    top :  getPosition(pos.top, 'height', height),
-                    left : getPosition(pos.left, 'width', width)
-                });
-                
-                // show the image
-                self.show();
-                
-                // flag ready and call the callback
-                self.ready = true;
-                options.complete.call( self, self );
-            },
-            error: function() {
-                raise('Could not scale image: '+self.image.src);
-            },
-            timeout: 1000
-        });
-        return this;
-    }
-};
-
-// The main Galleria class
-
-var Galleria = function() {
+Galleria = function() {
     
     var self = this;
     
@@ -761,16 +544,16 @@ var Galleria = function() {
     
     // the internal keyboard object
     // keeps reference of the keybinds and provides helper methods for binding keys
-    this._keyboard = {
+    var keyboard = this._keyboard = {
         
         keys : {
-            UP: 38,
-            DOWN: 40,
-            LEFT: 37,
-            RIGHT: 39,
-            RETURN: 13,
-            ESCAPE: 27,
-            BACKSPACE: 8
+            'UP': 38,
+            'DOWN': 40,
+            'LEFT': 37,
+            'RIGHT': 39,
+            'RETURN': 13,
+            'ESCAPE': 27,
+            'BACKSPACE': 8
         },
         
         map : {},
@@ -779,32 +562,32 @@ var Galleria = function() {
         
         press: function(e) {
             var key = e.keyCode || e.which;
-            if ( key in self._keyboard.map && typeof self._keyboard.map[key] == 'function' ) {
-                self._keyboard.map[key].call(self, e);
+            if ( key in k.map && typeof keyboard.map[key] == 'function' ) {
+                keyboard.map[key].call(self, e);
             }
         },
         
         attach: function(map) {
             for( var key in map ) {
                 var up = key.toUpperCase();
-                if ( up in this.keys ) {
-                    this.map[ this.keys[up] ] = map[key];
+                if ( up in keyboard.keys ) {
+                    keyboard.map[ keyboard.keys[up] ] = map[key];
                 }
             }
-            if ( !this.bound ) {
-                this.bound = true;
-                $doc.bind('keydown', this.press);
+            if ( !keyboard.bound ) {
+                keyboard.bound = true;
+                $doc.bind('keydown', keyboard.press);
             }
         },
         
         detach: function() {
-            this.bound = false;
-            $doc.unbind('keydown', this.press);
+            keyboard.bound = false;
+            $doc.unbind('keydown', keyboard.press);
         }
     };
         
     // internal controls for keeping track of active / inactive images
-    this._controls = {
+    var controls = this._controls = {
         
         0: undef,
         
@@ -813,25 +596,24 @@ var Galleria = function() {
         active : 0,
         
         swap : function() {
-            this.active = this.active ? 0 : 1;
+            controls.active = controls.active ? 0 : 1;
         },
         
         getActive : function() {
-            return this[this.active];
+            return controls[ controls.active ];
         },
         
         getNext : function() {
-            return this[ 1 - this.active ];
+            return controls[ 1 - controls.active ];
         }
     };
     
     // internal carousel object
-    // todo
-    this._carousel = {
+    var carousel = this._carousel = {
         
         // shortcuts
-        next: this.$('thumb-nav-right'),
-        prev: this.$('thumb-nav-left'),
+        next: self.$('thumb-nav-right'),
+        prev: self.$('thumb-nav-left'),
         
         // cache the width
         width: 0,
@@ -866,19 +648,17 @@ var Galleria = function() {
                 height: h
             });
 
-            // use global context in case ov event triggering
-            self._carousel.max = w;
-            self._carousel.hooks = hooks;
-            self._carousel.width = self.$( 'thumbnails-list' ).width();
-            self._carousel.setClasses();
+            carousel.max = w;
+            carousel.hooks = hooks;
+            carousel.width = self.$( 'thumbnails-list' ).width();
+            carousel.setClasses();
 
             // todo: fix so the carousel moves to the left
         },
         
         bindControls: function() {
-            
-            var carousel = this
-            this.next.bind( CLICK(), function(e) {
+
+            carousel.next.bind( CLICK(), function(e) {
                 e.preventDefault();
                 
                 if ( self._options.carousel_steps == 'auto' ) {
@@ -895,7 +675,7 @@ var Galleria = function() {
                 }
             });
             
-            this.prev.bind( CLICK(), function(e) {
+            carousel.prev.bind( CLICK(), function(e) {
                 e.preventDefault();
                 
                 if ( self._options.carousel_steps == 'auto' ) {
@@ -918,51 +698,52 @@ var Galleria = function() {
         // calculate and set positions
         set: function( i ) {
             i = Math.max( i, 0 );
-            while ( this.hooks[i-1] + this.width > this.max && i >= 0 ) {
+            while ( carousel.hooks[i-1] + carousel.width > carousel.max && i >= 0 ) {
                 i--;
             }
-            this.current = i;
-            this.animate();
+            carousel.current = i;
+            carousel.animate();
         },
         
         // get the last position
         getLast: function(i) {
-            return ( i || this.current ) -1;
+            return ( i || carousel.current ) -1;
         },
         
         // follow the active image
         follow: function(i) {
             
             //don't follow if position fits
-            if ( i == 0 || i == this.hooks.length-2 ) {
-                this.set( i );
+            if ( i == 0 || i == carousel.hooks.length-2 ) {
+                carousel.set( i );
                 return;
             }
             
             // calculate last position
-            var last = this.current;
-            while( this.hooks[last] - this.hooks[ this.current ] < this.width && last <= this.hooks.length) {
+            var last = carousel.current;
+            while( carousel.hooks[last] - carousel.hooks[ carousel.current ] < 
+                   carousel.width && last <= carousel.hooks.length ) {
                 last ++;
             }
             
             // set position
-            if ( i-1 < this.current ) {
-                this.set( i-1 );
+            if ( i-1 < carousel.current ) {
+                carousel.set( i-1 );
             } else if ( i+2 > last) {
-                this.set( i - last + this.current + 2 );
+                carousel.set( i - last + carousel.current + 2 );
             }
         },
         
         // helper for setting disabled classes
         setClasses: function() {
-            this.prev.toggleClass( 'disabled', !this.current );
-            this.next.toggleClass( 'disabled', this.hooks[ this.current ] + this.width > this.max )
+            carousel.prev.toggleClass( 'disabled', !carousel.current );
+            carousel.next.toggleClass( 'disabled', carousel.hooks[ carousel.current ] + carousel.width > carousel.max )
         },
         
         // the animation method    
         animate: function(to) {
-            this.setClasses();
-            var num = this.hooks[this.current] * -1;
+            carousel.setClasses();
+            var num = carousel.hooks[ carousel.current ] * -1;
             
             if ( isNaN( num ) ) {
                 return;
@@ -979,9 +760,8 @@ var Galleria = function() {
     };
     
     // tooltip control
-    // added in 1.99
-    // not implemented yet!
-    this._tooltip = {
+    // added in 1.2
+    var tooltip = this._tooltip = {
         
         initialized : false,
         
@@ -991,7 +771,7 @@ var Galleria = function() {
         
         init: function() {
             
-            this.initialized = true;
+            tooltip.initialized = true;
             
             var css = '.galleria-tooltip{padding:3px 8px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:11px;line-height:1.3' +
                       'opacity:0;box-shadow:0 0 2px rgba(0,0,0,.4);-moz-box-shadow:0 0 2px rgba(0,0,0,.4);-webkit-box-shadow:0 0 2px rgba(0,0,0,.4);}';
@@ -1038,38 +818,38 @@ var Galleria = function() {
         // you can also bind single DOM elements using bind(elem, string)
         bind: function( elem, value ) {
             
-            if (! this.initialized ) {
-                this.init();
+            if (! tooltip.initialized ) {
+                tooltip.init();
             }
             
             var hover = function( elem, value) {
                 
-                self._tooltip.define( elem, value );
+                tooltip.define( elem, value );
                 
                 $( elem ).hover(function() {
 
-                    self._tooltip.active = elem;
+                    tooltip.active = elem;
                     Utils.clearTimer('switch_tooltip');
-                    self.$('container').bind( 'mousemove', self._tooltip.move ).trigger( 'mousemove' );
-                    self._tooltip.show( elem );
+                    self.$('container').unbind( 'mousemove', tooltip.move ).bind( 'mousemove', tooltip.move ).trigger( 'mousemove' );
+                    tooltip.show( elem );
                     
                     Galleria.utils.addTimer( 'tooltip', function() {
                         
                         Utils.show( self.get( 'tooltip' ), 400 );
-                        self._tooltip.open = true;
+                        tooltip.open = true;
                         
-                    }, self._tooltip.open ? 0 : 1000);
+                    }, tooltip.open ? 0 : 1000);
                     
                 }, function() {
                     
-                    self._tooltip.active = null;
+                    tooltip.active = null;
                     
-                    self.$( 'container' ).unbind( 'mousemove', self._tooltip.move );
+                    self.$( 'container' ).unbind( 'mousemove', tooltip.move );
                     Utils.clearTimer( 'tooltip' );
                     
                     Utils.hide( self.get( 'tooltip' ), 200, function() {
                         Utils.addTimer('switch_tooltip', function() {
-                            self._tooltip.open = false;
+                            tooltip.open = false;
                         }, 1000);
                     });
                 })
@@ -1111,14 +891,14 @@ var Galleria = function() {
             
             $(elem).data('tt', value);
             
-            self._tooltip.show( elem );
+            tooltip.show( elem );
 
         },
         
         refresh: function() {
             $.each( arguments, function(i, elem) {
-                if ( self._tooltip.active == elem ) {
-                    self._tooltip.show( elem );
+                if ( tooltip.active == elem ) {
+                    tooltip.show( elem );
                 }
             });
         }
@@ -1127,7 +907,7 @@ var Galleria = function() {
     // internal fullscreen control
     // added in 1.195
     // still kind of experimental
-    this._fullscreen = {
+    var fullscreen = this._fullscreen = {
         scrolled: 0,
         enter: function(callback) {
             
@@ -1136,7 +916,7 @@ var Galleria = function() {
             
             self.$( 'container' ).addClass( 'fullscreen' );
             
-            this.scrolled = $(window).scrollTop();
+            fullscreen.scrolled = $(window).scrollTop();
             
             // begin styleforce
             Utils.forceStyles(self.get('container'), {
@@ -1183,7 +963,7 @@ var Galleria = function() {
             
             // bind the scaling to the resize event
             $(window).resize( function() {
-                self._fullscreen.scale();
+                fullscreen.scale();
             } );
         },
         
@@ -1201,7 +981,7 @@ var Galleria = function() {
             Utils.revertStyles( self.get('container'), DOM().html, DOM().body );
             
             // scroll back
-            window.scrollTo(0, this.scrolled);
+            window.scrollTo(0, fullscreen.scrolled);
             
             // detach all keyboard events (is this good?)
             self.detachKeyboard();
@@ -1221,13 +1001,13 @@ var Galleria = function() {
                 self.trigger( Galleria.FULLSCREEN_EXIT );
             });
             
-            $(window).unbind('resize', this.scale);
+            $(window).unbind('resize', fullscreen.scale);
         }
     };
     
     // the internal idle object for controlling idle states
     // TODO occational event conflicts
-    this._idle = {
+    var idle = this._idle = {
         
         trunk: [],
         
@@ -1237,8 +1017,8 @@ var Galleria = function() {
             if (!elem) {
                 return;
             }
-            if (!this.bound) {
-                this.addEvent();
+            if (!idle.bound) {
+                idle.addEvent();
             }
             elem = $(elem);
             
@@ -1253,35 +1033,35 @@ var Galleria = function() {
                 complete: true,
                 busy: false
             });
-            this.addTimer();
-            this.trunk.push(elem);
+            idle.addTimer();
+            idle.trunk.push(elem);
         },
         
         remove: function(elem) {
             
             elem = jQuery(elem);
             
-            $.each(this.trunk, function(i, el) {
+            $.each(idle.trunk, function(i, el) {
                 if ( el.length && !el.not(elem).length ) {
                     self._idle.show(elem);
                     self._idle.trunk.splice(i,1);
                 }
             });
             
-            if (!this.trunk.length) {
-                this.removeEvent();
+            if (!idle.trunk.length) {
+                idle.removeEvent();
                 Utils.clearTimer('idle');
             }
         },
         
         addEvent : function() {
-            this.bound = true;
-            self.$('container').bind('mousemove click', this.showAll );
+            idle.bound = true;
+            self.$('container').bind('mousemove click', idle.showAll );
         },
         
         removeEvent : function() {
-            this.bound = false;
-            self.$('container').unbind('mousemove click', this.showAll );
+            idle.bound = false;
+            self.$('container').unbind('mousemove click', idle.showAll );
         },
         
         addTimer : function() {
@@ -1293,7 +1073,7 @@ var Galleria = function() {
         hide : function() {
             self.trigger( Galleria.IDLE_ENTER );
             
-            $.each(this.trunk, function(i, elem) {
+            $.each( idle.trunk, function(i, elem) {
                 
                 var data = elem.data('idle');
                 
@@ -1339,13 +1119,13 @@ var Galleria = function() {
                     }
                 });
             }
-            this.addTimer();
+            idle.addTimer();
         }
     };
     
     // internal lightbox object
     // creates a predesigned lightbox for simple popups of images in galleria
-    this._lightbox = {
+    var lightbox = this._lightbox = {
         
         width : 0,
         
@@ -1364,10 +1144,10 @@ var Galleria = function() {
             // trigger the event
             self.trigger( Galleria.LIGHTBOX_OPEN );
             
-            if (this.initialized) {
+            if ( lightbox.initialized ) {
                 return;
             }
-            this.initialized = true;
+            lightbox.initialized = true;
             
             // create some elements to work with
             var elems = 'overlay box content shadow title info close prevholder prev nextholder next counter image',
@@ -1406,11 +1186,11 @@ var Galleria = function() {
             // create the elements            
             $.each(elems.split(' '), function( i, elemId ) {
                 self.addElement( 'lightbox-' + elemId );
-                el[ elemId ] = self._lightbox.elems[ elemId ] = self.get( 'lightbox-' + elemId );
+                el[ elemId ] = lightbox.elems[ elemId ] = self.get( 'lightbox-' + elemId );
             });
 
             // initiate the image
-            this.image = new Picture();
+            lightbox.image = new Galleria.Picture();
 
             // append the elements
             self.append({
@@ -1421,13 +1201,13 @@ var Galleria = function() {
                 'lightbox-nextholder': 'lightbox-next'
             });
             
-            $( el.image ).append( this.image.container );
+            $( el.image ).append( lightbox.image.container );
             
             $( DOM().body ).append( el.overlay, el.box );
             
             // add the prev/next nav and bind some controls
 
-            hover( $( el.close ).bind( CLICK(), this.hide ).html('&#215;') );
+            hover( $( el.close ).bind( CLICK(), lightbox.hide ).html('&#215;') );
             
             $.each( ['Prev','Next'], function(i, dir) {
                 
@@ -1436,19 +1216,17 @@ var Galleria = function() {
                 $( el[ dir.toLowerCase()+'holder'] ).hover(function() {
                     $d.show();
                 }, function() {
-                    $d.fadeOut(200);
+                    $d.fadeOut( 200 );
                 }).bind( CLICK(), function() {
-                    self._lightbox[ 'show' + dir ]()
+                    lightbox[ 'show' + dir ]()
                 });
                 
             })
-            $( el.overlay ).bind( CLICK(), this.hide );
+            $( el.overlay ).bind( CLICK(), lightbox.hide );
 
         },
         
         rescale: function(event) {
-            
-            var lightbox = self._lightbox;
             
             // calculate
             var width = Math.min( $(window).width(), lightbox.width ),
@@ -1482,15 +1260,13 @@ var Galleria = function() {
                         
                         image.show();
                         Utils.show( image.image, speed );
-                        Utils.show( self._lightbox.elems.info, speed );
+                        Utils.show( lightbox.elems.info, speed );
                     }
                 );
             }
         },
         
         hide: function() {
-            
-            var lightbox = self._lightbox;
             
             // remove the image
             lightbox.image.image = null;
@@ -1508,31 +1284,29 @@ var Galleria = function() {
         },
         
         showNext: function() {
-            self._lightbox.show( self.getNext( self._lightbox.active ) );
+            lightbox.show( self.getNext( lightbox.active ) );
         },
         
         showPrev: function() {
-            self._lightbox.show( self.getPrev( self._lightbox.active ) );
+            lightbox.show( self.getPrev( lightbox.active ) );
         },
         
         show: function(index) {
             
-            this.active = index = typeof index == 'number' ? index : self.getIndex();
+            lightbox.active = index = typeof index == 'number' ? index : self.getIndex();
             
-            if (!this.initialized) {
-                this.init();
+            if ( !lightbox.initialized ) {
+                lightbox.init();
             }
             
-            $(window).unbind('resize', this.rescale );
+            $(window).unbind('resize', lightbox.rescale );
             
             var data = self.getData(index),
                 total = self.getDataLength();
             
-            Utils.hide( this.elems.info );
+            Utils.hide( lightbox.elems.info );
             
-            var lightbox = this;
-            
-            this.image.load( data.image, function( image ) {
+            lightbox.image.load( data.image, function( image ) {
                 
                 lightbox.width = image.original.width;
                 lightbox.height = image.original.height;
@@ -1555,19 +1329,30 @@ var Galleria = function() {
             $( lightbox.elems.box ).show();
         }
     };
+    
+    return this;
 };
 
 // end Galleria constructor
 
 Galleria.prototype = {
     
-    // the public init() is used to assign target, options and a THEMELOAD event
+    /**
+        Use this function to initialize the gallery and start loading.
+        Should only be called once per instance.
+        
+        @param {HTML Element} target The target element
+        @param {Object} options The gallery options
+        
+        @returns {Galleria}
+    */    
+    
     init: function( target, options ) {
 
         var self = this;
         
         // save the instance
-        Galleria.galleries.push( this );
+        _galleries.push( this );
         
         // save the original ingredients
         this._original = {
@@ -1582,7 +1367,7 @@ Galleria.prototype = {
 
         // raise error if no target is detected
         if ( !this._target ) {
-             raise('Target not found.');
+             Galleria.raise('Target not found.');
              return;
         }
         
@@ -1652,7 +1437,7 @@ Galleria.prototype = {
         } else {
             
             Utils.addTimer('themeload', function() {
-                raise( 'No theme found. ');
+                Galleria.raise( 'No theme found. ');
             }, 2000)
             
             $doc.one( Galleria.THEMELOAD, function() {
@@ -1665,18 +1450,19 @@ Galleria.prototype = {
     // the internal _init is called when the THEMELOAD event is triggered
     // this method should only be called once per instance
     // for manipulation of data, use the .load method
+    
     _init: function() {
         var self = this;
         
         if ( this._initialized ) {
-            raise( 'Init failed: Gallery instance already initialized.' );
+            Galleria.raise( 'Init failed: Gallery instance already initialized.' );
             return this;
         }
         
         this._initialized = true;
         
         if ( !Galleria.theme ) {
-            raise( 'Init failed: No theme found.' );
+            Galleria.raise( 'Init failed: No theme found.' );
             return this;
         }
         
@@ -1731,7 +1517,7 @@ Galleria.prototype = {
                         }
                     }
                     
-                    return thumbHeight() && num.width && num.height;
+                    return thumbHeight() && num.width && num.height > 50;
                 
                 },
                 
@@ -1750,7 +1536,8 @@ Galleria.prototype = {
                     }
                 },
                 error: function() {
-                    raise('Width & Height not found.')
+                    // Height was probably not set, raise a hard error
+                    Galleria.raise('Width & Height not found.', true)
                 },
                 timeout: 2000
             });
@@ -1869,7 +1656,7 @@ Galleria.prototype = {
         $.each( new Array(2), function(i) {
             
             // create a new Picture instance
-            var image = new Picture();
+            var image = new Galleria.Picture();
             
             // apply some styles
             $( image.container ).css({
@@ -1977,7 +1764,7 @@ Galleria.prototype = {
             if ( o.thumbnails === true ) {
                 
                 // add a new Picture instance
-                thumb = new Picture(i);
+                thumb = new Galleria.Picture(i);
                 
                 // get source from thumb or image
                 var src = data.thumb || data.image;
@@ -2123,14 +1910,30 @@ Galleria.prototype = {
             },
             
             error: function() {
-                raise('stageM not found')
+                Galleria.raise('stage meassures not found')
             }
             
         })
     },
     
-    // the public load method loads new data into galleria
-    // triggers the DATA event when ready
+    /**
+        Loads data into the gallery.
+        You can call this method on an existing gallery to reload the gallery with new data.
+        
+        @param {Array} source Optional JSON array of data.
+        Defaults to the data_source option
+        
+        @param {String} source Optional selector of DOM nodes that contains the data. 
+        Defaults to the Gallery target
+        
+        @param {String} selector Optional element selector of what elements to parse. 
+        Defaults to 'img'.
+        
+        @param {Function} config Optional function to modify the data extraction proceedure from the selector.
+        See the data_config option for more information.
+        
+        @returns {Galleria}
+    */
     load : function( source, selector, config ) {
         
         var self = this;
@@ -2163,7 +1966,7 @@ Galleria.prototype = {
                 this._data = source;
                 this.trigger( Galleria.DATA );
             } else {
-                raise( 'Load failed: JSON Array not valid.' );
+                Galleria.raise( 'Load failed: JSON Array not valid.' );
             }
             return this;
         }
@@ -2201,7 +2004,7 @@ Galleria.prototype = {
         if ( this.getDataLength() ) {
             this.trigger( Galleria.DATA );
         } else {
-            raise('Load failed: no data found.');
+            Galleria.raise('Load failed: no data found.');
         }
         return this;
         
@@ -2216,14 +2019,42 @@ Galleria.prototype = {
         return true;
     },
     
+    /**
+        Bind any event to Galleria
+    
+        @param {String} type The Event type to listen for
+        @param {Function} fn The function to execute when the event is triggered
+    
+        @example this.bind( Galleria.IMAGE, function() { Galleria.log('image shown') });
+    
+        @returns {Galleria}
+    */
+    
     bind : function(type, fn) {
         this.$( 'container' ).bind( type, this.proxy(fn) );
         return this;
     },
     
+    /**
+        Unbind any event to Galleria
+    
+        @param {String} type The Event type to forget
+    
+        @returns {Galleria}
+    */
+    
     unbind : function(type) {
         this.$( 'container' ).unbind( type );
+        return this;
     },
+    
+    /**
+        Manually trigger a Galleria event
+    
+        @param {String} type The Event to trigger
+    
+        @returns {Galleria}
+    */
     
     trigger : function( type ) {
         type = typeof type == 'object' ? 
@@ -2233,63 +2064,187 @@ Galleria.prototype = {
         return this;
     },
     
-    addIdleState: function() {
+    /**
+        Assign an "idle state" to any element.
+        The idle state will be applied after a certain amount of idle time
+        Useful to hide f.ex navigation when the gallery is inactive
+    
+        @param {HTML Element} elem The Dom node to apply the idle state to
+        @param {String} elem selector to apply the idle state to
+        @param {Object} styles the CSS styles to apply
+        
+        @example addIdleState( this.get('image-nav'), { opacity: 0 });
+    
+        @returns {Galleria}
+    */
+    
+    addIdleState: function( elem, styles ) {
         this._idle.add.apply( this._idle, Utils.array( arguments ) );
         return this;
     },
     
-    removeIdleState: function() {
+    /**
+        Removes any idle state previousle set using addIdleState()
+    
+        @param {HTML Element} elem The Dom node to apply the idle state to
+        @param {String} elem The selector to apply the idle state to
+    
+        @returns {Galleria}
+    */
+    
+    removeIdleState: function( elem ) {
         this._idle.remove.apply( this._idle, Utils.array( arguments ) );
         return this;
     },
-    
+
+    /**
+        Force Galleria to enter idle mode
+        
+        @returns {Galleria}
+    */
+
     enterIdleMode: function() {
         this._idle.hide();
         return this;
     },
-    
+
+    /**
+        Force Galleria to exit idle mode
+        
+        @returns {Galleria}
+    */
+
     exitIdleMode: function() {
         this.idle._show();
         return this;
     },
     
-    enterFullscreen: function() {
+    /**
+        Enter FullScreen mode
+        
+        @param {Function} callback the function to be executed when the fullscreen mode is fully applied.
+        
+        @returns {Galleria}
+    */
+    
+    enterFullscreen: function( callback ) {
         this._fullscreen.enter.apply( this, Utils.array( arguments ) );
         return this;
     },
-    
-    exitFullscreen: function() {
+
+    /**
+        Exits FullScreen mode
+        
+        @param {Function} callback the function to be executed when the fullscreen mode is fully applied.
+        
+        @returns {Galleria}
+    */
+
+    exitFullscreen: function( callback ) {
         this._fullscreen.exit.apply( this, Utils.array( arguments ) );
         return this;
     },
     
-    bindTooltip: function() {
+    /**
+        Adds a tooltip to any element
+        
+        @param {HTML Element} elem The DOM Node to attach the event to
+        @param {Object} elem An object with elemID:value pairs to apply tooltips to
+        @param {String} value The tooltip message
+        @param {Function} value A function that returns the tooltip message
+        
+        @example this.bindTooltip( this.get('thumbnails'), 'My thumbnails');
+        @example this.bindTooltip( this.get('thumbnails'), function() { return 'My thumbs' });
+        @example this.bindTooltip( { image_nav: 'Navigation' });
+        
+        @returns {Galleria}
+    */
+    
+    bindTooltip: function( elem, value ) {
         this._tooltip.bind.apply( this._tooltip, Utils.array(arguments) );
+        return this;
     },
     
-    defineTooltip: function() {
+    /**
+        Redefine a tooltip
+        Use this if you want to change the tooltip value at runtime
+        
+        @param {HTML Element} elem The DOM Node to attach the event to
+        @param {String} value The tooltip message
+        @param {Function} value A function that returns the tooltip message
+        
+        @returns {Galleria}
+    */
+    
+    defineTooltip: function( elem, value ) {
         this._tooltip.define.apply( this._tooltip, Utils.array(arguments) );
+        return this;
     },
+    
+    // leave this out of the API for now
     
     refreshTooltip: function() {
         this._tooltip.refresh.apply( this._tooltip, Utils.array(arguments) );
+        return this;
     },
+    
+    /**
+        Open a pre-designed lightbox with the currently active image.
+        You can control some visuals using gallery options.
+        
+        @returns {Galleria}
+    */
     
     openLightbox: function() {
         this._lightbox.show.apply( this._lightbox, Utils.array( arguments ) );
+        return this;
     },
-    
+
+    /**
+        Close the lightbox.
+        
+        @returns {Galleria}
+    */
+
     closeLightbox: function() {
         this._lightbox.hide.apply( this._lightbox, Utils.array( arguments ) );
+        return this;
     },
+    
+    /**
+        Get the currently active image element.
+        
+        @returns {HTML Element} The image element
+    */
     
     getActiveImage: function() {
         return this._getActive().image || undef;
     },
     
+    /**
+        Get the currently active thumbnail element.
+        
+        @returns {HTML Element} The thumbnail element
+    */
+    
     getActiveThumb: function() {
         return this._thumbnails[ this._active ].image || undef;
     },
+    
+    /**
+        Get the mouse position relative to the gallery container
+        
+        @param e The mouse event
+        
+        @example
+
+var gallery = this;
+$(document).mousemove(function(e) { 
+    console.log( gallery.getMousePosition(e).x ); 
+});
+        
+        @returns {Object} Object with x & y of the relative mouse postion
+    */
     
     getMousePosition : function(e) {
         return {
@@ -2298,7 +2253,14 @@ Galleria.prototype = {
         };
     },
     
-    // the public addPan method adds a panning effect to the image
+    /**
+        Adds a panning effect to the image
+        
+        @param img The optional image element. If not specified it takes the currently active image
+        
+        @returns {Galleria}
+    */
+    
     addPan : function( img ) {
 
         if ( this._options.image_crop === false ) {
@@ -2388,6 +2350,17 @@ Galleria.prototype = {
         return this;
     },
     
+    /**
+        Brings the scope into any callback
+        
+        @param fn The callback to bring the scope into
+        @param scope Optional scope to bring
+        
+        @example $('#fullscreen').click( this.proxy(function() { this.enterFullscreen(); }) )
+        
+        @returns {Function} Return the callback with the gallery scope
+    */
+    
     proxy : function( fn, scope ) {
         if ( typeof fn !== 'function' ) {
             return function() {};
@@ -2397,6 +2370,12 @@ Galleria.prototype = {
             return fn.apply( scope, Utils.array( arguments ) );
         };
     },
+    
+    /**
+        Removes the panning effect set by addPan()
+        
+        @returns {Galleria}
+    */
     
     removePan: function() {
         
@@ -2412,7 +2391,19 @@ Galleria.prototype = {
         return this;
     },
     
-    addElement : function() {
+    /**
+        Adds an element to the Galleria DOM array.
+        When you add an element here, you can access it using element ID in many API calls
+        
+        @param {String} id The element ID you wish to use. You can add many elements by adding more arguments.
+        
+        @example addElement('mybutton');
+        @example addElement('mybutton','mylink');
+        
+        @returns {Galleria}
+    */
+    
+    addElement : function( id ) {
         
         var dom = this._dom;
         
@@ -2423,36 +2414,95 @@ Galleria.prototype = {
         return this;
     },
     
-    attachKeyboard : function() {
+    /**
+        Attach keyboard events to Galleria
+
+        @param {Object} map The map object of events. 
+        Possible keys are 'UP', 'DOWN', 'LEFT', 'RIGHT', 'RETURN', 'ESCAPE' and 'BACKSPACE'.
+        
+        @example
+
+this.attachKeyboard({
+    right: this.next,
+    left: this.prev,
+    up: function() {
+        console.log( 'up key pressed' )
+    }
+});
+        
+        @returns {Galleria}
+    */
+    
+    attachKeyboard : function( map ) {
         this._keyboard.attach.apply( this._keyboard, Utils.array( arguments ) );
         return this;
     },
+    
+    /**
+        Detach all keyboard events to Galleria
+        
+        @returns {Galleria}
+    */
     
     detachKeyboard : function() {
         this._keyboard.detach.apply( this._keyboard, Utils.array( arguments ) );
         return this;
     },
     
-    // Fast helper for appending galleria elements by blueprint
-    appendChild : function( parent, child ) {
-        this.$( parent ).append( this.get( child ) || child );
+    /**
+        Fast helper for appending galleria elements that you added using addElement()
+        
+        @param {String} parentID The parent element ID where the element will be appended
+        @param {String} childID the element ID that should be appended
+        
+        @example this.addElement('myElement');
+        this.appendChild( 'info', 'myElement' );
+        
+        @returns {Galleria}
+    */
+        
+    appendChild : function( parentID, childID ) {
+        this.$( parentID ).append( this.get( childID ) || childID );
         return this;
     },
     
-    // Fast helper for prepending galleria elements by blueprint
-    prependChild : function( parent, child ) {
-        this.$( parent ).prepend( this.get( child ) || child );
+    /**
+        Fast helper for appending galleria elements that you added using addElement()
+        
+        @param {String} parentID The parent element ID where the element will be preppended
+        @param {String} childID the element ID that should be preppended
+        
+        @example
+
+this.addElement('myElement');
+this.prependChild( 'info', 'myElement' );
+        
+        @returns {Galleria}
+    */
+    
+    prependChild : function( parenID, childID ) {
+        this.$( parentID ).prepend( this.get( childID ) || childID );
         return this;
     },
     
-    // Remove galleria elements by blueprint
-    remove : function() {
+    /**
+        Remove an element by blueprint
+        
+        @param {String} elemID The element to be removed. 
+        You can remove multiple elements by adding arguments.
+        
+        @returns {Galleria}
+    */
+    
+    remove : function( elemID ) {
         this.$( Utils.array( arguments ).join(',') ).remove();
         return this;
     },
     
     // a fast helper for building dom structures
-    append : function(data) {
+    // leave this out of the API for now
+    
+    append : function( data ) {
         for( var i in data) {
             if ( data[i].constructor == Array ) {
                 for( var j=0; data[i][j]; j++ ) {
@@ -2483,18 +2533,35 @@ Galleria.prototype = {
         return this;
     },
     
+    /**
+        Updates the carousel, 
+        useful if you resize the gallery and want to re-check if the carousel nav is needed.
+        
+        @returns {Galleria}
+    */
+    
     updateCarousel : function() {
         this._carousel.update();
+        return this;
     },
     
-    // A public method for rescaling the gallery
-    rescale : function( width, height, callback ) {
+    /**
+        Rescales the gallery
+        
+        @param {Number} width The target width
+        @param {Number} height The target height
+        @param {Function} complete The callback to be called when the scaling is complete
+
+        @returns {Galleria}
+    */
+    
+    rescale : function( width, height, complete ) {
         
         var self = this;
         
         // allow rescale(fn)
         if ( typeof width == 'function' ) {
-            callback = width;
+            complete = width;
             width = undef;
         }
         
@@ -2516,8 +2583,8 @@ Galleria.prototype = {
             
             self.trigger( Galleria.RESCALE );
             
-            if ( typeof callback == 'function' ) {
-                callback.call( self );
+            if ( typeof complete == 'function' ) {
+                complete.call( self );
             }
         };
         
@@ -2526,11 +2593,20 @@ Galleria.prototype = {
         } else {
             scale.call( self ); 
         }
+        
+        return this;
     },
     
-    // the public proxy for displaying the image
-    // adds the image to a transition queue if set
-    show : function( index, rewind, history ) {
+    /**
+        Shows an image by index
+        
+        @param {Number} index The index to show
+        @param {Boolean} rewind A boolean that should be true if you want the transition to go back
+        
+        @returns {Galleria}
+    */
+    
+    show : function( index, rewind, _history ) {
         // do nothing if queue is false and transition is in progress
         if ( !this._options.queue && this._queue.stalled ) {
             return;
@@ -2539,10 +2615,10 @@ Galleria.prototype = {
         
         rewind = typeof rewind != 'undefined' ? !!rewind : index < this.getIndex();
         
-        history = history || false;
+        _history = _history || false;
         
         // do the history thing and return
-        if ( !history && Galleria.History ) {
+        if ( !_history && Galleria.History ) {
             Galleria.History.value( index.toString() );
             return;
         }
@@ -2646,7 +2722,7 @@ Galleria.prototype = {
                 
             try {
                 for ( var i = this._options.preload; i > 0; i-- ) {
-                    p = new Picture();
+                    p = new Galleria.Picture();
                     p.add( self.getData( n ).image );
                     n = self.getNext( n );
                 }
@@ -2708,7 +2784,7 @@ Galleria.prototype = {
                         self._options.transition_initial : self._options.transition;
                     
                     // validate the transition
-                    if ( transition in Galleria.transitions === false ) {
+                    if ( transition in _transitions === false ) {
                         
                         complete();
                     
@@ -2721,7 +2797,7 @@ Galleria.prototype = {
                         };
                         
                         // call the transition function and send some stuff
-                        Galleria.transitions[ transition ].call(self, params, complete );
+                        _transitions[ transition ].call(self, params, complete );
                         
                     }
                 }
@@ -2729,21 +2805,38 @@ Galleria.prototype = {
         });
     },
     
-    // getNext() returns the next index, or he first if you are at the last
-    // base is optional and defines where to start looking
+    /**
+        Gets the next index
+        
+        @param {Number} base Optional starting point
+        
+        @returns {Number} the next index, or the first if you are at the first (looping)
+    */
+    
     getNext : function( base ) {
         base = typeof base == 'number' ? base : this.getIndex();
         return base == this.getDataLength() - 1 ? 0 : base + 1;
     },
     
-    // getPrev() returns the previous index, or he last if you are at the first
-    // base is optional and defines where to start looking
+    /**
+        Gets the previous index
+        
+        @param {Number} base Optional starting point
+        
+        @returns {Number} the previous index, or the last if you are at the first (looping)
+    */
+
     getPrev : function( base ) {
         base = typeof base == 'number' ? base : this.getIndex();
         return base === 0 ? this.getDataLength() - 1 : base - 1;
     },
     
-    // next() shows the next image in line
+    /**
+        Shows the next image in line
+        
+        @returns {Galleria}
+    */
+    
     next : function() {
         if ( this.getDataLength() > 1 ) {
             this.show( this.getNext(), false );
@@ -2751,7 +2844,12 @@ Galleria.prototype = {
         return this;
     },
     
-    // prev() shows the previous image in line
+    /**
+        Shows the previous image in line
+        
+        @returns {Galleria}
+    */
+    
     prev : function() {
         if ( this.getDataLength() > 1 ) {
             this.show( this.getPrev(), true );
@@ -2759,55 +2857,115 @@ Galleria.prototype = {
         return this;
     },
     
-    // get() returns the internal DOM element
+    /**
+        Retrieve a DOM element by element ID
+        
+        @param {String} elemId The delement ID to fetch
+        
+        @returns {HTML Element} The elements DOM node or null if not found.
+    */
+    
     get : function( elemId ) {
         return elemId in this._dom ? this._dom[ elemId ] : null;
     },
     
-    // getData() returns the data object
-    // if no index specified it will take the currently active image
+    /**
+        Retrieve a data object
+        
+        @param {Number} index The data index to retrieve. 
+        If no index specified it will take the currently active image
+        
+        @returns {Object} The data object
+    */
+
     getData : function( index ) {
         return index in this._data ? 
             this._data[ index ] : this._data[ this._active ];
     },
     
-    // getDataLength() returns the length of the data object
+    /**
+        Retrieve the number of data items
+        
+        @returns {Number} The data length
+    */
     getDataLength : function() {
         return this._data.length;
     },
     
-    // getIndex() returns the current index
+    /**
+        Retrieve the currently active index
+        
+        @returns {Number} The active index
+    */
+    
     getIndex : function() {
         return typeof this._active === 'number' ? this._active : 0;
     },
     
-    // get the stage height
+    /**
+        Retrieve the stage height
+        
+        @returns {Number} The stage height
+    */
+    
     getStageHeight : function() {
         return this._stageHeight;
     },
     
-    // get the stage width
+    /**
+        Retrieve the stage width
+        
+        @returns {Number} The stage width
+    */
+        
     getStageWidth : function() {
         return this._stageWidth;
     },
     
-    // get options
-    // if no key specified it will return all options
+    /**
+        Retrieve the option
+        
+        @param {String} key The option key to retrieve. If no key specified it will return all options in an object.
+        
+        @returns option or options
+    */
+    
     getOptions : function( key ) {
         return typeof key == 'undefined' ? this._options : this._options[ key ];
     },
     
-    // set options
-    // you can set options using setOptions( 'autoplay', true ) or setOptions({ autoplay: true });
+    /**
+        Set options to the instance. 
+        You can set options using a key & value argument or a single object argument (see examples)
+        
+        @param {String} key The option key
+        @param {String} value the the options value
+        
+        @example setOptions( 'autoplay', true ) 
+        @example setOptions({ autoplay: true });
+        
+        @returns {Galleria}
+    */
+    
     setOptions : function( key, value ) {
         if ( typeof key == 'object' ) {
             $.extend( this._options, key );
         } else {
             this._options[ key ] = value;
         }
+        return this;
     },
     
-    play : function(delay) {
+    /**
+        Starts playing the slideshow
+        
+        @param {Number} delay Sets the slideshow interval in milliseconds. 
+        If you set it once, you can just call play() and get the same interval the next time.
+        
+        @returns {Galleria}
+    */
+    
+    play : function( delay ) {
         
         this.trigger( Galleria.PLAY );
         
@@ -2818,6 +2976,12 @@ Galleria.prototype = {
         
         return this;
     },
+    
+    /**
+        Stops the slideshow if currently playing
+        
+        @returns {Galleria}
+    */
     
     pause : function() {
         this.trigger( Galleria.PAUSE );
@@ -2859,13 +3023,20 @@ Galleria.prototype = {
         }
     },
     
-    // manually set another index
     setIndex: function( val ) {
         this._active = val;
         return this;
     },
     
-    // manually modify the counter
+    /**
+        Manually modify the counter
+        
+        @param {Number} index Optional data index to fectch, 
+        if no index found it assumes the currently active index
+        
+        @returns {Galleria}
+    */
+    
     setCounter: function( index ) {
 
         if ( typeof index == 'number' ) {
@@ -2886,7 +3057,15 @@ Galleria.prototype = {
         return this;
     },
     
-    // manually set captions
+    /**
+        Manually set captions
+        
+        @param {Number} index Optional data index to fectch, 
+        if no index found it assumes the currently active index
+        
+        @returns {Galleria}
+    */
+    
     setInfo : function( index ) {
         
         var self = this,
@@ -2906,7 +3085,15 @@ Galleria.prototype = {
         return this;
     },
     
-    // check if the data contains any captions
+    /**
+        Checks if the data contains any captions
+        
+        @param {Number} index Optional data index to fectch, 
+        if no index found it assumes the currently active index.
+        
+        @returns {Boolean}
+    */
+    
     hasInfo : function( index ) {
         
         var d = this.getData( index );
@@ -2920,8 +3107,6 @@ Galleria.prototype = {
         
     },
     
-    // returns a jQuery object of elements based on elemId
-    // you can call for multiple IDs separated with commas
     jQuery : function( str ) {
         
         var self = this,
@@ -2944,7 +3129,17 @@ Galleria.prototype = {
         return jQ;
     },
     
-    // shortcut for jQuery
+    /**
+        Converts element IDs into a jQuery collection
+        You can call for multiple IDs separated with commas.
+        
+        @param {String} str One or more element IDs (comma-separated)
+        
+        @returns {jQuery}
+        
+        @example this.$('info,container').hide();
+    */
+    
     $ : function() {
         return this.jQuery.apply( this, Utils.array( arguments ) );
     }
@@ -2953,29 +3148,27 @@ Galleria.prototype = {
 
 // End of Galleria prototype
 
-// Begin statics
-
 $.extend( Galleria, {
-    
-    // Events
-    DATA:             'data',
-    READY:            'ready',
-    THUMBNAIL:        'thumbnail',
-    LOADSTART:        'loadstart',
-    LOADFINISH:       'loadfinish',
-    IMAGE:            'image',
-    THEMELOAD:        'themeload',
-    PLAY:             'play',
-    PAUSE:            'pause',
-    PROGRESS:         'progress',
-    FULLSCREEN_ENTER: 'fullscreen_enter',
-    FULLSCREEN_EXIT:  'fullscreen_exit',
-    IDLE_ENTER:       'idle_enter',
-    IDLE_EXIT:        'idle_exit',
-    RESCALE:          'rescale',
-    LIGHTBOX_OPEN:    'lightbox_open',
-    LIGHTBOX_CLOSE:   'lightbox_close',
-    LIGHTBOX_IMAGE:   'lightbox_image',
+
+    // Event placeholders
+    DATA:             'g_data',
+    READY:            'g_ready',
+    THUMBNAIL:        'g_thumbnail',
+    LOADSTART:        'g_loadstart',
+    LOADFINISH:       'g_loadfinish',
+    IMAGE:            'g_image',
+    THEMELOAD:        'g_themeload',
+    PLAY:             'g_play',
+    PAUSE:            'g_pause',
+    PROGRESS:         'g_progress',
+    FULLSCREEN_ENTER: 'g_fullscreen_enter',
+    FULLSCREEN_EXIT:  'g_fullscreen_exit',
+    IDLE_ENTER:       'g_idle_enter',
+    IDLE_EXIT:        'g_idle_exit',
+    RESCALE:          'g_rescale',
+    LIGHTBOX_OPEN:    'g_lightbox_open',
+    LIGHTBOX_CLOSE:   'g_lightbox_close',
+    LIGHTBOX_IMAGE:   'g_lightbox_image',
     
     // Browser helpers
     IE9:     IE == 9,
@@ -2992,248 +3185,522 @@ $.extend( Galleria, {
     IPHONE:  /iphone/.test( NAV ),
     IPAD:    /ipad/.test( NAV ),
     ANDROID: /android/.test( NAV ),
-    MOBILE:  !!( /iphone/.test( NAV ) || /ipad/.test( NAV ) || /android/.test( NAV ) ),
     
-    // addTheme
-    addTheme: function( theme ) {
+    // Todo detect touch devices in a better way, possibly using event detection
+    TOUCH:   !!( /iphone/.test( NAV ) || /ipad/.test( NAV ) || /android/.test( NAV ) ),
+});
 
-        // make sure we have a name
-        if ( !!theme['name'] === false ) {
-            raise('No theme name specified');
-        }
+// Galleria static methods
+
+/**
+    Adds a theme that you can use for your Gallery
+    
+    @param {Object} theme Object that should contain all your theme settings.
+    <ul>
+        <li>name – name of the theme</li>
+        <li>author - name of the author</li>
+        <li>version - version number</li>
+        <li>css - css file name (not path)</li>
+        <li>defaults - default options to apply, including theme-specific options</li>
+        <li>init - the init function</li>
+    </ul>
+    
+    @returns {Object} theme
+*/
+
+Galleria.addTheme = function( theme ) {
+
+    // make sure we have a name
+    if ( !!theme['name'] === false ) {
+        Galleria.raise('No theme name specified');
+    }
+    
+    if ( typeof theme.defaults != 'object' ) {
+        theme.defaults = {};
+    }
+    
+    if ( typeof theme.css == 'string' ) {
         
-        if ( typeof theme.defaults != 'object' ) {
-            theme.defaults = {};
-        }
+        var css;
         
-        if ( typeof theme.css == 'string' ) {
+        // look for the absolute path
+        $('script').each(function( i, script ) {
             
-            var css;
-            
-            // look for the absolute path
-            $('script').each(function( i, script ) {
-                
-                // look for the theme script
-                var reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
-                if( reg.test( script.src )) {
+            // look for the theme script
+            var reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
+            if( reg.test( script.src )) {
 
-                    // we have a match
-                    css = script.src.replace(/[^\/]*$/, "") + theme.css;
+                // we have a match
+                css = script.src.replace(/[^\/]*$/, "") + theme.css;
 
-                    Utils.addTimer( "css", function() {
-                        Utils.loadCSS( css, 'galleria-theme', function() {
-                            Galleria.theme = theme;
-                            $doc.trigger( Galleria.THEMELOAD );
-                        });
-                    }, 1);
+                Utils.addTimer( "css", function() {
+                    Utils.loadCSS( css, 'galleria-theme', function() {
+                        Galleria.theme = theme;
+                        $doc.trigger( Galleria.THEMELOAD );
+                    });
+                }, 1);
 
-                }
-            });
-            
-            if ( !css ) {
-                raise('No theme CSS loaded');
             }
+        });
+        
+        if ( !css ) {
+            Galleria.raise('No theme CSS loaded');
         }
-        return theme;
+    }
+    return theme;
+};
+
+/**
+    loadTheme loads a theme js file and attaches a load event to Galleria
+    
+    @param {String} src The relative path to the theme source file
+    
+    @param {Object} option Optional options you want to apply
+*/
+
+Galleria.loadTheme = function( src, options ) {
+        
+    var loaded = false,
+        length = _galleries.length;
+    
+    // first clear the current theme, if exists
+    Galleria.theme = undef;
+    
+    // load the theme
+    Utils.loadScript( src, function() {
+        loaded = true;
+    } );
+
+    // set a 1 sec timeout, then display a hard error if no theme is loaded
+    Utils.wait({
+        until: function() {
+            return loaded;
+        },
+        error: function() {
+            Galleria.raise( "Theme at " + src + " could not load, check theme path.", true )
+        },
+        success: function() {
+            
+            // check for existing galleries and reload them with the new theme
+            if ( length ) {
+            
+                // temporary save the new galleries
+                var refreshed = [];
+
+                // refresh all instances
+                // when adding a new theme to an existing gallery, all options will be resetted but the data will be kept
+                // you can apply new options as a second argument
+                $.each( Galleria.get(), function(i, instance) {
+
+                    // mix the old data and options into the new instance
+                    var op = $.extend( instance._original.options, {
+                        data_source: instance._data
+                    }, options);
+
+                    // remove the old container
+                    instance.$('container').remove();
+
+                    // create a new instance 
+                    var g = new Galleria();
+
+                    // move the id
+                    g._id = instance._id;
+
+                    // initialize the new instance
+                    g.init( instance._original.target, op );
+
+                    // push the new instance
+                    refreshed.push( g );
+                });
+
+                // now overwrite the old holder with the new instances
+                _galleries = refreshed;
+            }
+        },
+        timeout: 1000
+    });
+};
+
+/**
+    Retrieves a Galleria instance.
+    
+    @param {Number} index Optional index to retrieve. 
+    If no index is supplied, the method will return all instances in an array.
+    
+    @returns {Null or Array}
+*/
+
+Galleria.get = function( index ) {
+    if ( !!_galleries[ index ] ) {
+        return _galleries[ index ];
+    } else if ( typeof index !== 'number' ) {
+        return _galleries;
+    } else {
+        Galleria.raise('Gallery index ' + index + ' not found');
+    }
+};
+
+/**
+    Creates a transition to be used in your gallery
+    
+    @param {String} name The name of the transition that you will use as an option
+    
+    @param {Function} fn The function to be executed in the transition.
+    The function contains two arguments, params and complete.
+    Use the params Object to integrate the transition, and then call complete when you are done.
+    
+*/
+    
+Galleria.addTransition = function( name, fn ) {
+    _transitions[name] = fn;
+};
+
+/**
+    The Galleria utils provides generic helper methods
+*/
+
+Galleria.utils = Utils;
+
+/**
+    A helper metod for cross-browser logging. 
+    It uses the console log if available otherwise it falls back to the opera 
+    debugger and finally <code>alert()</code>
+    
+    @example Galleria.log("hello", document.body, [1,2,3]);
+*/
+
+Galleria.log = function() {
+    try { 
+        window.console.log.apply( window.console, Utils.array(arguments) ); 
+    } catch( e ) {
+        try {
+            opera.postError.apply( opera, arguments ); 
+        } catch( er ) {
+              alert( Utils.array(arguments).split(', ') ); 
+        } 
+    }
+};
+
+/**
+    Method for raising errors
+    
+    @param {String} msg The message to throw
+    
+    @param {Boolean} fatal Set this to true to override debug settings and display a fatal error
+*/
+
+Galleria.raise = function( msg, fatal ) {
+    if ( DEBUG || force ) {
+        var type = fatal ? 'Fatal error' : 'Error';
+        throw new Error( type + ': ' + msg );
+    }
+};
+
+/**
+    Adds preload, cache, scale and crop functionality
+    
+    @constructor
+    
+    @requires jQuery
+    
+    @param {Number} id Optional id to keep track of instances
+*/
+
+Galleria.Picture = function( id ) {
+    
+    // save the id
+    this.id = id || null;
+
+    // the image should be null until loaded
+    this.image = null;
+
+    // Create a new container
+    this.container = Utils.create('galleria-image');
+
+    // add container styles
+    $( this.container ).css({
+        overflow: 'hidden',
+        position: 'relative' // for IE Standards mode
+    });
+
+    // saves the original meassurements
+    this.original = {
+        width: 0,
+        height: 0
+    };
+
+    // flag when the image is ready
+    this.ready = false;
+    
+    // flag when the image is loaded
+    this.loaded = false;
+    
+};
+
+Galleria.Picture.prototype = {
+    
+    // the inherited cache object
+    cache: {},
+    
+    // creates a new image and adds it to cache when loaded
+    add: function( src ) {
+        
+        var self = this;
+
+        // create the image
+        var image = new Image();
+        
+        // force a block display
+        $( image ).css( 'display', 'block');
+        
+        if ( self.cache[ src ] ) {
+            // no need to onload if the image is cached
+            image.src = src;
+            self.loaded = true;
+            self.original = {
+                height: image.height,
+                width: image.width
+            };
+            return image;
+        }
+
+        // begin preload and insert in cache when done
+        image.onload = function() {
+            self.original = {
+                height: this.height,
+                width: this.width
+            };
+            self.cache[ src ] = src; // will override old cache
+            self.loaded = true;
+        }
+        
+        image.src = src;
+        return image;
+        
     },
     
-    // loadTheme
-    loadTheme: function( src, options ) {
+    // show the image on stage
+    show: function() {
+        Utils.show( this.image );
+    },
+    
+    // hide the image
+    hide: function() {
+        Utils.moveOut( this.image );
+    },
+    
+    clear: function() {
+        this.image = null;
+    },
+    
+    /**
+        Checks if an image is in cache
         
-        var loaded = false,
-            length = Galleria.galleries.length;
+        @param {String} src The image source path, ex '/path/to/img.jpg'
         
-        // first clear the current theme, if exists
-        Galleria.theme = undef;
+        @returns {Boolean}
+    */
+    
+    isCached: function( src ) {
+        return !!this.cache[src];
+    },
+    
+    /**
+        Loads an image and call the callback when ready.
+        Will also add the image to cache.
         
-        // load the theme
-        Utils.loadScript( src, function() {
-            loaded = true;
-        } );
+        @param {String} src The image source path, ex '/path/to/img.jpg'
+        @param {Function} callback The function to be executed when the image is loaded & scaled
+        
+        @returns {jQuery} The image container object
+    */
+    
+    load: function(src, callback) {
+        
+        // save the instance
+        var self = this;
 
-        // set a 1 sec timeout, then display a hard error if no theme is loaded
+        $( this.container ).empty(true);
+        
+        // add the image to cache and hide it
+        this.image = this.add( src );
+        Utils.hide( this.image );
+        
+        // append the image into the container
+        $( this.container ).append( this.image );
+        
+        // check for loaded image using a timeout
         Utils.wait({
             until: function() {
-                return loaded;
-            },
-            error: function() {
-                raise( "Theme at " + src + " could not load, check theme path.", true )
+                // TODO this should be properly tested in Opera
+                return self.loaded && self.image.complete && self.image.width;
             },
             success: function() {
+                // call success
+                window.setTimeout(function() { callback.call( self, self ) }, 1 );
+            },
+            error: function() {
+                window.setTimeout(function() { callback.call( self, self ) }, 1 );
+                Galleria.raise('image not loaded in 10 seconds: '+ src);
+            },
+            timeout: 10000
+        });
+        
+        // return the container
+        return this.container;
+    },
+    
+    /**
+        Scales and crops the image
+        
+        @param {Object} options The method takes an object with a number of options:
+        
+        <ul>
+            <li>width - width of the container</li>
+            <li>height - height of the container</li>
+            <li>min - minimum scale ratio</li>
+            <li>max - maximum scale ratio</li>
+            <li>margin - distance in pixels from the image border to the container</li>
+            <li>complete - a callback that fires when scaling is complete</li>
+            <li>position - positions the image, works like the css background-image property.</li>
+            <li>crop - defines how to crop. Can be true, false, 'width' or 'height'</li>
+        </ul>
+        
+        @returns {jQuery} The image container object
+    */
+    
+    scale: function( options ) {
+        
+        // extend some defaults
+        options = $.extend({
+            width: 0,
+            height: 0,
+            min: undef,
+            max: undef,
+            margin: 0,
+            complete: function(){},
+            position: 'center',
+            crop: false
+        }, options);
+        
+        // return the element if no image found
+        if (!this.image) {
+            return this.container;
+        }
+        
+        // store locale variables of width & height
+        var width,
+            height,
+            self = this,
+            $container = $( self.container );
+        
+        // wait for the width/height
+        Utils.wait({
+            until: function() {
                 
-                // check for existing galleries and reload them with the new theme
-                if ( length ) {
-                
-                    // temporary save the new galleries
-                    var refreshed = [];
+                width  = options.width
+                    || $container.width()
+                    || Utils.parseValue( $container.css('width') );
+                    
+                height = options.height
+                    || $container.height()
+                    || Utils.parseValue( $container.css('height') );
 
-                    // refresh all instances
-                    // when adding a new theme to an existing gallery, all options will be resetted but the data will be kept
-                    // you can apply new options as a second argument
-                    $.each( Galleria.get(), function(i, instance) {
+                return width && height;
+            },
+            success: function() {
+                // calculate some cropping
+                var newWidth = ( width - options.margin*2 ) / self.original.width,
+                    newHeight = ( height- options.margin*2 ) / self.original.height,
+                    cropMap = {
+                        'true'  : Math.max( newWidth, newHeight ),
+                        'width' : newWidth,
+                        'height': newHeight,
+                        'false' : Math.min( newWidth, newHeight )
+                    },
+                    ratio = cropMap[ options.crop.toString() ];
 
-                        // mix the old data and options into the new instance
-                        var op = $.extend( instance._original.options, {
-                            data_source: instance._data
-                        }, options);
-
-                        // remove the old container
-                        instance.$('container').remove();
-
-                        // create a new instance 
-                        var g = new Galleria();
-
-                        // move the id
-                        g._id = instance._id;
-
-                        // initialize the new instance
-                        g.init( instance._original.target, op );
-
-                        // push the new instance
-                        refreshed.push( g );
-                    });
-
-                    // now overwrite the old holder with the new instances
-                    Galleria.galleries = refreshed;
+                // allow max_scale_ratio
+                if ( options.max ) {
+                    ratio = Math.min( options.max, ratio );
                 }
+                
+                // allow min_scale_ratio
+                if ( options.min ) {
+                    ratio = Math.max( options.min, ratio );
+                }
+                
+                $( self.container ).width( width ).height( height );
+                
+                // round up the width / height
+                $.each( ['width','height'], function( i, m ) {
+                    $( self.image )[ m ]( self[ m ] = Math.ceil( self.original[ m ] * ratio ) );
+                });
+                
+                // calculate image_position
+                var pos = {},
+                    mix = {},
+                    getPosition = function(value, meassure, margin) {
+                        var result = 0;
+                        if (/\%/.test(value)) {
+                            var flt = parseInt(value) / 100;
+                            result = Math.ceil( $( self.image )[ meassure ]() * -1 * flt + margin * flt );
+                        } else {
+                            result = Utils.parseValue( value );
+                        }
+                        return result;
+                    },
+                    positionMap = {
+                        'top': { top: 0 },
+                        'left': { left: 0 },
+                        'right': { left: '100%' },
+                        'bottom': { top: '100%' }
+                    };
+                
+                $.each( options.position.toLowerCase().split(' '), function( i, value ) {
+                    if ( value == 'center' ) {
+                        value = '50%';
+                    }
+                    pos[i ? 'top' : 'left'] = value;
+                });
+                
+                $.each( pos, function( i, value ) {
+                    if ( positionMap.hasOwnProperty( value ) ) {
+                        $.extend( mix, positionMap[ value ] );
+                    }
+                });
+                
+                pos = pos.top ? $.extend( pos, mix ) : mix;
+            
+                pos = $.extend({
+                    top: '50%',
+                    left: '50%'
+                }, pos);
+                
+                // apply position
+                $( self.image ).css({
+                    position : 'relative',
+                    top :  getPosition(pos.top, 'height', height),
+                    left : getPosition(pos.left, 'width', width)
+                });
+                
+                // show the image
+                self.show();
+                
+                // flag ready and call the callback
+                self.ready = true;
+                options.complete.call( self, self );
+            },
+            error: function() {
+                Galleria.raise('Could not scale image: '+self.image.src);
             },
             timeout: 1000
         });
-    },
-    
-    // array of instances
-    galleries: [],
-    
-    // get any instance
-    get: function( index ) {
-        if ( !!this.galleries[ index ] ) {
-            return this.galleries[ index ];
-        } else if ( typeof index !== 'number' ) {
-            return this.galleries;
-        } else {
-            raise('Gallery index ' + index + ' not found');
-        }
-    },
-    
-    // transitions object
-    transitions: {
-        
-        fade:      function(params, complete) {
-            jQuery(params.next).css('opacity',0).show().animate({
-                opacity: 1
-            }, params.speed, complete);
+        return this;
+    }
+};
 
-            if (params.prev) {
-                jQuery(params.prev).css('opacity',1).show().animate({
-                    opacity: 0
-                }, params.speed);
-            }
-        },
-        
-        flash:     function(params, complete) {
-            jQuery(params.next).css('opacity',0);
-            if (params.prev) {
-                jQuery(params.prev).animate({
-                    opacity: 0
-                }, (params.speed/2), function() {
-                    jQuery(params.next).animate({
-                        opacity: 1
-                    }, params.speed, complete);
-                });
-            } else {
-                jQuery(params.next).animate({
-                    opacity: 1
-                }, params.speed, complete);
-            }
-        },
-        
-        pulse:     function(params, complete) {
-            if (params.prev) {
-                $(params.prev).hide();
-            }
-            jQuery(params.next).css('opacity',0).animate({
-                opacity:1
-            }, params.speed, complete);
-        },
-        
-        slide:     function(params, complete) {
-            var image  = $(params.next).parent(),
-                images = this.$('images'), // ??
-                width  = this._stageWidth,
-                easing = this.getOptions( 'easing' );
-                
-            image.css({
-                left: width * ( params.rewind ? -1 : 1 )
-            });
-            images.animate({
-                left: width * ( params.rewind ? 1 : -1 )
-            }, {
-                duration: params.speed,
-                queue: false,
-                easing: easing,
-                complete: function() {
-                    images.css('left',0);
-                    image.css('left',0);
-                    complete();
-                }
-            });
-        },
-        
-        fadeslide: function(params, complete) {
-            
-            var x = 0,
-                easing = this.getOptions("easing");
-            
-            if (params.prev) {
-                x = Utils.parseValue( $(params.prev).css("left") );
-                $(params.prev).css({
-                    opacity: 1,
-                    left: x
-                }).animate({
-                    opacity: 0,
-                    left: x + ( 50 * ( params.rewind ? 1 : -1 ) )
-                },{
-                    duration: params.speed,
-                    queue: false,
-                    easing: easing
-                });
-            }
-            
-            x = Utils.parseValue( $(params.next).css("left") );
-            
-            $(params.next).css({
-                left: x + ( 50 * ( params.rewind ? -1 : 1 ) ), 
-                opacity: 0
-            }).animate({
-                opacity: 1,
-                left: x
-            }, {
-                duration: params.speed,
-                complete: complete,
-                queue: false,
-                easing: easing
-            });
-        }
-    },
-    
-    // add your own transition
-    addTransition: function( name, fn ) {
-        this.transitions[name] = fn;
-    },
 
-    // bring the utils
-    utils: Utils,
-    
-    // bring the Picture class
-    Picture: Picture,
-    
-    // bring the log
-    log: log,
-    
-    // bring raise
-    raise: raise
-    
-});
 
 // our own easings
 $.extend( $.easing, {

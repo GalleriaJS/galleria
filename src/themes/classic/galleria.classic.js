@@ -31,13 +31,13 @@ Galleria.addTheme({
         // cache some stuff
         var toggle   = this.$('image-nav-left,image-nav-right,counter'),
             info     = this.$('info-link,info-close,info-text'),
-            click    = Galleria.MOBILE ? 'touchstart' : 'click';
+            click    = Galleria.TOUCH ? 'touchstart' : 'click';
         
         // show loader & counter with opacity
         this.$('loader,counter').show().css('opacity',.4)
 
-        // some stuff for non-mobile browsers
-        if (! Galleria.MOBILE ) {
+        // some stuff for non-touch browsers
+        if (! Galleria.TOUCH ) {
             
             // fade thumbnails
             this.$('thumbnails').children().hover(function() {

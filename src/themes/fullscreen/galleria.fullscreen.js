@@ -36,7 +36,8 @@ Galleria.addTheme({
             info     = this.$('info'),
             
             OPEN = !options._hide_dock,
-            POS = 0;
+            POS = 0,
+            CLICK = Galleria.TOUCH ? 'touchstart' : 'click';
 
         if (Galleria.IE) {
             this.addElement('iefix');
