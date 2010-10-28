@@ -558,7 +558,7 @@ Galleria = function() {
 
         press: function(e) {
             var key = e.keyCode || e.which;
-            if ( key in k.map && typeof keyboard.map[key] == 'function' ) {
+            if ( key in keyboard.map && typeof keyboard.map[key] == 'function' ) {
                 keyboard.map[key].call(self, e);
             }
         },
