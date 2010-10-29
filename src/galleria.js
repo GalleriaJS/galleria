@@ -784,14 +784,14 @@ Galleria = function() {
             var mouseX = self.getMousePosition(e).x,
                 mouseY = self.getMousePosition(e).y,
                 $elem = self.$( 'tooltip' ),
-        x = mouseX,
-        y = mouseY,
-        height = $elem.outerHeight( true ) + 1,
-        width = $elem.outerWidth( true ),
-        limitY = height + 15;
+                x = mouseX,
+                y = mouseY,
+                height = $elem.outerHeight( true ) + 1,
+                width = $elem.outerWidth( true ),
+                limitY = height + 15;
 
-            var maxX = self._stageWidth - width;
-            var maxY = self._stageHeight - height;
+            var maxX = self._stageWidth - width,
+                maxY = self._stageHeight - height;
 
             if ( !isNaN(x) && !isNaN(y) ) {
 
@@ -1487,10 +1487,10 @@ Galleria.prototype = {
                         if (self._options[ m ] && typeof self._options[ m ] == 'number') {
                             num[ m ] = self._options[ m ];
                         } else {
-                            num[m] = $container[ m ]() ||
+                            num[m] = Utils.parseValue( self.$( 'target' ).css( m ) ) ||
                                      Utils.parseValue( $container.css( m ) ) ||
                                      self.$( 'target' )[ m ]() ||
-                                     Utils.parseValue( self.$( 'target' ).css( m ) );
+                                     $container[ m ]()
                         }
 
                         $container[m]( num[ m ] );
@@ -2579,6 +2579,18 @@ this.prependChild( 'info', 'myElement' );
 
         return this;
     },
+    
+    /**
+        Refreshes the gallery.
+        Useful if you change image options at runtime and want to apply the changes to the active image.
+
+        @returns {Galleria}
+    */
+    
+    refresh : function() {
+        this._scaleImage();
+        return this;
+    },
 
     /**
         Shows an image by index
@@ -3312,7 +3324,7 @@ Galleria.loadTheme = function( src, options ) {
     @param {Number} index Optional index to retrieve.
     If no index is supplied, the method will return all instances in an array.
 
-    @returns {Null or Array}
+    @returns {Galleria or Array}
 */
 
 Galleria.get = function( index ) {
