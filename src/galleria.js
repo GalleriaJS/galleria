@@ -2587,8 +2587,11 @@ this.prependChild( 'info', 'myElement' );
         @returns {Galleria}
     */
     
-    refresh : function() {
+    refreshImage : function() {
         this._scaleImage();
+        if ( this._options.image_pan ) {
+            this.addPan();
+        }
         return this;
     },
 
