@@ -7,9 +7,9 @@
  */
 
 (function($) {
- 
+
 // If no Galleria, fail silently
-var G = window.Galleria; 
+var G = window.Galleria;
 if (typeof G == 'undefined') {
     return;
 }
@@ -21,7 +21,7 @@ var F = G.Flickr = function(api_key) {
         return;
     }
 
-    this.callback = function(){};
+    this.callback = function() {};
 
     // The required API key
     this.api_key = api_key;
@@ -31,8 +31,8 @@ var F = G.Flickr = function(api_key) {
         size: 'big', // photo size ( small,medium,big,original )
         sort: 'interestingness-desc', // sort option ( date-posted-asc, date-posted-desc, date-taken-asc, date-taken-desc, interestingness-desc, interestingness-asc, relevance )
         description: false // set this to true to get description as caption
-    }
-}
+    };
+};
 
 F.prototype = {
 
@@ -57,7 +57,7 @@ F.prototype = {
         var args = arguments;
         return this._call({
             method: 'flickr.urls.lookupUser',
-            url: 'flickr.com/photos/'+username
+            url: 'flickr.com/photos/' + username
         }, function(data) {
             this._set(args);
             this._find({
@@ -89,12 +89,12 @@ F.prototype = {
     // use getGroup to get the photos from a group ID
     // added in 1.2
     searchGroup: function(str, callback) {
-        callback = callback || function(){};
+        callback = callback || function() {};
         this._call({
             text: str,
             method: 'flickr.groups.search'
         }, function(data) {
-            callback.call( window, data.groups.group)
+            callback.call( window, data.groups.group);
         });
         return this;
     },
@@ -144,7 +144,7 @@ F.prototype = {
         }, params );
 
         $.each(params, function( key, value ) {
-            url += '&'+ key + '=' +value;
+            url += '&' + key + '=' + value;
         });
 
         $.getJSON(url, function(data) {
@@ -171,7 +171,7 @@ F.prototype = {
             var gallery = [],
             photos = data.photos ? data.photos.photo : data.photoset.photo,
             len = Math.min(this.options.max, photos.length);
-            
+
             for ( var i=0; i<len; i++ ) {
                 var photo = photos[i],
                 img = photo.url_m;
@@ -197,7 +197,7 @@ F.prototype = {
                     if( photo.url_o ) {
                         img = photo.url_o;
                     }
-                    break;    
+                    break;
                 }
                 var item = {
                     thumb: photos[i].url_t,
@@ -210,13 +210,12 @@ F.prototype = {
             this.callback.call( this, gallery );
         });
     }
-}
-
+};
 
 // Static
 // TODO: fetch any flickr feed ( YQL integration )
 F.getFeed = function(type, params) {
-	
-}
+
+};
 
 })( jQuery );
