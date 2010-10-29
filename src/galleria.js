@@ -3381,7 +3381,7 @@ Galleria.log = function() {
 */
 
 Galleria.raise = function( msg, fatal ) {
-    if ( DEBUG || force ) {
+    if ( DEBUG || fatal ) {
         var type = fatal ? 'Fatal error' : 'Error';
         throw new Error( type + ': ' + msg );
     }
