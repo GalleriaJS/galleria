@@ -560,6 +560,15 @@ dt{margin-top:4px;}
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#refreshImage">refreshImage</a></b>()
+								</div>
+								<div class="description">Refreshes the gallery.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/Galleria.html#remove">remove</a></b>(elemID)
 								</div>
 								<div class="description">Remove an element by blueprint</div>
@@ -652,7 +661,7 @@ dt{margin-top:4px;}
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/Galleria.html#updateCarousel">updateCarousel</a></b>()
 								</div>
-								<div class="description">Updates the carousel, 
+								<div class="description">Updates the carousel,
         useful if you resize the gallery and want to re-check if the carousel nav is needed.</div>
 							</td>
 						</tr>
@@ -1104,7 +1113,7 @@ this.attachKeyboard({
 									<span class="light fixedFont">{Object}</span> <b>map</b>
 									
 								</dt>
-								<dd>The map object of events. 
+								<dd>The map object of events.
         Possible keys are 'UP', 'DOWN', 'LEFT', 'RIGHT', 'RETURN', 'ESCAPE' and 'BACKSPACE'.</dd>
 							
 							</dl>
@@ -1186,7 +1195,7 @@ this.attachKeyboard({
 					
 					</div>
 					<div class="description">
-						Adds a tooltip to any element. 
+						Adds a tooltip to any element.
         You can also call this method with an object as argument with elemID:value pairs to apply tooltips to (see examples)
 						
 						
@@ -1546,7 +1555,7 @@ this.attachKeyboard({
 					<a name=".get"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{Null or Array}</span>
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a> or Array}</span>
 					<span class="light">Galleria.</span><b>get</b>(index)
 					
 					</div>
@@ -1566,7 +1575,7 @@ this.attachKeyboard({
 									<span class="light fixedFont">{Number}</span> <b>index</b>
 									
 								</dt>
-								<dd>Optional index to retrieve. 
+								<dd>Optional index to retrieve.
     If no index is supplied, the method will return all instances in an array.</dd>
 							
 							</dl>
@@ -1578,7 +1587,7 @@ this.attachKeyboard({
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{Null or Array}</span> </dd>
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a> or Array}</span> </dd>
 							
 							</dl>
 						
@@ -1674,7 +1683,7 @@ this.attachKeyboard({
 									<span class="light fixedFont">{Number}</span> <b>index</b>
 									
 								</dt>
-								<dd>The data index to retrieve. 
+								<dd>The data index to retrieve.
         If no index specified it will take the currently active image</dd>
 							
 							</dl>
@@ -1776,8 +1785,8 @@ this.attachKeyboard({
 					
 					<pre class="code">
 var gallery = this;
-$(document).mousemove(function(e) { 
-    console.log( gallery.getMousePosition(e).x ); 
+$(document).mousemove(function(e) {
+    console.log( gallery.getMousePosition(e).x );
 });</pre>
 					
 					
@@ -2026,7 +2035,7 @@ $(document).mousemove(function(e) {
 									<span class="light fixedFont">{Number}</span> <b>index</b>
 									
 								</dt>
-								<dd>Optional data index to fectch, 
+								<dd>Optional data index to fectch,
         if no index found it assumes the currently active index.</dd>
 							
 							</dl>
@@ -2128,7 +2137,7 @@ $(document).mousemove(function(e) {
 									<span class="light fixedFont">{String}</span> <b>selector</b>
 									
 								</dt>
-								<dd>Optional element selector of what elements to parse. 
+								<dd>Optional element selector of what elements to parse.
         Defaults to 'img'.</dd>
 							
 								<dt>
@@ -2206,8 +2215,8 @@ $(document).mousemove(function(e) {
 					
 					</div>
 					<div class="description">
-						A helper metod for cross-browser logging. 
-    It uses the console log if available otherwise it falls back to the opera 
+						A helper metod for cross-browser logging.
+    It uses the console log if available otherwise it falls back to the opera
     debugger and finally <code>alert()</code>
 						
 						
@@ -2349,7 +2358,7 @@ $(document).mousemove(function(e) {
 									<span class="light fixedFont">{Number}</span> <b>delay</b>
 									
 								</dt>
-								<dd>Sets the slideshow interval in milliseconds. 
+								<dd>Sets the slideshow interval in milliseconds.
         If you set it once, you can just call play() and get the same interval the next time.</dd>
 							
 							</dl>
@@ -2552,6 +2561,39 @@ this.prependChild( 'info', 'myElement' );</pre>
 
 					<hr />
 				
+					<a name="refreshImage"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>refreshImage</b>()
+					
+					</div>
+					<div class="description">
+						Refreshes the gallery.
+        Useful if you change image options at runtime and want to apply the changes to the active image.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="remove"> </a>
 					<div class="fixedFont">
 					
@@ -2575,7 +2617,7 @@ this.prependChild( 'info', 'myElement' );</pre>
 									<span class="light fixedFont">{String}</span> <b>elemID</b>
 									
 								</dt>
-								<dd>The element to be removed. 
+								<dd>The element to be removed.
         You can remove multiple elements by adding arguments.</dd>
 							
 							</dl>
@@ -2749,7 +2791,7 @@ this.prependChild( 'info', 'myElement' );</pre>
 									<span class="light fixedFont">{Number}</span> <b>index</b>
 									
 								</dt>
-								<dd>Optional data index to fectch, 
+								<dd>Optional data index to fectch,
         if no index found it assumes the currently active index</dd>
 							
 							</dl>
@@ -2793,7 +2835,7 @@ this.prependChild( 'info', 'myElement' );</pre>
 									<span class="light fixedFont">{Number}</span> <b>index</b>
 									
 								</dt>
-								<dd>Optional data index to fectch and apply as caption, 
+								<dd>Optional data index to fectch and apply as caption,
         if no index found it assumes the currently active index</dd>
 							
 							</dl>
@@ -2822,7 +2864,7 @@ this.prependChild( 'info', 'myElement' );</pre>
 					
 					</div>
 					<div class="description">
-						Set options to the instance. 
+						Set options to the instance.
         You can set options using a key & value argument or a single object argument (see examples)
 						
 						
@@ -3019,7 +3061,7 @@ this.prependChild( 'info', 'myElement' );</pre>
 					
 					</div>
 					<div class="description">
-						Updates the carousel, 
+						Updates the carousel,
         useful if you resize the gallery and want to re-check if the carousel nav is needed.
 						
 						
