@@ -2468,7 +2468,7 @@ this.prependChild( 'info', 'myElement' );
         @returns {Galleria}
     */
 
-    prependChild : function( parenID, childID ) {
+    prependChild : function( parentID, childID ) {
         this.$( parentID ).prepend( this.get( childID ) || childID );
         return this;
     },
