@@ -558,7 +558,7 @@ Galleria = function() {
 
         press: function(e) {
             var key = e.keyCode || e.which;
-            if ( key in k.map && typeof keyboard.map[key] == 'function' ) {
+            if ( key in keyboard.map && typeof keyboard.map[key] == 'function' ) {
                 keyboard.map[key].call(self, e);
             }
         },
@@ -1493,7 +1493,6 @@ Galleria.prototype = {
                                      $container[ m ]()
                         }
 
-                        $container[m]( num[ m ] );
                     });
 
                     var thumbHeight = function() {
@@ -1515,6 +1514,10 @@ Galleria.prototype = {
 
                     // remove the testElem
                     $( testElem ).remove();
+                    
+                    // apply the new meassures
+                    $container.width( num.width );
+                    $container.height( num.height );
 
                     // for some strange reason, webkit needs a single setTimeout to play ball
                     if ( Galleria.WEBKIT ) {
