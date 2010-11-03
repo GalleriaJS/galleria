@@ -147,7 +147,8 @@ var DEBUG = false,
         fadeslide: function(params, complete) {
 
             var x = 0,
-                easing = this.getOptions('easing');
+                easing = this.getOptions('easing'),
+                distance = this.getStageWidth();
 
             if (params.prev) {
                 x = Utils.parseValue( $(params.prev).css('left') );
@@ -156,7 +157,7 @@ var DEBUG = false,
                     left: x
                 }).animate({
                     opacity: 0,
-                    left: x + ( 50 * ( params.rewind ? 1 : -1 ) )
+                    left: x + ( distance * ( params.rewind ? 1 : -1 ) )
                 },{
                     duration: params.speed,
                     queue: false,
@@ -167,7 +168,7 @@ var DEBUG = false,
             x = Utils.parseValue( $(params.next).css('left') );
 
             $(params.next).css({
-                left: x + ( 50 * ( params.rewind ? -1 : 1 ) ),
+                left: x + ( distance * ( params.rewind ? -1 : 1 ) ),
                 opacity: 0
             }).animate({
                 opacity: 1,
@@ -3536,10 +3537,10 @@ Galleria.Picture.prototype = {
             },
             success: function() {
                 // call success
-                window.setTimeout(function() { callback.call( self, self ); }, 1 );
+                window.setTimeout(function() { callback.call( self, self ); }, 50 );
             },
             error: function() {
-                window.setTimeout(function() { callback.call( self, self ); }, 1 );
+                window.setTimeout(function() { callback.call( self, self ); }, 50 );
                 Galleria.raise('image not loaded in 10 seconds: '+ src);
             },
             timeout: 10000
