@@ -2467,7 +2467,7 @@ this.prependChild( 'info', 'myElement' );
         @returns {Galleria}
     */
 
-    prependChild : function( parenID, childID ) {
+    prependChild : function( parentID, childID ) {
         this.$( parentID ).prepend( this.get( childID ) || childID );
         return this;
     },
@@ -2989,6 +2989,17 @@ this.prependChild( 'info', 'myElement' );
         this.trigger( Galleria.PAUSE );
         this._playing = false;
         return this;
+    },
+
+    /**
+     * Toggle between play and pause events.
+     *
+     * @param {Number} delay Sets the slideshow interval in milliseconds.
+     *
+     * @returns {Galleria}
+     */
+    playToggle : function( delay ) {
+        return ( this._playing ) ? this.pause() : this.play( delay );
     },
 
     _playCheck : function() {
