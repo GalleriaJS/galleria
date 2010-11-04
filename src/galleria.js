@@ -1770,9 +1770,17 @@ Galleria.prototype = {
                 $container = $( thumb.container );
 
                 // move some data into the instance
+                // for some reason, jQuery cant handle css(property) when zooming in FF, breaking the gallery
+                // so we resort to getComputedStyle for browsers who support it
+                var getStyle = function( prop ) {
+                    return doc.defaultView && doc.defaultView.getComputedStyle ?
+                        doc.defaultView.getComputedStyle( thumb.container, null )[ prop ] :
+                        $container.css( prop );
+                };
+
                 thumb.data = {
-                    width  : Utils.parseValue( $container.css('width') ),
-                    height : Utils.parseValue( $container.css('height') ),
+                    width  : Utils.parseValue( getStyle( 'width' ) ),
+                    height : Utils.parseValue( getStyle( 'height' ) ),
                     order  : i
                 };
 
@@ -2990,14 +2998,15 @@ this.prependChild( 'info', 'myElement' );
         this._playing = false;
         return this;
     },
-
+    
     /**
-     * Toggle between play and pause events.
-     *
-     * @param {Number} delay Sets the slideshow interval in milliseconds.
-     *
-     * @returns {Galleria}
-     */
+        Toggle between play and pause events.
+    
+        @param {Number} delay Sets the slideshow interval in milliseconds.
+    
+        @returns {Galleria}
+    */
+    
     playToggle : function( delay ) {
         return ( this._playing ) ? this.pause() : this.play( delay );
     },
