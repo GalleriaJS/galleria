@@ -550,7 +550,8 @@ Galleria = function() {
             'RIGHT': 39,
             'RETURN': 13,
             'ESCAPE': 27,
-            'BACKSPACE': 8
+            'BACKSPACE': 8,
+            'SPACE': 32
         },
 
         map : {},
@@ -1515,7 +1516,7 @@ Galleria.prototype = {
 
                     // remove the testElem
                     $( testElem ).remove();
-                    
+
                     // apply the new meassures
                     $container.width( num.width );
                     $container.height( num.height );
@@ -2413,7 +2414,7 @@ $(document).mousemove(function(e) {
         Attach keyboard events to Galleria
 
         @param {Object} map The map object of events.
-        Possible keys are 'UP', 'DOWN', 'LEFT', 'RIGHT', 'RETURN', 'ESCAPE' and 'BACKSPACE'.
+        Possible keys are 'UP', 'DOWN', 'LEFT', 'RIGHT', 'RETURN', 'ESCAPE', 'BACKSPACE', and 'SPACE'.
 
         @example
 
@@ -2591,14 +2592,14 @@ this.prependChild( 'info', 'myElement' );
 
         return this;
     },
-    
+
     /**
         Refreshes the gallery.
         Useful if you change image options at runtime and want to apply the changes to the active image.
 
         @returns {Galleria}
     */
-    
+
     refreshImage : function() {
         this._scaleImage();
         if ( this._options.image_pan ) {
@@ -2998,15 +2999,15 @@ this.prependChild( 'info', 'myElement' );
         this._playing = false;
         return this;
     },
-    
+
     /**
         Toggle between play and pause events.
-    
+
         @param {Number} delay Sets the slideshow interval in milliseconds.
-    
+
         @returns {Galleria}
     */
-    
+
     playToggle : function( delay ) {
         return ( this._playing ) ? this.pause() : this.play( delay );
     },
