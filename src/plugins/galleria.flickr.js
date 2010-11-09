@@ -151,7 +151,7 @@ F.prototype = {
             if ( data.stat == 'ok' ) {
                 callback.call(scope, data);
             } else {
-                Galelria.raise( data.code.toString() + ' ' + data.stat + ': ' + data.message );
+                Galleria.raise( data.code.toString() + ' ' + data.stat + ': ' + data.message );
             }
         });
         return scope;
