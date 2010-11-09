@@ -1227,9 +1227,9 @@ Galleria = function() {
         rescale: function(event) {
 
             // calculate
-            var width = Math.min( $(window).width(), lightbox.width ),
-                height = Math.min( $(window).height(), lightbox.height ),
-                ratio = Math.min( (width - 60) / lightbox.width, (height - 80) / lightbox.height ),
+             var width = Math.min( $(window).width()-40, lightbox.width ),
+                height = Math.min( $(window).height()-60, lightbox.height ),
+                ratio = Math.min( width / lightbox.width, height / lightbox.height ),
                 destWidth = ( lightbox.width * ratio ) + 40,
                 destHeight = ( lightbox.height * ratio ) + 60,
                 to = {
