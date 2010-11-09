@@ -1,5 +1,5 @@
 /*
- * Galleria v 1.2 prerelease 1.1 2010-10-29
+ * Galleria v 1.2 prerelease 1.1 2010-11-04
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -147,7 +147,8 @@ var DEBUG = false,
         fadeslide: function(params, complete) {
 
             var x = 0,
-                easing = this.getOptions('easing');
+                easing = this.getOptions('easing'),
+                distance = this.getStageWidth();
 
             if (params.prev) {
                 x = Utils.parseValue( $(params.prev).css('left') );
@@ -156,7 +157,7 @@ var DEBUG = false,
                     left: x
                 }).animate({
                     opacity: 0,
-                    left: x + ( 50 * ( params.rewind ? 1 : -1 ) )
+                    left: x + ( distance * ( params.rewind ? 1 : -1 ) )
                 },{
                     duration: params.speed,
                     queue: false,
@@ -167,7 +168,7 @@ var DEBUG = false,
             x = Utils.parseValue( $(params.next).css('left') );
 
             $(params.next).css({
-                left: x + ( 50 * ( params.rewind ? -1 : 1 ) ),
+                left: x + ( distance * ( params.rewind ? -1 : 1 ) ),
                 opacity: 0
             }).animate({
                 opacity: 1,
@@ -549,7 +550,8 @@ Galleria = function() {
             'RIGHT': 39,
             'RETURN': 13,
             'ESCAPE': 27,
-            'BACKSPACE': 8
+            'BACKSPACE': 8,
+            'SPACE': 32
         },
 
         map : {},
@@ -830,7 +832,7 @@ Galleria = function() {
                     tooltip.show( elem );
 
                     Galleria.utils.addTimer( 'tooltip', function() {
-
+                        self.$( 'tooltip' ).stop();
                         Utils.show( self.get( 'tooltip' ), 400 );
                         tooltip.open = true;
 
@@ -952,7 +954,7 @@ Galleria = function() {
                         callback.call( self );
                     }
 
-                }, 50);
+                }, 100);
 
                 self.trigger( Galleria.FULLSCREEN_ENTER );
             });
@@ -1429,7 +1431,7 @@ Galleria.prototype = {
             this._init();
         } else {
             Utils.addTimer('themeload', function() {
-                Galleria.raise( 'No theme found. ');
+                Galleria.raise( 'No theme found.', true);
             }, 2000);
 
             $doc.one( Galleria.THEMELOAD, function() {
@@ -1514,7 +1516,7 @@ Galleria.prototype = {
 
                     // remove the testElem
                     $( testElem ).remove();
-                    
+
                     // apply the new meassures
                     $container.width( num.width );
                     $container.height( num.height );
@@ -1575,7 +1577,9 @@ Galleria.prototype = {
 
             // if second load, just do the show and return
             if ( one ) {
-                this.show( this._options.show );
+                if ( typeof this._options.show == 'number' ) {
+                    this.show( this._options.show );
+                }
                 return;
             }
 
@@ -1769,9 +1773,17 @@ Galleria.prototype = {
                 $container = $( thumb.container );
 
                 // move some data into the instance
+                // for some reason, jQuery cant handle css(property) when zooming in FF, breaking the gallery
+                // so we resort to getComputedStyle for browsers who support it
+                var getStyle = function( prop ) {
+                    return doc.defaultView && doc.defaultView.getComputedStyle ?
+                        doc.defaultView.getComputedStyle( thumb.container, null )[ prop ] :
+                        $container.css( prop );
+                };
+
                 thumb.data = {
-                    width  : Utils.parseValue( $container.css('width') ),
-                    height : Utils.parseValue( $container.css('height') ),
+                    width  : Utils.parseValue( getStyle( 'width' ) ),
+                    height : Utils.parseValue( getStyle( 'height' ) ),
                     order  : i
                 };
 
@@ -1821,7 +1833,7 @@ Galleria.prototype = {
                             self.trigger({
                                 type: Galleria.THUMBNAIL,
                                 thumbTarget: thumb.image,
-                                thumbOrder: thumb.data.order
+                                index: thumb.data.order
                             });
                         }
                     });
@@ -1852,7 +1864,7 @@ Galleria.prototype = {
                 self.trigger({
                     type: Galleria.THUMBNAIL,
                     thumbTarget: thumb.image,
-                    thumbOrder: i
+                    index: i
                 });
 
             // create null object to silent errors
@@ -2404,7 +2416,7 @@ $(document).mousemove(function(e) {
         Attach keyboard events to Galleria
 
         @param {Object} map The map object of events.
-        Possible keys are 'UP', 'DOWN', 'LEFT', 'RIGHT', 'RETURN', 'ESCAPE' and 'BACKSPACE'.
+        Possible keys are 'UP', 'DOWN', 'LEFT', 'RIGHT', 'RETURN', 'ESCAPE', 'BACKSPACE', and 'SPACE'.
 
         @example
 
@@ -2582,14 +2594,14 @@ this.prependChild( 'info', 'myElement' );
 
         return this;
     },
-    
+
     /**
         Refreshes the gallery.
         Useful if you change image options at runtime and want to apply the changes to the active image.
 
         @returns {Galleria}
     */
-    
+
     refreshImage : function() {
         this._scaleImage();
         if ( this._options.image_pan ) {
@@ -2608,10 +2620,12 @@ this.prependChild( 'info', 'myElement' );
     */
 
     show : function( index, rewind, _history ) {
-        // do nothing if queue is false and transition is in progress
-        if ( !this._options.queue && this._queue.stalled ) {
+
+        // do nothing if index is false or queue is false and transition is in progress
+        if ( index === false || !this._options.queue && this._queue.stalled ) {
             return;
         }
+        
         index = Math.max( 0, Math.min( parseInt(index), this.getDataLength() - 1 ) );
 
         rewind = typeof rewind != 'undefined' ? !!rewind : index < this.getIndex();
@@ -2643,8 +2657,13 @@ this.prependChild( 'info', 'myElement' );
         // shortcuts
         var self   = this,
             queue  = this._queue[ 0 ],
-            data   = this.getData( queue.index ),
-            src    = data.image,
+            data   = this.getData( queue.index );
+        
+        if ( !data ) {
+            return;
+        }
+        
+        var src    = data.image,
             active = this._controls.getActive(),
             next   = this._controls.getNext(),
             cached = next.isCached( src ),
@@ -2900,7 +2919,7 @@ this.prependChild( 'info', 'myElement' );
     */
 
     getIndex : function() {
-        return typeof this._active === 'number' ? this._active : 0;
+        return typeof this._active === 'number' ? this._active : false;
     },
 
     /**
@@ -2991,12 +3010,13 @@ this.prependChild( 'info', 'myElement' );
     },
 
     /**
-     * Toggle between play and pause events.
-     *
-     * @param {Number} delay Sets the slideshow interval in milliseconds.
-     *
-     * @returns {Galleria}
-     */
+        Toggle between play and pause events.
+
+        @param {Number} delay Sets the slideshow interval in milliseconds.
+
+        @returns {Galleria}
+    */
+
     playToggle : function( delay ) {
         return ( this._playing ) ? this.pause() : this.play( delay );
     },
@@ -3547,10 +3567,10 @@ Galleria.Picture.prototype = {
             },
             success: function() {
                 // call success
-                window.setTimeout(function() { callback.call( self, self ); }, 1 );
+                window.setTimeout(function() { callback.call( self, self ); }, 50 );
             },
             error: function() {
-                window.setTimeout(function() { callback.call( self, self ); }, 1 );
+                window.setTimeout(function() { callback.call( self, self ); }, 50 );
                 Galleria.raise('image not loaded in 10 seconds: '+ src);
             },
             timeout: 10000
