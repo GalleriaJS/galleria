@@ -832,7 +832,7 @@ Galleria = function() {
                     tooltip.show( elem );
 
                     Galleria.utils.addTimer( 'tooltip', function() {
-
+                        self.$( 'tooltip' ).stop();
                         Utils.show( self.get( 'tooltip' ), 400 );
                         tooltip.open = true;
 
@@ -954,7 +954,7 @@ Galleria = function() {
                         callback.call( self );
                     }
 
-                }, 50);
+                }, 100);
 
                 self.trigger( Galleria.FULLSCREEN_ENTER );
             });
@@ -1431,7 +1431,7 @@ Galleria.prototype = {
             this._init();
         } else {
             Utils.addTimer('themeload', function() {
-                Galleria.raise( 'No theme found. ');
+                Galleria.raise( 'No theme found.', true);
             }, 2000);
 
             $doc.one( Galleria.THEMELOAD, function() {
@@ -1831,7 +1831,7 @@ Galleria.prototype = {
                             self.trigger({
                                 type: Galleria.THUMBNAIL,
                                 thumbTarget: thumb.image,
-                                thumbOrder: thumb.data.order
+                                index: thumb.data.order
                             });
                         }
                     });
@@ -1862,7 +1862,7 @@ Galleria.prototype = {
                 self.trigger({
                     type: Galleria.THUMBNAIL,
                     thumbTarget: thumb.image,
-                    thumbOrder: i
+                    index: i
                 });
 
             // create null object to silent errors
@@ -2653,8 +2653,13 @@ this.prependChild( 'info', 'myElement' );
         // shortcuts
         var self   = this,
             queue  = this._queue[ 0 ],
-            data   = this.getData( queue.index ),
-            src    = data.image,
+            data   = this.getData( queue.index );
+        
+        if ( !data ) {
+            return;
+        }
+        
+        var src    = data.image,
             active = this._controls.getActive(),
             next   = this._controls.getNext(),
             cached = next.isCached( src ),
