@@ -1,5 +1,5 @@
 /*
- * Galleria v 1.2 prerelease 1.1 2010-11-04
+ * Galleria v 1.2 prerelease 1.1 2010-11-14
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -2384,8 +2384,6 @@ $(document).mousemove(function(e) {
 
         Utils.clearTimer('pan');
 
-        this.rescale();
-
         return this;
     },
 
@@ -2515,7 +2513,7 @@ this.prependChild( 'info', 'myElement' );
 
     // an internal helper for scaling according to options
     _scaleImage : function( image, options ) {
-
+        
         options = $.extend({
             width:    this._stageWidth,
             height:   this._stageHeight,
@@ -2766,7 +2764,6 @@ this.prependChild( 'info', 'myElement' );
             imageTarget: next.image,
             thumbTarget: thumb.image
         });
-
         // begin loading the next image
         next.load( src, function( next ) {
             self._scaleImage( next, {
@@ -2785,6 +2782,7 @@ this.prependChild( 'info', 'myElement' );
                     self._queue.stalled = true;
 
                     // remove the image panning, if applied
+                    // TODO: rethink if this is necessary
                     self.removePan();
 
                     // set the captions and counter
@@ -3351,7 +3349,7 @@ Galleria.loadTheme = function( src, options ) {
                 _galleries = refreshed;
             }
         },
-        timeout: 1000
+        timeout: 2000
     });
 };
 
