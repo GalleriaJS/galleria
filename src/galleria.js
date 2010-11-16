@@ -22,15 +22,7 @@ var DEBUG = false,
         // use this to make touch devices snappier
         return Galleria.TOUCH ? 'touchstart' : 'click';
     },
-    IE    = (function() {
-        var v = 3,
-            div = doc.createElement( 'div' );
-        while (
-            div.innerHTML = '<!--[if gt IE '+(++v)+']><i></i><![endif]-->',
-            div.getElementsByTagName('i')[0]
-        );
-        return v > 4 ? v : undef;
-    }() ),
+    IE    = $.browser.msie ? Math.floor(parseFloat($.browser.version)) : undef,
     DOM   = function() {
         return {
             html:  doc.documentElement,
