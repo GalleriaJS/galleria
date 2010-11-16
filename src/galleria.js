@@ -3299,6 +3299,9 @@ Galleria.addTheme = function( theme ) {
         if ( !css ) {
             Galleria.raise('No theme CSS loaded');
         }
+    } else {
+        Galleria.theme = theme;
+        $doc.trigger( Galleria.THEMELOAD );
     }
     return theme;
 };
