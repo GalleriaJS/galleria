@@ -1,5 +1,5 @@
 /*
- * Galleria v 1.2 prerelease 1.1 2010-11-14
+ * Galleria v 1.2 prerelease 1.1 2010-11-17
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -636,7 +636,7 @@ Galleria = function() {
                 if ( thumb.ready ) {
                     w += thumb.outerWidth || $( thumb.container ).outerWidth( true );
                     hooks[ i+1 ] = w;
-                    h = Math.max( h, thumb.outerHeight || $( thumb.container).outerHeight() );
+                    h = Math.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
                 }
             });
             self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > self._stageWidth );
@@ -1069,6 +1069,7 @@ Galleria = function() {
         },
 
         hide : function() {
+
             self.trigger( Galleria.IDLE_ENTER );
 
             $.each( idle.trunk, function(i, elem) {
@@ -1079,8 +1080,8 @@ Galleria = function() {
                     return;
                 }
 
-                data.complete = false;
-
+                elem.data('idle').complete = false;
+                
                 elem.stop().animate(data.to, {
                     duration: 600,
                     queue: false,
@@ -1090,6 +1091,7 @@ Galleria = function() {
         },
 
         showAll : function() {
+
             Utils.clearTimer('idle');
 
             $.each(self._idle.trunk, function( i, elem ) {
@@ -1106,8 +1108,10 @@ Galleria = function() {
                 data.busy = true;
 
                 self.trigger( Galleria.IDLE_EXIT );
+                
+                Utils.clearTimer( 'idle' );
 
-                elem.animate(data.from, {
+                elem.stop().animate(data.from, {
                     duration: 300,
                     queue: false,
                     easing: 'swing',
@@ -1857,15 +1861,23 @@ Galleria.prototype = {
                 if ( optval == 'numbers' ) {
                     $( thumb.image ).text( i + 1 );
                 }
-
-                $( thumb.container ).append( thumb.image );
+                
                 this.$( 'thumbnails' ).append( thumb.container );
-
-                self.trigger({
-                    type: Galleria.THUMBNAIL,
-                    thumbTarget: thumb.image,
-                    index: i
-                });
+                
+                // we need to "fake" a loading delay before we append and trigger
+                // 50+ should be enough
+                
+                window.setTimeout((function(image, index, container) {
+                    return function() {
+                        $( container ).append( image );
+                        self.trigger({
+                            type: Galleria.THUMBNAIL,
+                            thumbTarget: image,
+                            index: index
+                        });
+                    }
+                })( thumb.image, i, thumb.container ), 50 + (i*20) );
+                
 
             // create null object to silent errors
             } else {
@@ -1905,10 +1917,12 @@ Galleria.prototype = {
             until: function() {
                 self._stageWidth  = self.$( 'stage' ).width();
                 self._stageHeight = self.$( 'stage' ).height();
-                return( self._stageWidth && self._stageHeight > 50 ); // what is an acceptable height?
+                return( self._stageWidth && 
+                        self._stageHeight > 50 ); // what is an acceptable height?
             },
 
             success: function() {
+                console.log('ready');
                 self.trigger( Galleria.READY );
             },
 
@@ -3708,8 +3722,8 @@ Galleria.Picture.prototype = {
                 // apply position
                 $( self.image ).css({
                     position : 'relative',
-                    top :  getPosition(pos.top, 'height', height),
-                    left : getPosition(pos.left, 'width', width)
+                    top :  getPosition(pos.top, 'height', height) - options.margin,
+                    left : getPosition(pos.left, 'width', width) - options.margin
                 });
 
                 // show the image
