@@ -1,5 +1,5 @@
 /*
- * Galleria v 1.2 prerelease 1.1 2010-11-17
+ * Galleria v 1.2 prerelease 1.1 2010-11-18
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -1489,14 +1489,19 @@ Galleria.prototype = {
 
                     // keep trying to get the value
                     $.each(['width', 'height'], function( i, m ) {
-
+                        
+                        // first check if options is set
+                        
                         if (self._options[ m ] && typeof self._options[ m ] == 'number') {
                             num[ m ] = self._options[ m ];
                         } else {
-                            num[m] = Utils.parseValue( self.$( 'target' ).css( m ) ) ||
-                                     Utils.parseValue( $container.css( m ) ) ||
-                                     self.$( 'target' )[ m ]() ||
-                                     $container[ m ]()
+                            
+                            // else extract the meassures in the following order:
+                            
+                            num[m] = Utils.parseValue( $container.css( m ) ) ||         // 1. the container css
+                                     Utils.parseValue( self.$( 'target' ).css( m ) ) || // 2. the target css
+                                     $container[ m ]() ||                               // 3. the container jQuery method
+                                     self.$( 'target' )[ m ]();                         // 4. the container jQuery method
                         }
 
                     });
@@ -1922,7 +1927,6 @@ Galleria.prototype = {
             },
 
             success: function() {
-                console.log('ready');
                 self.trigger( Galleria.READY );
             },
 
