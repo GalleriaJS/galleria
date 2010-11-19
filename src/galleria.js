@@ -639,7 +639,6 @@ Galleria = function() {
                     h = Math.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
                 }
             });
-            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > self._stageWidth );
 
             self.$( 'thumbnails' ).css({
                 width: w,
@@ -650,6 +649,8 @@ Galleria = function() {
             carousel.hooks = hooks;
             carousel.width = self.$( 'thumbnails-list' ).width();
             carousel.setClasses();
+
+            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > carousel.width );
 
             // todo: fix so the carousel moves to the left
         },
@@ -792,8 +793,8 @@ Galleria = function() {
                 width = $elem.outerWidth( true ),
                 limitY = height + 15;
 
-            var maxX = self._stageWidth - width,
-                maxY = self._stageHeight - height;
+            var maxX = self.$( 'container').width() - width,
+                maxY = self.$( 'container').height() - height;
 
             if ( !isNaN(x) && !isNaN(y) ) {
 
@@ -844,7 +845,9 @@ Galleria = function() {
 
                     self.$( 'container' ).unbind( 'mousemove', tooltip.move );
                     Utils.clearTimer( 'tooltip' );
-
+                    
+                    self.$( 'tooltip' ).stop();
+                    
                     Utils.hide( self.get( 'tooltip' ), 200, function() {
                         Utils.addTimer('switch_tooltip', function() {
                             tooltip.open = false;
@@ -2264,8 +2267,8 @@ $(document).mousemove(function(e) {
 
     getMousePosition : function(e) {
         return {
-            x: e.pageX - this.$( 'stage' ).offset().left,
-            y: e.pageY - this.$( 'stage' ).offset().top
+            x: e.pageX - this.$( 'container' ).offset().left,
+            y: e.pageY - this.$( 'container' ).offset().top
         };
     },
 
