@@ -2,6 +2,16 @@
 Options
 =======
 
+.. toctree::
+   :hidden:
+   :glob:
+
+   *
+
+
+.. highlight:: javascript
+
+
 Galleria options are defined using a flat object during initialization.::
 
     $('#galleria').galleria({
@@ -10,10 +20,11 @@ Galleria options are defined using a flat object during initialization.::
         image_crop: true
     });
 
-**Note:** You can define your own options and set defaults for each theme using the Theme builder API.
+.. note:: You can define your own options and set defaults for each theme using
+          the Theme builder API.
 
 List of options
-***************
+---------------
 
 :doc:`autoplay` Sets Galleria to play slidehow when initialized.
 

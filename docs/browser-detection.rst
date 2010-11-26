@@ -1,12 +1,11 @@
-=====================
+=================
 Broswer detection
-=====================
-
+=================
+  
 These static variables are mainly used to detect browsers.
 
 Example usage
 -------------
-
 ::
 
     <script>
@@ -16,7 +15,7 @@ Example usage
     </script>
     
 IE
----
+--
 Detects IE6+ using object detection.
 
 IE6

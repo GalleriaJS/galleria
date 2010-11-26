@@ -34,10 +34,3 @@ Plugins
     
     plugins/flickr
 
-Misc
-----
-
-.. toctree::
-    :maxdepth: 1
-    
-    contents

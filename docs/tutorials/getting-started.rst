@@ -2,6 +2,8 @@
 Getting started
 ===============
 
+.. highlight:: javascript
+
 Requirements
 ============
 

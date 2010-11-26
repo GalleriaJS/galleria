@@ -2,6 +2,9 @@
 Events
 ======
 
+.. highlight:: javascript
+
+
 You can bind functions to the Galleria events to build custom themes. All callbacks contains an event object as a function argument. The event object is similar to jQuery's event model, except that it adds event.scope that refers to the current gallery scope of each event. Some events will add even further properties to the event object, specified here.
 
 Use ``.bind()`` to listen to the Galleria events. In the callback, the this keyword inside the callback always refers to the same gallery scope. Example::
