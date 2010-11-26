@@ -1,6 +1,6 @@
-======
+******
 Events
-======
+******
 
 You can bind functions to the Galleria events to build custom themes. All
 callbacks contains an event object as a function argument. The event object is
@@ -23,8 +23,8 @@ keyword inside the callback always refers to the same gallery scope. Example::
     });
     
     
-List of public events
-=====================
+List of events
+==============
 
 Galleria.THUMBNAIL
 ------------------
@@ -35,9 +35,11 @@ following properties to the event object:
 
 - **thumbOrder** (int) the index of the thumbnail, starting at 0
 
+
 Galleria.LOADSTART
 ------------------
-Triggers every time Galleria begins loading an image. Adds the following properties to the event object:
+Triggers every time Galleria begins loading an image. Adds the following
+properties to the event object:
 
 - **cached** (boolean) is true if the image is cached (no loading required).
 
@@ -48,6 +50,7 @@ Triggers every time Galleria begins loading an image. Adds the following propert
   belongs to the imageTarget.
 
 - **index** (Number) The galleria index of the image about to load.
+
 
 Galleria.LOADFINISH
 -------------------
@@ -64,6 +67,7 @@ properties to the event object:
   
 - **index** (Number) The galleria index of the image loaded.
 
+
 Galleria.IMAGE
 --------------
 Triggers when the gallery image is displayed after loading and transition. Adds
@@ -76,13 +80,16 @@ the following properties to the event object:
 
 - **index** (Number) The galleria index of the image loaded.
 
+
 Galleria.PLAY
 -------------
 Triggers when the galleria slideshow starts playing.
 
+
 Galleria.PAUSE
 --------------
 Triggers when the galleria slideshow stops playing.
+
 
 Galleria.PROGRESS
 -----------------
@@ -98,34 +105,42 @@ the event object:
 - **milliseconds** (Number) prints the milliseconds elapsed since the last
   image during slideshow.
 
+
 Galleria.FULLSCREEN_ENTER
 -------------------------
 Triggers when the gallery goes into fullscreen mode.
+
 
 Galleria.FULLSCREEN_EXIT
 ------------------------
 Triggers when the gallery exits the fullscreen mode.
 
+
 Galleria.IDLE_ENTER
 -------------------
 Triggers when the gallery goes into idle mode.
 
+
 Galleria.IDLE_EXIT
 ------------------
 Triggers when the gallery exists idle mode.
+
 
 Galleria.RESCALE
 ----------------
 Triggers every time the rescale() method is used and completed for rescaling
 the gallery.
 
+
 Galleria.LIGHTBOX_OPEN
 ----------------------
 Triggers every time the lightbox is opened.
 
+
 Galleria.LIGHTBOX_CLOSE
 -----------------------
 Triggers every time the lightbox is closed.
+
 
 Galleria.LIGHTBOX_IMAGE
 -----------------------

@@ -1,12 +1,14 @@
-===============
+***************
 Getting started
-===============
+***************
+
 
 Requirements
 ============
 - Get the latest and greatest version of Galleria and jQuery
 
 - Place the galleria src folder in your project.
+
 
 Usage
 =====
@@ -40,11 +42,11 @@ If you want separate thumbnails, just add them as a link::
         <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
         <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" alt="Another text" title="Another title"></a>
     </div>
-    
+
 You can also define the images as a JSON array::
-    
+
     <script>
-    
+
     var data = [
         {
             image: 'img1.jpg'
@@ -61,15 +63,16 @@ You can also define the images as a JSON array::
             link: '/path/to/destination.html'
         }
     ];
-    
+
     $('#container').galleria({
         data_source: data
     });
-    
+
     </script>
-    
+
 Galleria also provides plugins to fetch image data from other sources like
 Flickr & SlideShowPro.
+
 
 Activate Galleria
 -----------------
@@ -86,7 +89,8 @@ documentation for a complete list.
 
 If you run into problems, try passing ``debug: true`` as an option or set
 ``Galleria.debug = true`` to trace errors.
-        
+
+
 More examples
 -------------
 With extra options::
@@ -103,7 +107,9 @@ With extra options::
     </script>
 
 Customize
---------- 
-If you wish to add alternative sources of image data, try the flickr and ssp
-documentation. If you would like to add more advanced cunstomizations, read the
-**Extending Galleria** section. *Good luck!*
+---------
+If you wish to add alternative sources of image data, try the
+:doc:`/tutorial/flickr` and :doc:`/tutorial/slideshowpro` documentation. If you
+would like to add more advanced cunstomizations, read
+:doc:`/tutorial/extending`. *Good luck!*
+
