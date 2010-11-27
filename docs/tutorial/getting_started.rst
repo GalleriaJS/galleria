@@ -110,7 +110,7 @@ With extra options::
 Customize
 ---------
 If you wish to add alternative sources of image data, try the
-:doc:`/tutorial/flickr` and :doc:`/tutorial/slideshowpro` documentation. If you
+:doc:`/plugin/flickr` and :doc:`/plugin/slideshowpro` documentation. If you
 would like to add more advanced cunstomizations, read
 :doc:`/tutorial/extending`. *Good luck!*
 
