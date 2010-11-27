@@ -5,7 +5,7 @@ transition
     | type: **String**
     | default: **'fade'**
 
-The transition that is used when displaying the images. 
+The transition that is used when displaying the images.
 There are some built-in transitions in Galleria, but you can also create your own using our Transitions API.
 
 Built-in transitions

@@ -23,7 +23,7 @@ this::
             data_source: data
         });
     });
-    
+
 You can set options using ``.setOptions()`` or as a second argument to the
 call::
 
@@ -32,10 +32,10 @@ call::
         size: 'medium',
         sort: 'date-posted-desc'
     });
-    
+
     flickr.getSet('72057594078378762', function(data) {
         $('#galleria').galleria({
-            source: data
+            data_source: data
         });
     });
 

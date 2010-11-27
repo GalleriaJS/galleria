@@ -41,8 +41,8 @@ ensure CSS encapsulation. The class ``.carousel`` is added to
 added to ``thumb-nav-left`` and ``thumb-nav-right`` if you are at the end/start
 of the carousel.
 
-The HTML structure is built with a ``galleria-`` prefix to all classes to ensure CSS encapsulation. 
-The class ``.carousel`` is added to ``thumbnails-container``  if a carousel is present. 
+The HTML structure is built with a ``galleria-`` prefix to all classes to ensure CSS encapsulation.
+The class ``.carousel`` is added to ``thumbnails-container``  if a carousel is present.
 The ``.disabled`` class is added to ``thumb-nav-left`` and ``thumb-nav-right`` if you are at the end/start of the carousel.
 
 This presentation of the Galleria HTML structure is good to have when building CSS for your custom theme::

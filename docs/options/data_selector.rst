@@ -5,8 +5,8 @@ data_selector
     | type: **String**
     | default: **'img'**
 
-The selector Galleria should look for in the HTML source. 
-If you are using other elements than images to store data in the HTML, you can set this option to configure Galleria to look for the right elements. 
+The selector Galleria should look for in the HTML source.
+If you are using other elements than images to store data in the HTML, you can set this option to configure Galleria to look for the right elements.
 
 You can use any jQuery selector, see http://api.jquery.com/category/selectors/
 
@@ -21,7 +21,7 @@ Example::
         <a href="myimg.jpg">My image</a>
         <a href="myimg2.jpg">My other image</a>
     </div>
-    
+
     <script>
     $('#galleria').galleria({
         data_selector: "a",

@@ -20,9 +20,9 @@ Example on how to open a lightbox when clicking the main image:
     <script>
     $('#galleria').galleria({
         on_image: function( image, thumb ) {
-        
+
             var gallery = this;
-            
+
             // image is now the image element and gallery the instance
             $( image ).click( function() {
                 gallery.openLightbox();

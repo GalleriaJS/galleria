@@ -5,14 +5,14 @@ data_config( [HTML element] )
     | type: **Function**
     | arguments: **HTML element**
 
-This very useful function configures how the data should be extracted from the source. 
+This very useful function configures how the data should be extracted from the source.
 It should return an object that will blend in with the default extractions.
 
 Use this option to control how your data should be interpreted.
 A common case is when you have HTML markup that you would like to implement as captions.
 This option can tell Galleria how to interpret your HTML code so it collects the right data.
 
-The argument is a HTML element selected from the HTML source ( most often an Image element ). 
+The argument is a HTML element selected from the HTML source ( most often an Image element ).
 Use this to traverse the source and return the right data into Galleria.
 
 If you are using other elements than Images as source, you can change the selctor using the data_selector option.
@@ -47,7 +47,7 @@ Example on how to alter the extraction logic:
         }
     });
     </script>
-    
+
 Example on how to add rich HTML captions:
 .........................................
 
