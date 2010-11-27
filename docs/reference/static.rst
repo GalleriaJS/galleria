@@ -2,7 +2,6 @@
 Static methods & variables
 **************************
 
-
 Static methods
 ==============
 Static methods are exposed using ``Galleria.fn()``.
