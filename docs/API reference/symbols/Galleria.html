@@ -1,0 +1,3100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		
+		<title>Galleria API Reference - Galleria</title>
+
+		<style type="text/css">
+		html{background:#eee;}
+body{width:960px;margin:30px;border:1px solid #ddd;padding:20px;
+    background:#fff;font:12px/16px arial,sans-serif;color:#444;}
+a{color:#579CC7;}
+hr{display:none!important;}
+th{text-align:left;background:#eee;}
+th:first-child,
+td:first-child{width:100px;}
+td,th{border-left:1px solid #ddd;border-bottom:1px solid #ddd;padding:6px;vertical-align:top;}
+table{border-right:1px solid #ddd;border-top:1px solid #ddd;}
+caption{text-align:left;font:normal 16px/1.1 georgia,serif;margin:18px 0 9px;}
+
+#index *{text-align:left!important;}
+
+tr.active th,
+tr.active td{background:#eee;color:#000;}
+
+tr.hover th,
+tr.hover td{background:#ffc;color:#000;}
+
+.summaryTable{width:400px;}
+
+.nameDescription .fixedFont{font-size:16px;margin-bottom:6px;display:block;color:#000;}
+.nameDescription{color:#888;}
+.nameDescription a{color:#000;text-decoration:none;}
+
+.attributes{text-align:right;color:#888;}
+
+#detail-view{position:fixed;top:40px;left:470px;
+width:500px;border:1px solid #ddd;padding:20px;}
+
+#detail-view .fixedFont{color:#888;margin-bottom:12px;font-size:18px;color:#000;}
+#detail-view .fixedFont .light{display:none;}
+#detail-view .fixedFont.light{font-size:12px;color:#888;}
+dt{margin-top:4px;}
+#detail-view dt.heading{border-top:1px solid #ddd;padding-top:8px;
+    margin:12px 0 6px;font-weight:bold;color:#000;}
+#detail-view dd{margin:0;}
+
+.sectionTitle{display:none!important;}
+		</style>
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<script>
+		$(function() {
+    
+    var sections = {};
+    var container = $('<div>').attr('id','detail-view').appendTo(document.body)
+    var showSection = function( id ) {
+        container.empty();
+        sections[ id.replace(/\#/,'') ].appendTo(container).show();
+    }
+    
+    $('a[name]').each(function() {
+        sections[ this.name ] = $(this).nextUntil('a[name]').hide();
+    });
+    
+    $('.summaryTable .nameDescription').each(function() {
+        $(this).css('cursor','pointer').click(function(e) {
+            e.preventDefault();
+            $('tr.active').removeClass('active')
+            $(this).closest('tr').addClass('active');
+            showSection($(this).find('a').attr('href').replace(/[^\#]+/,''));
+        }).hover(function() {
+            $(this).closest('tr').addClass('hover');
+        }, function() {
+            $(this).closest('tr').removeClass('hover');
+        })
+    })
+
+});
+		</script>
+	</head>
+
+	<body>
+<!-- ============================== header ================================= -->	
+		<!-- begin static/header.html -->
+		<div id="header">
+</div>
+		<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+		<div id="index">
+			<!-- begin publish.classesIndex -->
+			<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	
+	
+	<li><a href="../symbols/Galleria.html">Galleria</a></li>
+	
+	<li><a href="../symbols/Galleria.Picture.html">Galleria.Picture</a></li>
+	
+</ul>
+<hr />
+			<!-- end publish.classesIndex -->
+		</div>
+		
+		<div id="content">
+<!-- ============================== class title ============================ -->
+			<h1 class="classTitle">
+				
+				Class Galleria
+			</h1>
+
+<!-- ============================== class summary ========================== -->			
+			<p class="description">
+				
+				
+			
+				
+				
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/galleria_src_galleria.js.html">galleria.js</a>.
+				
+			</p>
+
+<!-- ============================== constructor summary ==================== -->			
+			
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Galleria.">
+				<caption>Class Summary</caption>
+				<thead>
+					<tr>
+						<th scope="col">Constructor Attributes</th>
+						<th scope="col">Constructor Name and Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="attributes">&nbsp;</td>
+						<td class="nameDescription" >
+							<div class="fixedFont">
+								<b><a href="../symbols/Galleria.html#constructor">Galleria</a></b>()
+							</div>
+							<div class="description">The main Galleria class</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+
+<!-- ============================== properties summary ===================== -->
+			
+
+<!-- ============================== methods summary ======================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Galleria.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#$">$</a></b>(str)
+								</div>
+								<div class="description">Converts element IDs into a jQuery collection
+        You can call for multiple IDs separated with commas.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#addElement">addElement</a></b>(id)
+								</div>
+								<div class="description">Adds an element to the Galleria DOM array.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#addIdleState">addIdleState</a></b>(elem, styles)
+								</div>
+								<div class="description">Assign an "idle state" to any element.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#addPan">addPan</a></b>(img)
+								</div>
+								<div class="description">Adds a panning effect to the image</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Galleria.<b><a href="../symbols/Galleria.html#.addTheme">addTheme</a></b>(theme)
+								</div>
+								<div class="description">Adds a theme that you can use for your Gallery</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Galleria.<b><a href="../symbols/Galleria.html#.addTransition">addTransition</a></b>(name, fn)
+								</div>
+								<div class="description">Creates a transition to be used in your gallery</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#appendChild">appendChild</a></b>(parentID, childID)
+								</div>
+								<div class="description">Fast helper for appending galleria elements that you added using addElement()</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#attachKeyboard">attachKeyboard</a></b>(map)
+								</div>
+								<div class="description">Attach keyboard events to Galleria</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#bind">bind</a></b>(type, fn)
+								</div>
+								<div class="description">Bind any event to Galleria</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#bindTooltip">bindTooltip</a></b>(elem, value)
+								</div>
+								<div class="description">Adds a tooltip to any element.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#closeLightbox">closeLightbox</a></b>()
+								</div>
+								<div class="description">Close the lightbox.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#defineTooltip">defineTooltip</a></b>(elem, value)
+								</div>
+								<div class="description">Redefine a tooltip
+        Use this if you want to change the tooltip value at runtime</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#detachKeyboard">detachKeyboard</a></b>()
+								</div>
+								<div class="description">Detach all keyboard events to Galleria</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#enterFullscreen">enterFullscreen</a></b>(callback)
+								</div>
+								<div class="description">Enter FullScreen mode</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#enterIdleMode">enterIdleMode</a></b>()
+								</div>
+								<div class="description">Force Galleria to enter idle mode.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#exitFullscreen">exitFullscreen</a></b>(callback)
+								</div>
+								<div class="description">Exits FullScreen mode</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#exitIdleMode">exitIdleMode</a></b>()
+								</div>
+								<div class="description">Force Galleria to exit idle mode.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#get">get</a></b>(elemId)
+								</div>
+								<div class="description">Retrieve a DOM element by element ID</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Galleria.<b><a href="../symbols/Galleria.html#.get">get</a></b>(index)
+								</div>
+								<div class="description">Retrieves a Galleria instance.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getActiveImage">getActiveImage</a></b>()
+								</div>
+								<div class="description">Get the currently active image element.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getActiveThumb">getActiveThumb</a></b>()
+								</div>
+								<div class="description">Get the currently active thumbnail element.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getData">getData</a></b>(index)
+								</div>
+								<div class="description">Retrieve a data object</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getDataLength">getDataLength</a></b>()
+								</div>
+								<div class="description">Retrieve the number of data items</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getIndex">getIndex</a></b>()
+								</div>
+								<div class="description">Retrieve the currently active index</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getMousePosition">getMousePosition</a></b>(e)
+								</div>
+								<div class="description">Get the mouse position relative to the gallery container</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getNext">getNext</a></b>(base)
+								</div>
+								<div class="description">Gets the next index</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getOptions">getOptions</a></b>(key)
+								</div>
+								<div class="description">Retrieve the option</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getPrev">getPrev</a></b>(base)
+								</div>
+								<div class="description">Gets the previous index</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getStageHeight">getStageHeight</a></b>()
+								</div>
+								<div class="description">Retrieve the stage height</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#getStageWidth">getStageWidth</a></b>()
+								</div>
+								<div class="description">Retrieve the stage width</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#hasInfo">hasInfo</a></b>(index)
+								</div>
+								<div class="description">Checks if the data contains any captions</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#init">init</a></b>(target, options)
+								</div>
+								<div class="description">Use this function to initialize the gallery and start loading.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#load">load</a></b>(source, selector, config)
+								</div>
+								<div class="description">Loads data into the gallery.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Galleria.<b><a href="../symbols/Galleria.html#.loadTheme">loadTheme</a></b>(src, option)
+								</div>
+								<div class="description">loadTheme loads a theme js file and attaches a load event to Galleria</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Galleria.<b><a href="../symbols/Galleria.html#.log">log</a></b>()
+								</div>
+								<div class="description">A helper metod for cross-browser logging.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#next">next</a></b>()
+								</div>
+								<div class="description">Shows the next image in line</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#openLightbox">openLightbox</a></b>()
+								</div>
+								<div class="description">Open a pre-designed lightbox with the currently active image.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#pause">pause</a></b>()
+								</div>
+								<div class="description">Stops the slideshow if currently playing</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#play">play</a></b>(delay)
+								</div>
+								<div class="description">Starts playing the slideshow</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#prependChild">prependChild</a></b>(parentID, childID)
+								</div>
+								<div class="description">Fast helper for appending galleria elements that you added using addElement()</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#prev">prev</a></b>()
+								</div>
+								<div class="description">Shows the previous image in line</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#proxy">proxy</a></b>(fn, scope)
+								</div>
+								<div class="description">Brings the scope into any callback</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Galleria.<b><a href="../symbols/Galleria.html#.raise">raise</a></b>(msg, fatal)
+								</div>
+								<div class="description">Method for raising errors</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#refreshImage">refreshImage</a></b>()
+								</div>
+								<div class="description">Refreshes the gallery.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#remove">remove</a></b>(elemID)
+								</div>
+								<div class="description">Remove an element by blueprint</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#removeIdleState">removeIdleState</a></b>(elem)
+								</div>
+								<div class="description">Removes any idle state previously set using addIdleState()</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#removePan">removePan</a></b>()
+								</div>
+								<div class="description">Removes the panning effect set by addPan()</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#rescale">rescale</a></b>(width, height, complete)
+								</div>
+								<div class="description">Rescales the gallery</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#setCounter">setCounter</a></b>(index)
+								</div>
+								<div class="description">Manually modify the counter</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#setInfo">setInfo</a></b>(index)
+								</div>
+								<div class="description">Manually set captions</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#setOptions">setOptions</a></b>(key, value)
+								</div>
+								<div class="description">Set options to the instance.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#show">show</a></b>(index, rewind, _history)
+								</div>
+								<div class="description">Shows an image by index</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#trigger">trigger</a></b>(type)
+								</div>
+								<div class="description">Manually trigger a Galleria event</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#unbind">unbind</a></b>(type)
+								</div>
+								<div class="description">Unbind any event to Galleria</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Galleria.html#updateCarousel">updateCarousel</a></b>()
+								</div>
+								<div class="description">Updates the carousel,
+        useful if you resize the gallery and want to re-check if the carousel nav is needed.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->		
+			
+			<div class="details"><a name="constructor"> </a>
+				<div class="sectionTitle">
+					Class Detail
+				</div>
+				
+				<div class="fixedFont">
+						<b>Galleria</b>()
+				</div>
+				
+				<div class="description">
+					The main Galleria class
+					<br /><i>Author: </i>http://aino.se.
+				</div>
+				
+				
+				
+				<pre class="code">var gallery = new Galleria();</pre>
+				
+				
+				
+				
+					
+					
+					
+					
+					
+						<dl class="detailList">
+						<dt class="heading">Returns:</dt>
+						
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+						
+						</dl>
+					
+					
+						<dl class="detailList">
+						<dt class="heading">Requires:</dt>
+						
+							<dd>jQuery</dd>
+						
+						</dl>
+					
+					
+
+			</div>
+			
+
+<!-- ============================== field details ========================== -->		
+			
+
+<!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="$"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{jQuery}</span>
+					<b>$</b>(str)
+					
+					</div>
+					<div class="description">
+						Converts element IDs into a jQuery collection
+        You can call for multiple IDs separated with commas.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">this.$('info,container').hide();</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>str</b>
+									
+								</dt>
+								<dd>One or more element IDs (comma-separated)</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{jQuery}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="addElement"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>addElement</b>(id)
+					
+					</div>
+					<div class="description">
+						Adds an element to the Galleria DOM array.
+        When you add an element here, you can access it using element ID in many API calls
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">addElement('mybutton');</pre>
+					
+					<pre class="code">addElement('mybutton','mylink');</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>id</b>
+									
+								</dt>
+								<dd>The element ID you wish to use. You can add many elements by adding more arguments.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="addIdleState"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>addIdleState</b>(elem, styles)
+					
+					</div>
+					<div class="description">
+						Assign an "idle state" to any element.
+        The idle state will be applied after a certain amount of idle time
+        Useful to hide f.ex navigation when the gallery is inactive
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">addIdleState( this.get('image-nav'), { opacity: 0 });</pre>
+					
+					<pre class="code">addIdleState( '.galleria-image-nav', { top: -200 });</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{HTML Element or String}</span> <b>elem</b>
+									
+								</dt>
+								<dd>The Dom node or selector to apply the idle state to</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>styles</b>
+									
+								</dt>
+								<dd>the CSS styles to apply</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="addPan"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>addPan</b>(img)
+					
+					</div>
+					<div class="description">
+						Adds a panning effect to the image
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>img</b>
+									
+								</dt>
+								<dd>The optional image element. If not specified it takes the currently active image</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".addTheme"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">Galleria.</span><b>addTheme</b>(theme)
+					
+					</div>
+					<div class="description">
+						Adds a theme that you can use for your Gallery
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>theme</b>
+									
+								</dt>
+								<dd>Object that should contain all your theme settings.
+    <ul>
+        <li>name – name of the theme</li>
+        <li>author - name of the author</li>
+        <li>version - version number</li>
+        <li>css - css file name (not path)</li>
+        <li>defaults - default options to apply, including theme-specific options</li>
+        <li>init - the init function</li>
+    </ul></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> theme</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".addTransition"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">Galleria.</span><b>addTransition</b>(name, fn)
+					
+					</div>
+					<div class="description">
+						Creates a transition to be used in your gallery
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>name</b>
+									
+								</dt>
+								<dd>The name of the transition that you will use as an option</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>fn</b>
+									
+								</dt>
+								<dd>The function to be executed in the transition.
+    The function contains two arguments, params and complete.
+    Use the params Object to integrate the transition, and then call complete when you are done.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="appendChild"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>appendChild</b>(parentID, childID)
+					
+					</div>
+					<div class="description">
+						Fast helper for appending galleria elements that you added using addElement()
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">this.addElement('myElement');
+        this.appendChild( 'info', 'myElement' );</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>parentID</b>
+									
+								</dt>
+								<dd>The parent element ID where the element will be appended</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>childID</b>
+									
+								</dt>
+								<dd>the element ID that should be appended</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="attachKeyboard"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>attachKeyboard</b>(map)
+					
+					</div>
+					<div class="description">
+						Attach keyboard events to Galleria
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">
+this.attachKeyboard({
+    right: this.next,
+    left: this.prev,
+    up: function() {
+        console.log( 'up key pressed' )
+    }
+});</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>map</b>
+									
+								</dt>
+								<dd>The map object of events.
+        Possible keys are 'UP', 'DOWN', 'LEFT', 'RIGHT', 'RETURN', 'ESCAPE' and 'BACKSPACE'.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="bind"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>bind</b>(type, fn)
+					
+					</div>
+					<div class="description">
+						Bind any event to Galleria
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">this.bind( Galleria.IMAGE, function() { Galleria.log('image shown') });</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>type</b>
+									
+								</dt>
+								<dd>The Event type to listen for</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>fn</b>
+									
+								</dt>
+								<dd>The function to execute when the event is triggered</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="bindTooltip"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>bindTooltip</b>(elem, value)
+					
+					</div>
+					<div class="description">
+						Adds a tooltip to any element.
+        You can also call this method with an object as argument with elemID:value pairs to apply tooltips to (see examples)
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">this.bindTooltip( this.get('thumbnails'), 'My thumbnails');</pre>
+					
+					<pre class="code">this.bindTooltip( this.get('thumbnails'), function() { return 'My thumbs' });</pre>
+					
+					<pre class="code">this.bindTooltip( { image_nav: 'Navigation' });</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{HTML Element}</span> <b>elem</b>
+									
+								</dt>
+								<dd>The DOM Node to attach the event to</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String or Function}</span> <b>value</b>
+									
+								</dt>
+								<dd>The tooltip message. Can also be a function that returns a string.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="closeLightbox"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>closeLightbox</b>()
+					
+					</div>
+					<div class="description">
+						Close the lightbox.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="defineTooltip"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>defineTooltip</b>(elem, value)
+					
+					</div>
+					<div class="description">
+						Redefine a tooltip
+        Use this if you want to change the tooltip value at runtime
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{HTML Element}</span> <b>elem</b>
+									
+								</dt>
+								<dd>The DOM Node to attach the event to</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String or Function}</span> <b>value</b>
+									
+								</dt>
+								<dd>The tooltip message. Can also be a function that returns a string.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="detachKeyboard"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>detachKeyboard</b>()
+					
+					</div>
+					<div class="description">
+						Detach all keyboard events to Galleria
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="enterFullscreen"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>enterFullscreen</b>(callback)
+					
+					</div>
+					<div class="description">
+						Enter FullScreen mode
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>callback</b>
+									
+								</dt>
+								<dd>the function to be executed when the fullscreen mode is fully applied.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="enterIdleMode"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>enterIdleMode</b>()
+					
+					</div>
+					<div class="description">
+						Force Galleria to enter idle mode.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="exitFullscreen"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>exitFullscreen</b>(callback)
+					
+					</div>
+					<div class="description">
+						Exits FullScreen mode
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>callback</b>
+									
+								</dt>
+								<dd>the function to be executed when the fullscreen mode is fully applied.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="exitIdleMode"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>exitIdleMode</b>()
+					
+					</div>
+					<div class="description">
+						Force Galleria to exit idle mode.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="get"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{HTML Element}</span>
+					<b>get</b>(elemId)
+					
+					</div>
+					<div class="description">
+						Retrieve a DOM element by element ID
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>elemId</b>
+									
+								</dt>
+								<dd>The delement ID to fetch</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{HTML Element}</span> The elements DOM node or null if not found.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".get"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a> or Array}</span>
+					<span class="light">Galleria.</span><b>get</b>(index)
+					
+					</div>
+					<div class="description">
+						Retrieves a Galleria instance.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>index</b>
+									
+								</dt>
+								<dd>Optional index to retrieve.
+    If no index is supplied, the method will return all instances in an array.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a> or Array}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getActiveImage"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{HTML Element}</span>
+					<b>getActiveImage</b>()
+					
+					</div>
+					<div class="description">
+						Get the currently active image element.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{HTML Element}</span> The image element</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getActiveThumb"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{HTML Element}</span>
+					<b>getActiveThumb</b>()
+					
+					</div>
+					<div class="description">
+						Get the currently active thumbnail element.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{HTML Element}</span> The thumbnail element</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getData"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Object}</span>
+					<b>getData</b>(index)
+					
+					</div>
+					<div class="description">
+						Retrieve a data object
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>index</b>
+									
+								</dt>
+								<dd>The data index to retrieve.
+        If no index specified it will take the currently active image</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> The data object</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getDataLength"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Number}</span>
+					<b>getDataLength</b>()
+					
+					</div>
+					<div class="description">
+						Retrieve the number of data items
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> The data length</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getIndex"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Number}</span>
+					<b>getIndex</b>()
+					
+					</div>
+					<div class="description">
+						Retrieve the currently active index
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> The active index</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getMousePosition"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Object}</span>
+					<b>getMousePosition</b>(e)
+					
+					</div>
+					<div class="description">
+						Get the mouse position relative to the gallery container
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">
+var gallery = this;
+$(document).mousemove(function(e) {
+    console.log( gallery.getMousePosition(e).x );
+});</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>e</b>
+									
+								</dt>
+								<dd>The mouse event</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> Object with x & y of the relative mouse postion</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getNext"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Number}</span>
+					<b>getNext</b>(base)
+					
+					</div>
+					<div class="description">
+						Gets the next index
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>base</b>
+									
+								</dt>
+								<dd>Optional starting point</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> the next index, or the first if you are at the first (looping)</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getOptions"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>getOptions</b>(key)
+					
+					</div>
+					<div class="description">
+						Retrieve the option
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>key</b>
+									
+								</dt>
+								<dd>The option key to retrieve. If no key specified it will return all options in an object.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd>option or options</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getPrev"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Number}</span>
+					<b>getPrev</b>(base)
+					
+					</div>
+					<div class="description">
+						Gets the previous index
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>base</b>
+									
+								</dt>
+								<dd>Optional starting point</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> the previous index, or the last if you are at the first (looping)</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getStageHeight"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Number}</span>
+					<b>getStageHeight</b>()
+					
+					</div>
+					<div class="description">
+						Retrieve the stage height
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> The stage height</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getStageWidth"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Number}</span>
+					<b>getStageWidth</b>()
+					
+					</div>
+					<div class="description">
+						Retrieve the stage width
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> The stage width</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="hasInfo"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>hasInfo</b>(index)
+					
+					</div>
+					<div class="description">
+						Checks if the data contains any captions
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>index</b>
+									
+								</dt>
+								<dd>Optional data index to fectch,
+        if no index found it assumes the currently active index.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="init"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>init</b>(target, options)
+					
+					</div>
+					<div class="description">
+						Use this function to initialize the gallery and start loading.
+        Should only be called once per instance.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{HTML Element}</span> <b>target</b>
+									
+								</dt>
+								<dd>The target element</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>options</b>
+									
+								</dt>
+								<dd>The gallery options</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="load"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>load</b>(source, selector, config)
+					
+					</div>
+					<div class="description">
+						Loads data into the gallery.
+        You can call this method on an existing gallery to reload the gallery with new data.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Array or String}</span> <b>source</b>
+									
+								</dt>
+								<dd>Optional JSON array of data or selector of where to find data in the document.
+        Defaults to the Galleria target or data_source option.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>selector</b>
+									
+								</dt>
+								<dd>Optional element selector of what elements to parse.
+        Defaults to 'img'.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>config</b>
+									
+								</dt>
+								<dd>Optional function to modify the data extraction proceedure from the selector.
+        See the data_config option for more information.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".loadTheme"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">Galleria.</span><b>loadTheme</b>(src, option)
+					
+					</div>
+					<div class="description">
+						loadTheme loads a theme js file and attaches a load event to Galleria
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>src</b>
+									
+								</dt>
+								<dd>The relative path to the theme source file</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>option</b>
+									
+								</dt>
+								<dd>Optional options you want to apply</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".log"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">Galleria.</span><b>log</b>()
+					
+					</div>
+					<div class="description">
+						A helper metod for cross-browser logging.
+    It uses the console log if available otherwise it falls back to the opera
+    debugger and finally <code>alert()</code>
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">Galleria.log("hello", document.body, [1,2,3]);</pre>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="next"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>next</b>()
+					
+					</div>
+					<div class="description">
+						Shows the next image in line
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="openLightbox"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>openLightbox</b>()
+					
+					</div>
+					<div class="description">
+						Open a pre-designed lightbox with the currently active image.
+        You can control some visuals using gallery options.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="pause"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>pause</b>()
+					
+					</div>
+					<div class="description">
+						Stops the slideshow if currently playing
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="play"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>play</b>(delay)
+					
+					</div>
+					<div class="description">
+						Starts playing the slideshow
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>delay</b>
+									
+								</dt>
+								<dd>Sets the slideshow interval in milliseconds.
+        If you set it once, you can just call play() and get the same interval the next time.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="prependChild"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>prependChild</b>(parentID, childID)
+					
+					</div>
+					<div class="description">
+						Fast helper for appending galleria elements that you added using addElement()
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">
+this.addElement('myElement');
+this.prependChild( 'info', 'myElement' );</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>parentID</b>
+									
+								</dt>
+								<dd>The parent element ID where the element will be preppended</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>childID</b>
+									
+								</dt>
+								<dd>the element ID that should be preppended</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="prev"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>prev</b>()
+					
+					</div>
+					<div class="description">
+						Shows the previous image in line
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="proxy"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Function}</span>
+					<b>proxy</b>(fn, scope)
+					
+					</div>
+					<div class="description">
+						Brings the scope into any callback
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">$('#fullscreen').click( this.proxy(function() { this.enterFullscreen(); }) )</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>fn</b>
+									
+								</dt>
+								<dd>The callback to bring the scope into</dd>
+							
+								<dt>
+									<b>scope</b>
+									
+								</dt>
+								<dd>Optional scope to bring</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Function}</span> Return the callback with the gallery scope</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".raise"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">Galleria.</span><b>raise</b>(msg, fatal)
+					
+					</div>
+					<div class="description">
+						Method for raising errors
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>msg</b>
+									
+								</dt>
+								<dd>The message to throw</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Boolean}</span> <b>fatal</b>
+									
+								</dt>
+								<dd>Set this to true to override debug settings and display a fatal error</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="refreshImage"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>refreshImage</b>()
+					
+					</div>
+					<div class="description">
+						Refreshes the gallery.
+        Useful if you change image options at runtime and want to apply the changes to the active image.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="remove"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>remove</b>(elemID)
+					
+					</div>
+					<div class="description">
+						Remove an element by blueprint
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>elemID</b>
+									
+								</dt>
+								<dd>The element to be removed.
+        You can remove multiple elements by adding arguments.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="removeIdleState"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>removeIdleState</b>(elem)
+					
+					</div>
+					<div class="description">
+						Removes any idle state previously set using addIdleState()
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{HTML Element or String}</span> <b>elem</b>
+									
+								</dt>
+								<dd>The Dom node or selector to remove the idle state from.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="removePan"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>removePan</b>()
+					
+					</div>
+					<div class="description">
+						Removes the panning effect set by addPan()
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="rescale"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>rescale</b>(width, height, complete)
+					
+					</div>
+					<div class="description">
+						Rescales the gallery
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>width</b>
+									
+								</dt>
+								<dd>The target width</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>height</b>
+									
+								</dt>
+								<dd>The target height</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>complete</b>
+									
+								</dt>
+								<dd>The callback to be called when the scaling is complete</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="setCounter"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>setCounter</b>(index)
+					
+					</div>
+					<div class="description">
+						Manually modify the counter
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>index</b>
+									
+								</dt>
+								<dd>Optional data index to fectch,
+        if no index found it assumes the currently active index</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="setInfo"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>setInfo</b>(index)
+					
+					</div>
+					<div class="description">
+						Manually set captions
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>index</b>
+									
+								</dt>
+								<dd>Optional data index to fectch and apply as caption,
+        if no index found it assumes the currently active index</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="setOptions"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>setOptions</b>(key, value)
+					
+					</div>
+					<div class="description">
+						Set options to the instance.
+        You can set options using a key & value argument or a single object argument (see examples)
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">setOptions( 'autoplay', true )</pre>
+					
+					<pre class="code">setOptions({ autoplay: true });</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>key</b>
+									
+								</dt>
+								<dd>The option key</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>value</b>
+									
+								</dt>
+								<dd>the the options value</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="show"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>show</b>(index, rewind, _history)
+					
+					</div>
+					<div class="description">
+						Shows an image by index
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>index</b>
+									
+								</dt>
+								<dd>The index to show</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Boolean}</span> <b>rewind</b>
+									
+								</dt>
+								<dd>A boolean that should be true if you want the transition to go back</dd>
+							
+								<dt>
+									<b>_history</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="trigger"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>trigger</b>(type)
+					
+					</div>
+					<div class="description">
+						Manually trigger a Galleria event
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>type</b>
+									
+								</dt>
+								<dd>The Event to trigger</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="unbind"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>unbind</b>(type)
+					
+					</div>
+					<div class="description">
+						Unbind any event to Galleria
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>type</b>
+									
+								</dt>
+								<dd>The Event type to forget</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="updateCarousel"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/Galleria.html">Galleria</a>}</span>
+					<b>updateCarousel</b>()
+					
+					</div>
+					<div class="description">
+						Updates the carousel,
+        useful if you resize the gallery and want to re-check if the carousel nav is needed.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Galleria.html">Galleria</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					
+				
+			
+			
+<!-- ============================== event details ========================= -->		
+			
+			
+			<hr />
+		</div>
+
+		
+<!-- ============================== footer ================================= -->
+	</body>
+</html>

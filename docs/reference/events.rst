@@ -1,12 +1,14 @@
 ******
 Events
 ******
-
 You can bind functions to the Galleria events to build custom themes. All
 callbacks contains an event object as a function argument. The event object is
 similar to jQuery's event model, except that it adds event.scope that refers to
 the current gallery scope of each event. Some events will add even further
 properties to the event object, specified here.
+
+.. highlight:: javascript
+
 
 Use ``.bind()`` to listen to the Galleria events. In the callback, the this
 keyword inside the callback always refers to the same gallery scope. Example::
@@ -21,8 +23,7 @@ keyword inside the callback always refers to the same gallery scope. Example::
             Galleria.log(e.target + ' is not cached. Begin preload...');
         }
     });
-    
-    
+
 List of events
 ==============
 
@@ -64,7 +65,7 @@ properties to the event object:
 
 - **thumbTarget** (HTML element) The ``IMG`` element of the thumbnail that
   belongs to the imageTarget.
-  
+
 - **index** (Number) The galleria index of the image loaded.
 
 

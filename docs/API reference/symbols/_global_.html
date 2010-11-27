@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		
+		<title>Galleria API Reference - _global_</title>
+
+		<style type="text/css">
+		html{background:#eee;}
+body{width:960px;margin:30px;border:1px solid #ddd;padding:20px;
+    background:#fff;font:12px/16px arial,sans-serif;color:#444;}
+a{color:#579CC7;}
+hr{display:none!important;}
+th{text-align:left;background:#eee;}
+th:first-child,
+td:first-child{width:100px;}
+td,th{border-left:1px solid #ddd;border-bottom:1px solid #ddd;padding:6px;vertical-align:top;}
+table{border-right:1px solid #ddd;border-top:1px solid #ddd;}
+caption{text-align:left;font:normal 16px/1.1 georgia,serif;margin:18px 0 9px;}
+
+#index *{text-align:left!important;}
+
+tr.active th,
+tr.active td{background:#eee;color:#000;}
+
+tr.hover th,
+tr.hover td{background:#ffc;color:#000;}
+
+.summaryTable{width:400px;}
+
+.nameDescription .fixedFont{font-size:16px;margin-bottom:6px;display:block;color:#000;}
+.nameDescription{color:#888;}
+.nameDescription a{color:#000;text-decoration:none;}
+
+.attributes{text-align:right;color:#888;}
+
+#detail-view{position:fixed;top:40px;left:470px;
+width:500px;border:1px solid #ddd;padding:20px;}
+
+#detail-view .fixedFont{color:#888;margin-bottom:12px;font-size:18px;color:#000;}
+#detail-view .fixedFont .light{display:none;}
+#detail-view .fixedFont.light{font-size:12px;color:#888;}
+dt{margin-top:4px;}
+#detail-view dt.heading{border-top:1px solid #ddd;padding-top:8px;
+    margin:12px 0 6px;font-weight:bold;color:#000;}
+#detail-view dd{margin:0;}
+
+.sectionTitle{display:none!important;}
+		</style>
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<script>
+		$(function() {
+    
+    var sections = {};
+    var container = $('<div>').attr('id','detail-view').appendTo(document.body)
+    var showSection = function( id ) {
+        container.empty();
+        sections[ id.replace(/\#/,'') ].appendTo(container).show();
+    }
+    
+    $('a[name]').each(function() {
+        sections[ this.name ] = $(this).nextUntil('a[name]').hide();
+    });
+    
+    $('.summaryTable .nameDescription').each(function() {
+        $(this).css('cursor','pointer').click(function(e) {
+            e.preventDefault();
+            $('tr.active').removeClass('active')
+            $(this).closest('tr').addClass('active');
+            showSection($(this).find('a').attr('href').replace(/[^\#]+/,''));
+        }).hover(function() {
+            $(this).closest('tr').addClass('hover');
+        }, function() {
+            $(this).closest('tr').removeClass('hover');
+        })
+    })
+
+});
+		</script>
+	</head>
+
+	<body>
+<!-- ============================== header ================================= -->	
+		<!-- begin static/header.html -->
+		<div id="header">
+</div>
+		<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+		<div id="index">
+			<!-- begin publish.classesIndex -->
+			<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	
+	
+	<li><a href="../symbols/Galleria.html">Galleria</a></li>
+	
+	<li><a href="../symbols/Galleria.Picture.html">Galleria.Picture</a></li>
+	
+</ul>
+<hr />
+			<!-- end publish.classesIndex -->
+		</div>
+		
+		<div id="content">
+<!-- ============================== class title ============================ -->
+			<h1 class="classTitle">
+				
+				Built-In Namespace _global_
+			</h1>
+
+<!-- ============================== class summary ========================== -->			
+			<p class="description">
+				
+				
+			
+				
+				
+				
+			</p>
+
+<!-- ============================== constructor summary ==================== -->			
+			
+
+<!-- ============================== properties summary ===================== -->
+			
+
+<!-- ============================== methods summary ======================== -->
+			
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->		
+			
+
+<!-- ============================== field details ========================== -->		
+			
+
+<!-- ============================== method details ========================= -->		
+			
+			
+<!-- ============================== event details ========================= -->		
+			
+			
+			<hr />
+		</div>
+
+		
+<!-- ============================== footer ================================= -->
+	</body>
+</html>
