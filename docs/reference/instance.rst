@@ -300,7 +300,7 @@ Example::
 
 
 .prependChild( parentID, childID )
----------------------------------
+----------------------------------
 
     | returns **Galleria**
 

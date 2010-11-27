@@ -1,36 +1,39 @@
-.. _index:
-
-======================
+**********************
 Galleria Documentation
-======================
+**********************
 
-.. rubric:: Everything you need to know about Galleria (hopefully).
+.. rubric:: Everything you need to know about Galleria.
 
 Introduction
-------------
+============
 
 .. toctree::
     :maxdepth: 1
     
-    tutorials/getting-started
-    tutorials/extending-galleria
-    DOM
+    tutorial/getting_started
+    tutorial/extending
+    reference/DOM
+
 
 API Layer
----------
+=========
 
 .. toctree::
     :maxdepth: 1
     
     options/index
-    events
-    browser-detection
+    reference/events
+    reference/instance
+    reference/static
+
 
 Plugins
--------
+=======
 
 .. toctree::
     :maxdepth: 1
     
-    plugins/flickr
+    plugin/flickr
+    plugin/slideshowpro
+    plugin/history
 

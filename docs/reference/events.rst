@@ -24,6 +24,7 @@ keyword inside the callback always refers to the same gallery scope. Example::
         }
     });
 
+
 List of events
 ==============
 

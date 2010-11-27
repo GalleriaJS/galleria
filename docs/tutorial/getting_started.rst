@@ -4,7 +4,7 @@ Getting started
 
 .. highlight:: javascript
 
-Requirements
+Installation
 ============
 - Get the latest and greatest version of Galleria and jQuery
 
