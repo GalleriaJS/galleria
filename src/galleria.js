@@ -522,7 +522,7 @@ Galleria = function() {
     this._target = undef;
 
     // instance id
-    this._id = Utils.timestamp();
+    this._id = '' + Math.random();
 
     // add some elements
     var divs =  'container stage images image-nav image-nav-left image-nav-right ' +
@@ -3075,13 +3075,13 @@ this.prependChild( 'info', 'myElement' );
             now = Utils.timestamp();
 
         if ( this._playing ) {
-
-            Utils.clearTimer('play');
+            var timer_id = 'play' + this._id;
+            Utils.clearTimer(timer_id);
             var fn = function() {
 
                 played = Utils.timestamp() - now;
                 if ( played >= self._playtime && self._playing ) {
-                    Utils.clearTimer('play');
+                    Utils.clearTimer(timer_id);
                     self.next();
                     return;
                 }
@@ -3095,10 +3095,10 @@ this.prependChild( 'info', 'myElement' );
                         milliseconds: played
                     });
 
-                    Utils.addTimer( 'play', fn, interval );
+                    Utils.addTimer( timer_id, fn, interval );
                 }
             };
-            Utils.addTimer( 'play', fn, interval );
+            Utils.addTimer( timer_id, fn, interval );
         }
     },
 
