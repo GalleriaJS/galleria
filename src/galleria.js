@@ -229,41 +229,45 @@ var DEBUG = false,
             },
 
             hide : function( elem, speed, callback ) {
-                elem = $(elem);
+                if (elem) {
+                    elem = $(elem);
 
-                // save the value if not exist
-                if (! elem.data('opacity') ) {
-                    elem.data('opacity', elem.css('opacity') );
+                    // save the value if not exist
+                    if (! elem.data('opacity') ) {
+                        elem.data('opacity', elem.css('opacity') );
+                    }
+
+                    // always hide
+                    var style = { opacity: 0 };
+
+                    if (speed) {
+                        elem.stop().animate( style, speed, callback );
+                    } else {
+                        elem.css( style );
+                    };
                 }
-
-                // always hide
-                var style = { opacity: 0 };
-
-                if (speed) {
-                    elem.stop().animate( style, speed, callback );
-                } else {
-                    elem.css( style );
-                };
             },
 
             show : function( elem, speed, callback ) {
-                elem = $(elem);
+                if (elem) {
+                    elem = $(elem);
 
-                // bring back saved opacity
-                var saved = parseFloat( elem.data('opacity') ) || 1,
-                    style = { opacity: saved };
+                    // bring back saved opacity
+                    var saved = parseFloat( elem.data('opacity') ) || 1,
+                        style = { opacity: saved };
 
-                // reset save if opacity == 1
-                if (saved == 1) {
-                    elem.data('opacity', null);
+                    // reset save if opacity == 1
+                    if (saved == 1) {
+                        elem.data('opacity', null);
+                    }
+
+                    // animate or toggle
+                    if (speed) {
+                        elem.stop().animate( style, speed, callback );
+                    } else {
+                        elem.css( style );
+                    };
                 }
-
-                // animate or toggle
-                if (speed) {
-                    elem.stop().animate( style, speed, callback );
-                } else {
-                    elem.css( style );
-                };
             },
 
             addTimer : function() {
@@ -775,7 +779,7 @@ Galleria = function() {
 
             Utils.insertStyleTag(css);
 
-            self.$( 'tooltip' ).css('opacity', .8);
+            self.$( 'tooltip' ).css('opacity', 0.8);
             Utils.hide( self.get('tooltip') );
 
         },
@@ -882,7 +886,7 @@ Galleria = function() {
                 window.setTimeout( (function( ev ) {
                     return function() {
                         tooltip.move( ev );
-                    }
+                    };
                 })( e ), 10);
                 
                 elem.unbind( 'mouseup', arguments.callee );
@@ -1408,7 +1412,7 @@ Galleria.prototype = {
             max_scale_ratio: undef,
             min_scale_ratio: undef,
             on_image: function(img,thumb) {},
-            overlay_opacity: .85,
+            overlay_opacity: 0.85,
             overlay_background: '#0b0b0b',
             pause_on_interaction: true, // 1.9.96
             popup_links: false,
