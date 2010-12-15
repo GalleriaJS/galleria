@@ -1541,9 +1541,15 @@ Galleria.prototype = {
                     // for some strange reason, webkit needs a single setTimeout to play ball
                     if ( Galleria.WEBKIT ) {
                         window.setTimeout( function() {
-                            self._run();
+                          // Initialize thumbnail containers.
+                          self._initThumbContainers();
+                          // Set stage width and fire Galleria.ready()
+                          self._run();
                         }, 1);
                     } else {
+                        // Initialize thumbnail containers.
+                        self._initThumbContainers();
+                        // Set stage width and fire Galleria.ready()
                         self._run();
                     }
                 },
@@ -1623,20 +1629,24 @@ Galleria.prototype = {
                 });
             }
 
-            // call the theme init method
-            Galleria.theme.init.call( this, this._options );
+            // Call the theme init method.
+            Galleria.theme.init.call( this, self._options );
 
-            // call the extend option
+            // Call the extend option.
             this._options.extend.call( this, this._options );
 
             // show the initial image
             // first test for permalinks in history
             if ( /^[0-9]{1,4}$/.test( HASH ) && Galleria.History ) {
                 this.show( HASH, undef, true );
-
             } else {
-                this.show( this._options.show );
+                this.show( self._options.show );
             }
+
+            // Load in thumbnail images.
+            this._loadThumbs();
+
+            
 
         });
 
@@ -1754,19 +1764,77 @@ Galleria.prototype = {
         return this;
     },
 
-    // the internal _run method should be called after loading data into galleria
-    // creates thumbnails and makes sure the gallery has proper meassurements
-    _run : function() {
-        // shortcuts
+
+    // Creates thumbnail objects for every image. This allows us to show the 
+    // primary image before loading thumbnails.
+    _initThumbContainers : function () {
         var self = this,
             o = this._options,
-
-            // width/height for calculations
-            width  = 0,
-            height = 0,
-
             // cache the thumbnail option
             optval = typeof o.thumbnails == 'string' ? o.thumbnails.toLowerCase() : null;
+
+
+        // loop through data and create thumbnails
+        for ( var i = 0; this._data[i]; i++ ) {
+            if ( o.thumbnails === true ) {   
+
+                // add a new Picture instance
+                thumb = new Galleria.Picture(i);
+
+                // append the thumbnail
+                this.$( 'thumbnails' ).append( thumb.container );
+             // create empty spans if thumbnails is set to 'empty'
+             } else if ( optval == 'empty' || optval == 'numbers' ) {
+
+                thumb = {
+                    container:  Utils.create( 'galleria-image' ),
+                    image: Utils.create( 'img', 'span' ),
+                    ready: true
+                };
+
+                // create numbered thumbnails
+                if ( optval == 'numbers' ) {
+                    $( thumb.image ).text( i + 1 );
+                }
+
+                this.$( 'thumbnails' ).append( thumb.container );
+
+                // we need to "fake" a loading delay before we append and trigger
+                // 50+ should be enough
+                window.setTimeout((function(image, index, container) {
+                    return function() {
+                        $( container ).append( image );
+                        self.trigger({
+                            type: Galleria.THUMBNAIL,
+                            thumbTarget: image,
+                            index: index
+                        });
+                    }
+                })( thumb.image, i, thumb.container ), 50 + (i*20) );
+
+            // create null object to silent errors
+            } else {
+                thumb = {
+                    container: null,
+                    image: null
+                };
+            }
+
+            self._thumbnails.push( thumb );
+
+        }
+
+        return this;
+    },
+
+    _loadThumbs : function () {
+        var self = this,
+            o = this._options;
+            // width/height for calculations
+            width  = 0,
+            height = 0;
+
+        
 
         // loop through data and create thumbnails
         for( var i = 0; this._data[i]; i++ ) {
@@ -1778,7 +1846,7 @@ Galleria.prototype = {
             if ( o.thumbnails === true ) {
 
                 // add a new Picture instance
-                thumb = new Galleria.Picture(i);
+                thumb = this._thumbnails[i];
 
                 // get source from thumb or image
                 var src = data.thumb || data.image;
@@ -1794,8 +1862,8 @@ Galleria.prototype = {
                 // so we resort to getComputedStyle for browsers who support it
                 var getStyle = function( prop ) {
                     return doc.defaultView && doc.defaultView.getComputedStyle ?
-                        doc.defaultView.getComputedStyle( thumb.container, null )[ prop ] :
-                        $container.css( prop );
+                      doc.defaultView.getComputedStyle( thumb.container, null )[ prop ] :
+                      $container.css( prop );
                 };
 
                 thumb.data = {
@@ -1806,12 +1874,11 @@ Galleria.prototype = {
 
                 // grab & reset size for smoother thumbnail loads
                 $container.css(( o.thumb_fit && o.thumb_crop !== true ) ?
-                    { width: 0, height: 0 } :
-                    { width: thumb.data.width, height: thumb.data.height });
+                  { width: 0, height: 0 } :
+                  { width: thumb.data.width, height: thumb.data.height });
 
                 // load the thumbnail
                 thumb.load( src, function( thumb ) {
-
                     // scale when ready
                     thumb.scale({
                         width:    thumb.data.width,
@@ -1819,7 +1886,6 @@ Galleria.prototype = {
                         crop:     o.thumb_crop,
                         margin:   o.thumb_margin,
                         complete: function( thumb ) {
-
                             // shrink thumbnails to fit
                             var top = ['left', 'top'];
                             var arr = ['Width', 'Height'];
@@ -1834,10 +1900,10 @@ Galleria.prototype = {
                                     css = {};
                                     css[top[i]] = 0;
                                     $( thumb.image ).css( css);
-                                }
+                                 }
 
-                                // cache outer meassures
-                                thumb['outer' + meassure] = $( thumb.container )['outer' + meassure]( true );
+                                 // cache outer meassures
+                                 thumb['outer' + meassure] = $( thumb.container )['outer' + meassure]( true );
                             });
 
                             // set high quality if downscale is moderate
@@ -1861,67 +1927,34 @@ Galleria.prototype = {
                     thumb.add( data.image );
                 }
 
-            // create empty spans if thumbnails is set to 'empty'
-            } else if ( optval == 'empty' || optval == 'numbers' ) {
 
-                thumb = {
-                    container:  Utils.create( 'galleria-image' ),
-                    image: Utils.create( 'img', 'span' ),
-                    ready: true
-                };
+                // add events for thumbnails
+                // you can control the event type using thumb_event_type
+                // we'll add the same event to the source if it's kept
+                $( thumb.container ).add( o.keep_source && o.link_source_images ? data.original : null )
+                    .data('index', i).bind(o.thumb_event_type, function(e) {
+                        // pause if option is set
+                        if ( o.pause_on_interaction ) {
+                            self.pause();
+                        }
 
-                // create numbered thumbnails
-                if ( optval == 'numbers' ) {
-                    $( thumb.image ).text( i + 1 );
-                }
-                
-                this.$( 'thumbnails' ).append( thumb.container );
-                
-                // we need to "fake" a loading delay before we append and trigger
-                // 50+ should be enough
-                
-                window.setTimeout((function(image, index, container) {
-                    return function() {
-                        $( container ).append( image );
-                        self.trigger({
-                            type: Galleria.THUMBNAIL,
-                            thumbTarget: image,
-                            index: index
-                        });
-                    }
-                })( thumb.image, i, thumb.container ), 50 + (i*20) );
-                
+                        // extract the index from the data
+                        var index = $( e.currentTarget ).data( 'index' );
+                        if ( self.getIndex() !== index ) {
+                            self.show( index );
+                        }
 
-            // create null object to silent errors
-            } else {
-                thumb = {
-                    container: null,
-                    image: null
-                };
+                        e.preventDefault();
+                });
             }
-
-            // add events for thumbnails
-            // you can control the event type using thumb_event_type
-            // we'll add the same event to the source if it's kept
-
-            $( thumb.container ).add( o.keep_source && o.link_source_images ? data.original : null )
-                .data('index', i).bind(o.thumb_event_type, function(e) {
-                    // pause if option is set
-                    if ( o.pause_on_interaction ) {
-                        self.pause();
-                    }
-
-                    // extract the index from the data
-                    var index = $( e.currentTarget ).data( 'index' );
-                    if ( self.getIndex() !== index ) {
-                        self.show( index );
-                    }
-
-                    e.preventDefault();
-            });
-
-            this._thumbnails.push( thumb );
         }
+    },
+
+    // the internal _run method should be called after loading data into galleria
+    // creates thumbnails and makes sure the gallery has proper meassurements
+    _run : function() {
+        // shortcuts
+        var self = this;
 
         // make sure we have a stageHeight && stageWidth
 
