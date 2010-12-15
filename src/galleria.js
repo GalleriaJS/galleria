@@ -1401,6 +1401,7 @@ Galleria.prototype = {
             image_pan: false,
             image_pan_smoothness: 12,
             image_position: '50%',
+            info_keys: ['title', 'description', 'author'],
             keep_source: false,
             lightbox_fade_speed: 200,
             lightbox_transition_speed: 500,
@@ -3137,9 +3138,9 @@ this.prependChild( 'info', 'myElement' );
     },
 
     /**
-        Manually set captions
+        Manually set info
 
-        @param {Number} index Optional data index to fectch and apply as caption,
+        @param {Number} index Optional data index to fetch and apply info,
         if no index found it assumes the currently active index
 
         @returns {Galleria}
@@ -3150,18 +3151,20 @@ this.prependChild( 'info', 'myElement' );
         var self = this,
             data = this.getData( index );
 
-        $.each( ['title','description','author'], function( i, type ) {
+        $.each( self._options.info_keys || [], function( i, key ) {
 
-            var elem = self.$( 'info-' + type );
+            var elem = self.$( 'info-' + key );
 
-            if ( !!data[type] ) {
-                elem[ data[ type ].length ? 'show' : 'hide' ]().html( data[ type ] );
+            if ( !!data[ key ] ) {
+                elem[ data[ key ].length ? 'show' : 'hide' ]().html( data[ key ] );
             } else {
                elem.empty().hide();
             }
+
         });
 
         return this;
+
     },
 
     /**
