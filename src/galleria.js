@@ -1,5 +1,5 @@
 /*
- * Galleria v 1.2 prerelease 1.1 2010-11-23
+ * Galleria v 1.2 prerelease 1.2 2011-01-06
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -493,9 +493,6 @@ Galleria = function() {
     // flag for controlling play/pause
     this._playing = false;
 
-    // internal interval for slideshow
-    this._playtime = 5000;
-
     // internal variable for the currently active image
     this._active = null;
 
@@ -770,7 +767,7 @@ Galleria = function() {
 
             tooltip.initialized = true;
 
-            var css = '.galleria-tooltip{padding:3px 8px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:11px;line-height:1.3' +
+            var css = '.galleria-tooltip{padding:2px 7px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:10px;line-height:1.2' +
                       'opacity:0;box-shadow:0 0 2px rgba(0,0,0,.4);-moz-box-shadow:0 0 2px rgba(0,0,0,.4);-webkit-box-shadow:0 0 2px rgba(0,0,0,.4);}';
 
             Utils.insertStyleTag(css);
@@ -911,7 +908,10 @@ Galleria = function() {
     // still kind of experimental
     var fullscreen = this._fullscreen = {
         scrolled: 0,
+        active: false,
         enter: function(callback) {
+            
+            fullscreen.active = true;
 
             // hide the image until rescale is complete
             Utils.hide( self.getActiveImage() );
@@ -974,7 +974,9 @@ Galleria = function() {
         },
 
         exit: function(callback) {
-
+            
+            fullscreen.active = false;
+            
             Utils.hide( self.getActiveImage() );
 
             self.$('container').removeClass( 'fullscreen' );
@@ -1085,11 +1087,10 @@ Galleria = function() {
                 }
 
                 elem.data('idle').complete = false;
-                
                 elem.stop().animate(data.to, {
-                    duration: 600,
+                    duration: self._options.idle_speed,
                     queue: false,
-                    easing: 'swing'
+                    easing: self._options.easing
                 });
             });
         },
@@ -1116,9 +1117,9 @@ Galleria = function() {
                 Utils.clearTimer( 'idle' );
 
                 elem.stop().animate(data.from, {
-                    duration: 300,
+                    duration: self._options.idle_speed/2,
                     queue: false,
-                    easing: 'swing',
+                    easing: self._options.easing,
                     complete: function() {
                         $(this).data('idle').busy = false;
                         $(this).data('idle').complete = true;
@@ -1217,7 +1218,7 @@ Galleria = function() {
 
             $.each( ['Prev','Next'], function(i, dir) {
 
-                var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '‹&nbsp;' : '&nbsp;›' );
+                var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&nbsp;' : '&nbsp;&#8250;' );
 
                 $( el[ dir.toLowerCase()+'holder'] ).hover(function() {
                     $d.show();
@@ -1396,11 +1397,13 @@ Galleria.prototype = {
             extend: function(options) {},
             height: 'auto',
             idle_time: 3000,
+            idle_speed: 1200,
             image_crop: false,
             image_margin: 0,
             image_pan: false,
             image_pan_smoothness: 12,
             image_position: '50%',
+            interval: 5000, // 2010-11-24
             keep_source: false,
             lightbox_fade_speed: 200,
             lightbox_transition_speed: 500,
@@ -1557,7 +1560,7 @@ Galleria.prototype = {
 
         // postrun some stuff after the gallery is ready
         // make sure it only runs once
-        var one = false;
+        var second = false;
 
         this.bind( Galleria.READY, function() {
 
@@ -1585,22 +1588,24 @@ Galleria.prototype = {
                 this.pause();
 
                 if ( typeof this._options.autoplay == 'number' ) {
-                    this._playtime = this._options.autoplay;
+                    this._options.interval = this._options.autoplay;
                 }
-
-                this.trigger( Galleria.PLAY );
+                
                 this._playing = true;
             }
 
             // if second load, just do the show and return
-            if ( one ) {
+            if ( second ) {
                 if ( typeof this._options.show == 'number' ) {
                     this.show( this._options.show );
+                }
+                if ( this._options.autoplay ) {
+                    this.trigger( Galleria.PLAY );
                 }
                 return;
             }
 
-            one = true;
+            second = true;
 
             // initialize the History plugin
             if ( Galleria.History ) {
@@ -1628,7 +1633,13 @@ Galleria.prototype = {
 
             // call the extend option
             this._options.extend.call( this, this._options );
-
+            
+            // trigger play if autoplay is set
+            // we must do this after the init/extend call to include any binds
+            if ( this._options.autoplay ) {
+                this.trigger( Galleria.PLAY );
+            }
+            
             // show the initial image
             // first test for permalinks in history
             if ( /^[0-9]{1,4}$/.test( HASH ) && Galleria.History ) {
@@ -2161,13 +2172,26 @@ Galleria.prototype = {
     /**
         Exits FullScreen mode
 
-        @param {Function} callback the function to be executed when the fullscreen mode is fully applied.
+        @param {Function} callback the function to be executed when the fullscreen mode is fully removed.
 
         @returns {Galleria}
     */
 
     exitFullscreen: function( callback ) {
         this._fullscreen.exit.apply( this, Utils.array( arguments ) );
+        return this;
+    },
+    
+    /**
+        Toggle FullScreen mode
+
+        @param {Function} callback the function to be executed when the fullscreen mode is fully applied or removed.
+
+        @returns {Galleria}
+    */
+
+    toggleFullscreen: function( callback ) {
+        this._fullscreen[ this.isFullscreen() ? 'exit' : 'enter'].apply( this, Utils.array( arguments ) );
         return this;
     },
 
@@ -3022,7 +3046,7 @@ this.prependChild( 'info', 'myElement' );
         
         this._playing = true;
         
-        this._playtime = delay || this._playtime;
+        this._options.interval = delay || this._options.interval;
 
         this._playCheck();
         
@@ -3067,6 +3091,16 @@ this.prependChild( 'info', 'myElement' );
     isPlaying : function() {
         return this._playing;
     },
+    
+    /**
+        Checks if the gallery is currently in fullscreen mode
+
+        @returns {Boolean}
+    */
+    
+    isFullscreen : function() {
+        return this._fullscreen.active;
+    },
 
     _playCheck : function() {
         var self = this,
@@ -3080,7 +3114,7 @@ this.prependChild( 'info', 'myElement' );
             var fn = function() {
 
                 played = Utils.timestamp() - now;
-                if ( played >= self._playtime && self._playing ) {
+                if ( played >= self._options.interval && self._playing ) {
                     Utils.clearTimer('play');
                     self.next();
                     return;
@@ -3090,7 +3124,7 @@ this.prependChild( 'info', 'myElement' );
                     // trigger the PROGRESS event
                     self.trigger({
                         type:         Galleria.PROGRESS,
-                        percent:      Math.ceil( played / self._playtime * 100 ),
+                        percent:      Math.ceil( played / self._options.interval * 100 ),
                         seconds:      Math.floor( played / 1000 ),
                         milliseconds: played
                     });
@@ -3518,6 +3552,8 @@ Galleria.Picture = function( id ) {
 };
 
 Galleria.Picture.prototype = {
+    
+    constructor: Galleria.Picture,
 
     // the inherited cache object
     cache: {},
@@ -3782,18 +3818,22 @@ Galleria.Picture.prototype = {
 
 // our own easings
 $.extend( $.easing, {
+    
     galleria: function (_, t, b, c, d) {
         if ((t/=d/2) < 1) {
             return c/2*t*t*t*t + b;
         }
         return -c/2 * ((t-=2)*t*t*t - 2) + b;
     },
+    
     galleriaIn: function (_, t, b, c, d) {
-    return c*(t/=d)*t*t*t + b;
-  },
-  galleriaOut: function (_, t, b, c, d) {
-    return -c * ((t=t/d-1)*t*t*t - 1) + b;
-  }
+        return c*(t/=d)*t*t*t + b;
+    },
+    
+    galleriaOut: function (_, t, b, c, d) {
+        return -c * ((t=t/d-1)*t*t*t - 1) + b;
+    }
+    
 });
 
 // the plugin initializer
