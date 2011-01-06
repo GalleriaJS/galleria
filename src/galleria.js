@@ -493,6 +493,9 @@ Galleria = function() {
     // flag for controlling play/pause
     this._playing = false;
 
+    // internal interval for slideshow
+    this._playtime = 5000;
+
     // internal variable for the currently active image
     this._active = null;
 
@@ -767,7 +770,7 @@ Galleria = function() {
 
             tooltip.initialized = true;
 
-            var css = '.galleria-tooltip{padding:2px 7px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:10px;line-height:1.2' +
+            var css = '.galleria-tooltip{padding:3px 8px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:11px;line-height:1.3' +
                       'opacity:0;box-shadow:0 0 2px rgba(0,0,0,.4);-moz-box-shadow:0 0 2px rgba(0,0,0,.4);-webkit-box-shadow:0 0 2px rgba(0,0,0,.4);}';
 
             Utils.insertStyleTag(css);
@@ -976,7 +979,7 @@ Galleria = function() {
         exit: function(callback) {
             
             fullscreen.active = false;
-            
+
             Utils.hide( self.getActiveImage() );
 
             self.$('container').removeClass( 'fullscreen' );
@@ -1010,7 +1013,6 @@ Galleria = function() {
     };
 
     // the internal idle object for controlling idle states
-    // TODO occational event conflicts
     var idle = this._idle = {
 
         trunk: [],
@@ -1087,10 +1089,11 @@ Galleria = function() {
                 }
 
                 elem.data('idle').complete = false;
+                
                 elem.stop().animate(data.to, {
                     duration: self._options.idle_speed,
                     queue: false,
-                    easing: self._options.easing
+                    easing: 'swing'
                 });
             });
         },
@@ -1119,7 +1122,7 @@ Galleria = function() {
                 elem.stop().animate(data.from, {
                     duration: self._options.idle_speed/2,
                     queue: false,
-                    easing: self._options.easing,
+                    easing: 'swing',
                     complete: function() {
                         $(this).data('idle').busy = false;
                         $(this).data('idle').complete = true;
@@ -1169,8 +1172,8 @@ Galleria = function() {
                     info:       'position:absolute;bottom:10px;left:10px;right:10px;color:#444;font:11px/13px arial,sans-serif;height:13px',
                     close:      'position:absolute;top:10px;right:10px;height:20px;width:20px;background:#fff;text-align:center;cursor:pointer;color:#444;font:16px/22px arial,sans-serif;z-index:99999',
                     image:      'position:absolute;top:10px;left:10px;right:10px;bottom:30px;overflow:hidden',
-                    prevholder: 'position:absolute;width:50%;height:100%;cursor:pointer',
-                    nextholder: 'position:absolute;width:50%;height:100%;right:0;cursor:pointer',
+                    prevholder: 'position:absolute;width:50%;height:100%;cursor:pointer;background:#000;background:rgba(0,0,0,0);filter:alpha(opacity=0);',
+                    nextholder: 'position:absolute;width:50%;height:100%;right:-1px;cursor:pointer;background:#000;background:rgba(0,0,0,0);filter:alpha(opacity=0);',
                     prev:       'position:absolute;top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;left:20px;display:none;line-height:40px;text-align:center;color:#000',
                     next:       'position:absolute;top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;right:20px;left:auto;display:none;line-height:40px;text-align:center;color:#000',
                     title:      'float:left',
@@ -1220,9 +1223,10 @@ Galleria = function() {
 
                 var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&nbsp;' : '&nbsp;&#8250;' );
 
-                $( el[ dir.toLowerCase()+'holder'] ).hover(function() {
+                $( el[ dir.toLowerCase()+'holder'] ).hover(function(e) {
                     $d.show();
-                }, function() {
+                }, function(e) {
+                    e.stopPropagation();
                     $d.fadeOut( 200 );
                 }).bind( CLICK(), function() {
                     lightbox[ 'show' + dir ]();
@@ -1397,13 +1401,12 @@ Galleria.prototype = {
             extend: function(options) {},
             height: 'auto',
             idle_time: 3000,
-            idle_speed: 1200,
+            idle_speed: 200,
             image_crop: false,
             image_margin: 0,
             image_pan: false,
             image_pan_smoothness: 12,
             image_position: '50%',
-            interval: 5000, // 2010-11-24
             keep_source: false,
             lightbox_fade_speed: 200,
             lightbox_transition_speed: 500,
@@ -1560,7 +1563,7 @@ Galleria.prototype = {
 
         // postrun some stuff after the gallery is ready
         // make sure it only runs once
-        var second = false;
+        var one = false;
 
         this.bind( Galleria.READY, function() {
 
@@ -1588,24 +1591,22 @@ Galleria.prototype = {
                 this.pause();
 
                 if ( typeof this._options.autoplay == 'number' ) {
-                    this._options.interval = this._options.autoplay;
+                    this._playtime = this._options.autoplay;
                 }
-                
+
+                this.trigger( Galleria.PLAY );
                 this._playing = true;
             }
 
             // if second load, just do the show and return
-            if ( second ) {
+            if ( one ) {
                 if ( typeof this._options.show == 'number' ) {
                     this.show( this._options.show );
-                }
-                if ( this._options.autoplay ) {
-                    this.trigger( Galleria.PLAY );
                 }
                 return;
             }
 
-            second = true;
+            one = true;
 
             // initialize the History plugin
             if ( Galleria.History ) {
@@ -1633,13 +1634,7 @@ Galleria.prototype = {
 
             // call the extend option
             this._options.extend.call( this, this._options );
-            
-            // trigger play if autoplay is set
-            // we must do this after the init/extend call to include any binds
-            if ( this._options.autoplay ) {
-                this.trigger( Galleria.PLAY );
-            }
-            
+
             // show the initial image
             // first test for permalinks in history
             if ( /^[0-9]{1,4}$/.test( HASH ) && Galleria.History ) {
@@ -2001,8 +1996,16 @@ Galleria.prototype = {
         // check if the data is an array already
         if ( source.constructor == Array ) {
             if ( this.validate( source) ) {
+                
+                // copy image as thumb if no thumb exists
+                $.each( source, function( i, data ) {
+                    if ( 'thumb' in data == false ) {
+                        source[i].thumb = data.image;
+                    }
+                });
                 this._data = source;
                 this.trigger( Galleria.DATA );
+                
             } else {
                 Galleria.raise( 'Load failed: JSON Array not valid.' );
             }
@@ -2172,7 +2175,7 @@ Galleria.prototype = {
     /**
         Exits FullScreen mode
 
-        @param {Function} callback the function to be executed when the fullscreen mode is fully removed.
+        @param {Function} callback the function to be executed when the fullscreen mode is fully applied.
 
         @returns {Galleria}
     */
@@ -2181,6 +2184,7 @@ Galleria.prototype = {
         this._fullscreen.exit.apply( this, Utils.array( arguments ) );
         return this;
     },
+    
     
     /**
         Toggle FullScreen mode
@@ -3046,7 +3050,7 @@ this.prependChild( 'info', 'myElement' );
         
         this._playing = true;
         
-        this._options.interval = delay || this._options.interval;
+        this._playtime = delay || this._playtime;
 
         this._playCheck();
         
@@ -3114,7 +3118,7 @@ this.prependChild( 'info', 'myElement' );
             var fn = function() {
 
                 played = Utils.timestamp() - now;
-                if ( played >= self._options.interval && self._playing ) {
+                if ( played >= self._playtime && self._playing ) {
                     Utils.clearTimer('play');
                     self.next();
                     return;
@@ -3124,7 +3128,7 @@ this.prependChild( 'info', 'myElement' );
                     // trigger the PROGRESS event
                     self.trigger({
                         type:         Galleria.PROGRESS,
-                        percent:      Math.ceil( played / self._options.interval * 100 ),
+                        percent:      Math.ceil( played / self._playtime * 100 ),
                         seconds:      Math.floor( played / 1000 ),
                         milliseconds: played
                     });
@@ -3552,8 +3556,6 @@ Galleria.Picture = function( id ) {
 };
 
 Galleria.Picture.prototype = {
-    
-    constructor: Galleria.Picture,
 
     // the inherited cache object
     cache: {},
@@ -3750,7 +3752,7 @@ Galleria.Picture.prototype = {
 
                 // round up the width / height
                 $.each( ['width','height'], function( i, m ) {
-                    $( self.image )[ m ]( self[ m ] = Math.ceil( self.original[ m ] * ratio ) );
+                    $( self.image )[ m ]( self.image[m] = self[ m ] = Math.ceil( self.original[ m ] * ratio ) );
                 });
 
                 // calculate image_position
@@ -3759,8 +3761,10 @@ Galleria.Picture.prototype = {
                     getPosition = function(value, meassure, margin) {
                         var result = 0;
                         if (/\%/.test(value)) {
-                            var flt = parseInt(value) / 100;
-                            result = Math.ceil( $( self.image )[ meassure ]() * -1 * flt + margin * flt );
+                            var flt = parseInt(value) / 100,
+                                m = self.image[ meassure ] || $( self.image )[ meassure ]();
+                                
+                            result = Math.ceil( m * -1 * flt + margin * flt );
                         } else {
                             result = Utils.parseValue( value );
                         }
@@ -3818,22 +3822,18 @@ Galleria.Picture.prototype = {
 
 // our own easings
 $.extend( $.easing, {
-    
     galleria: function (_, t, b, c, d) {
         if ((t/=d/2) < 1) {
             return c/2*t*t*t*t + b;
         }
         return -c/2 * ((t-=2)*t*t*t - 2) + b;
     },
-    
     galleriaIn: function (_, t, b, c, d) {
-        return c*(t/=d)*t*t*t + b;
-    },
-    
-    galleriaOut: function (_, t, b, c, d) {
-        return -c * ((t=t/d-1)*t*t*t - 1) + b;
-    }
-    
+    return c*(t/=d)*t*t*t + b;
+  },
+  galleriaOut: function (_, t, b, c, d) {
+    return -c * ((t=t/d-1)*t*t*t - 1) + b;
+  }
 });
 
 // the plugin initializer
