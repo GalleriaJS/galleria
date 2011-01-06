@@ -1165,19 +1165,20 @@ Galleria = function() {
                 op = self._options,
                 css = '',
                 cssMap = {
-                    overlay:    'position:fixed;display:none;opacity:'+op.overlay_opacity+';top:0;left:0;width:100%;height:100%;background:'+op.overlay_background+';z-index:99990',
+                    overlay:    'position:fixed;display:none;opacity:'+op.overlay_opacity+';filter:alpha(opacity='+(op.overlay_opacity*100)+
+                                ');top:0;left:0;width:100%;height:100%;background:'+op.overlay_background+';z-index:99990',
                     box:        'position:fixed;display:none;width:400px;height:400px;top:50%;left:50%;margin-top:-200px;margin-left:-200px;z-index:99991',
                     shadow:     'position:absolute;background:#000;width:100%;height:100%;',
                     content:    'position:absolute;background-color:#fff;top:10px;left:10px;right:10px;bottom:10px;overflow:hidden',
                     info:       'position:absolute;bottom:10px;left:10px;right:10px;color:#444;font:11px/13px arial,sans-serif;height:13px',
                     close:      'position:absolute;top:10px;right:10px;height:20px;width:20px;background:#fff;text-align:center;cursor:pointer;color:#444;font:16px/22px arial,sans-serif;z-index:99999',
-                    image:      'position:absolute;top:10px;left:10px;right:10px;bottom:30px;overflow:hidden',
-                    prevholder: 'position:absolute;width:50%;height:100%;cursor:pointer;background:#000;background:rgba(0,0,0,0);filter:alpha(opacity=0);',
-                    nextholder: 'position:absolute;width:50%;height:100%;right:-1px;cursor:pointer;background:#000;background:rgba(0,0,0,0);filter:alpha(opacity=0);',
+                    image:      'position:absolute;top:10px;left:10px;right:10px;bottom:30px;overflow:hidden;display:block;',
+                    prevholder: 'position:absolute;width:50%;top:0;bottom:40px;cursor:pointer;',
+                    nextholder: 'position:absolute;width:50%;top:0;bottom:40px;right:-1px;cursor:pointer;',
                     prev:       'position:absolute;top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;left:20px;display:none;line-height:40px;text-align:center;color:#000',
                     next:       'position:absolute;top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;right:20px;left:auto;display:none;line-height:40px;text-align:center;color:#000',
                     title:      'float:left',
-                    counter:    'float:right;margin-left:8px'
+                    counter:    'float:right;margin-left:8px;'
                 },
                 hover = function(elem) {
                     return elem.hover(
@@ -1185,6 +1186,12 @@ Galleria = function() {
                         function() { $(this).css( 'color', '#444' ); }
                     );
                 };
+            
+            // IE8 fix for IE's transparent background event "feature"
+            if ( IE == 8 ) {
+                cssMap.nextholder += 'background:#000;filter:alpha(opacity=0);';
+                cssMap.prevholder += 'background:#000;filter:alpha(opacity=0);';
+            }
 
             // create and insert CSS
             $.each(cssMap, function( key, value ) {
@@ -1218,24 +1225,37 @@ Galleria = function() {
             // add the prev/next nav and bind some controls
 
             hover( $( el.close ).bind( CLICK(), lightbox.hide ).html('&#215;') );
+            
+            var over = false,
+                hide = true;
 
             $.each( ['Prev','Next'], function(i, dir) {
 
-                var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&nbsp;' : '&nbsp;&#8250;' );
-
-                $( el[ dir.toLowerCase()+'holder'] ).hover(function(e) {
+                var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&nbsp;' : '&nbsp;&#8250;' ),
+                    $e = $( el[ dir.toLowerCase()+'holder'] );
+                
+                $e.bind( CLICK(), function() {
+                    lightbox[ 'show' + dir ]();
+                });
+                
+                // IE7 will simply show the nav
+                if ( IE < 8 ) {
+                    $d.show();
+                    return;
+                }
+                
+                $e.hover( function() {
                     $d.show();
                 }, function(e) {
-                    e.stopPropagation();
-                    $d.fadeOut( 200 );
-                }).bind( CLICK(), function() {
-                    lightbox[ 'show' + dir ]();
+                    $d.stop().fadeOut( 200 );
                 });
 
             });
             $( el.overlay ).bind( CLICK(), lightbox.hide );
 
         },
+        
+        
 
         rescale: function(event) {
 
@@ -1568,7 +1588,7 @@ Galleria.prototype = {
         this.bind( Galleria.READY, function() {
 
             // show counter
-            Utils.show( this.get('counter') );
+            Utils.show( this.$('counter') );
 
             // bind clicknext
             if ( this._options.clicknext ) {
@@ -3164,10 +3184,17 @@ this.prependChild( 'info', 'myElement' );
 
         this.get( 'current' ).innerHTML = index;
 
-        if ( IE == 8 ) { // weird IE8 bug
+        if ( IE ) { // weird IE bug
 
-            var opacity = this.$( 'counter' ).css( 'opacity' );
-            this.$( 'counter' ).css( 'opacity', opacity );
+            var count = this.$( 'counter' );
+                opacity = count.css( 'opacity' ),
+                style = count.attr('style');
+                
+            if (opacity == 1) {
+                count.attr('style', style.replace(/filter[^\;]+\;/i,''));
+            } else {
+                this.$( 'counter' ).css( 'opacity', opacity );
+            }
 
         }
 
