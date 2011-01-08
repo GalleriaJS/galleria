@@ -50,17 +50,17 @@ You can also define the images as a JSON array::
 
     var data = [
         {
-            image: 'img1.jpg'
-            thumb: 'thumb1.jpg'
+            image: 'img1.jpg',
+            thumb: 'thumb1.jpg',
             title: 'my first image',
-            description: 'Lorem ipsum caption'
+            description: 'Lorem ipsum caption',
             link: 'http://domain.com'
         },
         {
-            image: 'img2.jpg'
-            thumb: 'thumb2.jpg'
+            image: 'img2.jpg',
+            thumb: 'thumb2.jpg',
             title: 'my second image',
-            description: 'Another caption'
+            description: 'Another caption',
             link: '/path/to/destination.html'
         }
     ];
