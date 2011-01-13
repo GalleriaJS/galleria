@@ -1,6 +1,6 @@
-***************
-Getting started
-***************
+***********
+Quick start
+***********
 
 .. highlight:: javascript
 
