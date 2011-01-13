@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <title>Galleria Classic Theme</title>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-        <script src="../../../src/galleria.js"></script>
+        <script src="../../galleria.js"></script>
         <style>
             html,body{background:#333}
             .content{color:#eee;font:14px/1.4 "helvetica neue", arial,sans-serif;width:620px;margin:20px auto}
@@ -35,7 +35,11 @@
     // Load the classic theme
     Galleria.loadTheme('galleria.classic.js');
     // Initialize Galleria
-    $('#galleria').galleria();
+    $('#galleria').galleria({
+        extend: function() {
+
+        }
+    });
     </script>
     </body>
 </html>

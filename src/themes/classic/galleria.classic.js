@@ -49,6 +49,7 @@ Galleria.addTheme({
             this.addIdleState( this.get('image-nav-left'), { left:-50 });
             this.addIdleState( this.get('image-nav-right'), { right:-50 });
             this.addIdleState( this.get('counter'), { opacity:0 });
+            
         }
         
         // toggle info
@@ -59,11 +60,11 @@ Galleria.addTheme({
         }
         
         // bind some stuff
-        this.bind(Galleria.THUMBNAIL, function(e) {
+        this.bind('thumbnail', function(e) {
             $(e.thumbTarget).parent(':not(.active)').children().css('opacity',.6)
         });
         
-        this.bind(Galleria.LOADSTART, function(e) {
+        this.bind('loadstart', function(e) {
             if (!e.cached) {
                 this.$('loader').show().fadeTo(200, .4);
             }
@@ -73,7 +74,7 @@ Galleria.addTheme({
             $(e.thumbTarget).css('opacity',1).parent().siblings().children().css('opacity',.6);
         });
         
-        this.bind(Galleria.LOADFINISH, function(e) {
+        this.bind('loadfinish', function(e) {
             this.$('loader').fadeOut(200);
         });
     }
