@@ -39,6 +39,21 @@ var DEBUG = false,
             title: doc.title
         };
     },
+    
+    // list of Galleria events
+    _events = 'data ready thumbnail loadstart loadfinish image themeload play pause progress fullscreen_enter fullscreen_exit ' +
+              'idle_enter idle_exit rescale lightbox_open lightbox_close lightbox_image',
+    
+    _events = _events.split(' '),
+    
+    _patchEvent = function( type ) {
+        
+        // allow 'image' instead of Galleria.IMAGE
+        if ( $.inArray( type, _events ) > -1 ) {
+            return Galleria[ type.toUpperCase() ];
+        };
+        return type;
+    }
 
     // the internal timeouts object
     // provides helper methods for controlling timeouts
@@ -1077,7 +1092,6 @@ Galleria = function() {
         },
 
         hide : function() {
-
             self.trigger( Galleria.IDLE_ENTER );
 
             $.each( idle.trunk, function(i, elem) {
@@ -2092,6 +2106,10 @@ Galleria.prototype = {
     */
 
     bind : function(type, fn) {
+
+        // allow 'image' instead of Galleria.IMAGE
+        type = _patchEvent( type );
+
         this.$( 'container' ).bind( type, this.proxy(fn) );
         return this;
     },
@@ -2105,6 +2123,9 @@ Galleria.prototype = {
     */
 
     unbind : function(type) {
+        
+        type = _patchEvent( type );
+        
         this.$( 'container' ).unbind( type );
         return this;
     },
@@ -2118,10 +2139,13 @@ Galleria.prototype = {
     */
 
     trigger : function( type ) {
+
         type = typeof type == 'object' ?
             $.extend( type, { scope: this } ) :
-            { type: type, scope: this };
+            { type: _patchEvent( type ), scope: this };
+        
         this.$( 'container' ).trigger( type );
+        
         return this;
     },
 
@@ -3293,27 +3317,15 @@ this.prependChild( 'info', 'myElement' );
 
 // End of Galleria prototype
 
-$.extend( Galleria, {
 
-    // Event placeholders
-    DATA:             'g_data',
-    READY:            'g_ready',
-    THUMBNAIL:        'g_thumbnail',
-    LOADSTART:        'g_loadstart',
-    LOADFINISH:       'g_loadfinish',
-    IMAGE:            'g_image',
-    THEMELOAD:        'g_themeload',
-    PLAY:             'g_play',
-    PAUSE:            'g_pause',
-    PROGRESS:         'g_progress',
-    FULLSCREEN_ENTER: 'g_fullscreen_enter',
-    FULLSCREEN_EXIT:  'g_fullscreen_exit',
-    IDLE_ENTER:       'g_idle_enter',
-    IDLE_EXIT:        'g_idle_exit',
-    RESCALE:          'g_rescale',
-    LIGHTBOX_OPEN:    'g_lightbox_open',
-    LIGHTBOX_CLOSE:   'g_lightbox_close',
-    LIGHTBOX_IMAGE:   'g_lightbox_image',
+// Add events as static variables
+$.each( _events, function( i, ev ) {
+    
+    Galleria[ ev.toUpperCase() ] = 'galleria.'+ev;
+    
+} );
+
+$.extend( Galleria, {
 
     // Browser helpers
     IE9:     IE == 9,

@@ -63,7 +63,8 @@ Galleria.addTheme({
                 this.$('iefix').width(info.outerWidth()).height(info.outerHeight());
             }
         });
-        this.bind(Galleria.RESCALE, function() {
+        
+        this.bind('rescale', function() {
             POS = this.getStageHeight() - tab.height() - 2;
             thumbs.css('top', OPEN ? POS - list.outerHeight() + 2 : POS);
             var img = this.getActiveImage();
@@ -72,23 +73,23 @@ Galleria.addTheme({
             }
         });
 
-        this.bind(Galleria.LOADSTART, function(e) {
+        this.bind('loadstart', function(e) {
             if (!e.cached) {
                 loader.show().fadeTo(100, 1);
             }
             $(e.thumbTarget).css('opacity', 1).parent().siblings().children().css('opacity', .6);
         });
 
-        this.bind(Galleria.LOADFINISH, function(e) {
+        this.bind('loadfinish', function(e) {
             loader.fadeOut(300);
             this.$('info, iefix').toggle(this.hasInfo());
         });
 
-        this.bind(Galleria.IMAGE, function(e) {
+        this.bind('image', function(e) {
             fixCaption(e.imageTarget);
         });
 
-        this.bind(Galleria.THUMBNAIL, function(e) {
+        this.bind('thumbnail', function(e) {
             $(e.thumbTarget).parent(':not(.active)').children().css('opacity', .6);
             $(e.thumbTarget).click(function() {
                 if (OPEN && options._close_on_click) {
@@ -97,7 +98,7 @@ Galleria.addTheme({
             });
         });
 
-        this.trigger(Galleria.RESCALE);
+        this.trigger('rescale');
 
         this.addIdleState(thumbs, { opacity: 0 });
         this.addIdleState(this.get('info'), { opacity: 0 });
@@ -127,7 +128,7 @@ Galleria.addTheme({
                 OPEN = !OPEN;
             }));
         } else {
-            this.bind(Galleria.THUMBNAIL, function() {
+            this.bind('thumbnail', function() {
                 thumbs.css('top', POS - list.outerHeight() + 2);
             });
             tab.css('visibility', 'hidden');
