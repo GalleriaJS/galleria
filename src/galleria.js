@@ -62,6 +62,25 @@ var DEBUG = false,
         
     })(),
     
+    // legacy options
+    // allows the old my_setting syntax and converts it to camel case
+    
+    _legacyOptions = function( options ) {
+        
+        $.each( options, function( key, value ) {
+            if ( /^[a-z]+_/.test( key ) ) {
+                n = '';
+                $.each( key.split('_'), function( i, k ) {
+                    n += i > 0 ? k.substr( 0, 1 ).toUpperCase() + k.substr( 1 ) : k;
+                });
+                options[ n ] = value;
+                delete options[ key ];
+            }
+        });
+
+        return options;
+    },
+    
     _patchEvent = function( type ) {
         
         // allow 'image' instead of Galleria.IMAGE
@@ -899,11 +918,11 @@ Galleria = function() {
             
             var text = elem.data( 'tt' );
             
+            text = typeof text == 'function' ? text() : text;
+            
             if ( ! text ) {
                 return;
             }
-            
-            text = typeof text == 'function' ? text() : text;
             
             self.$( 'tooltip' ).html( text.replace(/\s/, '&nbsp;') );
             
@@ -1196,8 +1215,8 @@ Galleria = function() {
                 op = self._options,
                 css = '',
                 cssMap = {
-                    overlay:    'position:fixed;display:none;opacity:'+op.overlay_opacity+';filter:alpha(opacity='+(op.overlay_opacity*100)+
-                                ');top:0;left:0;width:100%;height:100%;background:'+op.overlay_background+';z-index:99990',
+                    overlay:    'position:fixed;display:none;opacity:'+op.overlayOpacity+';filter:alpha(opacity='+(op.overlayOpacity*100)+
+                                ');top:0;left:0;width:100%;height:100%;background:'+op.overlayBackground+';z-index:99990',
                     box:        'position:fixed;display:none;width:400px;height:400px;top:50%;left:50%;margin-top:-200px;margin-left:-200px;z-index:99991',
                     shadow:     'position:absolute;background:#000;width:100%;height:100%;',
                     content:    'position:absolute;background-color:#fff;top:10px;left:10px;right:10px;bottom:10px;overflow:hidden',
@@ -1418,18 +1437,7 @@ Galleria.prototype = {
         var self = this,
             n;
         
-        // legacy options
-        
-        $.each( options, function( key, value ) {
-            if ( /_/.test( key ) ) {
-                n = '';
-                $.each( key.split('_'), function( i, k ) {
-                    n += i > 0 ? k.substr( 0, 1 ).toUpperCase() + k.substr( 1 ) : k;
-                });
-                options[ n ] = value;
-                delete options[ key ];
-            }
-        });
+        options = _legacyOptions( options );
 
         // save the instance
         _galleries.push( this );
@@ -3401,6 +3409,8 @@ Galleria.addTheme = function( theme ) {
 
     if ( typeof theme.defaults != 'object' ) {
         theme.defaults = {};
+    } else {
+        theme.defaults = _legacyOptions( theme.defaults );
     }
 
     if ( typeof theme.css == 'string' ) {

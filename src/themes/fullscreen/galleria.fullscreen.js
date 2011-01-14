@@ -15,12 +15,15 @@ Galleria.addTheme({
     css: 'galleria.fullscreen.css',
     defaults: {
         transition: 'none',
-        image_crop: true,
-        thumb_crop: 'height',
+        imageCrop: true,
+        thumbCrop: 'height',
+        easing: 'galleriaOut',
+        
         // set this to false if you want to keep the thumbnails:
-        _hide_dock: true,
+        _hideDock: true,
+        
         // set this to true if you want to shrink the carousel when clicking a thumbnail:
-        _close_on_click: false
+        _closeOnClick: false
     },
     init: function(options) {
 
@@ -33,7 +36,7 @@ Galleria.addTheme({
             list     = this.$('thumbnails-list'),
             infotext = this.$('info-text'),
             info     = this.$('info'),
-            OPEN     = !options._hide_dock,
+            OPEN     = !options._hideDock,
             POS      = 0,
             CLICK    = Galleria.TOUCH ? 'touchstart' : 'click';
 
@@ -92,7 +95,7 @@ Galleria.addTheme({
         this.bind('thumbnail', function(e) {
             $(e.thumbTarget).parent(':not(.active)').children().css('opacity', .6);
             $(e.thumbTarget).click(function() {
-                if (OPEN && options._close_on_click) {
+                if (OPEN && options._closeOnClick) {
                     tab.click();
                 }
             });
@@ -113,17 +116,17 @@ Galleria.addTheme({
             $(this).animate({opacity: 0});
         }).show();
 
-        if (options._hide_dock) {
+        if (options._hideDock) {
             tab.click(this.proxy(function() {
                 tab.toggleClass('open', !OPEN);
                 if (!OPEN) {
                     thumbs.animate({
                         top: POS - list.outerHeight() + 2
-                    }, 400, 'galleria');
+                    }, 400, options.easing);
                 } else {
                     thumbs.animate({
                         top: POS
-                    }, 400, 'galleria');
+                    }, 400, options.easing);
                 }
                 OPEN = !OPEN;
             }));

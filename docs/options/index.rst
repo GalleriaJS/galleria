@@ -11,6 +11,14 @@ Options
 
 .. highlight:: javascript
 
+The Galleria options covers most of the gallery customizations you will need for each implementation. 
+Below you will find a summary of all options available. Click on a option title for more explanations and examples.
+
+These options are the standard options that you can use for all themes. However, themes can add new options and set/modify default values on their own. Please check each theme documentation for full coverage. Custom options for each theme starts with an underscore.
+
+
+Using options
+=============
 
 Galleria options are defined using a flat object during initialization.::
 
@@ -20,11 +28,10 @@ Galleria options are defined using a flat object during initialization.::
         image_crop: true
     });
 
-.. note:: Themes can add new options and set/modify default values, please check each theme documentation for coverage. Custom options for each theme starts with an underscore.
-
 
 List of options
 ===============
+
 - :doc:`autoplay` Sets Galleria to play slidehow when initialized.
 
 - :doc:`carousel` Toggle the creation of a carousel.
@@ -39,7 +46,7 @@ List of options
 - :doc:`clicknext` Helper for adding a click event on the entire stage to move
   forward.
 
-- :doc:`dataConfig` Defines how Galleria should parse the HTML.
+- :doc:`dataConfig` Defines how Galleria should parse the HTML. Useful for adding custom HTML captions.
 
 - :doc:`dataSelector` Defines the selector Galleria should look for in the
   source.
