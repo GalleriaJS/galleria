@@ -41,10 +41,26 @@ var DEBUG = false,
     },
     
     // list of Galleria events
-    _events = 'data ready thumbnail loadstart loadfinish image themeload play pause progress fullscreen_enter fullscreen_exit ' +
-              'idle_enter idle_exit rescale lightbox_open lightbox_close lightbox_image',
+    _events = 'data ready thumbnail loadstart loadfinish image themeload play pause progress ' + 
+              'fullscreen_enter fullscreen_exit idle_enter idle_exit rescale ' +
+              'lightbox_open lightbox_close lightbox_image',
     
-    _events = _events.split(' '),
+    _events = (function() {
+
+        var evs = [];
+        
+        $.each( _events.split(' '), function( i, ev ) {
+            evs.push( ev );
+            
+            // legacy events
+            if ( /_/.test( ev ) ) {
+                evs.push( ev.replace( /_/g, '' ) );
+            }
+        });
+
+        return evs;
+        
+    })(),
     
     _patchEvent = function( type ) {
         
@@ -52,8 +68,9 @@ var DEBUG = false,
         if ( $.inArray( type, _events ) > -1 ) {
             return Galleria[ type.toUpperCase() ];
         };
+        
         return type;
-    }
+    },
 
     // the internal timeouts object
     // provides helper methods for controlling timeouts
@@ -675,7 +692,7 @@ Galleria = function() {
             carousel.next.bind( CLICK(), function(e) {
                 e.preventDefault();
 
-                if ( self._options.carousel_steps == 'auto' ) {
+                if ( self._options.carouselSteps == 'auto' ) {
 
                     for ( var i = carousel.current; i < carousel.hooks.length; i++ ) {
                         if ( carousel.hooks[i] - carousel.hooks[ carousel.current ] > carousel.width ) {
@@ -685,14 +702,14 @@ Galleria = function() {
                     }
 
                 } else {
-                    carousel.set( carousel.current + self._options.carousel_steps);
+                    carousel.set( carousel.current + self._options.carouselSteps);
                 }
             });
 
             carousel.prev.bind( CLICK(), function(e) {
                 e.preventDefault();
 
-                if ( self._options.carousel_steps == 'auto' ) {
+                if ( self._options.carouselSteps == 'auto' ) {
 
                     for ( var i = carousel.current; i >= 0; i-- ) {
                         if ( carousel.hooks[ carousel.current ] - carousel.hooks[i] > carousel.width ) {
@@ -704,7 +721,7 @@ Galleria = function() {
                         }
                     }
                 } else {
-                    carousel.set( carousel.current - self._options.carousel_steps );
+                    carousel.set( carousel.current - self._options.carouselSteps );
                 }
             });
         },
@@ -766,7 +783,7 @@ Galleria = function() {
             self.$( 'thumbnails' ).animate({
                 left: num
             },{
-                duration: self._options.carousel_speed,
+                duration: self._options.carouselSpeed,
                 easing: self._options.easing,
                 queue: false
             });
@@ -1088,7 +1105,7 @@ Galleria = function() {
         addTimer : function() {
             Utils.addTimer('idle', function() {
                 self._idle.hide();
-            }, self._options.idle_time );
+            }, self._options.idleTime );
         },
 
         hide : function() {
@@ -1105,7 +1122,7 @@ Galleria = function() {
                 elem.data('idle').complete = false;
                 
                 elem.stop().animate(data.to, {
-                    duration: self._options.idle_speed,
+                    duration: self._options.idleSpeed,
                     queue: false,
                     easing: 'swing'
                 });
@@ -1134,7 +1151,7 @@ Galleria = function() {
                 Utils.clearTimer( 'idle' );
 
                 elem.stop().animate(data.from, {
-                    duration: self._options.idle_speed/2,
+                    duration: self._options.idleSpeed/2,
                     queue: false,
                     easing: 'swing',
                     complete: function() {
@@ -1292,11 +1309,11 @@ Galleria = function() {
             } else {
                 $( lightbox.elems.box ).animate(
                     to,
-                    self._options.lightbox_transition_speed,
+                    self._options.lightboxTransitionSpeed,
                     self._options.easing,
                     function() {
                         var image = lightbox.image,
-                            speed = self._options.lightbox_fade_speed;
+                            speed = self._options.lightboxFadeSpeed;
 
                         self.trigger({
                             type: Galleria.LIGHTBOX_IMAGE,
@@ -1323,7 +1340,7 @@ Galleria = function() {
             Utils.hide( lightbox.elems.info );
 
             Utils.hide( lightbox.elems.overlay, 200, function() {
-                $( this ).hide().css( 'opacity', self._options.overlay_opacity );
+                $( this ).hide().css( 'opacity', self._options.overlayOpacity );
                 self.trigger( Galleria.LIGHTBOX_CLOSE );
             });
         },
@@ -1398,7 +1415,21 @@ Galleria.prototype = {
 
     init: function( target, options ) {
 
-        var self = this;
+        var self = this,
+            n;
+        
+        // legacy options
+        
+        $.each( options, function( key, value ) {
+            if ( /_/.test( key ) ) {
+                n = '';
+                $.each( key.split('_'), function( i, k ) {
+                    n += i > 0 ? k.substr( 0, 1 ).toUpperCase() + k.substr( 1 ) : k;
+                });
+                options[ n ] = value;
+                delete options[ key ];
+            }
+        });
 
         // save the instance
         _galleries.push( this );
@@ -1423,50 +1454,49 @@ Galleria.prototype = {
         this._options = {
             autoplay: false,
             carousel: true,
-            carousel_follow: true,
-            carousel_speed: 400,
-            carousel_steps: 'auto',
+            carouselFollow: true,
+            carouselSpeed: 400,
+            carouselSteps: 'auto',
             clicknext: false,
-            data_config : function( elem ) { return {}; },
-            data_selector: 'img',
-            data_source: this._target,
+            dataConfig : function( elem ) { return {}; },
+            dataSelector: 'img',
+            dataSource: this._target,
             debug: undef,
             easing: 'galleria',
             extend: function(options) {},
             height: 'auto',
-            idle_time: 3000,
-            idle_speed: 200,
-            image_crop: false,
-            image_margin: 0,
-            image_pan: false,
-            image_pan_smoothness: 12,
-            image_position: '50%',
-            keep_source: false,
-            lightbox_fade_speed: 200,
-            lightbox_transition_speed: 500,
-            link_source_images: true,
-            max_scale_ratio: undef,
-            min_scale_ratio: undef,
-            on_image: function(img,thumb) {},
-            overlay_opacity: .85,
-            overlay_background: '#0b0b0b',
-            pause_on_interaction: true, // 1.9.96
-            popup_links: false,
+            idleTime: 3000,
+            idleSpeed: 200,
+            imageCrop: false,
+            imageMargin: 0,
+            imagePan: false,
+            imagePanSmoothness: 12,
+            imagePosition: '50%',
+            keepSource: false,
+            lightboxFadeSpeed: 200,
+            lightboxTransition_speed: 500,
+            linkSourceTmages: true,
+            maxScaleRatio: undef,
+            minScaleRatio: undef,
+            overlayOpacity: .85,
+            overlayBackground: '#0b0b0b',
+            pauseOnInteraction: true,
+            popupLinks: false,
             preload: 2,
             queue: true,
             show: 0,
-            show_info: true,
-            show_counter: true,
-            show_imagenav: true,
-            thumb_crop: true,
-            thumb_event_type: CLICK(),
-            thumb_fit: true,
-            thumb_margin: 0,
-            thumb_quality: 'auto',
+            showInfo: true,
+            showCounter: true,
+            showImagenav: true,
+            thumbCrop: true,
+            thumbEventType: CLICK(),
+            thumbFit: true,
+            thumbMargin: 0,
+            thumbQuality: 'auto',
             thumbnails: true,
             transition: 'fade',
-            transition_initial: undef,
-            transition_speed: 400,
+            transitionInitial: undef,
+            transitionSpeed: 400,
             width: 'auto'
         };
 
@@ -1786,11 +1816,6 @@ Galleria.prototype = {
             });
         }
 
-        // bind on_image helper
-        this.bind( Galleria.IMAGE, function( e ) {
-            this._options.on_image.call( this, e.imageTarget, e.thumbTarget );
-        });
-
         return this;
     },
 
@@ -1845,7 +1870,7 @@ Galleria.prototype = {
                 };
 
                 // grab & reset size for smoother thumbnail loads
-                $container.css(( o.thumb_fit && o.thumb_crop !== true ) ?
+                $container.css(( o.thumbFit && o.thumbCrop !== true ) ?
                     { width: 0, height: 0 } :
                     { width: thumb.data.width, height: thumb.data.height });
 
@@ -1856,8 +1881,8 @@ Galleria.prototype = {
                     thumb.scale({
                         width:    thumb.data.width,
                         height:   thumb.data.height,
-                        crop:     o.thumb_crop,
-                        margin:   o.thumb_margin,
+                        crop:     o.thumbCrop,
+                        margin:   o.thumbMargin,
                         complete: function( thumb ) {
 
                             // shrink thumbnails to fit
@@ -1867,7 +1892,7 @@ Galleria.prototype = {
                             // calculate shrinked positions
                             $.each(arr, function( i, meassure ) {
                                 var m = meassure.toLowerCase();
-                                if ( (o.thumb_crop !== true || o.thumb_crop == m ) && o.thumb_fit ) {
+                                if ( (o.thumbCrop !== true || o.thumbCrop == m ) && o.thumbFit ) {
                                     var css = {};
                                     css[m] = thumb[m];
                                     $( thumb.container ).css( css );
@@ -1882,8 +1907,8 @@ Galleria.prototype = {
 
                             // set high quality if downscale is moderate
                             Utils.toggleQuality( thumb.image,
-                                o.thumb_quality === true ||
-                                ( o.thumb_quality == 'auto' && thumb.original.width < thumb.width * 3 )
+                                o.thumbQuality === true ||
+                                ( o.thumbQuality == 'auto' && thumb.original.width < thumb.width * 3 )
                             );
 
                             // trigger the THUMBNAIL event
@@ -1944,10 +1969,10 @@ Galleria.prototype = {
             // you can control the event type using thumb_event_type
             // we'll add the same event to the source if it's kept
 
-            $( thumb.container ).add( o.keep_source && o.link_source_images ? data.original : null )
-                .data('index', i).bind(o.thumb_event_type, function(e) {
+            $( thumb.container ).add( o.keepSource && o.linkSourceImages ? data.original : null )
+                .data('index', i).bind(o.thumbEventType, function(e) {
                     // pause if option is set
-                    if ( o.pause_on_interaction ) {
+                    if ( o.pauseOnInteraction ) {
                         self.pause();
                     }
 
@@ -1990,7 +2015,7 @@ Galleria.prototype = {
         You can call this method on an existing gallery to reload the gallery with new data.
 
         @param {Array or String} source Optional JSON array of data or selector of where to find data in the document.
-        Defaults to the Galleria target or data_source option.
+        Defaults to the Galleria target or dataSource option.
 
         @param {String} selector Optional element selector of what elements to parse.
         Defaults to 'img'.
@@ -2019,13 +2044,13 @@ Galleria.prototype = {
         }
 
         // use the source set by target
-        source = source || this._options.data_source;
+        source = source || this._options.dataSource;
 
         // use selector set by option
-        selector = selector || this._options.data_selector;
+        selector = selector || this._options.dataSelector;
 
         // use the data_config set by option
-        config = config || this._options.data_config;
+        config = config || this._options.dataConfig;
 
         // check if the data is an array already
         if ( source.constructor == Array ) {
@@ -2368,7 +2393,7 @@ $(document).mousemove(function(e) {
 
     addPan : function( img ) {
 
-        if ( this._options.image_crop === false ) {
+        if ( this._options.imageCrop === false ) {
             return;
         }
 
@@ -2427,8 +2452,8 @@ $(document).mousemove(function(e) {
                 distY = img.height() - self._stageHeight;
                 destX = x / self._stageWidth * distX * -1;
                 destY = y / self._stageHeight * distY * -1;
-                curX += ( destX - curX ) / self._options.image_pan_smoothness;
-                curY += ( destY - curY ) / self._options.image_pan_smoothness;
+                curX += ( destX - curX ) / self._options.imagePanSmoothness;
+                curY += ( destY - curY ) / self._options.imagePanSmoothness;
 
                 position( distY, curY, 'Top' );
                 position( distX, curX, 'Left' );
@@ -2624,11 +2649,11 @@ this.prependChild( 'info', 'myElement' );
         options = $.extend({
             width:    this._stageWidth,
             height:   this._stageHeight,
-            crop:     this._options.image_crop,
-            max:      this._options.max_scale_ratio,
-            min:      this._options.min_scale_ratio,
-            margin:   this._options.image_margin,
-            position: this._options.image_position
+            crop:     this._options.imageCrop,
+            max:      this._options.maxScaleRatio,
+            min:      this._options.minScaleRatio,
+            margin:   this._options.imageMargin,
+            position: this._options.imagePosition
         }, options );
 
        ( image || this._controls.getActive() ).scale( options );
@@ -2670,9 +2695,6 @@ this.prependChild( 'info', 'myElement' );
 
         var scale = function() {
 
-            // shortcut
-            var o = self._options;
-
             // set stagewidth
             self._stageWidth = width || self.$( 'stage' ).width();
             self._stageHeight = height || self.$( 'stage' ).height();
@@ -2709,7 +2731,7 @@ this.prependChild( 'info', 'myElement' );
 
     refreshImage : function() {
         this._scaleImage();
-        if ( this._options.image_pan ) {
+        if ( this._options.imagePan ) {
             this.addPan();
         }
         return this;
@@ -2781,7 +2803,7 @@ this.prependChild( 'info', 'myElement' );
             self._queue.stalled = false;
 
             // optimize quality
-            Utils.toggleQuality( next.image, self._options.image_quality );
+            Utils.toggleQuality( next.image, self._options.imageQuality );
 
             // swap
             $( active.container ).css({
@@ -2795,18 +2817,19 @@ this.prependChild( 'info', 'myElement' );
             self._controls.swap();
 
             // add pan according to option
-            if ( self._options.image_pan ) {
+            if ( self._options.imagePan ) {
                 self.addPan( next.image );
             }
 
             // make the image link
             if ( data.link ) {
+                
                 $( next.image ).css({
                     cursor: 'pointer'
                 }).bind( CLICK(), function() {
 
                     // popup link
-                    if ( self._options.popup_links ) {
+                    if ( self._options.popupLinks ) {
                         var win = window.open( data.link, '_blank' );
                     } else {
                         window.location.href = data.link;
@@ -2835,7 +2858,7 @@ this.prependChild( 'info', 'myElement' );
         };
 
         // let the carousel follow
-        if ( this._options.carousel && this._options.carousel_follow ) {
+        if ( this._options.carousel && this._options.carouselFollow ) {
             this._carousel.follow( queue.index );
         }
 
@@ -2905,8 +2928,8 @@ this.prependChild( 'info', 'myElement' );
                         thumbTarget: self._thumbnails[ queue.index ].image
                     });
 
-                    var transition = active.image === null && self._options.transition_initial ?
-                        self._options.transition_initial : self._options.transition;
+                    var transition = active.image === null && self._options.transitionInitial ?
+                        self._options.transition_Initial : self._options.transition;
 
                     // validate the transition
                     if ( transition in _transitions === false ) {
@@ -2918,7 +2941,7 @@ this.prependChild( 'info', 'myElement' );
                             prev:   active.image,
                             next:   next.image,
                             rewind: queue.rewind,
-                            speed:  self._options.transition_speed || 400
+                            speed:  self._options.transitionSpeed || 400
                         };
 
                         // call the transition function and send some stuff
@@ -3321,7 +3344,10 @@ this.prependChild( 'info', 'myElement' );
 // Add events as static variables
 $.each( _events, function( i, ev ) {
     
-    Galleria[ ev.toUpperCase() ] = 'galleria.'+ev;
+    // legacy events
+    var type = /_/.test( ev ) ? ev.replace( /_/g, '' ) : ev;
+    
+    Galleria[ ev.toUpperCase() ] = 'galleria.'+type;
     
 } );
 
