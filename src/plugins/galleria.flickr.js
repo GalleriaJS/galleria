@@ -174,7 +174,9 @@ F.prototype = {
 
             for ( var i=0; i<len; i++ ) {
                 var photo = photos[i],
-                img = photo.url_m;
+                
+				img = 'http://farm'+photo['farm']+'.static.flickr.com/'+photo['server']+
+                '/'+photo['id']+'_' + photo['secret'] + '_z.jpg';
 
                 switch(this.options.size) {
                     case 'small':
@@ -196,6 +198,8 @@ F.prototype = {
                     case 'original':
                     if( photo.url_o ) {
                         img = photo.url_o;
+                    } else 	if ( photo.url_l ) {
+                        img = photo.url_l;
                     }
                     break;
                 }
