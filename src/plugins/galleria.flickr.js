@@ -109,6 +109,15 @@ F.prototype = {
         });
     },
 
+    // get favorite photos of an user
+    getFavorites: function(user_id) {
+        this._set(arguments);
+        return this._find({
+            user_id: user_id,
+            method: 'flickr.favorites.getPublicList'
+        });
+    },
+
     // set options
     setOptions: function( options ) {
         $.extend(this.options, options);
