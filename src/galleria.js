@@ -2005,7 +2005,7 @@ Galleria.prototype = {
                 href = parent.attr( 'href' );
 
             // check if it's a link to another image
-            if ( /\.(png|gif|jpg|jpeg)$/i.test(href) ) {
+            if ( /\.(png|gif|jpg|jpeg)(\?.*)?$/i.test(href) ) {
                 data.image = href;
 
             // else assign the href as a link if it exists

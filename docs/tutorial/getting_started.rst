@@ -18,12 +18,12 @@ Include jQuery and Galleria on your web page.
 Use the static method ``Galleria.loadTheme()`` to load a Galleria theme::
 
     <script>
-        Galleria.loadTheme('/js/galleria/themes/classic/galleria.classic.js');
+        Galleria.loadTheme('/js/galleria/src/themes/classic/galleria.classic.js');
     </script>
 
 You can also load the theme manually in your ``<head>`` tag::
 
-    <script src="/js/galleria/themes/classic/galleria.classic.js"></script>
+    <script src="/js/galleria/src/themes/classic/galleria.classic.js"></script>
 
 
 Add images
@@ -37,7 +37,7 @@ the site::
         <img src="/img/pic2.jpg" alt="Another text" title="Another title">
     </div>
 
-If you want separate thumbnails, just add them as a link::
+If you want separate thumbnails (recommended), just add them as a link::
 
     <div id="gallery">
         <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
@@ -50,17 +50,17 @@ You can also define the images as a JSON array::
 
     var data = [
         {
-            image: 'img1.jpg'
-            thumb: 'thumb1.jpg'
+            image: 'img1.jpg',
+            thumb: 'thumb1.jpg',
             title: 'my first image',
-            description: 'Lorem ipsum caption'
+            description: 'Lorem ipsum caption',
             link: 'http://domain.com'
         },
         {
-            image: 'img2.jpg'
-            thumb: 'thumb2.jpg'
+            image: 'img2.jpg',
+            thumb: 'thumb2.jpg',
             title: 'my second image',
-            description: 'Another caption'
+            description: 'Another caption',
             link: '/path/to/destination.html'
         }
     ];
@@ -72,7 +72,7 @@ You can also define the images as a JSON array::
     </script>
 
 Galleria also provides plugins to fetch image data from other sources like
-Flickr & SlideShowPro.
+Flickr.
 
 
 Activate Galleria
@@ -110,7 +110,7 @@ With extra options::
 Customize
 ---------
 If you wish to add alternative sources of image data, try the
-:doc:`/plugin/flickr` and :doc:`/plugin/slideshowpro` documentation. If you
+:doc:`/plugin/flickr` documentation. If you
 would like to add more advanced cunstomizations, read
 :doc:`/tutorial/extending`. *Good luck!*
 
