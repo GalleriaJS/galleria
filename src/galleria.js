@@ -701,7 +701,7 @@ Galleria = function() {
             carousel.width = self.$( 'thumbnails-list' ).width();
             carousel.setClasses();
 
-            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > carousel.width );
+            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', Number(w) > Number(carousel.width) );
 
             // todo: fix so the carousel moves to the left
         },
@@ -2001,6 +2001,7 @@ Galleria.prototype = {
         Utils.wait({
 
             until: function() {
+                self.$( 'stage' ).append(" ");
                 self._stageWidth  = self.$( 'stage' ).width();
                 self._stageHeight = self.$( 'stage' ).height();
                 return( self._stageWidth && 
