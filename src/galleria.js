@@ -3195,7 +3195,7 @@ this.prependChild( 'info', 'myElement' );
 			timer_id = 'play' + this._id;
 
         if ( this._playing ) {
-	
+			
 			Utils.clearTimer( timer_id );
 
             var fn = function() {
@@ -3675,7 +3675,7 @@ Galleria.Picture.prototype = {
             self.loaded = true;
         });
 		
-		//image.src = '#';
+		image.src = '#';
         image.src = src;
 
         return image;
