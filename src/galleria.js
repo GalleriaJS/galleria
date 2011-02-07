@@ -66,6 +66,12 @@ var DEBUG = false,
     // allows the old my_setting syntax and converts it to camel case
     
     _legacyOptions = function( options ) {
+	
+		if ( typeof options !== 'object' ) {
+			
+			// return whatever it was...
+			return options;
+		}
         
         $.each( options, function( key, value ) {
             if ( /^[a-z]+_/.test( key ) ) {
@@ -573,7 +579,7 @@ Galleria = function() {
     this._target = undef;
 
     // instance id
-    this._id = Utils.timestamp();
+    this._id = '' + Math.random();
 
     // add some elements
     var divs =  'container stage images image-nav image-nav-left image-nav-right ' +
@@ -3185,16 +3191,18 @@ this.prependChild( 'info', 'myElement' );
         var self = this,
             played = 0,
             interval = 20,
-            now = Utils.timestamp();
+            now = Utils.timestamp(),
+			timer_id = 'play' + this._id;
 
         if ( this._playing ) {
+	
+			Utils.clearTimer( timer_id );
 
-            Utils.clearTimer('play');
             var fn = function() {
 
                 played = Utils.timestamp() - now;
                 if ( played >= self._playtime && self._playing ) {
-                    Utils.clearTimer('play');
+                    Utils.clearTimer( timer_id );
                     self.next();
                     return;
                 }
@@ -3208,10 +3216,10 @@ this.prependChild( 'info', 'myElement' );
                         milliseconds: played
                     });
 
-                    Utils.addTimer( 'play', fn, interval );
+                    Utils.addTimer( timer_id, fn, interval );
                 }
             };
-            Utils.addTimer( 'play', fn, interval );
+            Utils.addTimer( timer_id, fn, interval );
         }
     },
 
@@ -3658,16 +3666,18 @@ Galleria.Picture.prototype = {
         }
 
         // begin preload and insert in cache when done
-        image.onload = function() {
+        $(image).load(function() {
             self.original = {
                 height: this.height,
                 width: this.width
             };
             self.cache[ src ] = src; // will override old cache
             self.loaded = true;
-        };
-
+        });
+		
+		//image.src = '#';
         image.src = src;
+
         return image;
 
     },
