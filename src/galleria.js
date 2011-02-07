@@ -3885,8 +3885,8 @@ Galleria.Picture.prototype = {
                 // apply position
                 $( self.image ).css({
                     position : 'relative',
-                    top :  getPosition(pos.top, 'height', height) - options.margin,
-                    left : getPosition(pos.left, 'width', width) - options.margin
+                    top :  getPosition(pos.top, 'height', height),
+                    left : getPosition(pos.left, 'width', width)
                 });
 
                 // show the image
