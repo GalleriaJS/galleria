@@ -15,10 +15,10 @@ Galleria.addTheme({
     css: 'galleria.classic.css',
     defaults: {
         transition: 'slide',
-        thumb_crop: 'height',
+        thumbCrop:  'height',
         
 		// set this to false if you want to show the caption all the time:
-        _toggle_info: true
+        _toggleInfo: true
     },
     init: function(options) {
         
@@ -39,13 +39,6 @@ Galleria.addTheme({
         // some stuff for non-touch browsers
         if (! Galleria.TOUCH ) {
             
-            // fade thumbnails
-            this.$('thumbnails').children().hover(function() {
-                $(this).not('.active').children().stop().fadeTo(100, 1);
-            }, function() {
-                $(this).not('.active').children().stop().fadeTo(400, .6);
-            });
-            
             this.addIdleState( this.get('image-nav-left'), { left:-50 });
             this.addIdleState( this.get('image-nav-right'), { right:-50 });
             this.addIdleState( this.get('counter'), { opacity:0 });
@@ -53,15 +46,29 @@ Galleria.addTheme({
         }
         
         // toggle info
-        if ( options._toggle_info ) {
+        if ( options._toggleInfo === true ) {
             info.bind( click, function() {
                 info.toggle();
             });
-        }
+        } else {
+			info.show();
+			this.$('info-link, info-close').hide();
+		}
         
         // bind some stuff
         this.bind('thumbnail', function(e) {
-            $(e.thumbTarget).parent(':not(.active)').children().css('opacity',.6)
+            
+            var thumb = $(e.thumbTarget).parent(':not(.active)').children().css('opacity',.6);
+            
+            if (! Galleria.TOUCH ) {
+
+                // fade thumbnails
+                $(e.thumbTarget).parent().hover(function() {
+                    $(this).not('.active').children().stop().fadeTo(100, 1);
+                }, function() {
+                    $(this).not('.active').children().stop().fadeTo(400, .6);
+                });
+            }
         });
         
         this.bind('loadstart', function(e) {

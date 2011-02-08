@@ -754,7 +754,7 @@ Galleria = function() {
         // calculate and set positions
         set: function( i ) {
             i = Math.max( i, 0 );
-            while ( carousel.hooks[i - 1] + carousel.width > carousel.max && i >= 0 ) {
+            while ( carousel.hooks[i - 1] + carousel.width >= carousel.max && i >= 0 ) {
                 i--;
             }
             carousel.current = i;
@@ -793,7 +793,7 @@ Galleria = function() {
         // helper for setting disabled classes
         setClasses: function() {
             carousel.prev.toggleClass( 'disabled', !carousel.current );
-            carousel.next.toggleClass( 'disabled', carousel.hooks[ carousel.current ] + carousel.width > carousel.max );
+            carousel.next.toggleClass( 'disabled', carousel.hooks[ carousel.current ] + carousel.width >= carousel.max );
         },
 
         // the animation method
@@ -1833,19 +1833,32 @@ Galleria.prototype = {
         return this;
     },
 
-    // the internal _run method should be called after loading data into galleria
-    // creates thumbnails and makes sure the gallery has proper meassurements
-    _run : function() {
-        // shortcuts
-        var self = this,
+    // Creates the thumbnails and carousel
+    // can be used at any time, f.ex when the data object is manipulated
+    
+	_createThumbnails : function() {
+		
+		var self = this,
             o = this._options,
 
             // width/height for calculations
             width  = 0,
             height = 0,
+            
+            // get previously active thumbnail, if exists
+            active = (function() {
+                var a = self.$('thumbnails').find('.active');
+                if ( !a.length ) {
+                    return false;
+                }
+                return a.find('img').attr('src');
+            })(),
 
             // cache the thumbnail option
             optval = typeof o.thumbnails == 'string' ? o.thumbnails.toLowerCase() : null;
+        
+        this._thumbnails = [];
+    	this.$( 'thumbnails' ).empty();
 
         // loop through data and create thumbnails
         for( var i = 0; this._data[i]; i++ ) {
@@ -1984,7 +1997,8 @@ Galleria.prototype = {
             // we'll add the same event to the source if it's kept
 
             $( thumb.container ).add( o.keepSource && o.linkSourceImages ? data.original : null )
-                .data('index', i).bind(o.thumbEventType, function(e) {
+                .data('index', i).bind( o.thumbEventType, function( e ) {
+                    
                     // pause if option is set
                     if ( o.pauseOnInteraction ) {
                         self.pause();
@@ -1998,9 +2012,22 @@ Galleria.prototype = {
 
                     e.preventDefault();
             });
+            
+            if (active == src) {
+                $( thumb.container ).addClass( 'active' );
+            }
 
             this._thumbnails.push( thumb );
         }
+	},
+
+    // the internal _run method should be called after loading data into galleria
+    // makes sure the gallery has proper meassurements before triggering ready
+    _run : function() {
+
+        var self = this;
+		
+		self._createThumbnails();
 
         // make sure we have a stageHeight && stageWidth
 
@@ -2070,14 +2097,7 @@ Galleria.prototype = {
         if ( source.constructor == Array ) {
             if ( this.validate( source) ) {
                 
-                // copy image as thumb if no thumb exists
-                $.each( source, function( i, data ) {
-                    if ( 'thumb' in data == false ) {
-                        source[i].thumb = data.image;
-                    }
-                });
-                this._data = source;
-                this.trigger( Galleria.DATA );
+                this._parseData.trigger( Galleria.DATA );
                 
             } else {
                 Galleria.raise( 'Load failed: JSON Array not valid.' );
@@ -2123,6 +2143,34 @@ Galleria.prototype = {
         return this;
 
     },
+    
+    // make sure the data works properly
+    _parseData : function() {
+        
+        // copy image as thumb if no thumb exists
+        $.each( this._data, function( i, data ) {
+            if ( 'thumb' in data == false ) {
+                this._data[ i ].thumb = data.image;
+            }
+        });
+        
+        return this;
+    },
+
+    /**
+        Append/prepend images to Galleria
+		Works just like Array.splice
+		https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/splice
+
+        @example this.splice( 2, 4 ); // removes 4 images after the second image
+
+        @returns {Galleria}
+    */
+	
+	splice: function() {
+		Array.prototype.splice.apply( this._data, Utils.array( arguments ) );
+		return this._parseData()._createThumbnails();
+	},
 
     _getActive: function() {
         return this._controls.getActive();
@@ -2139,7 +2187,7 @@ Galleria.prototype = {
         @param {String} type The Event type to listen for
         @param {Function} fn The function to execute when the event is triggered
 
-        @example this.bind( Galleria.IMAGE, function() { Galleria.log('image shown') });
+        @example this.bind( 'image', function() { Galleria.log('image shown') });
 
         @returns {Galleria}
     */
