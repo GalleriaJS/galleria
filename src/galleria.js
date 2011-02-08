@@ -2097,7 +2097,8 @@ Galleria.prototype = {
         if ( source.constructor == Array ) {
             if ( this.validate( source) ) {
                 
-                this._parseData.trigger( Galleria.DATA );
+                this._data = source;
+                this._parseData().trigger( Galleria.DATA );
                 
             } else {
                 Galleria.raise( 'Load failed: JSON Array not valid.' );
@@ -2147,10 +2148,12 @@ Galleria.prototype = {
     // make sure the data works properly
     _parseData : function() {
         
+        var self = this;
+        
         // copy image as thumb if no thumb exists
         $.each( this._data, function( i, data ) {
             if ( 'thumb' in data == false ) {
-                this._data[ i ].thumb = data.image;
+                self._data[ i ].thumb = data.image;
             }
         });
         
