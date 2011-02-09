@@ -2291,7 +2291,7 @@ Galleria.prototype = {
     */
 
     exitIdleMode: function() {
-        this.idle._show();
+        this._idle.show();
         return this;
     },
 
