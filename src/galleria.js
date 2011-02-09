@@ -1588,7 +1588,7 @@ Galleria.prototype = {
                             num[ m ] = self._options[ m ];
                         } else {
                             
-                            // else extract the meassures in the following order:
+                            // else extract the measures in the following order:
                             
                             num[m] = Utils.parseValue( $container.css( m ) ) ||         // 1. the container css
                                      Utils.parseValue( self.$( 'target' ).css( m ) ) || // 2. the target css
@@ -1618,7 +1618,7 @@ Galleria.prototype = {
                     // remove the testElem
                     $( testElem ).remove();
 
-                    // apply the new meassures
+                    // apply the new measures
                     $container.width( num.width );
                     $container.height( num.height );
 
@@ -1643,86 +1643,88 @@ Galleria.prototype = {
         // make sure it only runs once
         var one = false;
 
-        this.bind( Galleria.READY, function() {
+        this.bind( Galleria.READY, (function(one) {
+            
+            return function() {
+                
+                // show counter
+                Utils.show( this.$('counter') );
 
-            // show counter
-            Utils.show( this.$('counter') );
-
-            // bind clicknext
-            if ( this._options.clicknext ) {
-                $.each( this._data, function( i, data ) {
-                    delete data.link;
-                });
-                this.$( 'stage' ).css({ cursor : 'pointer' }).bind( CLICK(), function(e) {
-                    self.next();
-                });
-            }
-
-            // bind carousel nav
-            if ( this._options.carousel ) {
-                this._carousel.bindControls();
-            }
-
-            // start autoplay
-            if ( this._options.autoplay ) {
-
-                this.pause();
-
-                if ( typeof this._options.autoplay == 'number' ) {
-                    this._playtime = this._options.autoplay;
+                // bind carousel nav
+                if ( this._options.carousel ) {
+                    this._carousel.bindControls();
                 }
 
-                this.trigger( Galleria.PLAY );
-                this._playing = true;
-            }
+                // start autoplay
+                if ( this._options.autoplay ) {
 
-            // if second load, just do the show and return
-            if ( one ) {
-                if ( typeof this._options.show == 'number' ) {
+                    this.pause();
+
+                    if ( typeof this._options.autoplay == 'number' ) {
+                        this._playtime = this._options.autoplay;
+                    }
+
+                    this.trigger( Galleria.PLAY );
+                    this._playing = true;
+                }
+
+                // if second load, just do the show and return
+                if ( one ) {
+                    if ( typeof this._options.show == 'number' ) {
+                        this.show( this._options.show );
+                    }
+                    return;
+                }
+            
+                one = true;
+        
+                // bind clicknext
+                if ( this._options.clicknext ) {
+                    $.each( this._data, function( i, data ) {
+                        delete data.link;
+                    });
+                    this.$( 'stage' ).css({ cursor : 'pointer' }).bind( CLICK(), function(e) {
+                        self.next();
+                    });
+                }
+
+                // initialize the History plugin
+                if ( Galleria.History ) {
+
+                    // bind the show method
+                    Galleria.History.change(function(e) {
+
+                        // grab history ID
+                        var val = parseInt( e.value.replace( /\//, '' ) );
+
+                        // if ID is NaN, the user pressed back from the first image
+                        // return to previous address
+                        if (isNaN(val)) {
+                            window.history.go(-1);
+
+                        // else show the image
+                        } else {
+                            self.show( val, undef, true );
+                        }
+                    });
+                }
+
+                // call the theme init method
+                Galleria.theme.init.call( this, this._options );
+
+                // call the extend option
+                this._options.extend.call( this, this._options );
+
+                // show the initial image
+                // first test for permalinks in history
+                if ( /^[0-9]{1,4}$/.test( HASH ) && Galleria.History ) {
+                    this.show( HASH, undef, true );
+
+                } else {
                     this.show( this._options.show );
                 }
-                return;
             }
-
-            one = true;
-
-            // initialize the History plugin
-            if ( Galleria.History ) {
-
-                // bind the show method
-                Galleria.History.change(function(e) {
-
-                    // grab history ID
-                    var val = parseInt( e.value.replace( /\//, '' ) );
-
-                    // if ID is NaN, the user pressed back from the first image
-                    // return to previous address
-                    if (isNaN(val)) {
-                        window.history.go(-1);
-
-                    // else show the image
-                    } else {
-                        self.show( val, undef, true );
-                    }
-                });
-            }
-
-            // call the theme init method
-            Galleria.theme.init.call( this, this._options );
-
-            // call the extend option
-            this._options.extend.call( this, this._options );
-
-            // show the initial image
-            // first test for permalinks in history
-            if ( /^[0-9]{1,4}$/.test( HASH ) && Galleria.History ) {
-                this.show( HASH, undef, true );
-
-            } else {
-                this.show( this._options.show );
-            }
-
-        });
+        })(one));
 
         // build the gallery frame
         this.append({
@@ -1917,8 +1919,8 @@ Galleria.prototype = {
                             var arr = ['Width', 'Height'];
 
                             // calculate shrinked positions
-                            $.each(arr, function( i, meassure ) {
-                                var m = meassure.toLowerCase();
+                            $.each(arr, function( i, measure ) {
+                                var m = measure.toLowerCase();
                                 if ( (o.thumbCrop !== true || o.thumbCrop == m ) && o.thumbFit ) {
                                     var css = {};
                                     css[m] = thumb[m];
@@ -1928,8 +1930,8 @@ Galleria.prototype = {
                                     $( thumb.image ).css( css);
                                 }
 
-                                // cache outer meassures
-                                thumb['outer' + meassure] = $( thumb.container )['outer' + meassure]( true );
+                                // cache outer measures
+                                thumb['outer' + measure] = $( thumb.container )['outer' + measure]( true );
                             });
 
                             // set high quality if downscale is moderate
@@ -2022,7 +2024,7 @@ Galleria.prototype = {
 	},
 
     // the internal _run method should be called after loading data into galleria
-    // makes sure the gallery has proper meassurements before triggering ready
+    // makes sure the gallery has proper measurements before triggering ready
     _run : function() {
 
         var self = this;
@@ -2045,7 +2047,7 @@ Galleria.prototype = {
             },
 
             error: function() {
-                Galleria.raise('stage meassures not found');
+                Galleria.raise('stage measures not found');
             }
 
         });
@@ -2660,10 +2662,10 @@ this.attachKeyboard({
     },
 
     /**
-        Fast helper for appending galleria elements that you added using addElement()
+        Fast helper for prepending galleria elements that you added using addElement()
 
-        @param {String} parentID The parent element ID where the element will be preppended
-        @param {String} childID the element ID that should be preppended
+        @param {String} parentID The parent element ID where the element will be prepended
+        @param {String} childID the element ID that should be prepended
 
         @example
 
@@ -2861,7 +2863,7 @@ this.prependChild( 'info', 'myElement' );
             cached = next.isCached( src ),
             thumb  = this._thumbnails[ queue.index ];
 
-            // to be fired when loading & transition is complete:
+        // to be fired when loading & transition is complete:
         var complete = function() {
 
             // remove stalled
@@ -3675,7 +3677,7 @@ Galleria.Picture = function( id ) {
         position: 'relative' // for IE Standards mode
     });
 
-    // saves the original meassurements
+    // saves the original measurements
     this.original = {
         width: 0,
         height: 0
@@ -3894,11 +3896,11 @@ Galleria.Picture.prototype = {
                 // calculate image_position
                 var pos = {},
                     mix = {},
-                    getPosition = function(value, meassure, margin) {
+                    getPosition = function(value, measure, margin) {
                         var result = 0;
                         if (/\%/.test(value)) {
                             var flt = parseInt(value) / 100,
-                                m = self.image[ meassure ] || $( self.image )[ meassure ]();
+                                m = self.image[ measure ] || $( self.image )[ measure ]();
                                 
                             result = Math.ceil( m * -1 * flt + margin * flt );
                         } else {
