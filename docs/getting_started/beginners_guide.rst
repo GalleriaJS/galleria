@@ -1,3 +1,5 @@
+.. highlight:: html
+
 ***************
 Beginners Guide
 ***************
@@ -9,9 +11,7 @@ This tutorial takes you through the very basics of setting up Galleria. If you'r
 A basic HTML template
 =====================
 
-If you haven't got a HTML template yet, here's a good one to start with:
-
-.. code-block:: html
+If you haven't got a HTML template yet, here's a good one to start with::
 
     <!doctype html>
     <html>
@@ -29,25 +29,19 @@ Installing jQuery
 Galleria is built on top of the jQuery JavaScript framework and you **must** include this in order for Galleria to work. 
 A number of large enterprises like Google provide hosted copies of jQuery. 
 
-Add the following inside the ``<head>`` element in your HTML to include the 1.4.4 version of jQuery.
-
-.. code-block:: html
+Add the following inside the ``<head>`` element in your HTML to include the 1.4.4 version of jQuery::
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 
 You can also `download <http://docs.jquery.com/Downloading_jQuery>`_ your own copy of jQuery and host it yourself if you wish, but this is not required.
 
-To make sure jQuery works properly add the following code inside the ``<body>`` tag
-
-.. code-block:: html
+To make sure jQuery works properly add the following code inside the ``<body>`` tag::
 
     <script>
         $("body").text("jQuery works");
     </script>
 
-The HTML file should look something like:
-
-.. code-block:: html
+The HTML file should look something like::
 
     <!doctype html>
     <html>
@@ -74,24 +68,18 @@ Now that we have a HTML template and jQuery in place, it's time to install Galle
 
 1. Download the latest version from the Galleria website.
 2. Extract the galleria.zip file and place the "galleria" directory where you have your HTML files.
-3. Add the following code beneath the jQuery script tag we added earlier
-
-.. code-block:: html
+3. Add the following code beneath the jQuery script tag we added earlier::
 
     <script src="galleria/src/galleria-1.2.min.js"></script>
     
-To make sure Gallery works properly add the following code inside the ``<body>`` tag
-
-.. code-block:: html
+To make sure Gallery works properly add the following code inside the ``<body>`` tag::
 
     <script>
         if (Galleria) { $("body").text('Galleria works') }
     </script>
 
 
-The HTML file should look something like:
-
-.. code-block:: html
+The HTML file should look something like::
 
     <!doctype html>
     <html>
@@ -117,9 +105,7 @@ Adding images
 Now we need to add a few images for Galleria to display. There are several ways of doing so, 
 but the simplest one is probably to just add images as HTML.
 
-Add the following markup inside the ``<body>`` tag
-
-.. code-block:: html
+Add the following markup inside the ``<body>`` tag::
 
     <div id="gallery">
         <img src="photo1.jpg">
@@ -134,9 +120,7 @@ Load a theme
 Galleria requires a theme to function. In this guide, we will use the included classic theme, 
 but you can download and try other themes later on.
 
-A theme is included using a javascript function called ``Galleria.loadTheme``. Insert the following code **after the images** in the source code:
-
-.. code-block:: html
+A theme is included using a javascript function called ``Galleria.loadTheme``. Insert the following code **after the images** in the source code::
 
     <script>
         Galleria.loadTheme('galleria/src/themes/classic/galleria.classic.js');
@@ -146,9 +130,7 @@ Set dimensions and fire up the gallery
 ======================================
 
 All we need to do now is set dimensions and apply Galleria. 
-Add the following script after the loadTheme function we just inserted:
-
-.. code-block:: html
+Add the following script after the loadTheme function we just inserted::
 
         $("#gallery").galleria({
             width: 500,
@@ -164,7 +146,7 @@ You can change the width & height to any dimensions you see fit for your design.
 The complete code example:
 --------------------------
 
-.. code-block:: html
+::
 
     <!doctype html>
     <html>
