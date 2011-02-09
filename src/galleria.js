@@ -1,5 +1,5 @@
 /*
- * Galleria v 1.2 prerelease 1.2 2011-02-07
+ * Galleria v 1.2 prerelease 1.3 2011-02-09
  * http://galleria.aino.se
  *
  * Copyright (c) 2010, Aino
@@ -2163,7 +2163,7 @@ Galleria.prototype = {
     },
 
     /**
-        Append/prepend images to Galleria
+        Adds and/or removes images from the gallery
 		Works just like Array.splice
 		https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/splice
 
@@ -2174,6 +2174,23 @@ Galleria.prototype = {
 	
 	splice: function() {
 		Array.prototype.splice.apply( this._data, Utils.array( arguments ) );
+		return this._parseData()._createThumbnails();
+	},
+	
+	/**
+        Append images to the gallery
+		Works just like Array.push
+		https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push
+
+        @example this.push({
+            image: 'image1.jpg'
+        }); // appends the image to the gallery
+
+        @returns {Galleria}
+    */
+	
+	push: function() {
+		Array.prototype.push.apply( this._data, Utils.array( arguments ) );
 		return this._parseData()._createThumbnails();
 	},
 
