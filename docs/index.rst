@@ -20,23 +20,8 @@ Themes
 .. toctree::
     :maxdepth: 1
     
-    themes/using_a_theme.rst
+    themes/using_themes.rst
     themes/creating_a_theme.rst
-
-
-API Reference
-=============
-
-.. toctree::
-    :maxdepth: 1
-
-    api/slideshow.rst
-    api/display.rst
-    api/retrieval.rst
-    options/index.rst
-    api/events
-    api/utilities
-
 
 Plugins
 =======
@@ -45,4 +30,38 @@ Plugins
     :maxdepth: 1
 
     plugin/flickr
+    plugin/history
 
+
+Guides
+=======
+
+.. toctree::
+    :maxdepth: 1
+
+    guides/extending
+    guides/dom
+    
+    
+Options
+=============
+
+.. toctree::
+    :maxdepth: 2
+
+    options/index
+    
+
+API Reference
+=============
+
+.. toctree::
+    :maxdepth: 2
+
+    api/slideshow
+    api/manipulation
+    api/display
+    api/retrieval
+    api/miscellaneous
+    api/events
+    api/utilities

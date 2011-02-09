@@ -28,6 +28,7 @@ You can also load the theme manually in your ``<head>`` tag::
 
     <script src="galleria/themes/classic/galleria.classic.js"></script>
 
+If you are looking for more info on how to install and load themes, check out :doc:`../themes/using_themes`.
 
 Add images
 ==========

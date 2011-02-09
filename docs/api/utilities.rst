@@ -4,6 +4,7 @@ Utilities
 
 Static methods
 ==============
+
 Static methods are exposed using ``Galleria.fn()``.
 
 
@@ -53,9 +54,10 @@ return an array with all galleries initiated. Example::
     });
 
 
+.. _loadTheme:
 
-Galleria.loadTheme( url )
--------------------------
+Galleria.loadTheme( url[, options] )
+------------------------------------
 
     | returns null
 
@@ -72,6 +74,8 @@ absolute path to the theme .js file. Example::
     $('#images').galleria();
 
     // when the theme is fully loaded, galleria will run.
+
+The second argument, options, can be used when loading a new theme into an existing gallery. Galleria will then reset the options and then apply any new options you add as a second argument.
 
 
 Galleria.addTransition( name, function )

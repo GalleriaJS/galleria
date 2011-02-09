@@ -16,6 +16,8 @@ Below you will find a summary of all options available. Click on a option title 
 
 These options are the standard options that you can use for all themes. However, themes can add new options and set/modify default values on their own. Please check each theme documentation for full coverage. Custom options for each theme starts with an underscore.
 
+**Note to prerelease users:**
+
 
 Using options
 =============
@@ -25,7 +27,7 @@ Galleria options are defined using a flat object during initialization.::
     $('#galleria').galleria({
         preload: 3,
         transition: 'fade',
-        image_crop: true
+        imageCrop: true
     });
 
 
@@ -40,7 +42,7 @@ List of options
 
 - :doc:`carouselSpeed` Carousel animation speed in milliseconds.
 
-- :doc:`carousel_steps` Defines how many "steps" the carousel should take on
+- :doc:`carouselSteps` Defines how many "steps" the carousel should take on
   each nav click.
 
 - :doc:`clicknext` Helper for adding a click event on the entire stage to move

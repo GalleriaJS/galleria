@@ -4,6 +4,8 @@ Beginners Guide
 
 This tutorial takes you through the very basics of setting up Galleria. If you're an experienced developer check out the :ref:`quick start <quick-start>` tutorial instead.
 
+:ref:`Skip to full code example <complete_code>`
+
 A basic HTML template
 =====================
 
@@ -156,8 +158,11 @@ Add the following script after the loadTheme function we just inserted:
     
 As you can see, we just applied galleria to the '#gallery' container where the images are, and set dimensions to 500x500 pixels. 
 You can change the width & height to any dimensions you see fit for your design.
-    
-Your full HTML file should now look something like:
+
+.. _complete_code:
+
+The complete code example:
+--------------------------
 
 .. code-block:: html
 

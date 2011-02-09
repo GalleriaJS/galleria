@@ -1,6 +1,7 @@
 ******
 Events
 ******
+
 You can bind functions to the Galleria events to build custom themes. All
 callbacks contains an event object as a function argument. The event object is
 similar to jQuery's event model, except that it adds event.scope that refers to
@@ -23,11 +24,17 @@ keyword inside the callback always refers to the same gallery scope. Example::
         }
     });
 
+=======================
+List of Galleria events
+=======================
+
 
 thumbnail
 =========
-Triggers when a thumbnail is loaded and displayed in Galleria. Adds the
-following properties to the event object:
+Triggers when a thumbnail is loaded and displayed in Galleria.
+
+Event properties:
+-----------------
 
 - **thumbTarget** (HTML element) The thumbnail IMG element
 
@@ -36,13 +43,14 @@ following properties to the event object:
 
 loadstart
 =========
-Triggers every time Galleria begins loading an image. Adds the following
-properties to the event object:
+Triggers every time Galleria begins loading an image.
+
+Event properties:
+-----------------
 
 - **cached** (boolean) is true if the image is cached (no loading required).
 
-- **imageTarget** (HTML element) The ``IMG`` element of the image about to
-  load.
+- **imageTarget** (HTML element) The ``IMG`` element of the image about to load.
 
 - **thumbTarget** (HTML element) The ``IMG`` element of the thumbnail that
   belongs to the imageTarget.
@@ -52,8 +60,10 @@ properties to the event object:
 
 loadfinish
 ==========
-Triggers every time Galleria has finnished loading an image. Adds the following
-properties to the event object:
+Triggers every time Galleria has finished loading an image.
+
+Event properties:
+-----------------
 
 - **cached** (boolean) is true if the image is cached (no loading required).
 
@@ -68,8 +78,10 @@ properties to the event object:
 
 image
 =====
-Triggers when the gallery image is displayed after loading and transition. Adds
-the following properties to the event object:
+Triggers when the gallery image is displayed after loading and transition.
+
+Event properties:
+-----------------
 
 - **imageTarget** (HTML element) The ``IMG`` element of the now active
   displayed image after transition.
@@ -92,8 +104,10 @@ Triggers when the galleria slideshow stops playing.
 progress
 ========
 Triggers every x milliseconds during slideshow. You can listen to this if you
-want to create a progress bar for slideshows. Adds the following properties to
-the event object:
+want to create a progress bar for slideshows.
+
+Event properties:
+-----------------
 
 - **percent** (Number) prints the percent (0-100) of the slideshow progress.
 
@@ -143,7 +157,9 @@ Triggers every time the lightbox is closed.
 lightbox_image
 ==============
 Triggers when the lightbox image is displayed after loading and transition.
-Adds the following properties to the event object:
+
+Event properties:
+-----------------
 
 - **imageTarget** (HTML element) The ``IMG`` element of the now active
   displayed image after transition.

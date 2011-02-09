@@ -2,6 +2,8 @@
 Display
 *******
 
+.. _enterFullscreen:
+
 .enterFullscreen( [callback] )
 ------------------------------
 
@@ -24,6 +26,13 @@ around 40 ms before everything is rescaled)
 This will exit fullscreen mode and revert the gallery to it's normal size and
 also revert the document styles. The callback is called when the fullscreen
 mode is turned off (it takes around 40 ms before everything is rescaled)
+
+.toggleFullscreen( [callback] )
+-------------------------------
+
+    | returns **Galleria**
+
+Toggles fullscreen mode.
 
 
 .showLightbox( [index] )
@@ -52,7 +61,7 @@ This will close the lightbox window.
 
 This will add an "idle" state of any element. The idle state activates when no
 user interaction has been made for x amount of milliseconds. You can modify the
-idle timeout using the idle_time option (default is 3000 milliseconds). Styles
+idle timeout using the :doc:`../options/idleTime` option (default is 3000 milliseconds). Styles
 is an object of CSS styles you wish to animate the element to when entering
 idle state. Example::
 
