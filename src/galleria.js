@@ -2,7 +2,7 @@
  * Galleria v 1.2 prerelease 1.3 2011-02-09
  * http://galleria.aino.se
  *
- * Copyright (c) 2010, Aino
+ * Copyright (c) 2011, Aino
  * Licensed under the MIT license.
  */
  
