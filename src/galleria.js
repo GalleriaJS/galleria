@@ -5,11 +5,11 @@
  * Copyright (c) 2011, Aino
  * Licensed under the MIT license.
  */
- 
+
 /*global jQuery, navigator, Galleria, Image */
 
 (function( $ ) {
-  
+
 // some references
 var undef,
     window = this,
@@ -25,17 +25,17 @@ var undef,
         return Galleria.TOUCH ? 'touchstart' : 'click';
     },
     IE    = (function() {
-        
+
         var v = 3,
             div = doc.createElement( 'div' ),
             all = div.getElementsByTagName( 'i' );
-            
+
         do {
             div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->';
         } while ( all[0] );
-        
+
         return v > 4 ? v : undef;
-        
+
     }() ),
     DOM   = function() {
         return {
@@ -45,19 +45,19 @@ var undef,
             title: doc.title
         };
     },
-    
+
     // list of Galleria events
     _eventlist = 'data ready thumbnail loadstart loadfinish image themeload play pause progress ' + 
               'fullscreen_enter fullscreen_exit idle_enter idle_exit rescale ' +
               'lightbox_open lightbox_close lightbox_image',
-    
+
     _events = (function() {
 
         var evs = [];
-        
+
         $.each( _eventlist.split(' '), function( i, ev ) {
             evs.push( ev );
-            
+
             // legacy events
             if ( /_/.test( ev ) ) {
                 evs.push( ev.replace( /_/g, '' ) );
@@ -65,22 +65,22 @@ var undef,
         });
 
         return evs;
-        
+
     }()),
-    
+
     // legacy options
     // allows the old my_setting syntax and converts it to camel case
-    
+
     _legacyOptions = function( options ) {
-        
+
         var n;
-	
-		if ( typeof options !== 'object' ) {
-			
-			// return whatever it was...
-			return options;
-		}
-        
+
+        if ( typeof options !== 'object' ) {
+
+            // return whatever it was...
+            return options;
+        }
+
         $.each( options, function( key, value ) {
             if ( /^[a-z]+_/.test( key ) ) {
                 n = '';
@@ -94,14 +94,14 @@ var undef,
 
         return options;
     },
-    
+
     _patchEvent = function( type ) {
-        
+
         // allow 'image' instead of Galleria.IMAGE
         if ( $.inArray( type, _events ) > -1 ) {
             return Galleria[ type.toUpperCase() ];
         }
-        
+
         return type;
     },
 
@@ -431,7 +431,7 @@ var undef,
             }
         };
     }()),
-    
+
     // the transitions holder
     _transitions = {
 
@@ -634,9 +634,9 @@ var Galleria = function() {
         },
 
         attach: function(map) {
-            
+
             var key, up;
-            
+
             for( key in map ) {
                 if ( map.hasOwnProperty( key ) ) {
                     up = key.toUpperCase();
@@ -729,7 +729,7 @@ var Galleria = function() {
         },
 
         bindControls: function() {
-            
+
             var i;
 
             carousel.next.bind( CLICK(), function(e) {
@@ -915,9 +915,9 @@ var Galleria = function() {
 
                     self.$( 'container' ).unbind( 'mousemove', tooltip.move );
                     Utils.clearTimer( 'tooltip' );
-                    
+
                     self.$( 'tooltip' ).stop();
-                    
+
                     Utils.hide( self.get( 'tooltip' ), 200, function() {
                         Utils.addTimer('switch_tooltip', function() {
                             tooltip.open = false;
@@ -937,12 +937,12 @@ var Galleria = function() {
         },
 
         show: function( elem ) {
-            
+
             elem = $( elem in self._dom ? self.get(elem) : elem );
-            
+
             var text = elem.data( 'tt' ),
                 mouseup = function( e ) {
-                    
+
                     // attach a tiny settimeout to make sure the new tooltip is filled
                     window.setTimeout( (function( ev ) {
                         return function() {
@@ -951,17 +951,17 @@ var Galleria = function() {
                     }( e )), 10);
 
                     elem.unbind( 'mouseup', mouseup );
-                    
+
                 };
-            
+
             text = typeof text === 'function' ? text() : text;
-            
+
             if ( ! text ) {
                 return;
             }
-            
+
             self.$( 'tooltip' ).html( text.replace(/\s/, '&nbsp;') );
-            
+
             // trigger mousemove on mouseup in case of click
             elem.bind( 'mouseup', mouseup );
         },
@@ -990,7 +990,7 @@ var Galleria = function() {
         scrolled: 0,
         active: false,
         enter: function(callback) {
-            
+
             fullscreen.active = true;
 
             // hide the image until rescale is complete
@@ -1054,7 +1054,7 @@ var Galleria = function() {
         },
 
         exit: function(callback) {
-            
+
             fullscreen.active = false;
 
             Utils.hide( self.getActiveImage() );
@@ -1168,7 +1168,7 @@ var Galleria = function() {
                 }
 
                 elem.data('idle').complete = false;
-                
+
                 elem.stop().animate(data.to, {
                     duration: self._options.idleSpeed,
                     queue: false,
@@ -1195,7 +1195,7 @@ var Galleria = function() {
                 data.busy = true;
 
                 self.trigger( Galleria.IDLE_EXIT );
-                
+
                 Utils.clearTimer( 'idle' );
 
                 elem.stop().animate(data.from, {
@@ -1268,7 +1268,7 @@ var Galleria = function() {
                     );
                 },
                 appends = {};
-            
+
             // IE8 fix for IE's transparent background event "feature"
             if ( IE === 8 ) {
                 cssMap.nextholder += 'background:#000;filter:alpha(opacity=0);';
@@ -1305,7 +1305,7 @@ var Galleria = function() {
                     });
                     appends[ prefix+key ] = arr;
             });
-            
+
             self.append( appends );
 
             $( el.image ).append( lightbox.image.container );
@@ -1320,17 +1320,17 @@ var Galleria = function() {
 
                 var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&nbsp;' : '&nbsp;&#8250;' ),
                     $e = $( el[ dir.toLowerCase()+'holder'] );
-                
+
                 $e.bind( CLICK(), function() {
                     lightbox[ 'show' + dir ]();
                 });
-                
+
                 // IE7 will simply show the nav
                 if ( IE < 8 ) {
                     $d.show();
                     return;
                 }
-                
+
                 $e.hover( function() {
                     $d.show();
                 }, function(e) {
@@ -1341,8 +1341,6 @@ var Galleria = function() {
             $( el.overlay ).bind( CLICK(), lightbox.hide );
 
         },
-        
-        
 
         rescale: function(event) {
 
@@ -1454,9 +1452,9 @@ var Galleria = function() {
 // end Galleria constructor
 
 Galleria.prototype = {
-    
+
     // bring back the constructor reference
-    
+
     constructor: Galleria,
 
     /**
@@ -1472,7 +1470,7 @@ Galleria.prototype = {
     init: function( target, options ) {
 
         var self = this;
-        
+
         options = _legacyOptions( options );
 
         // save the instance
@@ -1611,15 +1609,15 @@ Galleria.prototype = {
 
                     // keep trying to get the value
                     $.each(['width', 'height'], function( i, m ) {
-                        
+
                         // first check if options is set
-                        
+
                         if ( self._options[ m ] && typeof self._options[ m ] === 'number' ) {
                             num[ m ] = self._options[ m ];
                         } else {
-                            
+
                             // else extract the measures in the following order:
-                            
+
                             num[m] = Utils.parseValue( $container.css( m ) ) ||         // 1. the container css
                                      Utils.parseValue( self.$( 'target' ).css( m ) ) || // 2. the target css
                                      $container[ m ]() ||                               // 3. the container jQuery method
@@ -1674,9 +1672,9 @@ Galleria.prototype = {
         var one = false;
 
         this.bind( Galleria.READY, (function(one) {
-            
+
             return function() {
-                
+
                 // show counter
                 Utils.show( this.$('counter') );
 
@@ -1705,9 +1703,9 @@ Galleria.prototype = {
                     }
                     return;
                 }
-            
+
                 one = true;
-        
+
                 // bind clicknext
                 if ( this._options.clicknext ) {
                     $.each( this._data, function( i, data ) {
@@ -1867,19 +1865,19 @@ Galleria.prototype = {
 
     // Creates the thumbnails and carousel
     // can be used at any time, f.ex when the data object is manipulated
-    
+
 	_createThumbnails : function() {
-		
+
 		var i,
 		    src,
 		    thumb,
 		    data,
-		    
+
 		    $container,
-		    
+
 		    self = this,
             o = this._options,
-            
+
             // get previously active thumbnail, if exists
             active = (function() {
                 var a = self.$('thumbnails').find('.active');
@@ -1891,7 +1889,7 @@ Galleria.prototype = {
 
             // cache the thumbnail option
             optval = typeof o.thumbnails === 'string' ? o.thumbnails.toLowerCase() : null,
-            
+
             // move some data into the instance
             // for some reason, jQuery cant handle css(property) when zooming in FF, breaking the gallery
             // so we resort to getComputedStyle for browsers who support it
@@ -1900,7 +1898,7 @@ Galleria.prototype = {
                     doc.defaultView.getComputedStyle( thumb.container, null )[ prop ] :
                     $container.css( prop );
             },
-            
+
             fake = function(image, index, container) {
                 return function() {
                     $( container ).append( image );
@@ -1911,9 +1909,9 @@ Galleria.prototype = {
                     });
                 };
             },
-            
+
             onThumbEvent = function( e ) {
-                
+
                 // pause if option is set
                 if ( o.pauseOnInteraction ) {
                     self.pause();
@@ -1927,7 +1925,7 @@ Galleria.prototype = {
 
                 e.preventDefault();
             },
-            
+
             onThumbLoad = function( thumb ) {
 
                 // scale when ready
@@ -1975,9 +1973,9 @@ Galleria.prototype = {
                     }
                 });
             };
-        
+
         this._thumbnails = [];
-        
+
         this.$( 'thumbnails' ).empty();
 
         // loop through data and create thumbnails
@@ -2033,14 +2031,13 @@ Galleria.prototype = {
                 if ( optval === 'numbers' ) {
                     $( thumb.image ).text( i + 1 );
                 }
-                
+
                 this.$( 'thumbnails' ).append( thumb.container );
-                
+
                 // we need to "fake" a loading delay before we append and trigger
                 // 50+ should be enough
-                
+
                 window.setTimeout( ( fake )( thumb.image, i, thumb.container ), 50 + ( i*20 ) );
-                
 
             // create null object to silent errors
             } else {
@@ -2056,7 +2053,7 @@ Galleria.prototype = {
 
             $( thumb.container ).add( o.keepSource && o.linkSourceImages ? data.original : null )
                 .data('index', i).bind( o.thumbEventType, onThumbEvent );
-            
+
             if (active === src) {
                 $( thumb.container ).addClass( 'active' );
             }
@@ -2070,7 +2067,7 @@ Galleria.prototype = {
     _run : function() {
 
         var self = this;
-		
+
 		self._createThumbnails();
 
         // make sure we have a stageHeight && stageWidth
@@ -2140,10 +2137,10 @@ Galleria.prototype = {
         // check if the data is an array already
         if ( source.constructor === Array ) {
             if ( this.validate( source) ) {
-                
+
                 this._data = source;
                 this._parseData().trigger( Galleria.DATA );
-                
+
             } else {
                 Galleria.raise( 'Load failed: JSON Array not valid.' );
             }
@@ -2188,19 +2185,19 @@ Galleria.prototype = {
         return this;
 
     },
-    
+
     // make sure the data works properly
     _parseData : function() {
-        
+
         var self = this;
-        
+
         // copy image as thumb if no thumb exists
         $.each( this._data, function( i, data ) {
             if ( 'thumb' in data === false ) {
                 self._data[ i ].thumb = data.image;
             }
         });
-        
+
         return this;
     },
 
@@ -2213,12 +2210,12 @@ Galleria.prototype = {
 
         @returns Instance
     */
-	
+
 	splice: function() {
 		Array.prototype.splice.apply( this._data, Utils.array( arguments ) );
 		return this._parseData()._createThumbnails();
 	},
-	
+
 	/**
         Append images to the gallery
 		Works just like Array.push
@@ -2230,7 +2227,7 @@ Galleria.prototype = {
 
         @returns Instance
     */
-	
+
 	push: function() {
 		Array.prototype.push.apply( this._data, Utils.array( arguments ) );
 		return this._parseData()._createThumbnails();
@@ -2274,9 +2271,9 @@ Galleria.prototype = {
     */
 
     unbind : function(type) {
-        
+
         type = _patchEvent( type );
-        
+
         this.$( 'container' ).unbind( type );
         return this;
     },
@@ -2294,9 +2291,9 @@ Galleria.prototype = {
         type = typeof type === 'object' ?
             $.extend( type, { scope: this } ) :
             { type: _patchEvent( type ), scope: this };
-        
+
         this.$( 'container' ).trigger( type );
-        
+
         return this;
     },
 
@@ -2379,8 +2376,7 @@ Galleria.prototype = {
         this._fullscreen.exit.apply( this, Utils.array( arguments ) );
         return this;
     },
-    
-    
+
     /**
         Toggle FullScreen mode
 
@@ -2415,7 +2411,7 @@ Galleria.prototype = {
 
     /**
         Note: this method is deprecated. Use refreshTooltip() instead.
-        
+
         Redefine a tooltip.
         Use this if you want to re-apply a tooltip value to an already bound tooltip element.
 
@@ -2638,7 +2634,7 @@ $(document).mousemove(function(e) {
     removePan: function() {
 
         // todo: doublecheck IE8
-        
+
         this.$( 'stage' ).unbind( 'mousemove' );
 
         Utils.clearTimer( 'pan' );
@@ -2775,7 +2771,7 @@ this.prependChild( 'info', 'myElement' );
 
     // an internal helper for scaling according to options
     _scaleImage : function( image, options ) {
-        
+
         options = $.extend({
             width:    this._stageWidth,
             height:   this._stageHeight,
@@ -2882,7 +2878,7 @@ this.prependChild( 'info', 'myElement' );
         if ( index === false || ( !this._options.queue && this._queue.stalled ) ) {
             return;
         }
-        
+
         index = Math.max( 0, Math.min( parseInt( index, 10 ), this.getDataLength() - 1 ) );
 
         rewind = typeof rewind !== 'undefined' ? !!rewind : index < this.getIndex();
@@ -2915,11 +2911,11 @@ this.prependChild( 'info', 'myElement' );
         var self   = this,
             queue  = this._queue[ 0 ],
             data   = this.getData( queue.index );
-        
+
         if ( !data ) {
             return;
         }
-        
+
         var src    = data.image,
             active = this._controls.getActive(),
             next   = this._controls.getNext(),
@@ -2928,7 +2924,7 @@ this.prependChild( 'info', 'myElement' );
 
         // to be fired when loading & transition is complete:
         var complete = function() {
-            
+
             var win;
 
             // remove stalled
@@ -2955,7 +2951,7 @@ this.prependChild( 'info', 'myElement' );
 
             // make the image link
             if ( data.link ) {
-                
+
                 $( next.image ).css({
                     cursor: 'pointer'
                 }).bind( CLICK(), function() {
@@ -3246,13 +3242,13 @@ this.prependChild( 'info', 'myElement' );
     */
 
     play : function( delay ) {
-        
+
         this._playing = true;
-        
+
         this._playtime = delay || this._playtime;
 
         this._playCheck();
-        
+
         this.trigger( Galleria.PLAY );
 
         return this;
@@ -3265,11 +3261,11 @@ this.prependChild( 'info', 'myElement' );
     */
 
     pause : function() {
-        
+
         this._playing = false;
-        
+
         this.trigger( Galleria.PAUSE );
-        
+
         return this;
     },
 
@@ -3284,23 +3280,23 @@ this.prependChild( 'info', 'myElement' );
     playToggle : function( delay ) {
         return ( this._playing ) ? this.pause() : this.play( delay );
     },
-    
+
     /**
         Checks if the gallery is currently playing
 
         @returns {Boolean}
     */
-    
+
     isPlaying : function() {
         return this._playing;
     },
-    
+
     /**
         Checks if the gallery is currently in fullscreen mode
 
         @returns {Boolean}
     */
-    
+
     isFullscreen : function() {
         return this._fullscreen.active;
     },
@@ -3313,7 +3309,7 @@ this.prependChild( 'info', 'myElement' );
 			timer_id = 'play' + this._id;
 
         if ( this._playing ) {
-			
+
 			Utils.clearTimer( timer_id );
 
             var fn = function() {
@@ -3370,7 +3366,7 @@ this.prependChild( 'info', 'myElement' );
             var count = this.$( 'counter' ),
                 opacity = count.css( 'opacity' ),
                 style = count.attr('style');
-                
+
             if (opacity === 1) {
                 count.attr('style', style.replace(/filter[^\;]+\;/i,''));
             } else {
@@ -3423,7 +3419,7 @@ this.prependChild( 'info', 'myElement' );
 
         var check = 'title description'.split(' '),
             i;
-            
+
         for ( i = 0; check[i]; i++ ) {
             if ( !!this.getData( index )[ check[i] ] ) {
                 return true;
@@ -3477,12 +3473,12 @@ this.prependChild( 'info', 'myElement' );
 
 // Add events as static variables
 $.each( _events, function( i, ev ) {
-    
+
     // legacy events
     var type = /_/.test( ev ) ? ev.replace( /_/g, '' ) : ev;
-    
+
     Galleria[ ev.toUpperCase() ] = 'galleria.'+type;
-    
+
 } );
 
 $.extend( Galleria, {
@@ -3708,12 +3704,12 @@ Galleria.log = function() {
 */
 
 Galleria.raise = function( msg, fatal ) {
-    
+
     if ( DEBUG || fatal ) {
         var type = fatal ? 'Fatal error' : 'Error';
         throw new Error( type + ': ' + msg );
     }
-    
+
 };
 
 /**
@@ -3793,7 +3789,7 @@ Galleria.Picture.prototype = {
             self.cache[ src ] = src; // will override old cache
             self.loaded = true;
         });
-		
+
 		image.src = '#';
         image.src = src;
 
@@ -3967,7 +3963,7 @@ Galleria.Picture.prototype = {
                         if (/\%/.test(value)) {
                             var flt = parseInt( value, 10 ) / 100,
                                 m = self.image[ measure ] || $( self.image )[ measure ]();
-                                
+
                             result = Math.ceil( m * -1 * flt + margin * flt );
                         } else {
                             result = Utils.parseValue( value );
@@ -4026,22 +4022,22 @@ Galleria.Picture.prototype = {
 
 // our own easings
 $.extend( $.easing, {
-    
+
     galleria: function (_, t, b, c, d) {
         if ((t/=d/2) < 1) {
             return c/2*t*t*t*t + b;
         }
         return -c/2 * ((t-=2)*t*t*t - 2) + b;
     },
-    
+
     galleriaIn: function (_, t, b, c, d) {
         return c*(t/=d)*t*t*t + b;
     },
-    
+
     galleriaOut: function (_, t, b, c, d) {
         return -c * ((t=t/d-1)*t*t*t - 1) + b;
     }
-    
+
 });
 
 // the plugin initializer
