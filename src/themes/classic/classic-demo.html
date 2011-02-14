@@ -4,19 +4,34 @@
         <meta charset="utf-8">
         <title>Galleria Classic Theme</title>
         <style>
-            html,body{background:#333}
-            .content{color:#eee;font:14px/1.4 "helvetica neue", arial,sans-serif;width:620px;margin:20px auto}
-            h1{line-height:1.1;letter-spacing:-1px;}
-            a {color:#fff;}
-            #galleria{height:400px;}
+        
+            /* Demo styles */
+            html,body{background:#222;margin:0;}
+            body{border-top:4px solid #000;}
+            .content{color:#777;font:12px/1.4 "helvetica neue",arial,sans-serif;width:620px;margin:20px auto;}
+            h1{font-size:12px;font-weight:normal;color:#ddd;margin:0;}
+            p{margin:0 0 20px}
+            a {color:#22BCB9;text-decoration:none;}
+            .cred{margin-top:20px;font-size:11px;}
+            
+            /* This rule is read by Galleria to define the gallery height: */
+            #galleria{height:320px;}
+            
         </style>
+        
+        <!-- load jQuery -->
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+        
+        <!-- load Galleria -->
         <script src="../../galleria.js"></script>
 
     </head>
 <body>
     <div class="content">
         <h1>Galleria Classic Theme</h1>
+        <p>Demonstrating a basic gallery example.</p>
+        
+        <!-- Adding gallery images. We use resized thumbnails here for better performance, but it’s not necessary -->
         
         <div id="galleria">
             <a href="http://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Locomotives-Roundhouse2.jpg/1000px-Locomotives-Roundhouse2.jpg">
@@ -65,6 +80,8 @@
                 <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Antennae%2C_Hubble_images.jpg/1004px-Antennae%2C_Hubble_images.jpg">
             </a>
         </div>
+        
+        <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>.</p>
     </div>
     <script>
 
