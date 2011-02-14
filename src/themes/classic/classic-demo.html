@@ -11,7 +11,7 @@
             #galleria{height:400px;}
         </style>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-        <script src="../../galleria.js"></script>
+        <script src="../../galleria.min.js"></script>
 
     </head>
 <body>
@@ -33,11 +33,13 @@
         </div>
     </div>
     <script>
-
+console.log(Galleria, Galleria.IE8)
     // Load the classic theme
     Galleria.loadTheme('galleria.classic.js');
     // Initialize Galleria
     $('#galleria').galleria();
+    
+    
 
     </script>
     </body>

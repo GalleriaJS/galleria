@@ -538,6 +538,7 @@ var undef,
     The main Galleria class
 
     @class
+    @constructor
 
     @example var gallery = new Galleria();
 
@@ -545,7 +546,6 @@ var undef,
 
     @requires jQuery
 
-    @returns {Galleria}
 */
 
 var Galleria = function() {
@@ -1452,10 +1452,10 @@ Galleria.prototype = {
         Use this function to initialize the gallery and start loading.
         Should only be called once per instance.
 
-        @param {HTML Element} target The target element
+        @param {HTMLElement} target The target element
         @param {Object} options The gallery options
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     init: function( target, options ) {
@@ -2088,16 +2088,16 @@ Galleria.prototype = {
         Loads data into the gallery.
         You can call this method on an existing gallery to reload the gallery with new data.
 
-        @param {Array or String} source Optional JSON array of data or selector of where to find data in the document.
+        @param {Array|string} source Optional JSON array of data or selector of where to find data in the document.
         Defaults to the Galleria target or dataSource option.
 
-        @param {String} selector Optional element selector of what elements to parse.
+        @param {string} selector Optional element selector of what elements to parse.
         Defaults to 'img'.
 
-        @param {Function} config Optional function to modify the data extraction proceedure from the selector.
+        @param {Function} [config] Optional function to modify the data extraction proceedure from the selector.
         See the data_config option for more information.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     load : function( source, selector, config ) {
@@ -2200,7 +2200,7 @@ Galleria.prototype = {
 
         @example this.splice( 2, 4 ); // removes 4 images after the second image
 
-        @returns {Galleria}
+        @returns Instance
     */
 	
 	splice: function() {
@@ -2217,7 +2217,7 @@ Galleria.prototype = {
             image: 'image1.jpg'
         }); // appends the image to the gallery
 
-        @returns {Galleria}
+        @returns Instance
     */
 	
 	push: function() {
@@ -2237,12 +2237,12 @@ Galleria.prototype = {
     /**
         Bind any event to Galleria
 
-        @param {String} type The Event type to listen for
+        @param {string} type The Event type to listen for
         @param {Function} fn The function to execute when the event is triggered
 
         @example this.bind( 'image', function() { Galleria.log('image shown') });
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     bind : function(type, fn) {
@@ -2257,9 +2257,9 @@ Galleria.prototype = {
     /**
         Unbind any event to Galleria
 
-        @param {String} type The Event type to forget
+        @param {string} type The Event type to forget
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     unbind : function(type) {
@@ -2273,9 +2273,9 @@ Galleria.prototype = {
     /**
         Manually trigger a Galleria event
 
-        @param {String} type The Event to trigger
+        @param {string} type The Event to trigger
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     trigger : function( type ) {
@@ -2294,13 +2294,13 @@ Galleria.prototype = {
         The idle state will be applied after a certain amount of idle time
         Useful to hide f.ex navigation when the gallery is inactive
 
-        @param {HTML Element or String} elem The Dom node or selector to apply the idle state to
+        @param {HTMLElement|string} elem The Dom node or selector to apply the idle state to
         @param {Object} styles the CSS styles to apply
 
         @example addIdleState( this.get('image-nav'), { opacity: 0 });
         @example addIdleState( '.galleria-image-nav', { top: -200 });
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     addIdleState: function( elem, styles ) {
@@ -2311,9 +2311,9 @@ Galleria.prototype = {
     /**
         Removes any idle state previously set using addIdleState()
 
-        @param {HTML Element or String} elem The Dom node or selector to remove the idle state from.
+        @param {HTMLElement|string} elem The Dom node or selector to remove the idle state from.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     removeIdleState: function( elem ) {
@@ -2324,7 +2324,7 @@ Galleria.prototype = {
     /**
         Force Galleria to enter idle mode.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     enterIdleMode: function() {
@@ -2335,7 +2335,7 @@ Galleria.prototype = {
     /**
         Force Galleria to exit idle mode.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     exitIdleMode: function() {
@@ -2348,7 +2348,7 @@ Galleria.prototype = {
 
         @param {Function} callback the function to be executed when the fullscreen mode is fully applied.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     enterFullscreen: function( callback ) {
@@ -2361,7 +2361,7 @@ Galleria.prototype = {
 
         @param {Function} callback the function to be executed when the fullscreen mode is fully applied.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     exitFullscreen: function( callback ) {
@@ -2375,7 +2375,7 @@ Galleria.prototype = {
 
         @param {Function} callback the function to be executed when the fullscreen mode is fully applied or removed.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     toggleFullscreen: function( callback ) {
@@ -2387,14 +2387,14 @@ Galleria.prototype = {
         Adds a tooltip to any element.
         You can also call this method with an object as argument with elemID:value pairs to apply tooltips to (see examples)
 
-        @param {HTML Element} elem The DOM Node to attach the event to
-        @param {String or Function} value The tooltip message. Can also be a function that returns a string.
+        @param {HTMLElement} elem The DOM Node to attach the event to
+        @param {string|Function} value The tooltip message. Can also be a function that returns a string.
 
         @example this.bindTooltip( this.get('thumbnails'), 'My thumbnails');
         @example this.bindTooltip( this.get('thumbnails'), function() { return 'My thumbs' });
         @example this.bindTooltip( { image_nav: 'Navigation' });
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     bindTooltip: function( elem, value ) {
@@ -2408,10 +2408,10 @@ Galleria.prototype = {
         Redefine a tooltip.
         Use this if you want to re-apply a tooltip value to an already bound tooltip element.
 
-        @param {HTML Element} elem The DOM Node to attach the event to
-        @param {String or Function} value The tooltip message. Can also be a function that returns a string.
+        @param {HTMLElement} elem The DOM Node to attach the event to
+        @param {string|Function} value The tooltip message. Can also be a function that returns a string.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     defineTooltip: function( elem, value ) {
@@ -2423,12 +2423,12 @@ Galleria.prototype = {
         Refresh a tooltip value.
         Use this if you want to change the tooltip value at runtime, f.ex if you have a play/pause toggle.
 
-        @param {HTML Element} elem The DOM Node that has a tooltip that should be refreshed
+        @param {HTMLElement} elem The DOM Node that has a tooltip that should be refreshed
 
-        @returns {Galleria}
+        @returns Instance
     */
 
-    refreshTooltip: function() {
+    refreshTooltip: function( elem ) {
         this._tooltip.show.apply( this._tooltip, Utils.array(arguments) );
         return this;
     },
@@ -2437,7 +2437,7 @@ Galleria.prototype = {
         Open a pre-designed lightbox with the currently active image.
         You can control some visuals using gallery options.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     openLightbox: function() {
@@ -2448,7 +2448,7 @@ Galleria.prototype = {
     /**
         Close the lightbox.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     closeLightbox: function() {
@@ -2459,7 +2459,7 @@ Galleria.prototype = {
     /**
         Get the currently active image element.
 
-        @returns {HTML Element} The image element
+        @returns {HTMLElement} The image element
     */
 
     getActiveImage: function() {
@@ -2469,7 +2469,7 @@ Galleria.prototype = {
     /**
         Get the currently active thumbnail element.
 
-        @returns {HTML Element} The thumbnail element
+        @returns {HTMLElement} The thumbnail element
     */
 
     getActiveThumb: function() {
@@ -2503,7 +2503,7 @@ $(document).mousemove(function(e) {
 
         @param img The optional image element. If not specified it takes the currently active image
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     addPan : function( img ) {
@@ -2621,7 +2621,7 @@ $(document).mousemove(function(e) {
     /**
         Removes the panning effect set by addPan()
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     removePan: function() {
@@ -2639,12 +2639,12 @@ $(document).mousemove(function(e) {
         Adds an element to the Galleria DOM array.
         When you add an element here, you can access it using element ID in many API calls
 
-        @param {String} id The element ID you wish to use. You can add many elements by adding more arguments.
+        @param {string} id The element ID you wish to use. You can add many elements by adding more arguments.
 
         @example addElement('mybutton');
         @example addElement('mybutton','mylink');
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     addElement : function( id ) {
@@ -2674,7 +2674,7 @@ this.attachKeyboard({
     }
 });
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     attachKeyboard : function( map ) {
@@ -2685,7 +2685,7 @@ this.attachKeyboard({
     /**
         Detach all keyboard events to Galleria
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     detachKeyboard : function() {
@@ -2696,13 +2696,13 @@ this.attachKeyboard({
     /**
         Fast helper for appending galleria elements that you added using addElement()
 
-        @param {String} parentID The parent element ID where the element will be appended
-        @param {String} childID the element ID that should be appended
+        @param {string} parentID The parent element ID where the element will be appended
+        @param {string} childID the element ID that should be appended
 
         @example this.addElement('myElement');
         this.appendChild( 'info', 'myElement' );
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     appendChild : function( parentID, childID ) {
@@ -2713,15 +2713,15 @@ this.attachKeyboard({
     /**
         Fast helper for prepending galleria elements that you added using addElement()
 
-        @param {String} parentID The parent element ID where the element will be prepended
-        @param {String} childID the element ID that should be prepended
+        @param {string} parentID The parent element ID where the element will be prepended
+        @param {string} childID the element ID that should be prepended
 
         @example
 
 this.addElement('myElement');
 this.prependChild( 'info', 'myElement' );
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     prependChild : function( parentID, childID ) {
@@ -2732,10 +2732,10 @@ this.prependChild( 'info', 'myElement' );
     /**
         Remove an element by blueprint
 
-        @param {String} elemID The element to be removed.
+        @param {string} elemID The element to be removed.
         You can remove multiple elements by adding arguments.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     remove : function( elemID ) {
@@ -2784,7 +2784,7 @@ this.prependChild( 'info', 'myElement' );
         Updates the carousel,
         useful if you resize the gallery and want to re-check if the carousel nav is needed.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     updateCarousel : function() {
@@ -2795,11 +2795,11 @@ this.prependChild( 'info', 'myElement' );
     /**
         Rescales the gallery
 
-        @param {Number} width The target width
-        @param {Number} height The target height
+        @param {number} width The target width
+        @param {number} height The target height
         @param {Function} complete The callback to be called when the scaling is complete
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     rescale : function( width, height, complete ) {
@@ -2845,7 +2845,7 @@ this.prependChild( 'info', 'myElement' );
         Refreshes the gallery.
         Useful if you change image options at runtime and want to apply the changes to the active image.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     refreshImage : function() {
@@ -2859,10 +2859,10 @@ this.prependChild( 'info', 'myElement' );
     /**
         Shows an image by index
 
-        @param {Number} index The index to show
+        @param {number|boolean} index The index to show
         @param {Boolean} rewind A boolean that should be true if you want the transition to go back
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     show : function( index, rewind, _history ) {
@@ -3077,9 +3077,9 @@ this.prependChild( 'info', 'myElement' );
     /**
         Gets the next index
 
-        @param {Number} base Optional starting point
+        @param {number} base Optional starting point
 
-        @returns {Number} the next index, or the first if you are at the first (looping)
+        @returns {number} the next index, or the first if you are at the first (looping)
     */
 
     getNext : function( base ) {
@@ -3090,9 +3090,9 @@ this.prependChild( 'info', 'myElement' );
     /**
         Gets the previous index
 
-        @param {Number} base Optional starting point
+        @param {number} base Optional starting point
 
-        @returns {Number} the previous index, or the last if you are at the first (looping)
+        @returns {number} the previous index, or the last if you are at the first (looping)
     */
 
     getPrev : function( base ) {
@@ -3103,7 +3103,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Shows the next image in line
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     next : function() {
@@ -3116,7 +3116,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Shows the previous image in line
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     prev : function() {
@@ -3129,9 +3129,9 @@ this.prependChild( 'info', 'myElement' );
     /**
         Retrieve a DOM element by element ID
 
-        @param {String} elemId The delement ID to fetch
+        @param {string} elemId The delement ID to fetch
 
-        @returns {HTML Element} The elements DOM node or null if not found.
+        @returns {HTMLElement} The elements DOM node or null if not found.
     */
 
     get : function( elemId ) {
@@ -3141,7 +3141,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Retrieve a data object
 
-        @param {Number} index The data index to retrieve.
+        @param {number} index The data index to retrieve.
         If no index specified it will take the currently active image
 
         @returns {Object} The data object
@@ -3155,7 +3155,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Retrieve the number of data items
 
-        @returns {Number} The data length
+        @returns {number} The data length
     */
     getDataLength : function() {
         return this._data.length;
@@ -3164,7 +3164,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Retrieve the currently active index
 
-        @returns {Number} The active index
+        @returns {number|boolean} The active index or false if none found
     */
 
     getIndex : function() {
@@ -3174,7 +3174,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Retrieve the stage height
 
-        @returns {Number} The stage height
+        @returns {number} The stage height
     */
 
     getStageHeight : function() {
@@ -3184,7 +3184,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Retrieve the stage width
 
-        @returns {Number} The stage width
+        @returns {number} The stage width
     */
 
     getStageWidth : function() {
@@ -3194,7 +3194,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Retrieve the option
 
-        @param {String} key The option key to retrieve. If no key specified it will return all options in an object.
+        @param {string} key The option key to retrieve. If no key specified it will return all options in an object.
 
         @returns option or options
     */
@@ -3207,13 +3207,13 @@ this.prependChild( 'info', 'myElement' );
         Set options to the instance.
         You can set options using a key & value argument or a single object argument (see examples)
 
-        @param {String} key The option key
-        @param {String} value the the options value
+        @param {string} key The option key
+        @param {string} value the the options value
 
         @example setOptions( 'autoplay', true )
         @example setOptions({ autoplay: true });
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     setOptions : function( key, value ) {
@@ -3228,10 +3228,10 @@ this.prependChild( 'info', 'myElement' );
     /**
         Starts playing the slideshow
 
-        @param {Number} delay Sets the slideshow interval in milliseconds.
+        @param {number} delay Sets the slideshow interval in milliseconds.
         If you set it once, you can just call play() and get the same interval the next time.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     play : function( delay ) {
@@ -3250,7 +3250,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Stops the slideshow if currently playing
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     pause : function() {
@@ -3265,9 +3265,9 @@ this.prependChild( 'info', 'myElement' );
     /**
         Toggle between play and pause events.
 
-        @param {Number} delay Sets the slideshow interval in milliseconds.
+        @param {number} delay Sets the slideshow interval in milliseconds.
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     playToggle : function( delay ) {
@@ -3338,10 +3338,10 @@ this.prependChild( 'info', 'myElement' );
     /**
         Manually modify the counter
 
-        @param {Number} index Optional data index to fectch,
+        @param {number} index Optional data index to fectch,
         if no index found it assumes the currently active index
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     setCounter: function( index ) {
@@ -3374,10 +3374,10 @@ this.prependChild( 'info', 'myElement' );
     /**
         Manually set captions
 
-        @param {Number} index Optional data index to fectch and apply as caption,
+        @param {number} index Optional data index to fectch and apply as caption,
         if no index found it assumes the currently active index
 
-        @returns {Galleria}
+        @returns Instance
     */
 
     setInfo : function( index ) {
@@ -3402,10 +3402,10 @@ this.prependChild( 'info', 'myElement' );
     /**
         Checks if the data contains any captions
 
-        @param {Number} index Optional data index to fectch,
+        @param {number} index Optional data index to fectch,
         if no index found it assumes the currently active index.
 
-        @returns {Boolean}
+        @returns {boolean}
     */
 
     hasInfo : function( index ) {
@@ -3449,14 +3449,14 @@ this.prependChild( 'info', 'myElement' );
         Converts element IDs into a jQuery collection
         You can call for multiple IDs separated with commas.
 
-        @param {String} str One or more element IDs (comma-separated)
+        @param {string} str One or more element IDs (comma-separated)
 
-        @returns {jQuery}
+        @returns jQuery
 
         @example this.$('info,container').hide();
     */
 
-    $ : function() {
+    $ : function( str ) {
         return this.jQuery.apply( this, Utils.array( arguments ) );
     }
 
@@ -3566,9 +3566,9 @@ Galleria.addTheme = function( theme ) {
 /**
     loadTheme loads a theme js file and attaches a load event to Galleria
 
-    @param {String} src The relative path to the theme source file
+    @param {string} src The relative path to the theme source file
 
-    @param {Object} option Optional options you want to apply
+    @param {Object} [options] Optional options you want to apply
 */
 
 Galleria.loadTheme = function( src, options ) {
@@ -3637,10 +3637,10 @@ Galleria.loadTheme = function( src, options ) {
 /**
     Retrieves a Galleria instance.
 
-    @param {Number} index Optional index to retrieve.
+    @param {number} [index] Optional index to retrieve.
     If no index is supplied, the method will return all instances in an array.
 
-    @returns {Galleria or Array}
+    @returns Instance or Array of instances
 */
 
 Galleria.get = function( index ) {
@@ -3656,7 +3656,7 @@ Galleria.get = function( index ) {
 /**
     Creates a transition to be used in your gallery
 
-    @param {String} name The name of the transition that you will use as an option
+    @param {string} name The name of the transition that you will use as an option
 
     @param {Function} fn The function to be executed in the transition.
     The function contains two arguments, params and complete.
@@ -3693,16 +3693,18 @@ Galleria.log = function() {
 /**
     Method for raising errors
 
-    @param {String} msg The message to throw
+    @param {string} msg The message to throw
 
-    @param {Boolean} fatal Set this to true to override debug settings and display a fatal error
+    @param {boolean} [fatal] Set this to true to override debug settings and display a fatal error
 */
 
 Galleria.raise = function( msg, fatal ) {
+    
     if ( DEBUG || fatal ) {
         var type = fatal ? 'Fatal error' : 'Error';
         throw new Error( type + ': ' + msg );
     }
+    
 };
 
 /**
@@ -3712,7 +3714,7 @@ Galleria.raise = function( msg, fatal ) {
 
     @requires jQuery
 
-    @param {Number} id Optional id to keep track of instances
+    @param {number} [id] Optional id to keep track of instances
 */
 
 Galleria.Picture = function( id ) {
@@ -3807,9 +3809,9 @@ Galleria.Picture.prototype = {
     /**
         Checks if an image is in cache
 
-        @param {String} src The image source path, ex '/path/to/img.jpg'
+        @param {string} src The image source path, ex '/path/to/img.jpg'
 
-        @returns {Boolean}
+        @returns {boolean}
     */
 
     isCached: function( src ) {
@@ -3820,10 +3822,10 @@ Galleria.Picture.prototype = {
         Loads an image and call the callback when ready.
         Will also add the image to cache.
 
-        @param {String} src The image source path, ex '/path/to/img.jpg'
+        @param {string} src The image source path, ex '/path/to/img.jpg'
         @param {Function} callback The function to be executed when the image is loaded & scaled
 
-        @returns {jQuery} The image container object
+        @returns The image container (jQuery object)
     */
 
     load: function(src, callback) {
@@ -3877,7 +3879,7 @@ Galleria.Picture.prototype = {
             <li>crop - defines how to crop. Can be true, false, 'width' or 'height'</li>
         </ul>
 
-        @returns {jQuery} The image container object
+        @returns The image container object (jQuery)
     */
 
     scale: function( options ) {
