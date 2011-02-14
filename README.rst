@@ -3,36 +3,16 @@ Galleria
 ********
 **A JavaScript image gallery for the fastidious.**
 
-For more information and working demos visit: http://galleria.aino.se/.
+Info & demos: http://galleria.aino.se/.
 
-For updates, follow us at Twitter: http://twitter.com/galleriajs.
+Updates via twitter: http://twitter.com/galleriajs.
 
-Support
-=======
-Please don't post any support related issues on Github.
-
-If you need help we have a small beta support community over at:
-http://getsatisfaction.com/galleria.
-
-General information
-===================
-Galleria is a image gallery framework that is very easy to use, yet loaded with
-advanced customization options. Galleria and some of the themes provided here
-are free to use under the MIT license. Premium themes, transitions and more
-extras will soon be available for purchase at http://galleria.aino.se.
-
-A good way to get started is to read the Getting Started section at
-http://github.com/aino/galleria/blob/master/docs//tutorial/getting_started.rst
-
-Good luck!
-
+Support community at Get Satisfaction: http://getsatisfaction.com/galleria
 
 Documentation
 =============
+
 Documentation is currently available in `reST
 <http://en.wikipedia.org/wiki/ReStructuredText>`_ format in the repository.
 
-.. note:: We are currently re-organizing our docs for the 1.2 release.
-
-The options documentation is ready, but the Reference API is still under construction.
-
+You can build local HTML using `Sphinx <http://sphinx.pocoo.org/>`. 
