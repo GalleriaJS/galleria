@@ -1,17 +1,18 @@
-/*
- * Galleria Fullscreen Theme v. 2.2 2010-10-28
+/**
+ * @preserve Galleria Fullscreen Theme 2011-02-14
  * http://galleria.aino.se
  *
- * Copyright (c) 2010, Aino
+ * Copyright (c) 2011, Aino
  * Licensed under the MIT license.
  */
+ 
+/*global jQuery, Galleria, window */
 
 (function($) {
 
 Galleria.addTheme({
     name: 'fullscreen',
     author: 'Galleria',
-    version: '2.2',
     css: 'galleria.fullscreen.css',
     defaults: {
         transition: 'none',
@@ -37,8 +38,7 @@ Galleria.addTheme({
             infotext = this.$('info-text'),
             info     = this.$('info'),
             OPEN     = !options._hideDock,
-            POS      = 0,
-            CLICK    = Galleria.TOUCH ? 'touchstart' : 'click';
+            POS      = 0;
 
         if (Galleria.IE) {
             this.addElement('iefix');
@@ -47,7 +47,7 @@ Galleria.addTheme({
                 zIndex: 3,
                 position: 'absolute',
                 backgroundColor: '#000',
-                opacity: .4
+                opacity: 0.4
             });
         }
 
@@ -80,7 +80,7 @@ Galleria.addTheme({
             if (!e.cached) {
                 loader.show().fadeTo(100, 1);
             }
-            $(e.thumbTarget).css('opacity', 1).parent().siblings().children().css('opacity', .6);
+            $(e.thumbTarget).css('opacity', 1).parent().siblings().children().css('opacity', 0.6);
         });
 
         this.bind('loadfinish', function(e) {
@@ -93,7 +93,7 @@ Galleria.addTheme({
         });
 
         this.bind('thumbnail', function(e) {
-            $(e.thumbTarget).parent(':not(.active)').children().css('opacity', .6);
+            $(e.thumbTarget).parent(':not(.active)').children().css('opacity', 0.6);
             $(e.thumbTarget).click(function() {
                 if (OPEN && options._closeOnClick) {
                     tab.click();
@@ -140,7 +140,7 @@ Galleria.addTheme({
         this.$('thumbnails').children().hover(function() {
             $(this).not('.active').children().stop().fadeTo(100, 1);
         }, function() {
-            $(this).not('.active').children().stop().fadeTo(400, .6);
+            $(this).not('.active').children().stop().fadeTo(400, 0.6);
         });
 
         this.enterFullscreen();
@@ -164,4 +164,4 @@ Galleria.addTheme({
     }
 });
 
-})(jQuery);
+}(jQuery));

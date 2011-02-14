@@ -1,5 +1,5 @@
-/*
- * Galleria v 1.2 prerelease 1.3 2011-02-09
+/**
+ * @preserve Galleria v 1.2 2011-02-14
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -1243,19 +1243,21 @@ var Galleria = function() {
                 el = {},
                 op = self._options,
                 css = '',
+                abs = 'position:absolute;',
+                prefix = 'lightbox-',
                 cssMap = {
                     overlay:    'position:fixed;display:none;opacity:'+op.overlayOpacity+';filter:alpha(opacity='+(op.overlayOpacity*100)+
                                 ');top:0;left:0;width:100%;height:100%;background:'+op.overlayBackground+';z-index:99990',
                     box:        'position:fixed;display:none;width:400px;height:400px;top:50%;left:50%;margin-top:-200px;margin-left:-200px;z-index:99991',
-                    shadow:     'position:absolute;background:#000;width:100%;height:100%;',
-                    content:    'position:absolute;background-color:#fff;top:10px;left:10px;right:10px;bottom:10px;overflow:hidden',
-                    info:       'position:absolute;bottom:10px;left:10px;right:10px;color:#444;font:11px/13px arial,sans-serif;height:13px',
-                    close:      'position:absolute;top:10px;right:10px;height:20px;width:20px;background:#fff;text-align:center;cursor:pointer;color:#444;font:16px/22px arial,sans-serif;z-index:99999',
-                    image:      'position:absolute;top:10px;left:10px;right:10px;bottom:30px;overflow:hidden;display:block;',
-                    prevholder: 'position:absolute;width:50%;top:0;bottom:40px;cursor:pointer;',
-                    nextholder: 'position:absolute;width:50%;top:0;bottom:40px;right:-1px;cursor:pointer;',
-                    prev:       'position:absolute;top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;left:20px;display:none;line-height:40px;text-align:center;color:#000',
-                    next:       'position:absolute;top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;right:20px;left:auto;display:none;line-height:40px;text-align:center;color:#000',
+                    shadow:     abs+'background:#000;width:100%;height:100%;',
+                    content:    abs+'background-color:#fff;top:10px;left:10px;right:10px;bottom:10px;overflow:hidden',
+                    info:       abs+'bottom:10px;left:10px;right:10px;color:#444;font:11px/13px arial,sans-serif;height:13px',
+                    close:      abs+'top:10px;right:10px;height:20px;width:20px;background:#fff;text-align:center;cursor:pointer;color:#444;font:16px/22px arial,sans-serif;z-index:99999',
+                    image:      abs+'top:10px;left:10px;right:10px;bottom:30px;overflow:hidden;display:block;',
+                    prevholder: abs+'width:50%;top:0;bottom:40px;cursor:pointer;',
+                    nextholder: abs+'width:50%;top:0;bottom:40px;right:-1px;cursor:pointer;',
+                    prev:       abs+'top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;left:20px;display:none;line-height:40px;text-align:center;color:#000',
+                    next:       abs+'top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;right:20px;left:auto;display:none;line-height:40px;text-align:center;color:#000',
                     title:      'float:left',
                     counter:    'float:right;margin-left:8px;'
                 },
@@ -1264,7 +1266,8 @@ var Galleria = function() {
                         function() { $(this).css( 'color', '#bbb' ); },
                         function() { $(this).css( 'color', '#444' ); }
                     );
-                };
+                },
+                appends = {};
             
             // IE8 fix for IE's transparent background event "feature"
             if ( IE === 8 ) {
@@ -1274,7 +1277,7 @@ var Galleria = function() {
 
             // create and insert CSS
             $.each(cssMap, function( key, value ) {
-                css += '.galleria-lightbox-'+key+'{'+value+'}';
+                css += '.galleria-'+prefix+key+'{'+value+'}';
             });
 
             Utils.insertStyleTag( css );
@@ -1289,13 +1292,21 @@ var Galleria = function() {
             lightbox.image = new Galleria.Picture();
 
             // append the elements
-            self.append({
-                'lightbox-box': ['lightbox-shadow','lightbox-content', 'lightbox-close','lightbox-prevholder','lightbox-nextholder'],
-                'lightbox-info': ['lightbox-title','lightbox-counter'],
-                'lightbox-content': ['lightbox-info', 'lightbox-image'],
-                'lightbox-prevholder': 'lightbox-prev',
-                'lightbox-nextholder': 'lightbox-next'
+            $.each({
+                    box: 'shadow content close prevholder nextholder',
+                    info: 'title counter',
+                    content: 'info image',
+                    prevholder: 'prev',
+                    nextholder: 'next'
+                }, function( key, val ) {
+                    var arr = [];
+                    $.each( val.split(' '), function( i, prop ) {
+                        arr.push( prefix + prop );
+                    });
+                    appends[ prefix+key ] = arr;
             });
+            
+            self.append( appends );
 
             $( el.image ).append( lightbox.image.container );
 
@@ -3464,7 +3475,6 @@ this.prependChild( 'info', 'myElement' );
 
 // End of Galleria prototype
 
-
 // Add events as static variables
 $.each( _events, function( i, ev ) {
     
@@ -3507,7 +3517,6 @@ $.extend( Galleria, {
     <ul>
         <li>name – name of the theme</li>
         <li>author - name of the author</li>
-        <li>version - version number</li>
         <li>css - css file name (not path)</li>
         <li>defaults - default options to apply, including theme-specific options</li>
         <li>init - the init function</li>
@@ -4046,7 +4055,7 @@ $.fn.galleria = function( options ) {
     });
 };
 
-// expose Galleria
+// Expose
 window.Galleria = Galleria;
 
 // phew
