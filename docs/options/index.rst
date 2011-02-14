@@ -11,41 +11,49 @@ Options
 
 .. highlight:: javascript
 
+The Galleria options covers most of the gallery customizations you will need for each implementation. 
+Below you will find a summary of all options available. Click on a option title for more explanations and examples.
+
+These options are the standard options that you can use for all themes. However, themes can add new options and set/modify default values on their own. Please check each theme documentation for full coverage. Custom options for each theme starts with an underscore.
+
+**Note to prerelease users:**
+
+
+Using options
+=============
 
 Galleria options are defined using a flat object during initialization.::
 
     $('#galleria').galleria({
         preload: 3,
         transition: 'fade',
-        image_crop: true
+        imageCrop: true
     });
-
-.. note:: You can define your own options and set defaults for each theme using
-          the Theme builder API.
 
 
 List of options
 ===============
+
 - :doc:`autoplay` Sets Galleria to play slidehow when initialized.
 
 - :doc:`carousel` Toggle the creation of a carousel.
 
-- :doc:`carousel_follow` Defines if the carousel should follow the image.
+- :doc:`carouselFollow` Defines if the carousel should follow the image.
 
-- :doc:`carousel_speed` Carousel animation speed in milliseconds.
+- :doc:`carouselSpeed` Carousel animation speed in milliseconds.
 
-- :doc:`carousel_steps` Defines how many "steps" the carousel should take on
+- :doc:`carouselSteps` Defines how many "steps" the carousel should take on
   each nav click.
 
 - :doc:`clicknext` Helper for adding a click event on the entire stage to move
   forward.
 
-- :doc:`data_config` Defines how Galleria should parse the HTML.
+- :doc:`dataConfig` Defines how Galleria should parse the HTML. Useful for adding custom HTML captions.
 
-- :doc:`data_selector` Defines the selector Galleria should look for in the
+- :doc:`dataSelector` Defines the selector Galleria should look for in the
   source.
 
-- :doc:`data_source` Defines the Galleria data, or the HTML source where the
+- :doc:`dataSource` Defines the Galleria data, or the HTML source where the
   data is found.
 
 - :doc:`debug` Set this to true to get error messages.
@@ -56,40 +64,39 @@ List of options
 
 - :doc:`height` Manually set a gallery height.
 
-- :doc:`idle_time` Defines how long delay before Galleria goes into idle mode.
+- :doc:`idleTime` Defines how long delay before Galleria goes into idle mode.
 
-- :doc:`image_crop` Defines how Galleria will crop the image.
+- :doc:`idleSpeed` Defines the animation speed in milliseconds when entering/exiting idle mode.
 
-- :doc:`image_margin` Sets a margin between the image and the stage.
+- :doc:`imageCrop` Defines how Galleria will crop the image.
 
-- :doc:`image_pan` Toggles the image pan effect.
+- :doc:`imageMargin` Sets a margin between the image and the stage.
 
-- :doc:`image_pan_smoothness` Defines how smooth ( and CPU consuming ) the pan
+- :doc:`imagePan` Toggles the image pan effect.
+
+- :doc:`imagePanSmoothness` Defines how smooth ( and CPU consuming ) the pan
   effect should be.
 
-- :doc:`image_position` Positions the image.
+- :doc:`imagePosition` Positions the image.
 
-- :doc:`keep_source` Lets you keep the source elements.
+- :doc:`keepSource` Lets you keep the source elements.
 
-- :doc:`lightbox_fade_speed` Defines how fast the lightbox should fade.
+- :doc:`lightboxFadeSpeed` Defines how fast the lightbox should fade.
 
-- :doc:`lightbox_transition_speed` Defines how fast the lightbox should animate.
+- :doc:`lightboxTransitionSpeed` Defines how fast the lightbox should animate.
 
-- :doc:`max_scale_ratio` Defines how much Galleria is allowed to scale.
+- :doc:`maxScaleRatio` Defines how much Galleria is allowed to scale.
 
-- :doc:`min_scale_ratio` Defines how much Galleria must scale.
+- :doc:`minScaleRatio` Defines how much Galleria must scale.
 
-- :doc:`on_image` Helper event method for adding custom functionality every
-  time an image is shown.
+- :doc:`overlayOpacity` Sets how transparent the overlay should be.
 
-- :doc:`overlay_opacity` Sets how transparent the overlay should be.
+- :doc:`overlayBackground` Defines the background color of the overlay.
 
-- :doc:`overlay_background` Defines the background color of the overlay.
-
-- :doc:`pause_on_interaction` Toggles if Galleria should stop playing if the
+- :doc:`pauseOnInteraction` Toggles if Galleria should stop playing if the
   user navigates.
 
-- :doc:`popup_links` Open Image links in new windows.
+- :doc:`popupLinks` Open Image links in new windows.
 
 - :doc:`preload` Defines how much Galleria should preload.
 
@@ -97,27 +104,27 @@ List of options
 
 - :doc:`show` Lets you start the slideshow at any image index.
 
-- :doc:`show_info` Toggles the caption.
+- :doc:`showInfo` Toggles the caption.
 
-- :doc:`show_counter` Toggles the counter.
+- :doc:`showCounter` Toggles the counter.
 
-- :doc:`show_imagenav` Toggles the image navigation arrows.
+- :doc:`showImagenav` Toggles the image navigation arrows.
 
-- :doc:`thumb_crop` Same as image_crop for thumbnails.
+- :doc:`thumbCrop` Same as image_crop for thumbnails.
 
-- :doc:`thumb_fit` Lets you fit thumbnails according to width.
+- :doc:`thumbFit` Lets you fit thumbnails according to width.
 
-- :doc:`thumb_margin` Same as image_margin for thumbnails.
+- :doc:`thumbMargin` Same as :doc:`imageMargin` for thumbnails.
 
-- :doc:`thumb_quality` Defines if and how IE should use bicubic image rendering
+- :doc:`thumbQuality` Defines if and how IE should use bicubic image rendering
   for thumbnails
 
 - :doc:`thumbnails` Sets how and if thumbnails should be created.
 
 - :doc:`transition` Defines what transition to use.
 
-- :doc:`transition_initial` Sets a different transition on the the first image.
+- :doc:`transitionInitial` Sets a different transition on the the first image.
 
-- :doc:`transition_speed` Defines the speed of the transition.
+- :doc:`transitionSpeed` Defines the speed of the transition.
 
 - :doc:`width` Manually set a gallery width.

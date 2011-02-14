@@ -1,24 +1,25 @@
-/*
- * Galleria Classic Theme v. 1.5 2010-10-28
+/**
+ * @preserve Galleria Classic Theme 2011-02-14
  * http://galleria.aino.se
  *
- * Copyright (c) 2010, Aino
+ * Copyright (c) 2011, Aino
  * Licensed under the MIT license.
  */
+ 
+/*global jQuery, Galleria */
 
 (function($) {
 
 Galleria.addTheme({
     name: 'classic',
     author: 'Galleria',
-    version: '1.5',
     css: 'galleria.classic.css',
     defaults: {
         transition: 'slide',
-        thumb_crop: 'height',
+        thumbCrop:  'height',
         
 		// set this to false if you want to show the caption all the time:
-        _toggle_info: true
+        _toggleInfo: true
     },
     init: function(options) {
         
@@ -29,54 +30,61 @@ Galleria.addTheme({
         });
         
         // cache some stuff
-        var toggle   = this.$('image-nav-left,image-nav-right,counter'),
-            info     = this.$('info-link,info-close,info-text'),
-            click    = Galleria.TOUCH ? 'touchstart' : 'click';
+        var info = this.$('info-link,info-close,info-text'),
+            touch = Galleria.TOUCH,
+            click = touch ? 'touchstart' : 'click';
         
         // show loader & counter with opacity
-        this.$('loader,counter').show().css('opacity',.4)
+        this.$('loader,counter').show().css('opacity', 0.4);
 
         // some stuff for non-touch browsers
-        if (! Galleria.TOUCH ) {
-            
-            // fade thumbnails
-            this.$('thumbnails').children().hover(function() {
-                $(this).not('.active').children().stop().fadeTo(100, 1);
-            }, function() {
-                $(this).not('.active').children().stop().fadeTo(400, .6);
-            });
-            
+        if (! touch ) {
             this.addIdleState( this.get('image-nav-left'), { left:-50 });
             this.addIdleState( this.get('image-nav-right'), { right:-50 });
             this.addIdleState( this.get('counter'), { opacity:0 });
         }
         
         // toggle info
-        if ( options._toggle_info ) {
+        if ( options._toggleInfo === true ) {
             info.bind( click, function() {
                 info.toggle();
             });
-        }
+        } else {
+			info.show();
+			this.$('info-link, info-close').hide();
+		}
         
         // bind some stuff
-        this.bind(Galleria.THUMBNAIL, function(e) {
-            $(e.thumbTarget).parent(':not(.active)').children().css('opacity',.6)
+        this.bind('thumbnail', function(e) {
+            
+            if (! touch ) {
+                // fade thumbnails
+                $(e.thumbTarget).css('opacity', 0.6).parent().hover(function() {
+                    $(this).not('.active').children().stop().fadeTo(100, 1);
+                }, function() {
+                    $(this).not('.active').children().stop().fadeTo(400, 0.6);
+                });
+                
+                if ( e.index === options.show ) {
+                    $(e.thumbTarget).css('opacity',1);
+                }
+            }
         });
         
-        this.bind(Galleria.LOADSTART, function(e) {
+        this.bind('loadstart', function(e) {
             if (!e.cached) {
-                this.$('loader').show().fadeTo(200, .4);
+                this.$('loader').show().fadeTo(200, 0.4);
             }
             
             this.$('info').toggle( this.hasInfo() );
             
-            $(e.thumbTarget).css('opacity',1).parent().siblings().children().css('opacity',.6);
+            $(e.thumbTarget).css('opacity',1).parent().siblings().children().css('opacity', 0.6);
         });
         
-        this.bind(Galleria.LOADFINISH, function(e) {
+        this.bind('loadfinish', function(e) {
             this.$('loader').fadeOut(200);
         });
     }
 });
 
-})(jQuery);
+}(jQuery));

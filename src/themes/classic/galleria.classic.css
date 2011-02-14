@@ -80,14 +80,12 @@
     font: bold 12px/1.1 arial,sans-serif;
     margin: 0;
     color: #fff;
+	margin-bottom: 7px;
 }
 .galleria-info-description {
     font: italic 12px/1.4 georgia,serif;
     margin: 0;
     color: #bbb;
-}
-.galleria-info-title+.galleria-info-description {
-    margin-top: 7px;
 }
 .galleria-info-close {
     width: 9px;

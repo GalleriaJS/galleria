@@ -4,28 +4,24 @@ Galleria Documentation
 
 .. rubric:: Everything you need to know about Galleria.
 
-Introduction
-============
+Getting started
+===============
 
 .. toctree::
     :maxdepth: 1
 
-    tutorial/getting_started
-    tutorial/extending
-    reference/DOM
+    getting_started/beginners_guide
+    getting_started/quick_start
 
 
-API Layer
-=========
+Themes
+======
 
 .. toctree::
     :maxdepth: 1
-
-    options/index
-    reference/events
-    reference/instance
-    reference/static
-
+    
+    themes/using_themes.rst
+    themes/creating_a_theme.rst
 
 Plugins
 =======
@@ -34,6 +30,38 @@ Plugins
     :maxdepth: 1
 
     plugin/flickr
-    plugin/slideshowpro
     plugin/history
 
+
+Guides
+=======
+
+.. toctree::
+    :maxdepth: 1
+
+    guides/extending
+    guides/dom
+    
+    
+Options
+=============
+
+.. toctree::
+    :maxdepth: 2
+
+    options/index
+    
+
+API Reference
+=============
+
+.. toctree::
+    :maxdepth: 2
+
+    api/slideshow
+    api/manipulation
+    api/display
+    api/retrieval
+    api/miscellaneous
+    api/events
+    api/utilities
