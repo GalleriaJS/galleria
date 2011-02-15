@@ -21,9 +21,9 @@ Examples::
 
     | returns **Galleria**
 
-Adds and/or removes images from the gallery. This method works just like the JavaScript ``Array.splice`` method as explained here:
+Adds and/or removes images from the gallery. This method works just like the JavaScript ``Array.push`` method as explained here:
 
-https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/splice
+https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push
 
 Examples::
 
