@@ -3782,16 +3782,16 @@ Galleria.Picture.prototype = {
 
         // begin preload and insert in cache when done
         $(image).load(function() {
+            
             self.original = {
                 height: this.height,
                 width: this.width
             };
+            
             self.cache[ src ] = src; // will override old cache
             self.loaded = true;
-        });
-
-		image.src = '#';
-        image.src = src;
+            
+        }).attr('src', src);
 
         return image;
 
