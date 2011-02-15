@@ -3856,7 +3856,7 @@ Galleria.Picture.prototype = {
         Utils.wait({
             until: function() {
                 // TODO this should be properly tested in Opera
-                return self.loaded && self.image.complete && self.image.width;
+                return self.loaded && self.image.complete && self.original.width && self.image.width;
             },
             success: function() {
                 // call success
