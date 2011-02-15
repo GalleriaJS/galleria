@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2 2011-02-14
+ * @preserve Galleria v 1.2 2011-02-15
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -3768,16 +3768,21 @@ Galleria.Picture.prototype = {
 
         // force a block display
         $( image ).css( 'display', 'block');
+        
+        // There are strange cache issues in webkit, 
+        // but for other browsers we can bypass the onload event
+        if (! Galleria.WEBKIT ) {
 
-        if ( self.cache[ src ] ) {
-            // no need to onload if the image is cached
-            image.src = src;
-            self.loaded = true;
-            self.original = {
-                height: image.height,
-                width: image.width
-            };
-            return image;
+            if ( self.cache[ src ] ) {
+                // no need to onload if the image is cached
+                image.src = src;
+                self.loaded = true;
+                self.original = {
+                    height: image.height,
+                    width: image.width
+                };
+                return image;
+            }
         }
 
         // begin preload and insert in cache when done
