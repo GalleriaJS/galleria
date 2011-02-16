@@ -5,4 +5,4 @@ thumbCrop
     | type: **Boolean** or **String**
     | default: **true**
 
-Same as **image_crop** but for thumbnails.
+Same as **imageCrop** but for thumbnails.

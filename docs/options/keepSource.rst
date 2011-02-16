@@ -25,7 +25,7 @@ Example of placing the Galleria gallery outside the source and keep the thumbnai
     </div>
     <script>
     $('#gallery').galleria({
-        data_source: "#source", // fetch images from "#source"
-        keep_source: true // this prevents galleria from clearing the data source container
+        dataSource: "#source", // fetch images from "#source"
+        keepSource: true // this prevents galleria from clearing the data source container
     });
     </script>

@@ -21,7 +21,7 @@ Examples:
 
     // Galleria will look for images in '#images'
     // but use '#galleria' as gallery container:
-    $('#galleria').galleria({data_source: '#images'});
+    $('#galleria').galleria({dataSource: '#images'});
 
 
 Using custom data Array:
@@ -37,7 +37,7 @@ Using custom data Array:
     ];
 
     $('#gallery').galleria({
-        data_source: data,
+        dataSource: data,
     });
     </script>
 
@@ -54,7 +54,7 @@ Placing the Galleria gallery in a different place and keep the thumbnails:
     </div>
     <script>
     $('#gallery').galleria({
-        data_source: "#source",
-        keep_source: true // this prevents galleria from clearing the data source container
+        dataSource: "#source",
+        keepSource: true // this prevents galleria from clearing the data source container
     });
     </script>

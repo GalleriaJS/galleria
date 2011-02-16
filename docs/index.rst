@@ -57,11 +57,7 @@ API Reference
 
 .. toctree::
     :maxdepth: 2
-
-    api/slideshow
-    api/manipulation
-    api/display
-    api/retrieval
-    api/miscellaneous
+    
+    api/methods
     api/events
     api/utilities
