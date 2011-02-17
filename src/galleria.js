@@ -905,18 +905,18 @@ var Galleria = function() {
                     tooltip.show( elem );
 
                     Galleria.utils.addTimer( 'tooltip', function() {
-                        self.$( 'tooltip' ).stop();
+                        self.$( 'tooltip' ).stop().show();
                         Utils.show( self.get( 'tooltip' ), 400 );
                         tooltip.open = true;
 
-                    }, tooltip.open ? 0 : 1000);
+                    }, tooltip.open ? 0 : 500);
 
                 }, function() {
 
                     self.$( 'container' ).unbind( 'mousemove', tooltip.move );
                     Utils.clearTimer( 'tooltip' );
 
-                    self.$( 'tooltip' ).stop();
+                    self.$( 'tooltip' ).stop().hide();
 
                     Utils.hide( self.get( 'tooltip' ), 200, function() {
                         Utils.addTimer('switch_tooltip', function() {
@@ -1632,7 +1632,6 @@ Galleria.prototype = {
                     // make sure thumbnails have a height as well
                     if ( self._options.thumbnails ) {
                         self.$('thumbnails').append( testElem );
-                        console.log(self.$('thumbnails'))
                         thumbHeight = function() {
                             return !!$( testElem ).height();
                         };
