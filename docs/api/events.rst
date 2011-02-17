@@ -38,7 +38,7 @@ Event properties:
 
 - **thumbTarget** (HTML element) The thumbnail IMG element
 
-- **thumbOrder** (int) the index of the thumbnail, starting at 0
+- **index** (int) the index of the thumbnail, starting at 0
 
 
 loadstart

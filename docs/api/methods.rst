@@ -245,7 +245,7 @@ no index is specified. Example::
         $(e.thumbTarget).hover(this.proxy(function() {
         
             this.setInfo(e.thumbOrder); // sets the caption to display data from the hovered image
-            this.setCounter(e.thumbOrder); // sets the counter to display the index of the hovered image
+            this.setCounter(e.index); // sets the counter to display the index of the hovered image
             
         }, this.proxy(function() {
         

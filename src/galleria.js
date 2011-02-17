@@ -916,10 +916,12 @@ var Galleria = function() {
                     self.$( 'container' ).unbind( 'mousemove', tooltip.move );
                     Utils.clearTimer( 'tooltip' );
 
-                    self.$( 'tooltip' ).stop();
+                    self.$( 'tooltip' ).stop()
 
                     Utils.hide( self.get( 'tooltip' ), 200, function() {
+
                         self.$( 'tooltip' ).hide();
+
                         Utils.addTimer('switch_tooltip', function() {
                             tooltip.open = false;
                         }, 1000);
@@ -1573,7 +1575,6 @@ Galleria.prototype = {
 
     _init: function() {
         var self = this;
-
         if ( this._initialized ) {
             Galleria.raise( 'Init failed: Gallery instance already initialized.' );
             return this;
@@ -1639,7 +1640,6 @@ Galleria.prototype = {
                             return !!$( testElem ).height();
                         };
                     }
-
                     return thumbHeight() && num.width && num.height > 50;
 
                 },
@@ -1658,6 +1658,7 @@ Galleria.prototype = {
                             self._run();
                         }, 1);
                     } else {
+                        
                         self._run();
                     }
                 },
@@ -1870,16 +1871,16 @@ Galleria.prototype = {
     // Creates the thumbnails and carousel
     // can be used at any time, f.ex when the data object is manipulated
 
-	_createThumbnails : function() {
+    _createThumbnails : function() {
 
-		var i,
-		    src,
-		    thumb,
-		    data,
+        var i,
+            src,
+            thumb,
+            data,
 
-		    $container,
+            $container,
 
-		    self = this,
+            self = this,
             o = this._options,
 
             // get previously active thumbnail, if exists
@@ -2079,8 +2080,15 @@ Galleria.prototype = {
         Utils.wait({
 
             until: function() {
+                
+                // Opera crap
+                if ( Galleria.OPERA ) {
+                    self.$('stage').css('display','inline-block');
+                }
+                
                 self._stageWidth  = self.$( 'stage' ).width();
                 self._stageHeight = self.$( 'stage' ).height();
+                
                 return( self._stageWidth && 
                         self._stageHeight > 50 ); // what is an acceptable height?
             },
@@ -2090,7 +2098,7 @@ Galleria.prototype = {
             },
 
             error: function() {
-                Galleria.raise('stage measures not found');
+                Galleria.raise('Stage measures not found', true);
             }
 
         });
@@ -2140,7 +2148,7 @@ Galleria.prototype = {
 
         // check if the data is an array already
         if ( source.constructor === Array ) {
-            if ( this.validate( source) ) {
+            if ( this.validate( source ) ) {
 
                 this._data = source;
                 this._parseData().trigger( Galleria.DATA );
@@ -3711,7 +3719,7 @@ Galleria.raise = function( msg, fatal ) {
 
     if ( DEBUG || fatal ) {
         var type = fatal ? 'Fatal error' : 'Error';
-        throw new Error( type + ': ' + msg );
+        throw new Error(type + ': ' + msg);
     }
 
 };
@@ -3765,42 +3773,42 @@ Galleria.Picture.prototype = {
     // creates a new image and adds it to cache when loaded
     add: function( src ) {
 
-        var self = this;
+        var i,
+            self = this,
 
-        // create the image
-        var image = new Image();
+            // create the image
+            image = new Image(),
+            
+            onload = function() {
+                
+                // force chrome to reload the image in case of cache bug
+                // set a limit just in case
+                if ( ( !this.width || !this.height ) && i < 1000 ) {
+                    i++;
+                    $( image ).load( onload ).attr( 'src', src+'?'+new Date().getTime() );
+                }
+
+                self.original = {
+                    height: this.height,
+                    width: this.width
+                };
+
+                self.cache[ src ] = src; // will override old cache
+                self.loaded = true;
+            };
 
         // force a block display
         $( image ).css( 'display', 'block');
         
-        // There are strange cache issues in webkit, 
-        // but for other browsers we can bypass the onload event
-        if (! Galleria.WEBKIT ) {
-
-            if ( self.cache[ src ] ) {
-                // no need to onload if the image is cached
-                image.src = src;
-                self.loaded = true;
-                self.original = {
-                    height: image.height,
-                    width: image.width
-                };
-                return image;
-            }
+        if ( self.cache[ src ] ) {
+            // no need to onload if the image is cached
+            image.src = src;
+            onload.call( image );
+            return image;
         }
 
         // begin preload and insert in cache when done
-        $(image).load(function() {
-            
-            self.original = {
-                height: this.height,
-                width: this.width
-            };
-            
-            self.cache[ src ] = src; // will override old cache
-            self.loaded = true;
-            
-        }).attr('src', src);
+        $( image ).load( onload ).attr( 'src', src );
 
         return image;
 
