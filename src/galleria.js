@@ -1571,7 +1571,6 @@ Galleria.prototype = {
 
     _init: function() {
         var self = this;
-
         if ( this._initialized ) {
             Galleria.raise( 'Init failed: Gallery instance already initialized.' );
             return this;
@@ -1633,6 +1632,7 @@ Galleria.prototype = {
                     // make sure thumbnails have a height as well
                     if ( self._options.thumbnails ) {
                         self.$('thumbnails').append( testElem );
+                        console.log(self.$('thumbnails'))
                         thumbHeight = function() {
                             return !!$( testElem ).height();
                         };
@@ -1656,6 +1656,7 @@ Galleria.prototype = {
                             self._run();
                         }, 1);
                     } else {
+                        
                         self._run();
                     }
                 },
@@ -1868,16 +1869,16 @@ Galleria.prototype = {
     // Creates the thumbnails and carousel
     // can be used at any time, f.ex when the data object is manipulated
 
-	_createThumbnails : function() {
+    _createThumbnails : function() {
 
-		var i,
-		    src,
-		    thumb,
-		    data,
+        var i,
+            src,
+            thumb,
+            data,
 
-		    $container,
+            $container,
 
-		    self = this,
+            self = this,
             o = this._options,
 
             // get previously active thumbnail, if exists
@@ -2138,7 +2139,7 @@ Galleria.prototype = {
 
         // check if the data is an array already
         if ( source.constructor === Array ) {
-            if ( this.validate( source) ) {
+            if ( this.validate( source ) ) {
 
                 this._data = source;
                 this._parseData().trigger( Galleria.DATA );
@@ -3709,7 +3710,7 @@ Galleria.raise = function( msg, fatal ) {
 
     if ( DEBUG || fatal ) {
         var type = fatal ? 'Fatal error' : 'Error';
-        throw new Error( type + ': ' + msg );
+        throw new Error(type + ': ' + msg);
     }
 
 };
