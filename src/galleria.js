@@ -905,11 +905,11 @@ var Galleria = function() {
                     tooltip.show( elem );
 
                     Galleria.utils.addTimer( 'tooltip', function() {
-                        self.$( 'tooltip' ).stop();
+                        self.$( 'tooltip' ).stop().show();
                         Utils.show( self.get( 'tooltip' ), 400 );
                         tooltip.open = true;
 
-                    }, tooltip.open ? 0 : 1000);
+                    }, tooltip.open ? 0 : 500);
 
                 }, function() {
 
@@ -919,6 +919,7 @@ var Galleria = function() {
                     self.$( 'tooltip' ).stop();
 
                     Utils.hide( self.get( 'tooltip' ), 200, function() {
+                        self.$( 'tooltip' ).hide();
                         Utils.addTimer('switch_tooltip', function() {
                             tooltip.open = false;
                         }, 1000);
@@ -1551,12 +1552,13 @@ Galleria.prototype = {
         $( this._target ).children().hide();
 
         // now we just have to wait for the theme...
+        // is 5 seconds enough?
         if ( Galleria.theme ) {
             this._init();
         } else {
             Utils.addTimer('themeload', function() {
                 Galleria.raise( 'No theme found.', true);
-            }, 2000);
+            }, 5000);
 
             $doc.one( Galleria.THEMELOAD, function() {
                 Utils.clearTimer( 'themeload' );
@@ -3959,7 +3961,7 @@ Galleria.Picture.prototype = {
 
                 // round up the width / height
                 $.each( ['width','height'], function( i, m ) {
-                    $( self.image )[ m ]( self.image[m] = self[ m ] = Math.ceil( self.original[ m ] * ratio ) );
+                    $( self.image )[ m ]( self.image[m] = self[ m ] = Math.round( self.original[ m ] * ratio ) );
                 });
 
                 // calculate image_position
