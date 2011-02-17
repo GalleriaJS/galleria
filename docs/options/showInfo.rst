@@ -1,6 +1,6 @@
-=========
-show_info
-=========
+========
+showInfo
+========
 
     | type: **Boolean**
     | default: **true**

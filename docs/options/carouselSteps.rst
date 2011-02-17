@@ -13,5 +13,5 @@ You can control the animation speed using the carouselSpeed option.
 Example::
 
     $("#galleria").galleria({
-        carousel_steps: 2 // will advance the carousel 2 steps everytime the user clicks on the arrow
+        carouselSteps: 2 // will advance the carousel 2 steps everytime the user clicks on the arrow
     })

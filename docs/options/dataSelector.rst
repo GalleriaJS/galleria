@@ -24,8 +24,8 @@ Example::
 
     <script>
     $('#galleria').galleria({
-        data_selector: "a",
-        data_config: function(a) {
+        dataSelector: "a",
+        dataConfig: function(a) {
             // a is now the anchor element
             // the function should return an object with the new data
             return {

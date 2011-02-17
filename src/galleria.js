@@ -1779,6 +1779,8 @@ Galleria.prototype = {
         ) );
 
         this.setCounter('&#8211;');
+        
+        Utils.hide( self.get('tooltip') );
 
         // add images to the controls
         $.each( new Array(2), function(i) {
