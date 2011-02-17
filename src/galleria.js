@@ -3764,42 +3764,41 @@ Galleria.Picture.prototype = {
     // creates a new image and adds it to cache when loaded
     add: function( src ) {
 
-        var self = this;
+        var i,
+            self = this,
 
-        // create the image
-        var image = new Image();
+            // create the image
+            image = new Image(),
+            
+            onload = function() {
+                
+                // force chrome to reload the image in case of cache bug
+                if (!this.width || !this.height && i < 1000) {
+                    i++;
+                    $(image).load( onload ).attr('src', src+'?'+new Date().getTime());
+                }
+
+                self.original = {
+                    height: this.height,
+                    width: this.width
+                };
+
+                self.cache[ src ] = src; // will override old cache
+                self.loaded = true;
+            };
 
         // force a block display
         $( image ).css( 'display', 'block');
         
-        // There are strange cache issues in webkit, 
-        // but for other browsers we can bypass the onload event
-        if (! Galleria.WEBKIT ) {
-
-            if ( self.cache[ src ] ) {
-                // no need to onload if the image is cached
-                image.src = src;
-                self.loaded = true;
-                self.original = {
-                    height: image.height,
-                    width: image.width
-                };
-                return image;
-            }
+        if ( self.cache[ src ] ) {
+            // no need to onload if the image is cached
+            image.src = src;
+            onload.call( image );
+            return image;
         }
 
         // begin preload and insert in cache when done
-        $(image).load(function() {
-            
-            self.original = {
-                height: this.height,
-                width: this.width
-            };
-            
-            self.cache[ src ] = src; // will override old cache
-            self.loaded = true;
-            
-        }).attr('src', src);
+        $(image).load(onload).attr('src', src);
 
         return image;
 
