@@ -916,9 +916,10 @@ var Galleria = function() {
                     self.$( 'container' ).unbind( 'mousemove', tooltip.move );
                     Utils.clearTimer( 'tooltip' );
 
-                    self.$( 'tooltip' ).stop().hide();
+                    self.$( 'tooltip' ).stop()
 
                     Utils.hide( self.get( 'tooltip' ), 200, function() {
+                        self.$('.tooltip').hide();
                         Utils.addTimer('switch_tooltip', function() {
                             tooltip.open = false;
                         }, 1000);
@@ -1636,7 +1637,6 @@ Galleria.prototype = {
                             return !!$( testElem ).height();
                         };
                     }
-
                     return thumbHeight() && num.width && num.height > 50;
 
                 },
