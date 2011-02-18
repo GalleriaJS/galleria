@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2 2011-02-17
+ * @preserve Galleria v 1.2 2011-02-18
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -3546,34 +3546,54 @@ Galleria.addTheme = function( theme ) {
         theme.defaults = _legacyOptions( theme.defaults );
     }
 
+    var css = false,
+        reg;
+    
     if ( typeof theme.css === 'string' ) {
-
-        var css;
-
-        // look for the absolute path
-        $('script').each(function( i, script ) {
-
-            // look for the theme script
-            var reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
-            if( reg.test( script.src )) {
-
-                // we have a match
-                css = script.src.replace(/[^\/]*$/, '') + theme.css;
-
-                Utils.addTimer( "css", function() {
-                    Utils.loadCSS( css, 'galleria-theme', function() {
-                        Galleria.theme = theme;
-                        $doc.trigger( Galleria.THEMELOAD );
-                    });
-                }, 1);
-
+        
+        // look for manually added CSS
+        $('link').each(function( i, link ) {
+            reg = new RegExp( theme.css );
+            if ( reg.test( link.href ) ) {
+                
+                // we found the css
+                css = true;
+                Galleria.theme = theme;
+                $doc.trigger( Galleria.THEMELOAD );
+                
+                return false;
             }
         });
+        
+        // else look for the absolute path and load the CSS dynamic
+        if ( !css ) {
+
+            $('script').each(function( i, script ) {
+
+                // look for the theme script
+                reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
+                if( reg.test( script.src )) {
+
+                    // we have a match
+                    css = script.src.replace(/[^\/]*$/, '') + theme.css;
+
+                    Utils.addTimer( "css", function() {
+                        Utils.loadCSS( css, 'galleria-theme', function() {
+                            Galleria.theme = theme;
+                            $doc.trigger( Galleria.THEMELOAD );
+                        });
+                    }, 1);
+
+                }
+            });
+        }
 
         if ( !css ) {
             Galleria.raise('No theme CSS loaded');
         }
     } else {
+        
+        // pass
         Galleria.theme = theme;
         $doc.trigger( Galleria.THEMELOAD );
     }
