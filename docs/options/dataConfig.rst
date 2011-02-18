@@ -15,7 +15,9 @@ This option can tell Galleria how to interpret your HTML code so it collects the
 The argument is a HTML element selected from the HTML source ( most often an Image element ).
 Use this to traverse the source and return the right data into Galleria.
 
-If you are using other elements than Images as source, you can change the selctor using the data_selector option.
+If you are using other elements than Images as source, you can change the selector using the data_selector option.
+
+.. highlight:: html
 
 Default extractions from the HTML element:
 ..................................................
@@ -48,6 +50,8 @@ Example on how to alter the extraction logic:
     });
     </script>
 
+
+
 Example on how to add rich HTML captions:
 .........................................
 
@@ -56,7 +60,7 @@ Example on how to add rich HTML captions:
     <div id="galleria">
         <div class="image">
             <img src="myimg.jpg">
-            <h2Lorem ipsum title</h2>
+            <h2>Lorem ipsum title</h2>
             <div class="desc">You can add <strong>strong</strong> tags or any other HTML as caption</div>
         </div>
     </div>

@@ -8,6 +8,8 @@ carouselSpeed
 This option controls the slide speed of the carousel in milliseconds.
 It globally affects the carousel animation, both when following and sliding.
 
+.. highlight:: javascript
+
 Example::
 
     $("#galleria").galleria({

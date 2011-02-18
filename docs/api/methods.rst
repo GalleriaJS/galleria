@@ -2,6 +2,8 @@
 API Methods
 ***********
 
+.. highlight:: javascript
+
 Using the API
 =============
 

@@ -12,7 +12,7 @@ If you set this to **'numbers'**, Galleria will create empty spans with numbers 
 
 Example on how to create numbered elements instead of thumbnails
 ................................................................
-
+.. highlight:: html
 ::
 
     <script>

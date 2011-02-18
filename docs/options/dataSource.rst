@@ -10,6 +10,7 @@ By default, Galleria looks for HTML data in the target selector, but you can tel
 
 If you are using JSON data, you can use this option to bring that JSON Array into Galleria.
 
+.. highlight:: javascript
 
 Examples:
 =========
@@ -23,6 +24,7 @@ Examples:
     // but use '#galleria' as gallery container:
     $('#galleria').galleria({dataSource: '#images'});
 
+.. highlight:: html
 
 Using custom data Array:
 ........................

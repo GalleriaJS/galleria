@@ -13,6 +13,8 @@ Use extend as a method for adding custom modifications such as play/pause withou
 Example on how to add a play link by extending the theme:
 ..........................................................
 
+.. highlight:: html
+
 ::
 
     <a id="play" href="#">Play</a>
@@ -21,11 +23,9 @@ Example on how to add a play link by extending the theme:
             extend: function(options) {
 
                 var gallery = this; // "this" is the gallery instance
-
                 $('#play').click(function() {
 
                     gallery.play(); // call the play method
-
                 });
             }
         });

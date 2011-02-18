@@ -16,6 +16,8 @@ Useful for building custom thumbnails and still have galleria control the galler
 Example of placing the Galleria gallery outside the source and keep the thumbnails:
 ...................................................................................
 
+.. highlight:: html
+
 ::
 
     <div id="gallery"></div>

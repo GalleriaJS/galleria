@@ -7,6 +7,7 @@ Static methods
 
 Static methods are exposed using ``Galleria.fn()``.
 
+.. highlight:: javascript
 
 Galleria.log( msg [,msg,...] )
 ------------------------------

@@ -10,9 +10,10 @@ By default, Galleria fails most errors silently, but in development mode you sho
 
 If your gallery fails to load, turning debug to ``true`` is the first thing you should do.
 
+.. highlight:: javascript
 
 Example::
 
     $('#galleria').galleria({
         debug: true // debug is now on
-     });
+    });

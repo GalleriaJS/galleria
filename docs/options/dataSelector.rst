@@ -15,6 +15,8 @@ if they turn off JavaScript. By default, Galleria works with Image elements as a
 
 You can use the data_config option to parse the selected elements and extract data in a customized way.
 
+.. highlight:: html
+
 Example::
 
     <div id="galleria">
