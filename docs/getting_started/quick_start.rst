@@ -123,5 +123,5 @@ With extra options::
 Customize
 =========
 
-If you would like to add more advanced customizations, read :doc:`/guides/extending`. *Good luck!*
+If you would like to add more advanced customizations, read :doc:`/references/extending`. *Good luck!*
 

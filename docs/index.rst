@@ -23,24 +23,17 @@ Themes
     themes/using_themes.rst
     themes/creating_a_theme.rst
 
-Plugins
-=======
+
+References
+==========
 
 .. toctree::
     :maxdepth: 1
-
-    plugin/flickr
-    plugin/history
-
-
-Guides
-=======
-
-.. toctree::
-    :maxdepth: 1
-
-    guides/extending
-    guides/dom
+    
+    references/faq
+    references/optimizing
+    references/extending
+    references/dom
     
     
 Options
