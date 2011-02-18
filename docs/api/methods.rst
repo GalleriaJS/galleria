@@ -6,7 +6,7 @@ Using the API
 =============
 
 The Galleria methods are exposed in the instance. You have access to all methods listed here in the :doc:`../options/extend` option or by retrieveing the instance using ``Galleria.get``.
-Read more about how to use the Galleria instance in :doc:`../guides/extending`
+Read more about how to use the Galleria instance in :doc:`../references/extending`
 
 
 Slideshow

@@ -33,14 +33,16 @@ Plugins
     plugin/history
 
 
-Guides
-=======
+References
+==========
 
 .. toctree::
     :maxdepth: 1
-
-    guides/extending
-    guides/dom
+    
+    references/faq
+    references/optimizing
+    references/extending
+    references/dom
     
     
 Options
