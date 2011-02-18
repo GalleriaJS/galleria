@@ -23,15 +23,6 @@ Themes
     themes/using_themes.rst
     themes/creating_a_theme.rst
 
-Plugins
-=======
-
-.. toctree::
-    :maxdepth: 1
-
-    plugin/flickr
-    plugin/history
-
 
 References
 ==========
