@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2 2011-02-15
+ * @preserve Galleria v 1.2 2011-02-17
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -2083,7 +2083,7 @@ Galleria.prototype = {
                 
                 // Opera crap
                 if ( Galleria.OPERA ) {
-                    self.$('stage').css('display','inline-block');
+                    self.$( 'stage' ).css( 'display', 'inline-block' );
                 }
                 
                 self._stageWidth  = self.$( 'stage' ).width();
@@ -2359,7 +2359,7 @@ Galleria.prototype = {
     */
 
     exitIdleMode: function() {
-        this._idle.show();
+        this._idle.showAll();
         return this;
     },
 
