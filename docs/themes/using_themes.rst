@@ -43,6 +43,8 @@ This command loads all theme specific files and holds the gallery initialization
 2. Loading a theme manually using ``<script>``
 ----------------------------------------------
 
+.. highlight:: html
+
 Another option for loading the theme is to manually add a script tag that points to the theme, f.ex::
 
     <script src="galleria/themes/galleria.classic.js"></script>

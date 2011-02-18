@@ -62,12 +62,12 @@ Creata a simple theme step by step
 
 4. Go back to the galleria.my_theme.css file and add some styles
 
-5. Add images and modify the code until you are satisified with the result.
+5. Add images and modify the code until you are satisfied with the result.
    Feel free to use any free Galleria theme as a starting point.
 
 After the theme is created you can use the theme when calling Galleria::
 
-    Galleria.loadTheme(/path/to/themes/galleria.my_theme.js);
+    Galleria.loadTheme('/path/to/themes/galleria.my_theme.js');
     $('#images').galleria();
 
 

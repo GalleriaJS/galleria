@@ -1,10 +1,10 @@
+.. highlight:: html
+
 .. _quick-start:
 
 ***********
 Quick start
 ***********
-
-.. highlight:: javascript
 
 Installation
 ============
@@ -52,7 +52,6 @@ If you want separate thumbnails (recommended), just add them as a link::
 You can also define the images as a JSON array::
 
     <script>
-
     var data = [
         {
             image: 'img1.jpg',
@@ -73,7 +72,6 @@ You can also define the images as a JSON array::
     $('#container').galleria({
         data_source: data
     });
-
     </script>
 
 Galleria also provides plugins to fetch image data from other sources like
