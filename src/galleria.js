@@ -4057,7 +4057,7 @@ Galleria.Picture.prototype = {
     }
 };
 
-// our own easings
+// our own easings 
 $.extend( $.easing, {
 
     galleria: function (_, t, b, c, d) {
