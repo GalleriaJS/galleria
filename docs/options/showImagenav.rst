@@ -1,5 +1,5 @@
 =============
-show_imagenav
+showImagenav
 =============
 
     | type: **Boolean**

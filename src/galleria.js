@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2 2011-02-18
+ * @preserve Galleria v [version] [date]
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -47,7 +47,7 @@ var undef,
     },
 
     // list of Galleria events
-    _eventlist = 'data ready thumbnail loadstart loadfinish image themeload play pause progress ' + 
+    _eventlist = 'data ready thumbnail loadstart loadfinish image play pause progress ' + 
               'fullscreen_enter fullscreen_exit idle_enter idle_exit rescale ' +
               'lightbox_open lightbox_close lightbox_image',
 
@@ -1555,21 +1555,24 @@ Galleria.prototype = {
 
         // now we just have to wait for the theme...
         // is 5 seconds enough?
-        if ( Galleria.theme ) {
+        if ( typeof Galleria.theme === 'object' ) {
             this._init();
         } else {
-            Utils.addTimer('themeload', function() {
-                Galleria.raise( 'No theme found.', true);
-            }, 5000);
-
-            $doc.one( Galleria.THEMELOAD, function() {
-                Utils.clearTimer( 'themeload' );
-                self._init.call( self );
+            Utils.wait({
+                until: function() {
+                    return typeof Galleria.theme === 'object';
+                },
+                success: function() {
+                    self._init.call( self );
+                },
+                error: function() {
+                    Galleria.raise( 'No theme found.', true );
+                },
+                timeout: 5000
             });
         }
     },
 
-    // the internal _init is called when the THEMELOAD event is triggered
     // this method should only be called once per instance
     // for manipulation of data, use the .load method
 
@@ -3559,7 +3562,6 @@ Galleria.addTheme = function( theme ) {
                 // we found the css
                 css = true;
                 Galleria.theme = theme;
-                $doc.trigger( Galleria.THEMELOAD );
                 
                 return false;
             }
@@ -3580,7 +3582,6 @@ Galleria.addTheme = function( theme ) {
                     Utils.addTimer( "css", function() {
                         Utils.loadCSS( css, 'galleria-theme', function() {
                             Galleria.theme = theme;
-                            $doc.trigger( Galleria.THEMELOAD );
                         });
                     }, 1);
 
@@ -3595,7 +3596,6 @@ Galleria.addTheme = function( theme ) {
         
         // pass
         Galleria.theme = theme;
-        $doc.trigger( Galleria.THEMELOAD );
     }
     return theme;
 };
@@ -3793,7 +3793,7 @@ Galleria.Picture.prototype = {
     // creates a new image and adds it to cache when loaded
     add: function( src ) {
 
-        var i,
+        var i = 0,
             self = this,
 
             // create the image
