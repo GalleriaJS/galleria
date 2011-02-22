@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.1 2010-02-21
+ * @preserve Galleria v 1.2.2 2010-02-22
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -1844,7 +1844,8 @@ Galleria.prototype = {
 
         // hide controls if chosen to
         $.each( ['info','counter','image-nav'], function( i, el ) {
-            if ( self._options[ 'show_' + el.replace(/-/, '') ] === false ) {
+            el = el.substr(0,1).toUpperCase() + el.substr(1).replace(/-/,'');
+            if ( self._options[ 'show' + el ] === false ) {
                 Utils.moveOut( self.get( el ) );
             }
         });

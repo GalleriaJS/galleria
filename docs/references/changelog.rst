@@ -2,6 +2,9 @@
 Changelog
 *********
 
+1.2.2
+* Fixed showInfo, showCounter and showImagenav options
+
 1.2.1
 -----
 
