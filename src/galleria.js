@@ -1846,7 +1846,7 @@ Galleria.prototype = {
         $.each( ['info','counter','image-nav'], function( i, el ) {
             el = el.substr(0,1).toUpperCase() + el.substr(1).replace(/-/,'');
             if ( self._options[ 'show' + el ] === false ) {
-                Utils.moveOut( self.get( el ) );
+                Utils.moveOut( self.get( el.toLowerCase() ) );
             }
         });
 
