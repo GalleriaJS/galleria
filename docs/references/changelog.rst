@@ -3,6 +3,7 @@ Changelog
 *********
 
 1.2.2
+-----
 * Fixed showInfo, showCounter and showImagenav options
 * Fixed IE bug when loading a theme from jQuery’s domReady callback
 * Fixed IE7 bug when calculating height, it now takes the maximum height from different values
