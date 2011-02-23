@@ -318,11 +318,8 @@ var undef,
                        }
                    }
                };
-               
-               var s = doc.getElementsByTagName( 'script' )[0];
-               s.parentNode.insertBefore( script, s );
-               
-               //document.documentElement.appendChild( script );
+
+               DOM().head.appendChild( script );
             },
 
             // parse anything into a number
