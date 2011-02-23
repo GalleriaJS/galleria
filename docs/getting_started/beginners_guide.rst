@@ -70,7 +70,7 @@ Now that we have a HTML template and jQuery in place, it's time to install Galle
 2. Extract the galleria.zip file and place the "galleria" directory where you have your HTML files.
 3. Add the following code beneath the jQuery script tag we added earlier::
 
-    <script src="galleria/src/galleria-1.2.min.js"></script>
+    <script src="galleria/galleria-1.2.2.min.js"></script>
     
 To make sure Gallery works properly add the following code inside the ``<body>`` tag::
 
@@ -85,7 +85,7 @@ The HTML file should look something like::
     <html>
         <head>
             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-            <script src="galleria/src/galleria-1.2.min.js"></script>
+            <script src="galleria/galleria-1.2.2.min.js"></script>
         </head>
         <body>
             <script>
@@ -123,7 +123,7 @@ but you can download and try other themes later on.
 A theme is included using a javascript function called ``Galleria.loadTheme``. Insert the following code **after the images** in the source code::
 
     <script>
-        Galleria.loadTheme('galleria/src/themes/classic/galleria.classic.js');
+        Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
 
 
 Set dimensions and fire up the gallery
@@ -152,7 +152,7 @@ The complete code example:
     <html>
         <head>
             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-            <script src="galleria/src/galleria-1.2.min.js"></script>
+            <script src="galleria/galleria-1.2.2.min.js"></script>
         </head>
         <body>
             <div id="gallery">
@@ -161,7 +161,7 @@ The complete code example:
                 <img src="photo3.jpg">
             </div>
             <script>
-                Galleria.loadTheme('galleria/src/themes/classic/galleria.classic.js');
+                Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
                 $("#gallery").galleria({
                     width: 500,
                     height: 500

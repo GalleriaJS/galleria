@@ -1,6 +1,6 @@
-=============
-show_imagenav
-=============
+============
+showImagenav
+============
 
     | type: **Boolean**
     | default: **true**

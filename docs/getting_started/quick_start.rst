@@ -74,9 +74,6 @@ You can also define the images as a JSON array::
     });
     </script>
 
-Galleria also provides plugins to fetch image data from other sources like
-Flickr.
-
 
 Activate Galleria
 =================
