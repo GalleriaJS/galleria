@@ -3,11 +3,9 @@ Galleria
 ********
 **A JavaScript image gallery for the fastidious.**
 
-Info & demos: http://galleria.aino.se/.
+Info & demos: http://galleria.aino.se/
 
-Updates via twitter: http://twitter.com/galleriajs.
-
-Support community at Get Satisfaction: http://getsatisfaction.com/galleria
+Updates via twitter: http://twitter.com/galleriajs
 
 Documentation
 =============
