@@ -1,6 +1,6 @@
-============
+=============
 showImagenav
-============
+=============
 
     | type: **Boolean**
     | default: **true**

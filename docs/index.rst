@@ -31,6 +31,7 @@ References
     :maxdepth: 1
     
     references/faq
+    references/changelog
     references/optimize
     references/extending
     references/dom
