@@ -22,6 +22,10 @@ Themes
     
     themes/using_themes.rst
     themes/creating_a_theme.rst
+    themes/classic.rst
+    themes/miniml.rst
+    themes/twelve.rst
+    themes/fullscreen.rst
 
 
 References
