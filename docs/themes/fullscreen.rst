@@ -9,6 +9,8 @@ A fullscreen gallery that takes control over the entire browser window.
 Defaults
 --------
 
+::
+
     {
         transition: "none",
         imageCrop: true,
@@ -18,6 +20,8 @@ Defaults
 
 Theme-specific options
 ----------------------
+
+::
 
     {
         // Toggles the dock

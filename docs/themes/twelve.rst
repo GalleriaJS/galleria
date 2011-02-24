@@ -9,6 +9,8 @@ The Twelve theme was the first Premium theme created for Galleria.
 Defaults
 --------
 
+::
+
     {
         transition: "pulse",
         transitionSpeed: 500,
@@ -19,6 +21,8 @@ Defaults
 
 Theme-specific options
 ----------------------
+
+::
 
     {
         // Toggles the fullscreen button

@@ -9,6 +9,8 @@ A light, minimal Galleria theme using dots as navigation and some nifty details.
 Defaults
 --------
 
+::
+
     {
         transition: "pulse",
         thumbCrop: true,
@@ -20,6 +22,8 @@ Defaults
 
 Theme-specific options
 ----------------------
+
+::
 
     {   
         // Localized strings, modify these if you want tooltips in your language
