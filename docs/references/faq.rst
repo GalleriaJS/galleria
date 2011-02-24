@@ -13,7 +13,7 @@ What browsers can I run Galleria in?
 Wait a minute, what’s up with all the ”Buy now” stuff? I thought Galleria was free?
 -----------------------------------------------------------------------------------
 
-Galleria and two themes are released under the MIT license and is completely free to use and abuse. We like to keep it that way. However, nobody wants to see Galleria become yet another JavaScript component that drops out after the first beta, like so many jQuery-related products do. But in order to establish continuous growth and progress, we need fundings. Donations are always welcome, but unfortunately not enough to keep things running for us.
+The Galleria core and one bundled theme (Classic) is released under the MIT license and is completely free to use and abuse. We like to keep it that way. However, nobody wants to see Galleria become yet another JavaScript component that drops out after the first beta, like so many jQuery-related products do. But in order to establish continuous growth and progress, we need fundings. Donations are always welcome, but unfortunately not enough to keep things running for us.
 
 So the business model we decided to take was to keep Galleria 100% free but also develop Premium Themes and add-ons that we release under a commercial license. These themes are available for purchase on our site and they probably cost less than half of your hourly consulting fee rate. Purchasing themes is a great way to support the project and at the same time increase your portfolio of web design components.
 
