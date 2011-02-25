@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.2 2011-02-23
+ * @preserve Galleria v 1.2.2 2011-02-25
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -272,7 +272,7 @@ var undef,
 
             toggleQuality : function( img, force ) {
 
-                if ( IE !== 7 || IE !== 8  || !img ) {
+                if ( ( IE !== 7 && IE !== 8 ) || !img ) {
                     return;
                 }
 
