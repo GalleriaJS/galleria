@@ -2752,6 +2752,40 @@ this.prependChild( 'info', 'myElement' );
     },
 
     /**
+        Fast helper for placing galleria elements after siblings that you added using addElement().
+
+        @param {string} siblingID The sibling element ID after which to place the element.
+        @param {string} elementID The element ID that should be placed after.
+
+        @example this.addElement( 'myElement' );
+                 this.after( 'info', 'myElement' );
+
+        @returns {Galleria}
+    */
+
+    after : function( siblingID, elementID ) {
+        this.$( siblingID ).after( this.get( elementID ) || elementID );
+        return this;
+    },
+
+    /**
+        Fast helper for placing galleria elements before siblings that you added using addElement().
+
+        @param {string} siblingID The sibling element ID before which to place the element.
+        @param {string} elementID The element ID that should be placed before.
+
+        @example this.addElement( 'myElement' );
+                 this.before( 'info', 'myElement' );
+
+        @returns {Galleria}
+    */
+
+    before : function( siblingID, elementID ) {
+        this.$( siblingID ).before( this.get( elementID ) || elementID );
+        return this;
+    },
+
+    /**
         Remove an element by blueprint
 
         @param {string} elemID The element to be removed.
