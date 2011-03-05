@@ -1517,6 +1517,7 @@ Galleria.prototype = {
             imagePan: false,
             imagePanSmoothness: 12,
             imagePosition: '50%',
+            infoElements: ['title','description','author'],
             keepSource: false,
             lightboxFadeSpeed: 200,
             lightboxTransition_speed: 500,
@@ -3394,9 +3395,9 @@ this.prependChild( 'info', 'myElement' );
     },
 
     /**
-        Manually set captions
+        Manually set info
 
-        @param {number} index Optional data index to fectch and apply as caption,
+        @param {number} index Optional data index to fetch and apply info,
         if no index found it assumes the currently active index
 
         @returns Instance
@@ -3407,7 +3408,7 @@ this.prependChild( 'info', 'myElement' );
         var self = this,
             data = this.getData( index );
 
-        $.each( ['title','description','author'], function( i, type ) {
+        $.each( self._options.infoElements || [], function( i, type ) {
 
             var elem = self.$( 'info-' + type );
 
