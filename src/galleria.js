@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.2 2011-02-25
+ * @preserve Galleria v 1.2.3a 2011-03-11
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -1259,8 +1259,8 @@ var Galleria = function() {
                     image:      abs+'top:10px;left:10px;right:10px;bottom:30px;overflow:hidden;display:block;',
                     prevholder: abs+'width:50%;top:0;bottom:40px;cursor:pointer;',
                     nextholder: abs+'width:50%;top:0;bottom:40px;right:-1px;cursor:pointer;',
-                    prev:       abs+'top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;left:20px;display:none;line-height:40px;text-align:center;color:#000',
-                    next:       abs+'top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;right:20px;left:auto;display:none;line-height:40px;text-align:center;color:#000',
+                    prev:       abs+'top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;left:20px;display:none;text-align:center;color:#000;font:bold 16px/36px arial,sans-serif',
+                    next:       abs+'top:50%;margin-top:-20px;height:40px;width:30px;background:#fff;right:20px;left:auto;display:none;font:bold 16px/36px arial,sans-serif;text-align:center;color:#000',
                     title:      'float:left',
                     counter:    'float:right;margin-left:8px;'
                 },
@@ -1377,7 +1377,8 @@ var Galleria = function() {
                             imageTarget: image.image
                         });
 
-                        image.show();
+                        $( image.container ).show();
+                        
                         Utils.show( image.image, speed );
                         Utils.show( lightbox.elems.info, speed );
                     }
@@ -1434,9 +1435,10 @@ var Galleria = function() {
                     width: '100.5%',
                     height: '100.5%',
                     top: 0,
-                    zIndex: 99998,
-                    opacity: 0
+                    zIndex: 99998
                 });
+
+                Utils.hide( image.image );
 
                 lightbox.elems.title.innerHTML = data.title;
                 lightbox.elems.counter.innerHTML = (index + 1) + ' / ' + total;
@@ -1518,8 +1520,9 @@ Galleria.prototype = {
             imagePanSmoothness: 12,
             imagePosition: '50%',
             keepSource: false,
+            lightbox: false, // 1.2.3
             lightboxFadeSpeed: 200,
-            lightboxTransition_speed: 500,
+            lightboxTransitionSpeed: 400,
             linkSourceTmages: true,
             maxScaleRatio: undef,
             minScaleRatio: undef,
@@ -2964,19 +2967,26 @@ this.prependChild( 'info', 'myElement' );
                 self.addPan( next.image );
             }
 
-            // make the image link
-            if ( data.link ) {
+            // make the image link or add lightbox
+            // link takes precedence over lightbox if both are detected
+            if ( data.link || self._options.lightbox ) {
 
                 $( next.image ).css({
                     cursor: 'pointer'
                 }).bind( CLICK(), function() {
 
                     // popup link
-                    if ( self._options.popupLinks ) {
-                        win = window.open( data.link, '_blank' );
-                    } else {
-                        window.location.href = data.link;
+                    if ( data.link ) {
+                        if ( self._options.popupLinks ) {
+                            win = window.open( data.link, '_blank' );
+                        } else {
+                            window.location.href = data.link;
+                        }
+                        return;
                     }
+                    
+                    self.openLightbox();
+                    
                 });
             }
 
@@ -3072,7 +3082,7 @@ this.prependChild( 'info', 'myElement' );
                     });
 
                     var transition = active.image === null && self._options.transitionInitial ?
-                        self._options.transition_Initial : self._options.transition;
+                        self._options.transitionInitial : self._options.transition;
 
                     // validate the transition
                     if ( transition in _transitions === false ) {

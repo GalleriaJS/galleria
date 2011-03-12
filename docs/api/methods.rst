@@ -31,6 +31,13 @@ no interval is given, default (5000 = 5 seconds) is used.
 
 Stops the slideshow and resets the interval.
 
+.playToggle()
+-------------
+
+    | returns **Galleria**
+
+Stops the slideshow if currently playing, otherwise it start the slideshow.
+
 
 .next()
 -------

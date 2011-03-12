@@ -2,6 +2,14 @@
 Changelog
 *********
 
+1.2.3
+-----
+* Fixed initialLightbox option bug
+* Improved lightbox controls
+* Fixed fade bug in lightbox mode
+* Added a lightbox option as a helper for attaching a click event that triggers the lightbox for each image
+* Added playToggle() method in the docs
+
 1.2.2
 -----
 * Fixed showInfo, showCounter and showImagenav options
