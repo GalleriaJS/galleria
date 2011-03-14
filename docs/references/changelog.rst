@@ -4,6 +4,9 @@ Changelog
 
 1.2.3
 -----
+* Added 'big' as data key. This makes it possible to provide a bigger image for fullscreen mode.
+* Added 'Using image data' reference to explain in detail how Galleria handles image data
+* Added isPlaying(), isFullscreen() and refreshImage() to the API docs
 * Fixed so that exiting fullscreen mode will also revert the keymap that was applied before entering
 * Fixed attachKeyboard so that you can attach a custom keyCode (thanks rspeicher)
 * Fixed chrome bug when fading the tooltip

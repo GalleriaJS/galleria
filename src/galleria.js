@@ -1035,6 +1035,9 @@ var Galleria = function() {
                 right: self.next,
                 left: self.prev
             });
+            
+            // swap to big image by calling show again
+            self.show( self.getIndex() );
 
             // init the first rescale and attach callbacks
             self.rescale(function() {
@@ -2217,10 +2220,14 @@ Galleria.prototype = {
 
         var self = this;
 
-        // copy image as thumb if no thumb exists
         $.each( this._data, function( i, data ) {
+            // copy image as thumb if no thumb exists
             if ( 'thumb' in data === false ) {
                 self._data[ i ].thumb = data.image;
+            }
+            // copy image as big image if no biggie exists
+            if ( !'big' in data ) {
+                self._data[ i ].big = data.image;
             }
         });
 
@@ -2941,8 +2948,8 @@ this.prependChild( 'info', 'myElement' );
         if ( !data ) {
             return;
         }
-
-        var src    = data.image,
+        
+        var src    = this.isFullscreen() && 'big' in data ? data.big : data.image, // use big image if fullscreen mode
             active = this._controls.getActive(),
             next   = this._controls.getNext(),
             cached = next.isCached( src ),
@@ -3055,6 +3062,7 @@ this.prependChild( 'info', 'myElement' );
             imageTarget: next.image,
             thumbTarget: thumb.image
         });
+        
         // begin loading the next image
         next.load( src, function( next ) {
             self._scaleImage( next, {
