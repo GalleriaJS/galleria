@@ -4,7 +4,12 @@ Changelog
 
 1.2.3
 -----
-* Fixed initialLightbox option bug
+* Fixed so that exiting fullscreen mode will also revert the keymap that was applied before entering
+* Fixed attachKeyboard so that you can attach a custom keyCode (thanks rspeicher)
+* Fixed chrome bug when fading the tooltip
+* Fixed double show bug when using load()
+* Fixed initialTransition option bug
+* Fixed so that the counter updates properly when modifying the data object at run time
 * Improved lightbox controls
 * Fixed fade bug in lightbox mode
 * Added a lightbox option as a helper for attaching a click event that triggers the lightbox for each image
