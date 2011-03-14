@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.3a 2011-03-11
+ * @preserve Galleria v 1.2.3a2 2011-03-14
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -217,11 +217,6 @@ var undef,
                 // bring back saved opacity
                 var saved = parseFloat( elem.data('opacity') ) || 1,
                     style = { opacity: saved };
-
-                // reset save if opacity === 1
-                if (saved === 1) {
-                    elem.data('opacity', null);
-                }
 
                 // animate or toggle
                 if (speed) {
@@ -642,6 +637,8 @@ var Galleria = function() {
                     up = key.toUpperCase();
                     if ( up in keyboard.keys ) {
                         keyboard.map[ keyboard.keys[up] ] = map[key];
+                    } else {
+                        keyboard.map[ up ] = map[key];
                     }
                 }
             }
@@ -653,6 +650,7 @@ var Galleria = function() {
 
         detach: function() {
             keyboard.bound = false;
+            keyboard.map = {};
             $doc.unbind('keydown', keyboard.press);
         }
     };
@@ -990,8 +988,13 @@ var Galleria = function() {
     // added in 1.195
     // still kind of experimental
     var fullscreen = this._fullscreen = {
+        
         scrolled: 0,
+        
         active: false,
+        
+        keymap: self._keyboard.map,
+        
         enter: function(callback) {
 
             fullscreen.active = true;
@@ -1023,7 +1026,10 @@ var Galleria = function() {
             Utils.forceStyles( DOM().html, htmlbody );
             Utils.forceStyles( DOM().body, htmlbody );
 
-            // attach some keys
+            // temporarily attach some keys
+            // save the old ones first in a cloned object
+            fullscreen.keymap = $.extend({}, self._keyboard.map);
+            
             self.attachKeyboard({
                 escape: self.exitFullscreen,
                 right: self.next,
@@ -1070,8 +1076,9 @@ var Galleria = function() {
             // scroll back
             window.scrollTo(0, fullscreen.scrolled);
 
-            // detach all keyboard events (is this good?)
+            // detach all keyboard events and apply the old keymap
             self.detachKeyboard();
+            self.attachKeyboard( fullscreen.keymap );
 
             self.rescale(function() {
                 Utils.addTimer('fullscreen_exit', function() {
@@ -1704,7 +1711,6 @@ Galleria.prototype = {
                     this.trigger( Galleria.PLAY );
                     this._playing = true;
                 }
-
                 // if second load, just do the show and return
                 if ( one ) {
                     if ( typeof this._options.show === 'number' ) {
@@ -1757,7 +1763,7 @@ Galleria.prototype = {
                 if ( /^[0-9]{1,4}$/.test( HASH ) && Galleria.History ) {
                     this.show( HASH, undef, true );
 
-                } else {
+                } else if( this._data[ this._options.show ] ) {
                     this.show( this._options.show );
                 }
             };
@@ -1878,6 +1884,8 @@ Galleria.prototype = {
     // can be used at any time, f.ex when the data object is manipulated
 
     _createThumbnails : function() {
+        
+        this.get('total').innerHTML = this.getDataLength();
 
         var i,
             src,
