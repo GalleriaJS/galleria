@@ -20,7 +20,7 @@ You can provide this data to Galleria in a number of ways. The easiest way to st
 
 The most common way for a quick start is to let Galleria parse the HTML and extract data itself. 
 
-By default, Galleria parses your HTML in a specific way. The minimum HTML required for Galleria to function is this:
+By default, Galleria parses your HTML in a specific way. The minimum HTML required for Galleria to function is this::
 
     <img src="image.jpg">
 
@@ -33,7 +33,7 @@ You can place the ``<img>`` tags anywhere inside the container from where you ca
         original: [IMG element]
     }
 
-If you want to extract more data from the HTML source such as title & description, you can provide this as ``<img>`` attributes::
+Note that Galleria will use the image.jpg file to create thumbnails and the big image if you do not provide separate files for these views. If you want to extract more data from the HTML source such as title & description, you can provide this as ``<img>`` attributes::
 
     <img src="image.jpg" title="My image title" alt="My description" longdesc="http://my.destination.com">
 

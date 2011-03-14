@@ -7,7 +7,9 @@ One of the goals with Galleria is to simplify the process of creating beautiful 
 1. Use reasonably sized images
 ------------------------------
 
-The biggest performance lag comes from using really large images and letting Galleria scale them down for you. This might work OK in your local environment, but it can have great effects for users with less optimized setups. Always scale down your images to a reasonable size and use jpg for compression. A good standard to start with is 1000px x 1000px using 70 as quality.
+The biggest performance lag comes from using really large images and letting Galleria scale them down for you. This might work OK in your local environment, but it can have great effects for users with less optimized setups. Always scale down your images to a reasonable size and use jpg for compression. A good standard to start with is 600px x 600px using 70 as quality.
+
+If you think the images gets too distorted in fullscreen mode, you can define separate images for fullscreen. Just pass them as 'big' in the data object (using JSON or the dataConfig() option).
 
 
 2. Use separate thumbnails
