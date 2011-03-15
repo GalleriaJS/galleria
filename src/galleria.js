@@ -1066,7 +1066,7 @@ var Galleria = function() {
                                 imageTarget: image,
                                 thumbTarget: thumb
                             });
-                            $( self.getActiveImage() ).replaceWith( big.image );
+                            self._controls[ self._controls.active ].image.src = big.image.src;
                         }
                     });
                 });
@@ -2987,6 +2987,8 @@ this.prependChild( 'info', 'myElement' );
             next   = this._controls.getNext(),
             cached = next.isCached( src ),
             thumb  = this._thumbnails[ queue.index ];
+        
+        console.log(active,next)
 
         // to be fired when loading & transition is complete:
         var complete = function() {
@@ -3067,12 +3069,14 @@ this.prependChild( 'info', 'myElement' );
         if ( this._options.preload ) {
 
             var p, i,
-                n = this.getNext();
+                n = this.getNext(),
+                data;
 
             try {
                 for ( i = this._options.preload; i > 0; i-- ) {
                     p = new Galleria.Picture();
-                    p.add( self.getData( n ).image );
+                    data = self.getData( n );
+                    p.add( this.isFullscreen() && 'big' in data ? data.big : data.image );
                     n = self.getNext( n );
                 }
             } catch(e) {}
