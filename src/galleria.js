@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.3a2 2011-03-14
+ * @preserve Galleria v 1.2.3a3 2011-03-15
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -1017,11 +1017,13 @@ var Galleria = function() {
             });
 
             var htmlbody = {
-                height: '100%',
-                overflow: 'hidden',
-                margin:0,
-                padding:0
-            };
+                    height: '100%',
+                    overflow: 'hidden',
+                    margin:0,
+                    padding:0
+                },
+
+                data = self.getData();
 
             Utils.forceStyles( DOM().html, htmlbody );
             Utils.forceStyles( DOM().body, htmlbody );
@@ -1036,8 +1038,39 @@ var Galleria = function() {
                 left: self.prev
             });
             
-            // swap to big image by calling show again
-            self.show( self.getIndex() );
+            // swap to big image if it’s different from the display image
+            
+            if ( data.image !== data.big ) {
+                
+                var big    = new Galleria.Picture(),
+                    cached = big.isCached( data.big ),
+                    index  = self.getIndex(),
+                    thumb  = self._thumbnails[ index ],
+                    image  = big.image;
+                
+                self.trigger( {
+                    type: Galleria.LOADSTART,
+                    cached: cached,
+                    index: index,
+                    imageTarget: image,
+                    thumbTarget: thumb
+                });
+                
+                big.load( data.big, function( big ) {
+                    self._scaleImage( big, {
+                        complete: function( big ) {
+                            self.trigger({
+                                type: Galleria.LOADFINISH,
+                                cached: cached,
+                                index: index,
+                                imageTarget: image,
+                                thumbTarget: thumb
+                            });
+                            $( self.getActiveImage() ).replaceWith( big.image );
+                        }
+                    });
+                });
+            }
 
             // init the first rescale and attach callbacks
             self.rescale(function() {
@@ -3922,9 +3955,9 @@ Galleria.Picture.prototype = {
             },
             error: function() {
                 window.setTimeout(function() { callback.call( self, self ); }, 50 );
-                Galleria.raise('image not loaded in 10 seconds: '+ src);
+                Galleria.raise('image not loaded in 30 seconds: '+ src);
             },
-            timeout: 10000
+            timeout: 30000
         });
 
         // return the container
