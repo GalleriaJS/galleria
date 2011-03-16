@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.3a3 2011-03-15
+ * @preserve Galleria v 1.2.3a3 2011-03-16
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
