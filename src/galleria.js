@@ -1040,7 +1040,7 @@ var Galleria = function() {
             
             // swap to big image if it’s different from the display image
             
-            if ( data.image !== data.big ) {
+            if ( data.big && data.image !== data.big ) {
                 
                 var big    = new Galleria.Picture(),
                     cached = big.isCached( data.big ),
