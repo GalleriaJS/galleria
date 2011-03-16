@@ -1045,14 +1045,13 @@ var Galleria = function() {
                 var big    = new Galleria.Picture(),
                     cached = big.isCached( data.big ),
                     index  = self.getIndex(),
-                    thumb  = self._thumbnails[ index ],
-                    image  = big.image;
+                    thumb  = self._thumbnails[ index ]
                 
                 self.trigger( {
                     type: Galleria.LOADSTART,
                     cached: cached,
                     index: index,
-                    imageTarget: image,
+                    imageTarget: self.getActiveImage(),
                     thumbTarget: thumb
                 });
                 
@@ -1063,10 +1062,12 @@ var Galleria = function() {
                                 type: Galleria.LOADFINISH,
                                 cached: cached,
                                 index: index,
-                                imageTarget: image,
+                                imageTarget: big.image,
                                 thumbTarget: thumb
                             });
-                            self._controls[ self._controls.active ].image.src = big.image.src;
+                            if ( self._controls.getActive().image ) {
+                                self._controls.getActive().image.src = big.image.src;
+                            }
                         }
                     });
                 });
@@ -2217,7 +2218,7 @@ Galleria.prototype = {
 
             // check if it's a link to another image
             if ( /\.(png|gif|jpg|jpeg)(\?.*)?$/i.test(href) ) {
-                data.image = href;
+                data.image = data.big = href;
 
             // else assign the href as a link if it exists
             } else if ( href ) {
@@ -2231,6 +2232,7 @@ Galleria.prototype = {
                 title:       img.attr('title'),
                 thumb:       img.attr('src'),
                 image:       img.attr('src'),
+                big:         img.attr('src'),
                 description: img.attr('alt'),
                 link:        img.attr('longdesc'),
                 original:    img.get(0) // saved as a reference
@@ -2987,8 +2989,6 @@ this.prependChild( 'info', 'myElement' );
             next   = this._controls.getNext(),
             cached = next.isCached( src ),
             thumb  = this._thumbnails[ queue.index ];
-        
-        console.log(active,next)
 
         // to be fired when loading & transition is complete:
         var complete = function() {
