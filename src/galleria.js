@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.3a3 2011-03-16
+ * @preserve Galleria v 1.2.3a3 2011-03-17
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -722,6 +722,9 @@ var Galleria = function() {
             carousel.setClasses();
 
             self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > carousel.width );
+            
+            // one extra calculation
+            carousel.width = self.$( 'thumbnails-list' ).width();
 
             // todo: fix so the carousel moves to the left
         },
