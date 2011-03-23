@@ -589,7 +589,7 @@ var Galleria = function() {
 
     // add some elements
     var divs =  'container stage images image-nav image-nav-left image-nav-right ' +
-                'info info-text info-title info-description info-author ' +
+                'info info-text info-title info-description ' +
                 'thumbnails thumbnails-list thumbnails-container thumb-nav-left thumb-nav-right ' +
                 'loader counter tooltip',
         spans = 'current total';
@@ -1068,8 +1068,12 @@ var Galleria = function() {
                                 imageTarget: big.image,
                                 thumbTarget: thumb
                             });
-                            if ( self._controls.getActive().image ) {
-                                self._controls.getActive().image.src = big.image.src;
+                            var image = self._controls.getActive().image;
+                            console.log(image)
+                            if ( image ) {
+                                $( image ).width( big.image.width ).height( big.image.height )
+                                    .attr( 'style', $( big.image ).attr('style') )
+                                    .attr( 'src', big.image.src );
                             }
                         }
                     });
@@ -1812,7 +1816,7 @@ Galleria.prototype = {
         // build the gallery frame
         this.append({
             'info-text' :
-                ['info-title', 'info-description', 'info-author'],
+                ['info-title', 'info-description'],
             'info' :
                 ['info-text'],
             'image-nav' :
@@ -3473,7 +3477,7 @@ this.prependChild( 'info', 'myElement' );
         var self = this,
             data = this.getData( index );
 
-        $.each( ['title','description','author'], function( i, type ) {
+        $.each( ['title','description'], function( i, type ) {
 
             var elem = self.$( 'info-' + type );
 
