@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.3a3 2011-03-17
+ * @preserve Galleria v 1.2.3a4 2011-03-23
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -1069,7 +1069,6 @@ var Galleria = function() {
                                 thumbTarget: thumb
                             });
                             var image = self._controls.getActive().image;
-                            console.log(image)
                             if ( image ) {
                                 $( image ).width( big.image.width ).height( big.image.height )
                                     .attr( 'style', $( big.image ).attr('style') )
