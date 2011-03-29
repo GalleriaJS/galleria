@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.3a4 2011-03-23
+ * @preserve Galleria v 1.2.3a4 2011-03-29
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -1770,6 +1770,10 @@ Galleria.prototype = {
                         delete data.link;
                     });
                     this.$( 'stage' ).css({ cursor : 'pointer' }).bind( CLICK(), function(e) {
+                        // pause if options is set
+                        if ( self._options.pauseOnInteraction ) {
+                            self.pause();
+                        }
                         self.next();
                     });
                 }
@@ -1884,7 +1888,7 @@ Galleria.prototype = {
             }
 
             // pause if options is set
-            if ( self._options.pause_on_interaction ) {
+            if ( self._options.pauseOnInteraction ) {
                 self.pause();
             }
 
