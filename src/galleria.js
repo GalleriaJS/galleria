@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.3a4 2011-03-29
+ * @preserve Galleria v 1.2.3b1 2011-04-05
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -393,6 +393,7 @@ var undef,
                         }
 
                         if ( IE ) {
+                            // todo: test if IE really needs the readyState
                             link.attachEvent( 'onreadystatechange', function(e) {
                                 if( link.readyState === 'complete' ) {
                                     ready = true;
@@ -419,7 +420,7 @@ var undef,
                         error: function() {
                             Galleria.raise( 'Theme CSS could not load' );
                         },
-                        timeout: 1000
+                        timeout: 10000
                     });
                 }
                 return link;
