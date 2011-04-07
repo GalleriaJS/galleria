@@ -24,6 +24,7 @@
         
         <!-- load Galleria -->
         <script src="../../galleria.js"></script>
+        <script src="../../../../../plugins/flickr/galleria.flickr.js"></script>
 
     </head>
 <body>
@@ -81,7 +82,7 @@
             </a>
         </div>
         
-        <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>.</p>
+        <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>. <a href="#" id="load">Load</a></p>
     </div>
     <script>
 
@@ -89,7 +90,19 @@
     Galleria.loadTheme('galleria.classic.js');
     
     // Initialize Galleria
-    $('#galleria').galleria();
+    $('#galleria').galleria({
+        flickr: 'set:308783'
+    });
+    
+    $('#load').click(function(e) {
+        e.preventDefault();
+        var flickr = new Galleria.Flickr(),
+            instance = Galleria.get(0);
+        instance.$('loader').show();
+        flickr.search('milan', function(data) {
+            instance.load( data );
+        });
+    });
 
     </script>
     </body>
