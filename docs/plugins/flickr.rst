@@ -5,12 +5,14 @@ Flickr Plugin
 The Galleria Flickr Plugin is a small but useful plugin to allow your gallery to communicate with the Flickr API using some really simple commands. Galleria optimizes the Flickr data behind the scenes to make the Gallery rendering as good as possible. You can also control some aspects of the data conversion, like image sizes, sorting, captions etc. 
 
 Example on how to search flickr for "galleria" and display the first 30 results::
+---------------------------------------------------------------------------------
 
     $('#galleria').galleria({
         flickr: 'search:galleria'
     });
 
 Example on how to fetch a flickr photoset into Galleria and sort using date ascending::
+---------------------------------------------------------------------------------------
 
     $('#galleria').galleria({
         flickr: 'set:308783',
@@ -22,6 +24,7 @@ Example on how to fetch a flickr photoset into Galleria and sort using date asce
 When using the flickr plugin as a Galleria option like this, you simply apply a string like "method:argument" to fetch images. The plugin also allows for more advanced usage for tighter integrations.
 
 Example on how to create a flickr instance and call a method manually::
+-----------------------------------------------------------------------
 
     var flickr = new Galleria.Flickr();
     flickr.search('sweden', function(data) {
@@ -31,6 +34,7 @@ Example on how to create a flickr instance and call a method manually::
     });
     
 Example on how to inject Flickr data into an existing gallery and apply options::
+---------------------------------------------------------------------------------
 
     var flickr = new Galleria.Flickr();
     flickr.setOptions({
