@@ -28,17 +28,18 @@ Themes
     themes/fullscreen.rst
 
 
-References
-==========
+References & Guides
+===================
 
 .. toctree::
     :maxdepth: 1
     
-    references/faq
-    references/changelog
     references/optimize
     references/extending
+    references/data
     references/dom
+    references/faq
+    references/changelog
     
     
 Options

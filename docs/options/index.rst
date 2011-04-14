@@ -79,6 +79,8 @@ List of options
 
 - :doc:`keepSource` Lets you keep the source elements.
 
+- :doc:`lightbox` Helper for attaching a lightbox when the user clicks on an image.
+
 - :doc:`lightboxFadeSpeed` Defines how fast the lightbox should fade.
 
 - :doc:`lightboxTransitionSpeed` Defines how fast the lightbox should animate.
