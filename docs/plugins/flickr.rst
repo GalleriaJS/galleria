@@ -4,6 +4,16 @@ Flickr Plugin
 
 The Galleria Flickr Plugin is a small but useful plugin to allow your gallery to communicate with the Flickr API using some really simple commands. Galleria optimizes the Flickr data behind the scenes to make the Gallery rendering as good as possible. You can also control some aspects of the data conversion, like image sizes, sorting, captions etc. 
 
+How to install the plugin
+=========================
+
+Just include it in the head as a script tag, f.ex::
+
+    <script src="plugins/galleria.flickr.min.js"></script>
+
+Examples
+========
+
 **Example on how to search flickr for "galleria" and display the first 30 results**
 
 ::
