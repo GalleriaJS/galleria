@@ -4,6 +4,8 @@ Changelog
 
 1.2.3
 -----
+* Added Flickr plugin docs
+* Increased CSS load timeout to fix many loadTheme errors
 * Increased image load timeout to 30sec
 * Added 'big' as data key. This makes it possible to provide a bigger image for fullscreen mode.
 * Added 'Using image data' reference to explain in detail how Galleria handles image data
