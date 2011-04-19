@@ -162,6 +162,14 @@ this to automatically add pan on each image using the ``image_pan`` option.
 Removes all panning effects set by ``addPan()``.
 
 
+.refreshImage()
+---------------
+    
+    | returns **Galleria**
+
+Refreshes the image scale & position. Useful if you f.ex. change imageCrop options at run time and need to reposition the image accordingly.
+
+
 Manipulation
 ============
 
@@ -231,6 +239,26 @@ Example::
 
     // appends the element to the stage
     this.prependChild('stage','mystuff');
+    
+
+.setOptions( key, value ) 
+-------------------------
+
+    | returns **Galleria**
+
+Manipulates the gallery options at run time.
+
+Example::
+
+    this.setOptions( 'transition', 'slide' );
+
+You can also manipulate several options by applying an object. This example demonstrates how to alter the image positions and then 
+use refreshImage to apply the new options to the active image::
+
+    this.setOptions({
+        imagePosition: 'top left',
+        imageCrop: true
+    }).refreshImage();
 
 
 .setCounter( [index] )

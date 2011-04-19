@@ -1,3 +1,5 @@
+.. highlight:: javascript
+
 *******************
 Optimizing Galleria
 *******************
@@ -26,12 +28,16 @@ You can define separate thumbnails by linking a thumbnail to the big image in th
 There are no limits to how many images you can add, but after 30 it can clog the pipes on load, especially in IE. Use a reasonable amount of images at first, then try the ``.load()``, ``.splice()`` and ``.push()`` methods to add/remove image data on the fly.
 
 
-4. Include your theme js in the head
-------------------------------------
+4. Include your theme in the head
+---------------------------------
 
 We generally recommend you to use the ``Galleria.loadTheme`` method to load themes because it’s really convenient and makes it easier to switch themes. However, you might get a snappier result if you include the theme javascript in the head tag, especially if it’s minified together with the rest of your scripts.
+You can also add the theme CSS file as a ``<link>`` tag to make it load faster.
 
-You can also add the theme CSS file as a ``<link>`` tag to make it load faster. Just make sure you give it the id 'galleria-theme'.
+Example on how to load the theme in the head instad of using loadTheme::
+
+    <link rel="stylesheet" href="galleria/themes/classic/galleria.classic.css">
+    <script src="galleria/themes/classic/galleria.classic.min.js"></script>
 
 
 5. Use JSON as data
