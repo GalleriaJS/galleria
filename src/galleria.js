@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.3 2011-04-14
+ * @preserve Galleria v 1.2.3 2011-04-20
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -3002,74 +3002,77 @@ this.prependChild( 'info', 'myElement' );
             thumb  = this._thumbnails[ queue.index ];
 
         // to be fired when loading & transition is complete:
-        var complete = function() {
+        var complete = (function( data, next, active, queue, thumb ) {
+            
+            return function() {
 
-            var win;
+                var win;
 
-            // remove stalled
-            self._queue.stalled = false;
+                // remove stalled
+                self._queue.stalled = false;
 
-            // optimize quality
-            Utils.toggleQuality( next.image, self._options.imageQuality );
+                // optimize quality
+                Utils.toggleQuality( next.image, self._options.imageQuality );
 
-            // swap
-            $( active.container ).css({
-                zIndex: 0,
-                opacity: 0
-            });
-            $( next.container ).css({
-                zIndex: 1,
-                opacity: 1
-            });
-            self._controls.swap();
-
-            // add pan according to option
-            if ( self._options.imagePan ) {
-                self.addPan( next.image );
-            }
-
-            // make the image link or add lightbox
-            // link takes precedence over lightbox if both are detected
-            if ( data.link || self._options.lightbox ) {
-
-                $( next.image ).css({
-                    cursor: 'pointer'
-                }).bind( CLICK(), function() {
-
-                    // popup link
-                    if ( data.link ) {
-                        if ( self._options.popupLinks ) {
-                            win = window.open( data.link, '_blank' );
-                        } else {
-                            window.location.href = data.link;
-                        }
-                        return;
-                    }
-                    
-                    self.openLightbox();
-                    
+                // swap
+                $( active.container ).css({
+                    zIndex: 0,
+                    opacity: 0
                 });
-            }
+                $( next.container ).css({
+                    zIndex: 1,
+                    opacity: 1
+                });
+                self._controls.swap();
 
-            // remove the queued image
-            Array.prototype.shift.call( self._queue );
+                // add pan according to option
+                if ( self._options.imagePan ) {
+                    self.addPan( next.image );
+                }
 
-            // if we still have images in the queue, show it
-            if ( self._queue.length ) {
-                self._show();
-            }
+                // make the image link or add lightbox
+                // link takes precedence over lightbox if both are detected
+                if ( data.link || self._options.lightbox ) {
 
-            // check if we are playing
-            self._playCheck();
+                    $( next.image ).css({
+                        cursor: 'pointer'
+                    }).bind( CLICK(), function() {
 
-            // trigger IMAGE event
-            self.trigger({
-                type:        Galleria.IMAGE,
-                index:       queue.index,
-                imageTarget: next.image,
-                thumbTarget: thumb.image
-            });
-        };
+                        // popup link
+                        if ( data.link ) {
+                            if ( self._options.popupLinks ) {
+                                win = window.open( data.link, '_blank' );
+                            } else {
+                                window.location.href = data.link;
+                            }
+                            return;
+                        }
+                    
+                        self.openLightbox();
+                    
+                    });
+                }
+
+                // remove the queued image
+                Array.prototype.shift.call( self._queue );
+
+                // if we still have images in the queue, show it
+                if ( self._queue.length ) {
+                    self._show();
+                }
+
+                // check if we are playing
+                self._playCheck();
+
+                // trigger IMAGE event
+                self.trigger({
+                    type:        Galleria.IMAGE,
+                    index:       queue.index,
+                    imageTarget: next.image,
+                    thumbTarget: thumb.image
+                });
+            };
+        }( data, next, active, queue, thumb ));
 
         // let the carousel follow
         if ( this._options.carousel && this._options.carouselFollow ) {
