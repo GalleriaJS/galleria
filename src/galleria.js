@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.3 2011-04-20
+ * @preserve Galleria v 1.2.4a1 2011-04-26
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -17,7 +17,7 @@ var undef,
     $doc   = $( doc ),
 
 // internal constants
-    DEBUG = false,
+    DEBUG = true,
     NAV   = navigator.userAgent.toLowerCase(),
     HASH  = window.location.hash.replace(/#\//, ''),
     CLICK = function() {
@@ -146,6 +146,9 @@ var undef,
 
     // the internal gallery holder
     _galleries = [],
+    
+    // flag for errors
+    _hasError = false,
 
     // the Utils singleton
     Utils = (function() {
@@ -400,8 +403,23 @@ var undef,
                                 }
                             });
                         } else {
-                            // what to do here? returning for now.
-                            ready = true;
+                            // final test via ajax if not local
+                            if ( !( new RegExp('file://','i').test( href ) ) ) {
+                                $.get({
+                                    url: href,
+                                    success: function() {
+                                        ready = true;
+                                    },
+                                    error: function(e) {
+                                        // pass if origin is rejected in chrome for some reason
+                                        if( e.isRejected() && Galleria.WEBKIT ) {
+                                            ready = true;
+                                        }
+                                    }
+                                });
+                            } else {
+                                ready = true;
+                            }
                         }
                     }, 10);
                 }
@@ -418,9 +436,9 @@ var undef,
                             }, 100);
                         },
                         error: function() {
-                            Galleria.raise( 'Theme CSS could not load' );
+                            Galleria.raise( 'Theme CSS could not load', true );
                         },
-                        timeout: 10000
+                        timeout: 1000
                     });
                 }
                 return link;
@@ -1477,7 +1495,7 @@ var Galleria = function() {
 
             Utils.hide( lightbox.elems.info );
 
-            lightbox.image.load( data.image, function( image ) {
+            lightbox.image.load( data.big || data.image, function( image ) {
 
                 lightbox.width = image.original.width;
                 lightbox.height = image.original.height;
@@ -1544,7 +1562,7 @@ Galleria.prototype = {
 
         // raise error if no target is detected
         if ( !this._target ) {
-             Galleria.raise('Target not found.');
+             Galleria.raise('Target not found.', true);
              return;
         }
 
@@ -1599,9 +1617,9 @@ Galleria.prototype = {
             width: 'auto'
         };
 
-        // apply debug
-        if ( options && options.debug === true ) {
-            DEBUG = true;
+        // tirn off debug
+        if ( options && options.debug === false ) {
+            DEBUG = false;
         }
 
         // hide all content
@@ -1721,7 +1739,7 @@ Galleria.prototype = {
                 },
                 error: function() {
                     // Height was probably not set, raise a hard error
-                    Galleria.raise('Width & Height not found.', true);
+                    Galleria.raise('Could not extract sufficient width/height of the gallery. Traced measures: width:' + num.width + 'px, height: ' + num.height + 'px.', true);
                 },
                 timeout: 2000
             });
@@ -2160,7 +2178,7 @@ Galleria.prototype = {
             },
 
             error: function() {
-                Galleria.raise('Stage measures not found', true);
+                Galleria.raise('Stage width or height is too small to show the gallery. Traced measures: width:' + self._stageWidth + 'px, height: ' + self._stageHeight + 'px.', true);
             }
 
         });
@@ -2225,11 +2243,20 @@ Galleria.prototype = {
             img = $( img );
             var data = {},
                 parent = img.parent(),
-                href = parent.attr( 'href' );
+                href = parent.attr( 'href' ),
+                rel  = parent.attr( 'rel' ),
+                reg  = /\.(png|gif|jpg|jpeg)(\?.*)?$/i;
 
             // check if it's a link to another image
-            if ( /\.(png|gif|jpg|jpeg)(\?.*)?$/i.test(href) ) {
-                data.image = data.big = href;
+            if ( reg.test( href ) ) {
+                
+                data.image = href;
+                
+                if ( reg.test( rel ) ) {
+                    data.big = rel;
+                } else {
+                    data.big = href;
+                }
 
             // else assign the href as a link if it exists
             } else if ( href ) {
@@ -3814,9 +3841,54 @@ Galleria.log = function() {
 
 Galleria.raise = function( msg, fatal ) {
 
-    if ( DEBUG || fatal ) {
-        var type = fatal ? 'Fatal error' : 'Error';
-        throw new Error(type + ': ' + msg);
+    var type = fatal ? 'Fatal error' : 'Error',
+    
+        self = this,
+    
+        echo = function( msg ) {
+
+            var html = '<div style="padding:4px;margin:0 0 2px;background:#' + 
+                ( fatal ? '811' : '222' ) + '";>' +
+                ( fatal ? '<strong>' + type + ': </strong>' : '' ) + 
+                msg + '</div>';
+                
+            $.each( Galleria.get(), function() {
+                
+                var cont = this.$( 'errors' ),
+                    target = this.$( 'target' );
+
+                if ( !cont.length ) {
+                    
+                    target.css( 'position', 'relative' );
+
+                    cont = this.addElement( 'errors' ).appendChild( 'target', 'errors' ).$( 'errors' ).css({
+                        color: '#fff',
+                        position: 'absolute',
+                        top: 10,
+                        left: 10,
+                        zIndex: 50000
+                    });
+                }
+
+                cont.append( html );
+            });
+        };
+    
+    // if debug is on, display errors and throw exception if fatal
+    if ( DEBUG ) {
+        echo( msg );
+        if ( fatal ) {
+            throw new Error(type + ': ' + msg);
+        }
+    
+    // else just echo a silent generic error if fatal
+    } else if ( fatal ) {
+        if ( _hasError ) {
+            return;
+        }
+        _hasError = true;
+        fatal = false;
+        echo( 'Image gallery could not load.' );
     }
 
 };

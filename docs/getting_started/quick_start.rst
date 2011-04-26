@@ -48,6 +48,13 @@ If you want separate thumbnails (recommended), just add them as a link::
         <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
         <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" alt="Another text" title="Another title"></a>
     </div>
+    
+You may also add a separate larger image for fullscreen using the rel attribute::
+
+    <div id="gallery">
+        <a rel="img/big1.jpg" href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
+        <a rel="img/big2.jpg" href="/img/large2.jpg"><img src="/img/thumb2.jpg" alt="Another text" title="Another title"></a>
+    </div>
 
 You can also define the images as a JSON array::
 
@@ -56,6 +63,7 @@ You can also define the images as a JSON array::
         {
             image: 'img1.jpg',
             thumb: 'thumb1.jpg',
+            big: 'big1.jpg',
             title: 'my first image',
             description: 'Lorem ipsum caption',
             link: 'http://domain.com'
@@ -63,6 +71,7 @@ You can also define the images as a JSON array::
         {
             image: 'img2.jpg',
             thumb: 'thumb2.jpg',
+            big: 'big2.jpg',
             title: 'my second image',
             description: 'Another caption',
             link: '/path/to/destination.html'
@@ -73,6 +82,8 @@ You can also define the images as a JSON array::
         data_source: data
     });
     </script>
+    
+For a more in-depth explanation on how Galleria handles image data, read :doc:`/references/data`.
 
 
 Activate Galleria
@@ -96,9 +107,6 @@ Note that Galleria requires a height to function. If you don’t pass width/heig
 Galleria will try to detect dimensions automatically. However, if it fails to detect dimensions
 Galleria will throw a fatal error.
 
-If you run into problems, try passing ``debug: true`` as an option or set
-``Galleria.debug = true`` to trace errors.
-
 
 More examples
 =============
@@ -108,7 +116,7 @@ With extra options::
     <script>
         // crop images:
         $('#gallery').galleria({
-            image_crop: true
+            imageCrop: true
         });
         // use a fading transition:
         $('#gallery').galleria({

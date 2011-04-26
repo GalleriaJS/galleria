@@ -54,7 +54,7 @@ List of options
 - :doc:`dataSource` Defines the Galleria data, or the HTML source where the
   data is found.
 
-- :doc:`debug` Set this to true to get error messages.
+- :doc:`debug` Set this to false to prevent debug messages.
 
 - :doc:`easing` Defines the easing mode globally.
 

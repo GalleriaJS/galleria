@@ -2,6 +2,16 @@
 Changelog
 *********
 
+1.2.4
+-----
+* Improved overall error messages
+* Galleria now prints debug messages to the Galleria container for easier debugging
+* Debug is now true by default
+* Added better error display if debug is true or the error is fatal
+* Change lightbox image to use the bigger image if available
+* Fixed a link bug that caused the link destination to be mixed up between images
+* Added a rel attribute in the HTML that can be used to provide a big image for fullscreen view
+
 1.2.3
 -----
 * Added Flickr plugin docs

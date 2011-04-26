@@ -14,11 +14,12 @@ The image data object that Galleria uses is defined like this:
 * **link** – the image link url (optional) 
 * **original** a reference to the original IMG element (optional)
 
-You can provide this data to Galleria in a number of ways. The easiest way to start is probably by using plain HTML, but you’ll get more control using JSON. In this reference, we guide you through the different ways of providing data to Galleria.
+You can provide this data to Galleria in a number of ways. The easiest way to start is probably by using plain HTML, but you’ll get more control using JSON. 
+In this reference, we guide you through the different ways of providing data to Galleria.
 
 
 1. Using HTML
--------------
+=============
 
 The most common way for a quick start is to let Galleria parse the HTML and extract data itself. 
 
@@ -35,7 +36,12 @@ You can place the ``<img>`` tags anywhere inside the container from where you ca
         original: [IMG element]
     }
 
-Note that Galleria will use the image.jpg file to create thumbnails and the big image if you do not provide separate files for these views. If you want to extract more data from the HTML source such as title & description, you can provide this as ``<img>`` attributes::
+Note that Galleria will use the image.jpg file to create thumbnails and the big image if you do not provide separate files for these views. 
+
+Captions & meta data
+--------------------
+
+If you want to extract meta data from the HTML source such as title & description, you can provide this as ``<img>`` attributes::
 
     <img src="image.jpg" title="My image title" alt="My description" longdesc="http://my.destination.com">
 
@@ -51,7 +57,10 @@ Now you’ll get the following data::
         original: [IMG element]
     }
 
-If you want to provide separate thumbnails, just link the main image using ``<a>`` tags::
+Separate thumbnails
+-------------------
+
+If you want to provide separate thumbnails (highly recommended), just link the main image using ``<a>`` tags::
 
     <a href="image.jpg"><img src="thumb.jpg"></a>
 
@@ -64,9 +73,25 @@ Now you’ll get the following data::
         original: [IMG element]
     }
 
+Separate fullscreen image
+-------------------------
+
+You can also specify a separate larger image for fullscreen & lightbox, using the rel attribute of the anchor tag:
+
+    <a href="image.jpg" rel="big.jpg"><img src="thumb.jpg"></a>
+
+Thi will give you::
+
+    {
+        thumb: 'thumb.jpg',
+        image: 'image.jpg',
+        big: 'big.jpg',
+        original: [IMG element]
+    }
+
 
 2. Using HTML with dataConfig
------------------------------
+=============================
 
 You can also use the dataConfig option combined with HTML to obtain richer data from other sources to provide HTML captions or other custom data types.
 
@@ -87,14 +112,16 @@ An example on how to use the dataConfig option to extract HTML captions from ``<
         }
     });
 
-The dataConfig option function should return an object with any data key/value you wish to provide. If the key existed elsewhere, this will override it. In the example above, we extracted the HTML from the next paragraph after the image element and told Galleria that this is the description data.
+The dataConfig option function should return an object with any data key/value you wish to provide. If the key existed elsewhere, this will override it. 
+In the example above, we extracted the HTML from the next paragraph after the image element and told Galleria that this is the description data.
 
 3. Using JSON
--------------
+=============
 
-Another handy way to serve data is to provide a JSON array to Galleria. This method is preferred by many developers, since you gain more control over what is served to the client, and when. By serving HTML to the client and then let Galleria parse that HTML into Galleria data might be a performance downer if you don’t provide separate thumbnails, since the client has to download all images at once.
+Another handy way to serve data is to provide a JSON array to Galleria. This method is preferred by many developers, since you gain more control over what is served to the client, and when. 
+By serving HTML to the client and then let Galleria parse that HTML into Galleria data might be a performance downer if you don’t provide separate thumbnails, since the client has to download all images at once.
 
-Another good reason to use JSON is that you can provide a separate big image for fullscreen mode. Providing JSON data to Galleria is really easy::
+Providing JSON data to Galleria is really easy::
     
     <div id="galleria"></div>
     <script>
@@ -120,10 +147,6 @@ Another good reason to use JSON is that you can provide a separate big image for
         dataSource: data
     });
 
-Using JSON also makes sense if you want to modify the data using ``push()`` and ``splice()``. Remember that you can also use ``load()`` to load an entire different data set into a Galleria instance at runtime. This makes it easy to create links to separate galleries, f.ex photography categories.
-
-
-Fetching data
--------------
-
-You can fetch the data from the extend method or the theme init using the ``getData()`` method. Read more in the API sections for details.
+Using JSON also makes sense if you want to modify the data using ``push()`` and ``splice()``. 
+Remember that you can also use ``load()`` to load an entire different data set into a Galleria instance at runtime. 
+This makes it easy to create links to separate galleries, f.ex photography categories.
