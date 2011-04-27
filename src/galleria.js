@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4a1 2011-04-26
+ * @preserve Galleria v 1.2.4a2 2011-04-27
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -295,6 +295,7 @@ var undef,
 
             // a loadscript method that works for local scripts
             loadScript: function( url, callback ) {
+                
                 var done = false,
                     script = $('<scr'+'ipt>').attr({
                         src: url,
@@ -398,14 +399,15 @@ var undef,
                         if ( IE ) {
                             // todo: test if IE really needs the readyState
                             link.attachEvent( 'onreadystatechange', function(e) {
-                                if( link.readyState === 'complete' ) {
+                                if ( !ready && (!this.readyState ||
+                                    this.readyState === 'loaded' || this.readyState === 'complete') ) {
                                     ready = true;
                                 }
                             });
                         } else {
                             // final test via ajax if not local
                             if ( !( new RegExp('file://','i').test( href ) ) ) {
-                                $.get({
+                                $.ajax({
                                     url: href,
                                     success: function() {
                                         ready = true;
@@ -1547,9 +1549,6 @@ Galleria.prototype = {
 
         options = _legacyOptions( options );
 
-        // save the instance
-        _galleries.push( this );
-
         // save the original ingredients
         this._original = {
             target: target,
@@ -1617,7 +1616,7 @@ Galleria.prototype = {
             width: 'auto'
         };
 
-        // tirn off debug
+        // turn off debug
         if ( options && options.debug === false ) {
             DEBUG = false;
         }
@@ -2174,6 +2173,10 @@ Galleria.prototype = {
             },
 
             success: function() {
+                
+                // save the instance
+                _galleries.push( self );
+                
                 self.trigger( Galleria.READY );
             },
 
@@ -3725,7 +3728,7 @@ Galleria.loadTheme = function( src, options ) {
         loaded = true;
     } );
 
-    // set a 1 sec timeout, then display a hard error if no theme is loaded
+    // set a 2 sec timeout, then display a hard error if no theme is loaded
     Utils.wait({
         until: function() {
             return loaded;
@@ -3769,6 +3772,7 @@ Galleria.loadTheme = function( src, options ) {
 
                 // now overwrite the old holder with the new instances
                 _galleries = refreshed;
+
             }
         },
         timeout: 2000
@@ -3864,8 +3868,8 @@ Galleria.raise = function( msg, fatal ) {
                     cont = this.addElement( 'errors' ).appendChild( 'target', 'errors' ).$( 'errors' ).css({
                         color: '#fff',
                         position: 'absolute',
-                        top: 10,
-                        left: 10,
+                        top: 0,
+                        left: 0,
                         zIndex: 50000
                     });
                 }
