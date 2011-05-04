@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4a2 2011-04-27
+ * @preserve Galleria v 1.2.4a4 2011-05-04
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -146,6 +146,9 @@ var undef,
 
     // the internal gallery holder
     _galleries = [],
+    
+    // the internal instance holder
+    _instances = [],
     
     // flag for errors
     _hasError = false,
@@ -397,13 +400,20 @@ var undef,
                         }
 
                         if ( IE ) {
+                            
+                            // IE has a limit of 31 stylesheets in one document
+                            if( length >= 31 ) {
+                                Galleria.raise( 'You have reached the browser stylesheet limit (31)', true );
+                                return;
+                            }
+                            
                             // todo: test if IE really needs the readyState
-                            link.attachEvent( 'onreadystatechange', function(e) {
+                            link.onreadystatechange = function(e) {
                                 if ( !ready && (!this.readyState ||
                                     this.readyState === 'loaded' || this.readyState === 'complete') ) {
                                     ready = true;
                                 }
-                            });
+                            };
                         } else {
                             // final test via ajax if not local
                             if ( !( new RegExp('file://','i').test( href ) ) ) {
@@ -1558,6 +1568,9 @@ Galleria.prototype = {
 
         // save the target here
         this._target = this._dom.target = target.nodeName ? target : $( target ).get(0);
+        
+        // push the instance
+        _instances.push( this );
 
         // raise error if no target is detected
         if ( !this._target ) {
@@ -3855,14 +3868,14 @@ Galleria.raise = function( msg, fatal ) {
                 ( fatal ? '811' : '222' ) + '";>' +
                 ( fatal ? '<strong>' + type + ': </strong>' : '' ) + 
                 msg + '</div>';
-                
-            $.each( Galleria.get(), function() {
-                
+
+            $.each( _instances, function() {
+            
                 var cont = this.$( 'errors' ),
                     target = this.$( 'target' );
 
                 if ( !cont.length ) {
-                    
+                
                     target.css( 'position', 'relative' );
 
                     cont = this.addElement( 'errors' ).appendChild( 'target', 'errors' ).$( 'errors' ).css({
