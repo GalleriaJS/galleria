@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4a2 2011-04-27
+ * @preserve Galleria v 1.2.4b1 2011-05-12
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -403,13 +403,20 @@ var undef,
                         }
 
                         if ( IE ) {
+                            
+                            // IE has a limit of 31 stylesheets in one document
+                            if( length >= 31 ) {
+                                Galleria.raise( 'You have reached the browser stylesheet limit (31)', true );
+                                return;
+                            }
+                            
                             // todo: test if IE really needs the readyState
-                            link.attachEvent( 'onreadystatechange', function(e) {
+                            link.onreadystatechange = function(e) {
                                 if ( !ready && (!this.readyState ||
                                     this.readyState === 'loaded' || this.readyState === 'complete') ) {
                                     ready = true;
                                 }
-                            });
+                            };
                         } else {
                             // final test via ajax if not local
                             if ( !( new RegExp('file://','i').test( href ) ) ) {
@@ -1588,6 +1595,9 @@ Galleria.prototype = {
 
         // save the target here
         this._target = this._dom.target = target.nodeName ? target : $( target ).get(0);
+        
+        // push the instance
+        _instances.push( this );
 
         // raise error if no target is detected
         if ( !this._target ) {
@@ -2313,11 +2323,11 @@ Galleria.prototype = {
             // and push it into the data array
             self._data.push( $.extend({
 
-                title:       img.attr('title'),
+                title:       img.attr('title') || '',
                 thumb:       img.attr('src'),
                 image:       img.attr('src'),
                 big:         img.attr('src'),
-                description: img.attr('alt'),
+                description: img.attr('alt') || '',
                 link:        img.attr('longdesc'),
                 original:    img.get(0) // saved as a reference
 
@@ -3900,12 +3910,12 @@ Galleria.raise = function( msg, fatal ) {
                 msg + '</div>';
                 
             $.each( _instances, function() {
-                
+
                 var cont = this.$( 'errors' ),
                     target = this.$( 'target' );
 
                 if ( !cont.length ) {
-                    
+                
                     target.css( 'position', 'relative' );
 
                     cont = this.addElement( 'errors' ).appendChild( 'target', 'errors' ).$( 'errors' ).css({
