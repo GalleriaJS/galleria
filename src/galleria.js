@@ -1110,8 +1110,6 @@ var Galleria = function() {
                         }
                     });
                 });
-            } else if ( self._options.useCanvas ) {
-                self.rescale();
             }
 
             // init the first rescale and attach callbacks
