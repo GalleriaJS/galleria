@@ -580,10 +580,7 @@ var undef,
 var Galleria = function() {
 
     var self = this;
-
-    // append the instance
-    _instances.push( this );
-
+    
     // the theme used
     this._theme = undef;
 
