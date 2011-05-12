@@ -146,13 +146,13 @@ var undef,
 
     // the internal gallery holder
     _galleries = [],
-    
+
     // the internal instance holder
     _instances = [],
-    
+
     // flag for errors
     _hasError = false,
-    
+
     // canvas holder
     _canvas = false,
 
@@ -301,7 +301,7 @@ var undef,
 
             // a loadscript method that works for local scripts
             loadScript: function( url, callback ) {
-                
+
                 var done = false,
                     script = $('<scr'+'ipt>').attr({
                         src: url,
@@ -403,13 +403,13 @@ var undef,
                         }
 
                         if ( IE ) {
-                            
+
                             // IE has a limit of 31 stylesheets in one document
                             if( length >= 31 ) {
                                 Galleria.raise( 'You have reached the browser stylesheet limit (31)', true );
                                 return;
                             }
-                            
+
                             // todo: test if IE really needs the readyState
                             link.onreadystatechange = function(e) {
                                 if ( !ready && (!this.readyState ||
@@ -580,7 +580,7 @@ var undef,
 var Galleria = function() {
 
     var self = this;
-    
+
     // append the instance
     _instances.push( this );
 
@@ -759,7 +759,7 @@ var Galleria = function() {
             carousel.setClasses();
 
             self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > carousel.width );
-            
+
             // one extra calculation
             carousel.width = self.$( 'thumbnails-list' ).width();
 
@@ -1028,13 +1028,13 @@ var Galleria = function() {
     // added in 1.195
     // still kind of experimental
     var fullscreen = this._fullscreen = {
-        
+
         scrolled: 0,
-        
+
         active: false,
-        
+
         keymap: self._keyboard.map,
-        
+
         enter: function(callback) {
 
             fullscreen.active = true;
@@ -1071,21 +1071,21 @@ var Galleria = function() {
             // temporarily attach some keys
             // save the old ones first in a cloned object
             fullscreen.keymap = $.extend({}, self._keyboard.map);
-            
+
             self.attachKeyboard({
                 escape: self.exitFullscreen,
                 right: self.next,
                 left: self.prev
             });
-            
+
             // swap to big image if it’s different from the display image
-            
+
             if ( data && data.big && data.image !== data.big ) {
                 var big    = new Galleria.Picture(),
                     cached = big.isCached( data.big ),
                     index  = self.getIndex(),
                     thumb  = self._thumbnails[ index ];
-                
+
                 self.trigger( {
                     type: Galleria.LOADSTART,
                     cached: cached,
@@ -1093,7 +1093,7 @@ var Galleria = function() {
                     imageTarget: self.getActiveImage(),
                     thumbTarget: thumb
                 });
-                
+
                 big.load( data.big, function( big ) {
                     self._scaleImage( big, {
                         complete: function( big ) {
@@ -1318,7 +1318,7 @@ var Galleria = function() {
         image : null,
 
         elems : {},
-        
+
         keymap: false,
 
         init : function() {
@@ -1468,7 +1468,7 @@ var Galleria = function() {
                         });
 
                         $( image.container ).show();
-                        
+
                         Utils.show( image.image, speed );
                         Utils.show( lightbox.elems.info, speed );
                     }
@@ -1486,10 +1486,10 @@ var Galleria = function() {
             $( lightbox.elems.box ).hide();
 
             Utils.hide( lightbox.elems.info );
-            
+
             self.detachKeyboard();
             self.attachKeyboard( lightbox.keymap );
-            
+
             lightbox.keymap = false;
 
             Utils.hide( lightbox.elems.overlay, 200, function() {
@@ -1513,13 +1513,13 @@ var Galleria = function() {
             if ( !lightbox.initialized ) {
                 lightbox.init();
             }
-            
+
             // temporarily attach some keys
             // save the old ones first in a cloned object
             if ( !lightbox.keymap ) {
-                
+
                 lightbox.keymap = $.extend({}, self._keyboard.map);
-            
+
                 self.attachKeyboard({
                     escape: lightbox.hide,
                     right: lightbox.showNext,
@@ -1595,7 +1595,7 @@ Galleria.prototype = {
 
         // save the target here
         this._target = this._dom.target = target.nodeName ? target : $( target ).get(0);
-        
+
         // push the instance
         _instances.push( this );
 
@@ -1704,23 +1704,22 @@ Galleria.prototype = {
 
         // merge the theme & caller options
         $.extend( true, this._options, Galleria.theme.defaults, this._original.options );
-        
-        
+
         // check for canvas support
         (function( can ) {
-            
+
             if ( !( 'getContext' in can ) ) {
                 can = null;
                 return;
             }
-            
+
             _canvas = _canvas || {
                 elem: can,
                 context: can.getContext( '2d' ),
                 cache: {},
                 length: 0
             };
-            
+
         }( document.createElement( 'canvas' ) ) );
 
         // bind the gallery to run when data is ready
@@ -1762,10 +1761,10 @@ Galleria.prototype = {
                                 self.$( 'target' )[ m ]()                        // 4. the container jQuery method
                             );
                         }
-                        
+
                         // apply the new measures
                         $container[ m ]( num[ m ] );
-                        
+
                     });
                     return testHeight() && num.width && num.height > 10;
 
@@ -1778,14 +1777,14 @@ Galleria.prototype = {
                             self._run();
                         }, 1);
                     } else {
-                        
+
                         self._run();
                     }
                 },
                 error: function() {
-                    
+
                     // Height was probably not set, raise hard errors
-                    
+
                     if ( testHeight() ) {
                         Galleria.raise('Could not extract sufficient width/height of the gallery container. Traced measures: width:' + num.width + 'px, height: ' + num.height + 'px.', true);
                     } else {
@@ -1911,7 +1910,7 @@ Galleria.prototype = {
         ) );
 
         this.setCounter('&#8211;');
-        
+
         Utils.hide( self.get('tooltip') );
 
         // add images to the controls
@@ -2001,7 +2000,7 @@ Galleria.prototype = {
     // can be used at any time, f.ex when the data object is manipulated
 
     _createThumbnails : function() {
-        
+
         this.get('total').innerHTML = this.getDataLength();
 
         var i,
@@ -2212,24 +2211,24 @@ Galleria.prototype = {
         Utils.wait({
 
             until: function() {
-                
+
                 // Opera crap
                 if ( Galleria.OPERA ) {
                     self.$( 'stage' ).css( 'display', 'inline-block' );
                 }
-                
+
                 self._stageWidth  = self.$( 'stage' ).width();
                 self._stageHeight = self.$( 'stage' ).height();
-                
+
                 return( self._stageWidth && 
                         self._stageHeight > 50 ); // what is an acceptable height?
             },
 
             success: function() {
-                
+
                 // save the instance
                 _galleries.push( self );
-                
+
                 self.trigger( Galleria.READY );
             },
 
@@ -2305,9 +2304,9 @@ Galleria.prototype = {
 
             // check if it's a link to another image
             if ( reg.test( href ) ) {
-                
+
                 data.image = href;
-                
+
                 if ( reg.test( rel ) ) {
                     data.big = rel;
                 } else {
@@ -3077,7 +3076,7 @@ this.prependChild( 'info', 'myElement' );
         if ( !data ) {
             return;
         }
-        
+
         var src    = this.isFullscreen() && 'big' in data ? data.big : data.image, // use big image if fullscreen mode
             active = this._controls.getActive(),
             next   = this._controls.getNext(),
@@ -3086,7 +3085,7 @@ this.prependChild( 'info', 'myElement' );
 
         // to be fired when loading & transition is complete:
         var complete = (function( data, next, active, queue, thumb ) {
-            
+
             return function() {
 
                 var win;
@@ -3130,9 +3129,9 @@ this.prependChild( 'info', 'myElement' );
                             }
                             return;
                         }
-                    
+
                         self.openLightbox();
-                    
+
                     });
                 }
 
@@ -3196,7 +3195,7 @@ this.prependChild( 'info', 'myElement' );
             imageTarget: next.image,
             thumbTarget: thumb.image
         });
-        
+
         // begin loading the next image
         next.load( src, function( next ) {
             self._scaleImage( next, {
@@ -3541,7 +3540,7 @@ this.prependChild( 'info', 'myElement' );
             var count = this.$( 'counter' ),
                 opacity = count.css( 'opacity' ),
                 style = count.attr('style');
-                
+
             if ( style && parseInt( opacity, 10 ) === 1) {
                 count.attr('style', style.replace(/filter[^\;]+\;/i,''));
             } else {
@@ -3711,22 +3710,22 @@ Galleria.addTheme = function( theme ) {
 
     var css = false,
         reg;
-    
+
     if ( typeof theme.css === 'string' ) {
-        
+
         // look for manually added CSS
         $('link').each(function( i, link ) {
             reg = new RegExp( theme.css );
             if ( reg.test( link.href ) ) {
-                
+
                 // we found the css
                 css = true;
                 Galleria.theme = theme;
-                
+
                 return false;
             }
         });
-        
+
         // else look for the absolute path and load the CSS dynamic
         if ( !css ) {
 
@@ -3753,7 +3752,7 @@ Galleria.addTheme = function( theme ) {
             Galleria.raise('No theme CSS loaded');
         }
     } else {
-        
+
         // pass
         Galleria.theme = theme;
     }
@@ -3899,23 +3898,23 @@ Galleria.log = function() {
 Galleria.raise = function( msg, fatal ) {
 
     var type = fatal ? 'Fatal error' : 'Error',
-    
+
         self = this,
-    
+
         echo = function( msg ) {
 
             var html = '<div style="padding:4px;margin:0 0 2px;background:#' + 
                 ( fatal ? '811' : '222' ) + '";>' +
                 ( fatal ? '<strong>' + type + ': </strong>' : '' ) + 
                 msg + '</div>';
-                
+
             $.each( _instances, function() {
 
                 var cont = this.$( 'errors' ),
                     target = this.$( 'target' );
 
                 if ( !cont.length ) {
-                
+
                     target.css( 'position', 'relative' );
 
                     cont = this.addElement( 'errors' ).appendChild( 'target', 'errors' ).$( 'errors' ).css({
@@ -3930,14 +3929,14 @@ Galleria.raise = function( msg, fatal ) {
                 cont.append( html );
             });
         };
-    
+
     // if debug is on, display errors and throw exception if fatal
     if ( DEBUG ) {
         echo( msg );
         if ( fatal ) {
             throw new Error(type + ': ' + msg);
         }
-    
+
     // else just echo a silent generic error if fatal
     } else if ( fatal ) {
         if ( _hasError ) {
@@ -4004,9 +4003,9 @@ Galleria.Picture.prototype = {
 
             // create the image
             image = new Image(),
-            
+
             onload = function() {
-                
+
                 // force chrome to reload the image in case of cache bug
                 // set a limit just in case
                 if ( ( !this.width || !this.height ) && i < 1000 ) {
@@ -4025,7 +4024,7 @@ Galleria.Picture.prototype = {
 
         // force a block display
         $( image ).css( 'display', 'block');
-        
+
         if ( self.cache[ src ] ) {
             // no need to onload if the image is cached
             image.src = src;
@@ -4194,36 +4193,36 @@ Galleria.Picture.prototype = {
                 if ( options.min ) {
                     ratio = Math.max( options.min, ratio );
                 }
-                
+
                 $.each( ['width','height'], function( i, m ) {
                     $( self.image )[ m ]( self[ m ] = self.image[ m ] = Math.round( self.original[ m ] * ratio ) );
                 });
 
                 $( self.container ).width( width ).height( height );
-                
+
                 if ( options.canvas && _canvas ) {
-                    
+
                     _canvas.elem.width = self.width;
                     _canvas.elem.height = self.height;
-                    
+
                     canvasKey = self.image.src + ':' + self.width + 'x' + self.height;
-                    
+
                     self.image.src = _canvas.cache[ canvasKey ] || (function( key ) {
-                    
+
                         _canvas.context.drawImage(self.image, 0, 0, self.original.width*ratio, self.original.height*ratio);
-                        
+
                         try {
-                            
+
                             data = _canvas.elem.toDataURL();
                             _canvas.length += data.length;
                             return _canvas.cache[ key ] = data;
-                            
+
                         } catch( e ) {
                             return self.image.src;
                         }
-                    
+
                     }( canvasKey ) );
-                    
+
                 }
 
                 // calculate image_position
