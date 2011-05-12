@@ -6,10 +6,13 @@ Changelog
 -----
 * Improved overall error messages
 * Galleria now prints debug messages to the Galleria container for easier debugging
-* Debug is now true by default
-* Change lightbox image to use the bigger image if available
+* Debug is now true by default - set default to false when deploying
+* Changed lightbox image to use the bigger image if available
 * Fixed a link bug that caused the link destination to be mixed up between images
 * Added a rel attribute in the HTML that can be used to provide a big image for fullscreen view
+* Removed a thumbnail height check before validating the measurements
+* Added keyboard nav for the lightbox
+* Added canvas rescaling support for better thumbnail generation on the client. Still experimental; set useCanvas to true if you want to try it.
 
 1.2.3
 -----
