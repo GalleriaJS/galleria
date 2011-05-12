@@ -18,8 +18,8 @@ var undef,
 
 // internal constants
     DEBUG = true,
-    NAV   = navigator.userAgent.toLowerCase(),
-    HASH  = window.location.hash.replace(/#\//, ''),
+    NAV = navigator.userAgent.toLowerCase(),
+    HASH = window.location.hash.replace(/#\//, ''),
     CLICK = function() {
         // use this to make touch devices snappier
         return Galleria.TOUCH ? 'touchstart' : 'click';
@@ -147,8 +147,14 @@ var undef,
     // the internal gallery holder
     _galleries = [],
     
+    // the internal instance holder
+    _instances = [],
+    
     // flag for errors
     _hasError = false,
+    
+    // canvas holder
+    _canvas = false,
 
     // the Utils singleton
     Utils = (function() {
@@ -567,6 +573,9 @@ var undef,
 var Galleria = function() {
 
     var self = this;
+    
+    // append the instance
+    _instances.push( this );
 
     // the theme used
     this._theme = undef;
@@ -1065,11 +1074,10 @@ var Galleria = function() {
             // swap to big image if it’s different from the display image
             
             if ( data && data.big && data.image !== data.big ) {
-                
                 var big    = new Galleria.Picture(),
                     cached = big.isCached( data.big ),
                     index  = self.getIndex(),
-                    thumb  = self._thumbnails[ index ]
+                    thumb  = self._thumbnails[ index ];
                 
                 self.trigger( {
                     type: Galleria.LOADSTART,
@@ -1098,6 +1106,8 @@ var Galleria = function() {
                         }
                     });
                 });
+            } else if ( self._options.useCanvas ) {
+                self.rescale();
             }
 
             // init the first rescale and attach callbacks
@@ -1301,6 +1311,8 @@ var Galleria = function() {
         image : null,
 
         elems : {},
+        
+        keymap: false,
 
         init : function() {
 
@@ -1467,6 +1479,11 @@ var Galleria = function() {
             $( lightbox.elems.box ).hide();
 
             Utils.hide( lightbox.elems.info );
+            
+            self.detachKeyboard();
+            self.attachKeyboard( lightbox.keymap );
+            
+            lightbox.keymap = false;
 
             Utils.hide( lightbox.elems.overlay, 200, function() {
                 $( this ).hide().css( 'opacity', self._options.overlayOpacity );
@@ -1488,6 +1505,19 @@ var Galleria = function() {
 
             if ( !lightbox.initialized ) {
                 lightbox.init();
+            }
+            
+            // temporarily attach some keys
+            // save the old ones first in a cloned object
+            if ( !lightbox.keymap ) {
+                
+                lightbox.keymap = $.extend({}, self._keyboard.map);
+            
+                self.attachKeyboard({
+                    escape: lightbox.hide,
+                    right: lightbox.showNext,
+                    left: lightbox.showPrev
+                });
             }
 
             $(window).unbind('resize', lightbox.rescale );
@@ -1511,7 +1541,7 @@ var Galleria = function() {
 
                 Utils.hide( image.image );
 
-                lightbox.elems.title.innerHTML = data.title;
+                lightbox.elems.title.innerHTML = data.title || '';
                 lightbox.elems.counter.innerHTML = (index + 1) + ' / ' + total;
                 $(window).resize( lightbox.rescale );
                 lightbox.rescale();
@@ -1613,6 +1643,7 @@ Galleria.prototype = {
             transition: 'fade',
             transitionInitial: undef,
             transitionSpeed: 400,
+            useCanvas: false, // 1.2.4
             width: 'auto'
         };
 
@@ -1663,6 +1694,24 @@ Galleria.prototype = {
 
         // merge the theme & caller options
         $.extend( true, this._options, Galleria.theme.defaults, this._original.options );
+        
+        
+        // check for canvas support
+        (function( can ) {
+            
+            if ( !( 'getContext' in can ) ) {
+                can = null;
+                return;
+            }
+            
+            _canvas = _canvas || {
+                elem: can,
+                context: can.getContext( '2d' ),
+                cache: {},
+                length: 0
+            };
+            
+        }( document.createElement( 'canvas' ) ) );
 
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
@@ -1678,7 +1727,9 @@ Galleria.prototype = {
 
             // the gallery is ready, let's just wait for the css
             var num = { width: 0, height: 0 };
-            var testElem =  Utils.create('galleria-image');
+            var testHeight = function() {
+                return self.$( 'stage' ).height()
+            }
 
             // check container and thumbnail height
             Utils.wait({
@@ -1694,37 +1745,22 @@ Galleria.prototype = {
                         } else {
 
                             // else extract the measures from different sources and grab the highest value
-                            num[m] = Math.max(
+                            num[ m ] = Math.max(
                                 Utils.parseValue( $container.css( m ) ),         // 1. the container css
                                 Utils.parseValue( self.$( 'target' ).css( m ) ), // 2. the target css
                                 $container[ m ](),                               // 3. the container jQuery method
                                 self.$( 'target' )[ m ]()                        // 4. the container jQuery method
                             );
                         }
+                        
+                        // apply the new measures
+                        $container[ m ]( num[ m ] );
+                        
                     });
-
-                    var thumbHeight = function() {
-                        return true;
-                    };
-
-                    // make sure thumbnails have a height as well
-                    if ( self._options.thumbnails ) {
-                        self.$('thumbnails').append( testElem );
-                        thumbHeight = function() {
-                            return !!$( testElem ).height();
-                        };
-                    }
-                    return thumbHeight() && num.width && num.height > 10;
+                    return testHeight() && num.width && num.height > 10;
 
                 },
                 success: function() {
-
-                    // remove the testElem
-                    $( testElem ).remove();
-
-                    // apply the new measures
-                    $container.width( num.width );
-                    $container.height( num.height );
 
                     // for some strange reason, webkit needs a single setTimeout to play ball
                     if ( Galleria.WEBKIT ) {
@@ -1737,8 +1773,14 @@ Galleria.prototype = {
                     }
                 },
                 error: function() {
-                    // Height was probably not set, raise a hard error
-                    Galleria.raise('Could not extract sufficient width/height of the gallery. Traced measures: width:' + num.width + 'px, height: ' + num.height + 'px.', true);
+                    
+                    // Height was probably not set, raise hard errors
+                    
+                    if ( testHeight() ) {
+                        Galleria.raise('Could not extract sufficient width/height of the gallery container. Traced measures: width:' + num.width + 'px, height: ' + num.height + 'px.', true);
+                    } else {
+                        Galleria.raise('Could not extract a stage height from the CSS. Traced height: ' + testHeight() + 'px.', true);
+                    }
                 },
                 timeout: 2000
             });
@@ -2018,6 +2060,7 @@ Galleria.prototype = {
                     height:   thumb.data.height,
                     crop:     o.thumbCrop,
                     margin:   o.thumbMargin,
+                    canvas:   o.useCanvas,
                     complete: function( thumb ) {
 
                         // shrink thumbnails to fit
@@ -3856,7 +3899,7 @@ Galleria.raise = function( msg, fatal ) {
                 ( fatal ? '<strong>' + type + ': </strong>' : '' ) + 
                 msg + '</div>';
                 
-            $.each( Galleria.get(), function() {
+            $.each( _instances, function() {
                 
                 var cont = this.$( 'errors' ),
                     target = this.$( 'target' );
@@ -4072,6 +4115,7 @@ Galleria.Picture.prototype = {
             <li>complete - a callback that fires when scaling is complete</li>
             <li>position - positions the image, works like the css background-image property.</li>
             <li>crop - defines how to crop. Can be true, false, 'width' or 'height'</li>
+            <li>canvas - set to true to try a canvas-based rescale</li>
         </ul>
 
         @returns The image container object (jQuery)
@@ -4088,7 +4132,8 @@ Galleria.Picture.prototype = {
             margin: 0,
             complete: function() {},
             position: 'center',
-            crop: false
+            crop: false,
+            canvas: false
         }, options);
 
         // return the element if no image found
@@ -4096,11 +4141,12 @@ Galleria.Picture.prototype = {
             return this.container;
         }
 
-        // store locale variables of width & height
+        // store locale variables
         var width,
             height,
             self = this,
-            $container = $( self.container );
+            $container = $( self.container ),
+            data;
 
         // wait for the width/height
         Utils.wait({
@@ -4126,7 +4172,8 @@ Galleria.Picture.prototype = {
                         'height': newHeight,
                         'false' : Math.min( newWidth, newHeight )
                     },
-                    ratio = cropMap[ options.crop.toString() ];
+                    ratio = cropMap[ options.crop.toString() ],
+                    canvasKey = '';
 
                 // allow max_scale_ratio
                 if ( options.max ) {
@@ -4137,13 +4184,37 @@ Galleria.Picture.prototype = {
                 if ( options.min ) {
                     ratio = Math.max( options.min, ratio );
                 }
+                
+                $.each( ['width','height'], function( i, m ) {
+                    $( self.image )[ m ]( self[ m ] = self.image[ m ] = Math.round( self.original[ m ] * ratio ) );
+                });
 
                 $( self.container ).width( width ).height( height );
-
-                // round up the width / height
-                $.each( ['width','height'], function( i, m ) {
-                    $( self.image )[ m ]( self.image[m] = self[ m ] = Math.round( self.original[ m ] * ratio ) );
-                });
+                
+                if ( options.canvas && _canvas ) {
+                    
+                    _canvas.elem.width = self.width;
+                    _canvas.elem.height = self.height;
+                    
+                    canvasKey = self.image.src + ':' + self.width + 'x' + self.height;
+                    
+                    self.image.src = _canvas.cache[ canvasKey ] || (function( key ) {
+                    
+                        _canvas.context.drawImage(self.image, 0, 0, self.original.width*ratio, self.original.height*ratio);
+                        
+                        try {
+                            
+                            data = _canvas.elem.toDataURL();
+                            _canvas.length += data.length;
+                            return _canvas.cache[ key ] = data;
+                            
+                        } catch( e ) {
+                            return self.image.src;
+                        }
+                    
+                    }( canvasKey ) );
+                    
+                }
 
                 // calculate image_position
                 var pos = {},
@@ -4200,6 +4271,7 @@ Galleria.Picture.prototype = {
                 // flag ready and call the callback
                 self.ready = true;
                 options.complete.call( self, self );
+
             },
             error: function() {
                 Galleria.raise('Could not scale image: '+self.image.src);
