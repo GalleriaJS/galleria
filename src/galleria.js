@@ -332,8 +332,8 @@ var undef,
                 if (typeof val === 'number') {
                     return val;
                 } else if (typeof val === 'string') {
-                    var arr = val.match(/\-?\d/g);
-                    return arr && arr.constructor === Array ? parseInt( arr.join(''), 10 ) : 0;
+                    var arr = val.match(/\-?\d|\./g);
+                    return arr && arr.constructor === Array ? arr.join('')*1 : 0;
                 } else {
                     return 0;
                 }
