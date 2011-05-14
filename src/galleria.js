@@ -2024,9 +2024,15 @@ Galleria.prototype = {
             // for some reason, jQuery cant handle css(property) when zooming in FF, breaking the gallery
             // so we resort to getComputedStyle for browsers who support it
             getStyle = function( prop ) {
-                return doc.defaultView && doc.defaultView.getComputedStyle ?
-                    doc.defaultView.getComputedStyle( thumb.container, null )[ prop ] :
-                    $container.css( prop );
+            	val = doc.defaultView && doc.defaultView.getComputedStyle ?
+            	    doc.defaultView.getComputedStyle( thumb.container, null )[ prop ] :
+            	    $container.css( prop );
+           		
+           		// IE9 will occasionally grab a number with decimal places which Utils.parseValue doesn't treat as a number. Rounding the value on properties that should be numbers.
+            	if( prop == "height" || prop == "width" ) {
+            		val = Math.round( val );
+            	}
+                return 
             },
 
             fake = function(image, index, container) {
