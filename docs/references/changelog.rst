@@ -13,6 +13,7 @@ Changelog
 * Removed a thumbnail height check before validating the measurements
 * Added keyboard nav for the lightbox
 * Added canvas rescaling support for better thumbnail generation on the client. Still experimental; set useCanvas to true if you want to try it.
+* Fixed a rounding error in IE9 that caused the thumbnails to stretch
 
 1.2.3
 -----

@@ -100,7 +100,7 @@ mode is turned off (it takes around 40 ms before everything is rescaled)
 Toggles fullscreen mode.
 
 
-.showLightbox( [index] )
+.openLightbox( [index] )
 ------------------------
 
     | returns **Galleria**
@@ -111,7 +111,7 @@ window is fairly simple and pre-styled (no CSS or images needed). You can
 define some values like the overlay opacity as a galleria option.
 
 
-.hideLightbox()
+.closeLightbox()
 ---------------
 
     | returns **Galleria**
@@ -453,7 +453,7 @@ last function. Example attaching some keyboard action to galleria::
     });
 
     this.attachKeyboard({
-        left: this.showLightbox // will override the previously defined prev()
+        left: this.openLightbox // will override the previously defined prev()
     });
 
 
