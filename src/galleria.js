@@ -1715,7 +1715,7 @@ Galleria.prototype = {
                 length: 0
             };
 
-        }( document.createElement( 'canvas' ) ) );
+        }( doc.createElement( 'canvas' ) ) );
 
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
