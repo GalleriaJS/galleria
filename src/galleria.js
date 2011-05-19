@@ -1732,8 +1732,8 @@ Galleria.prototype = {
             // the gallery is ready, let's just wait for the css
             var num = { width: 0, height: 0 };
             var testHeight = function() {
-                return self.$( 'stage' ).height()
-            }
+                return self.$( 'stage' ).height();
+            };
 
             // check container and thumbnail height
             Utils.wait({
@@ -3161,13 +3161,13 @@ this.prependChild( 'info', 'myElement' );
 
             var p, i,
                 n = this.getNext(),
-                data;
+                ndata;
 
             try {
                 for ( i = this._options.preload; i > 0; i-- ) {
                     p = new Galleria.Picture();
-                    data = self.getData( n );
-                    p.add( this.isFullscreen() && 'big' in data ? data.big : data.image );
+                    ndata = self.getData( n );
+                    p.add( this.isFullscreen() && 'big' in ndata ? ndata.big : ndata.image );
                     n = self.getNext( n );
                 }
             } catch(e) {}
@@ -4210,7 +4210,8 @@ Galleria.Picture.prototype = {
 
                             data = _canvas.elem.toDataURL();
                             _canvas.length += data.length;
-                            return _canvas.cache[ key ] = data;
+                            _canvas.cache[ key ] = data;
+                            return data;
 
                         } catch( e ) {
                             return self.image.src;
