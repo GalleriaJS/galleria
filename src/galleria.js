@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4b2 2011-05-17
+ * @preserve Galleria v 1.2.4b4 2011-05-23
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -21,8 +21,7 @@ var undef,
     NAV = navigator.userAgent.toLowerCase(),
     HASH = window.location.hash.replace(/#\//, ''),
     CLICK = function() {
-        // use this to make touch devices snappier
-        return Galleria.TOUCH ? 'touchstart' : 'click';
+        return 'click';
     },
     IE    = (function() {
 
@@ -171,6 +170,101 @@ var undef,
                 elem.className = className;
                 return elem;
             },
+            
+            // CSS3 transitions, added in 1.2.4
+            animate : (function() {
+                
+                // detect transition
+                var transition = (function( style ) {
+                    var props = 'transition WebkitTransition MozTransition OTransition'.split(' '),
+                        i;
+                    
+                    for ( i = 0; props[i]; i++ ) {
+                        if ( typeof style[ props[ i ] ] !== 'undefined' ) {
+                            return props[ i ];
+                        }
+                    }
+                    return false;
+                }(( document.body || document.documentElement).style ));
+                
+                // map transitionend event
+                var endEvent = {
+                    MozTransition: 'transitionend',
+                    OTransition: 'oTransitionEnd',
+                    WebkitTransition: 'webkitTransitionEnd',
+                    transition: 'transitionend'
+                }[ transition ];
+
+                // map bezier easing conversions
+                var easings = {
+                    _default: [0.25, 0.1, 0.25, 1],
+                    galleria: [0.645, 0.045, 0.355, 1],
+                    galleriaIn: [0.55, 0.055, 0.675, 0.19],
+                    galleriaOut: [0.215, 0.61, 0.355, 1]
+                };
+                
+                // function for setting transition css for all browsers
+                var setStyle = function( elem, value ) {
+                    var css = {};
+                    $.each( 'webkit moz ms o'.split(' '), function() {
+                        css[ '-' + this + '-transition' ] = value;
+                    });
+                    elem.css( css );
+                };
+                
+                // the actual animation method
+                return function( elem, to, options ) {
+                    
+                    // extend defaults
+                    options = $.extend({
+                        duration: 400,
+                        complete: function(){}
+                    }, options);
+                
+                    // cache jQuery instance
+                    elem = $( elem );
+
+                    // fallback to jQuery’s animate if transition is not supported
+                    if ( !transition ) {
+                        elem.animate(to, options);
+                        return;
+                    }
+                    
+                    // the css strings to be applied
+                    var strings = [];
+                
+                    // the easing bezier
+                    var easing = options.easing in easings ? easings[ options.easing ] : easings._default;
+                    
+                    // add a tiny timeout so that the browsers catches any css changes before animating
+                    window.setTimeout(function() {
+                        
+                        // attach the end event
+                        elem.one(endEvent, (function( elem ) {
+                            return function() {
+                                
+                                // clear the animation
+                                setStyle(elem, 'none');
+                                
+                                // run the complete method
+                                options.complete.call(elem[0]);
+                            };
+                        }( elem )));
+                        
+                        // push the animation props
+                        $.each(to, function( p, val ) {
+                            strings.push(p + ' ' + options.duration + 'ms' + ' cubic-bezier('  + easing.join(',') + ')');
+                        });
+                        
+                        // set the animation styles
+                        setStyle( elem, strings.join(',') );
+                        
+                        // animate
+                        elem.css( to );
+                        
+                    },1 );
+                };
+            }()),
 
             forceStyles : function( elem, styles ) {
                 elem = $(elem);
@@ -214,7 +308,10 @@ var undef,
                 var style = { opacity: 0 };
 
                 if (speed) {
-                    elem.stop().animate( style, speed, callback );
+                    Utils.animate( elem, style, {
+                        duration: speed,
+                        complete: callback
+                    });
                 } else {
                     elem.css( style );
                 }
@@ -229,7 +326,10 @@ var undef,
 
                 // animate or toggle
                 if (speed) {
-                    elem.stop().animate( style, speed, callback );
+                    Utils.animate( elem, style, {
+                        duration: speed,
+                        complete: callback
+                    });
                 } else {
                     elem.css( style );
                 }
@@ -465,31 +565,46 @@ var undef,
     _transitions = {
 
         fade: function(params, complete) {
-            $(params.next).css('opacity', 0).show().animate({
+            $(params.next).css('opacity',0).show();
+            Utils.animate(params.next, {
                 opacity: 1
-            }, params.speed, complete);
-
+            },{
+                duration: params.speed,
+                complete: complete
+            });
             if (params.prev) {
-                $(params.prev).css('opacity', 1).show().animate({
+                $(params.prev).css('opacity',1).show();
+                Utils.animate(params.prev, {
                     opacity: 0
-                }, params.speed);
+                },{
+                    duration: params.speed
+                });
             }
         },
 
         flash: function(params, complete) {
             $(params.next).css('opacity', 0);
             if (params.prev) {
-                $(params.prev).animate({
+                Utils.animate( params.prev, {
                     opacity: 0
-                }, (params.speed / 2), function() {
-                    $(params.next).animate({
-                        opacity: 1
-                    }, params.speed, complete);
+                },{
+                    duration: params.speed/2,
+                    complete: function() {
+                        Utils.animate( params.next, {
+                            opacity:1
+                        },{
+                            duration: params.speed,
+                            complete: complete
+                        });
+                    }
                 });
             } else {
-                $(params.next).animate({
+                Utils.animate( params.next, {
                     opacity: 1
-                }, params.speed, complete);
+                },{
+                    duration: params.speed,
+                    complete: complete
+                });
             }
         },
 
@@ -497,9 +612,13 @@ var undef,
             if (params.prev) {
                 $(params.prev).hide();
             }
-            $(params.next).css('opacity', 0).animate({
+            $(params.next).css('opacity', 0);
+            Utils.animate(params.next, {
                 opacity:1
-            }, params.speed, complete);
+            },{
+                duration: params.speed,
+                complete: complete
+            });
         },
 
         slide: function(params, complete) {
@@ -507,22 +626,21 @@ var undef,
                 images = this.$('images'), // ??
                 width  = this._stageWidth,
                 easing = this.getOptions( 'easing' );
-
+            
             image.css({
                 left: width * ( params.rewind ? -1 : 1 )
             });
-            images.animate({
+            
+            Utils.animate( images, {
                 left: width * ( params.rewind ? 1 : -1 )
-            }, {
+            },{
                 duration: params.speed,
-                queue: false,
-                easing: easing,
                 complete: function() {
-                    images.css('left', 0);
-                    image.css('left', 0);
+                    images.add(image).css('left', 0);
                     complete();
                 }
             });
+    
         },
 
         fadeslide: function(params, complete) {
@@ -536,7 +654,8 @@ var undef,
                 $(params.prev).css({
                     opacity: 1,
                     left: x
-                }).animate({
+                });
+                Utils.animate(params.prev, {
                     opacity: 0,
                     left: x + ( distance * ( params.rewind ? 1 : -1 ) )
                 },{
@@ -551,7 +670,8 @@ var undef,
             $(params.next).css({
                 left: x + ( distance * ( params.rewind ? -1 : 1 ) ),
                 opacity: 0
-            }).animate({
+            });
+            Utils.animate(params.next, {
                 opacity: 1,
                 left: x
             }, {
@@ -858,7 +978,7 @@ var Galleria = function() {
                 return;
             }
 
-            self.$( 'thumbnails' ).animate({
+            Utils.animate(self.get( 'thumbnails' ), {
                 left: num
             },{
                 duration: self._options.carouselSpeed,
@@ -924,6 +1044,11 @@ var Galleria = function() {
         // you can bind multiple elementIDs using { elemID : function } or { elemID : string }
         // you can also bind single DOM elements using bind(elem, string)
         bind: function( elem, value ) {
+            
+            // todo: revise if alternative tooltip is needed for mobile devices
+            if (Galleria.TOUCH) {
+                return;
+            }
 
             if (! tooltip.initialized ) {
                 tooltip.init();
@@ -1254,11 +1379,9 @@ var Galleria = function() {
                 }
 
                 elem.data('idle').complete = false;
-
-                elem.stop().animate(data.to, {
-                    duration: self._options.idleSpeed,
-                    queue: false,
-                    easing: 'swing'
+                
+                Utils.animate( elem, data.to, {
+                    duration: self._options.idleSpeed
                 });
             });
         },
@@ -1283,16 +1406,15 @@ var Galleria = function() {
                 self.trigger( Galleria.IDLE_EXIT );
 
                 Utils.clearTimer( 'idle' );
-
-                elem.stop().animate(data.from, {
+                
+                Utils.animate( elem, data.from, {
                     duration: self._options.idleSpeed/2,
-                    queue: false,
-                    easing: 'swing',
                     complete: function() {
                         $(this).data('idle').busy = false;
                         $(this).data('idle').complete = true;
                     }
                 });
+                
             }
             idle.addTimer();
         }
@@ -1441,19 +1563,18 @@ var Galleria = function() {
                 to = {
                     width: destWidth,
                     height: destHeight,
-                    marginTop: Math.ceil( destHeight / 2 ) *- 1,
-                    marginLeft: Math.ceil( destWidth / 2 ) *- 1
+                    'margin-top': Math.ceil( destHeight / 2 ) *- 1,
+                    'margin-left': Math.ceil( destWidth / 2 ) *- 1
                 };
 
             // if rescale event, don't animate
             if ( event ) {
                 $( lightbox.elems.box ).css( to );
             } else {
-                $( lightbox.elems.box ).animate(
-                    to,
-                    self._options.lightboxTransitionSpeed,
-                    self._options.easing,
-                    function() {
+                Utils.animate( lightbox.elems.box, to, {
+                    duration: self._options.lightboxTransitionSpeed,
+                    easing: self._options.easing,
+                    complete: function() {
                         var image = lightbox.image,
                             speed = self._options.lightboxFadeSpeed;
 
@@ -1467,7 +1588,7 @@ var Galleria = function() {
                         Utils.show( image.image, speed );
                         Utils.show( lightbox.elems.info, speed );
                     }
-                );
+                });
             }
         },
 
@@ -1625,7 +1746,7 @@ Galleria.prototype = {
             keepSource: false,
             lightbox: false, // 1.2.3
             lightboxFadeSpeed: 200,
-            lightboxTransitionSpeed: 400,
+            lightboxTransitionSpeed: 300,
             linkSourceTmages: true,
             maxScaleRatio: undef,
             minScaleRatio: undef,
@@ -1639,6 +1760,7 @@ Galleria.prototype = {
             showInfo: true,
             showCounter: true,
             showImagenav: true,
+            swipe: true, // 1.2.4
             thumbCrop: true,
             thumbEventType: CLICK(),
             thumbFit: true,
@@ -1841,6 +1963,125 @@ Galleria.prototype = {
                         self.next();
                     });
                 }
+                
+                // bind swipe gesture
+                if ( this._options.swipe ) {
+                    
+                    (function( images ) {
+                        
+                        var swipeStart = 0,
+                            swipeMoved = 0,
+                            threshold = 100,
+                            multi = false;
+                        
+                        images.bind('touchstart', function(e) {
+                            
+                            if (e.originalEvent.touches.length) {
+                                return;
+                            }
+                            
+                            swipeStart = swipeMoved = e.originalEvent.touches[0].pageX;
+                            
+                        }).bind('touchmove', function(e) {
+                            
+                            if (e.originalEvent.touches.length > 1) {
+                                return;
+                            }
+                            
+                            e.preventDefault();
+                            swipeMoved = e.originalEvent.touches[0].pageX;
+                            
+                            if (!swipeStart) {
+                                swipeStart = swipeMoved;
+                            }
+                        
+                        }).bind('touchend', function(e) {
+                            
+                            // if multitouch (possibly zooming), abort
+                            if ( e.originalEvent.touches.length || multi ) {
+                                multi = !multi;
+                                return;
+                            }
+                            
+                            e.preventDefault();
+
+                            if ( swipeStart - swipeMoved > threshold ) {
+                                self.next();
+                            } else if ( swipeMoved - swipeStart > threshold ) {
+                                self.prev();
+                            }
+                            
+                            swipeStart = swipeMoved = 0;
+                            
+                        });
+                        
+                    }( self.$( 'images' ) ));
+                    
+                    // enhanced click for mobile devices
+                    // we bind a touchstart and hijack any click event in the bubble
+                    // then we execute the click directly and save it in a separate data object for later
+                    this.$('container').bind('touchstart', (function() {
+                        
+                        var node,
+                            evs,
+                            fakes,
+                            travel,
+                            evt = {},
+                            handler = function( e ) {
+                                e.preventDefault();
+                                evt = $.extend({}, e, true);
+                            },
+                            attach = function() {
+                                this.evt = evt;
+                            },
+                            fake = function() {
+                                this.handler.call(node, this.evt);
+                            };
+                        
+                        return function( e ) {
+                            
+                            node = e.target;
+                            travel = true;
+                            
+                            while( node.parentNode && travel ) {
+                        
+                                evs =   $(node).data('events');
+                                fakes = $(node).data('fakes');
+                        
+                                if (evs && 'click' in evs) {
+                            
+                                    travel = false;
+                            
+                                    // fake the click and save the event object
+                                    $(node).click(handler).click();
+                            
+                                    // remove the faked click
+                                    evs.click.pop();
+                            
+                                    // attach the faked event
+                                    $.each( evs.click, attach);
+                            
+                                    // save the faked clicks in a new data object
+                                    $(node).data('fakes', evs.click);
+                            
+                                    // remove all clicks
+                                    delete evs.click;
+
+                                } else if ( fakes ) {
+                            
+                                    travel = false;
+                                    
+                                    // fake all clicks
+                                    $.each( fakes, fake );
+                                }
+                        
+                                // bubble
+                                node = node.parentNode;
+                            }
+                        };
+                    }()));
+                    
+                }
 
                 // initialize the History plugin
                 if ( Galleria.History ) {
@@ -1907,6 +2148,9 @@ Galleria.prototype = {
         this.setCounter('&#8211;');
 
         Utils.hide( self.get('tooltip') );
+        
+        // add a notouch class on the container to prevent unwanted :hovers on touch devices
+        this.$( 'container' ).addClass( Galleria.TOUCH ? 'touch' : 'notouch' );
 
         // add images to the controls
         $.each( new Array(2), function(i) {
@@ -3667,9 +3911,7 @@ $.extend( Galleria, {
     IPHONE:  /iphone/.test( NAV ),
     IPAD:    /ipad/.test( NAV ),
     ANDROID: /android/.test( NAV ),
-
-    // Todo detect touch devices in a better way, possibly using event detection
-    TOUCH:   !!( /iphone/.test( NAV ) || /ipad/.test( NAV ) || /android/.test( NAV ) )
+    TOUCH:   ('ontouchstart' in document)
 
 });
 
@@ -4156,13 +4398,13 @@ Galleria.Picture.prototype = {
         Utils.wait({
             until: function() {
 
-                width  = options.width
-                    || $container.width()
-                    || Utils.parseValue( $container.css('width') );
+                width  = options.width || 
+                         $container.width() || 
+                         Utils.parseValue( $container.css('width') );
 
-                height = options.height
-                    || $container.height()
-                    || Utils.parseValue( $container.css('height') );
+                height = options.height || 
+                         $container.height() || 
+                         Utils.parseValue( $container.css('height') );
 
                 return width && height;
             },
@@ -4292,17 +4534,17 @@ $.extend( $.easing, {
 
     galleria: function (_, t, b, c, d) {
         if ((t/=d/2) < 1) {
-            return c/2*t*t*t*t + b;
+            return c/2*t*t*t + b;
         }
-        return -c/2 * ((t-=2)*t*t*t - 2) + b;
+        return c/2*((t-=2)*t*t + 2) + b;
     },
 
     galleriaIn: function (_, t, b, c, d) {
-        return c*(t/=d)*t*t*t + b;
+        return c*(t/=d)*t*t + b;
     },
 
     galleriaOut: function (_, t, b, c, d) {
-        return -c * ((t=t/d-1)*t*t*t - 1) + b;
+        return c*((t=t/d-1)*t*t + 1) + b;
     }
 
 });

@@ -14,6 +14,11 @@ Changelog
 * Added keyboard nav for the lightbox
 * Added canvas rescaling support for better thumbnail generation on the client. Still experimental; set useCanvas to true if you want to try it.
 * Fixed a rounding error in IE9 that caused the thumbnails to stretch
+* Added CSS3 animations with jQuery fallbacks for all transitions and other animations
+* Added a swipe option (default true) to activate swipe gesture for navigating
+* Improved the touchstart event for a better mobile experience in general
+* Improved the Galleria.TOUCH boolean to reflect an actual touch event
+* Improved the classic theme, other themes will also be improved
 
 1.2.3
 -----
