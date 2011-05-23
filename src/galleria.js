@@ -238,13 +238,14 @@ var undef,
                     // stop
                     if ( options.stop ) {
                         // clear the animation
+                        elem.unbind( endEvent );
                         setStyle(elem, 'none');
                     }
                     
                     // see if there is a change
                     var match = true
                     $.each( to, function( key, val ) {
-                        if ( Utils.parseValue( elem.css(key) ) != val ) {
+                        if ( Utils.parseValue( elem.css(key) ) != Utils.parseValue( val ) ) {
                             match = false;
                         }
                     });
