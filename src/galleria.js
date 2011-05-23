@@ -15,14 +15,12 @@ var undef,
     window = this,
     doc    = window.document,
     $doc   = $( doc ),
+    $win   = $( window ),
 
 // internal constants
     DEBUG = true,
     NAV = navigator.userAgent.toLowerCase(),
     HASH = window.location.hash.replace(/#\//, ''),
-    CLICK = function() {
-        return 'click';
-    },
     IE    = (function() {
 
         var v = 3,
@@ -218,15 +216,42 @@ var undef,
                     // extend defaults
                     options = $.extend({
                         duration: 400,
-                        complete: function(){}
+                        complete: function(){},
+                        stop: false
                     }, options);
                 
                     // cache jQuery instance
                     elem = $( elem );
+                    
+                    if ( !options.duration ) {
+                        elem.css( to );
+                        options.complete.call( elem[0] );
+                        return;
+                    }
 
                     // fallback to jQuery’s animate if transition is not supported
                     if ( !transition ) {
                         elem.animate(to, options);
+                        return;
+                    }
+                    
+                    // stop
+                    if ( options.stop ) {
+                        // clear the animation
+                        setStyle(elem, 'none');
+                    }
+                    
+                    // see if there is a change
+                    var match = true
+                    $.each( to, function( key, val ) {
+                        if ( Utils.parseValue( elem.css(key) ) != val ) {
+                            match = false;
+                        }
+                    });
+                    if (match) {
+                        window.setTimeout( function() {
+                            options.complete.call( elem[0] );
+                        }, options.duration);
                         return;
                     }
                     
@@ -310,7 +335,8 @@ var undef,
                 if (speed) {
                     Utils.animate( elem, style, {
                         duration: speed,
-                        complete: callback
+                        complete: callback,
+                        stop: true
                     });
                 } else {
                     elem.css( style );
@@ -328,12 +354,83 @@ var undef,
                 if (speed) {
                     Utils.animate( elem, style, {
                         duration: speed,
-                        complete: callback
+                        complete: callback,
+                        stop: true
                     });
                 } else {
                     elem.css( style );
                 }
             },
+            
+            
+            // enhanced click for mobile devices
+            // we bind a touchstart and hijack any click event in the bubble
+            // then we execute the click directly and save it in a separate data object for later
+            optimizeTouch: (function() {
+                
+                var node,
+                    evs,
+                    fakes,
+                    travel,
+                    evt = {},
+                    handler = function( e ) {
+                        e.preventDefault();
+                        evt = $.extend({}, e, true);
+                    },
+                    attach = function() {
+                        this.evt = evt;
+                    },
+                    fake = function() {
+                        this.handler.call(node, this.evt);
+                    };
+                    
+                return function( elem ) {
+                    
+                    $(elem).bind('touchstart', function( e ) {
+
+                        node = e.target;
+                        travel = true;
+                        
+                        while( node.parentNode && node != e.currentTarget && travel ) {
+            
+                            evs =   $(node).data('events');
+                            fakes = $(node).data('fakes');
+            
+                            if (evs && 'click' in evs) {
+                
+                                travel = false;
+                                e.preventDefault();
+                
+                                // fake the click and save the event object
+                                $(node).click(handler).click();
+                
+                                // remove the faked click
+                                evs.click.pop();
+                
+                                // attach the faked event
+                                $.each( evs.click, attach);
+                
+                                // save the faked clicks in a new data object
+                                $(node).data('fakes', evs.click);
+                
+                                // remove all clicks
+                                delete evs.click;
+
+                            } else if ( fakes ) {
+                
+                                travel = false;
+                                e.preventDefault();
+                        
+                                // fake all clicks
+                                $.each( fakes, fake );
+                            }
+            
+                            // bubble
+                            node = node.parentNode;
+                        }
+                    });
+                };
+            }()),
 
             addTimer : function() {
                 _timeouts.add.apply( _timeouts, Utils.array( arguments ) );
@@ -553,7 +650,7 @@ var undef,
                         error: function() {
                             Galleria.raise( 'Theme CSS could not load', true );
                         },
-                        timeout: 1000
+                        timeout: 3000
                     });
                 }
                 return link;
@@ -887,7 +984,7 @@ var Galleria = function() {
 
             var i;
 
-            carousel.next.bind( CLICK(), function(e) {
+            carousel.next.bind( 'click', function(e) {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
@@ -904,7 +1001,7 @@ var Galleria = function() {
                 }
             });
 
-            carousel.prev.bind( CLICK(), function(e) {
+            carousel.prev.bind( 'click', function(e) {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
@@ -1065,8 +1162,9 @@ var Galleria = function() {
                     tooltip.show( elem );
 
                     Galleria.utils.addTimer( 'tooltip', function() {
-                        self.$( 'tooltip' ).stop().show();
-                        Utils.show( self.get( 'tooltip' ), 400 );
+                        self.$( 'tooltip' ).stop().show().animate({
+                            opacity:1
+                        });
                         tooltip.open = true;
 
                     }, tooltip.open ? 0 : 500);
@@ -1076,9 +1174,9 @@ var Galleria = function() {
                     self.$( 'container' ).unbind( 'mousemove', tooltip.move );
                     Utils.clearTimer( 'tooltip' );
 
-                    self.$( 'tooltip' ).stop();
-
-                    Utils.hide( self.get( 'tooltip' ), 200, function() {
+                    self.$( 'tooltip' ).stop().animate({
+                        opacity: 0
+                    }, 200, function() {
 
                         self.$( 'tooltip' ).hide();
 
@@ -1166,7 +1264,7 @@ var Galleria = function() {
 
             self.$( 'container' ).addClass( 'fullscreen' );
 
-            fullscreen.scrolled = $(window).scrollTop();
+            fullscreen.scrolled = $win.scrollTop();
 
             // begin styleforce
             Utils.forceStyles(self.get('container'), {
@@ -1254,7 +1352,7 @@ var Galleria = function() {
             });
 
             // bind the scaling to the resize event
-            $(window).resize( function() {
+            $win.resize( function() {
                 fullscreen.scale();
             } );
         },
@@ -1296,7 +1394,7 @@ var Galleria = function() {
                 self.trigger( Galleria.FULLSCREEN_EXIT );
             });
 
-            $(window).unbind('resize', fullscreen.scale);
+            $win.unbind('resize', fullscreen.scale);
         }
     };
 
@@ -1521,22 +1619,24 @@ var Galleria = function() {
             $( el.image ).append( lightbox.image.container );
 
             $( DOM().body ).append( el.overlay, el.box );
+            
+            Utils.optimizeTouch( el.box );
 
             // add the prev/next nav and bind some controls
 
-            hover( $( el.close ).bind( CLICK(), lightbox.hide ).html('&#215;') );
+            hover( $( el.close ).bind( 'click', lightbox.hide ).html('&#215;') );
 
             $.each( ['Prev','Next'], function(i, dir) {
 
                 var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&nbsp;' : '&nbsp;&#8250;' ),
                     $e = $( el[ dir.toLowerCase()+'holder'] );
 
-                $e.bind( CLICK(), function() {
+                $e.bind( 'click', function() {
                     lightbox[ 'show' + dir ]();
                 });
 
-                // IE7 will simply show the nav
-                if ( IE < 8 ) {
+                // IE7 and touch devices will simply show the nav
+                if ( IE < 8 || Galleria.TOUCH ) {
                     $d.show();
                     return;
                 }
@@ -1548,18 +1648,23 @@ var Galleria = function() {
                 });
 
             });
-            $( el.overlay ).bind( CLICK(), lightbox.hide );
+            $( el.overlay ).bind( 'click', lightbox.hide );
+            
+            // the lightbox animation is slow on ipad
+            if ( Galleria.IPAD ) {
+                self._options.lightboxTransitionSpeed = 0;
+            }
 
         },
 
         rescale: function(event) {
 
             // calculate
-             var width = Math.min( $(window).width()-40, lightbox.width ),
-                height = Math.min( $(window).height()-60, lightbox.height ),
+             var width = Math.min( $win.width()-40, lightbox.width ),
+                height = Math.min( $win.height()-60, lightbox.height ),
                 ratio = Math.min( width / lightbox.width, height / lightbox.height ),
-                destWidth = ( lightbox.width * ratio ) + 40,
-                destHeight = ( lightbox.height * ratio ) + 60,
+                destWidth = Math.round( lightbox.width * ratio ) + 40,
+                destHeight = Math.round( lightbox.height * ratio ) + 60,
                 to = {
                     width: destWidth,
                     height: destHeight,
@@ -1597,7 +1702,7 @@ var Galleria = function() {
             // remove the image
             lightbox.image.image = null;
 
-            $(window).unbind('resize', lightbox.rescale);
+            $win.unbind('resize', lightbox.rescale);
 
             $( lightbox.elems.box ).hide();
 
@@ -1643,7 +1748,7 @@ var Galleria = function() {
                 });
             }
 
-            $(window).unbind('resize', lightbox.rescale );
+            $win.unbind('resize', lightbox.rescale );
 
             var data = self.getData(index),
                 total = self.getDataLength();
@@ -1666,7 +1771,7 @@ var Galleria = function() {
 
                 lightbox.elems.title.innerHTML = data.title || '';
                 lightbox.elems.counter.innerHTML = (index + 1) + ' / ' + total;
-                $(window).resize( lightbox.rescale );
+                $win.resize( lightbox.rescale );
                 lightbox.rescale();
             });
 
@@ -1746,7 +1851,7 @@ Galleria.prototype = {
             keepSource: false,
             lightbox: false, // 1.2.3
             lightboxFadeSpeed: 200,
-            lightboxTransitionSpeed: 300,
+            lightboxTransitionSpeed: 200,
             linkSourceTmages: true,
             maxScaleRatio: undef,
             minScaleRatio: undef,
@@ -1762,7 +1867,7 @@ Galleria.prototype = {
             showImagenav: true,
             swipe: true, // 1.2.4
             thumbCrop: true,
-            thumbEventType: CLICK(),
+            thumbEventType: 'click',
             thumbFit: true,
             thumbMargin: 0,
             thumbQuality: 'auto',
@@ -1955,7 +2060,7 @@ Galleria.prototype = {
                     $.each( this._data, function( i, data ) {
                         delete data.link;
                     });
-                    this.$( 'stage' ).css({ cursor : 'pointer' }).bind( CLICK(), function(e) {
+                    this.$( 'stage' ).css({ cursor : 'pointer' }).bind( 'click', function(e) {
                         // pause if options is set
                         if ( self._options.pauseOnInteraction ) {
                             self.pause();
@@ -2017,69 +2122,8 @@ Galleria.prototype = {
                         
                     }( self.$( 'images' ) ));
                     
-                    // enhanced click for mobile devices
-                    // we bind a touchstart and hijack any click event in the bubble
-                    // then we execute the click directly and save it in a separate data object for later
-                    this.$('container').bind('touchstart', (function() {
-                        
-                        var node,
-                            evs,
-                            fakes,
-                            travel,
-                            evt = {},
-                            handler = function( e ) {
-                                e.preventDefault();
-                                evt = $.extend({}, e, true);
-                            },
-                            attach = function() {
-                                this.evt = evt;
-                            },
-                            fake = function() {
-                                this.handler.call(node, this.evt);
-                            };
-                        
-                        return function( e ) {
-                            
-                            node = e.target;
-                            travel = true;
-                            
-                            while( node.parentNode && travel ) {
-                        
-                                evs =   $(node).data('events');
-                                fakes = $(node).data('fakes');
-                        
-                                if (evs && 'click' in evs) {
-                            
-                                    travel = false;
-                            
-                                    // fake the click and save the event object
-                                    $(node).click(handler).click();
-                            
-                                    // remove the faked click
-                                    evs.click.pop();
-                            
-                                    // attach the faked event
-                                    $.each( evs.click, attach);
-                            
-                                    // save the faked clicks in a new data object
-                                    $(node).data('fakes', evs.click);
-                            
-                                    // remove all clicks
-                                    delete evs.click;
-
-                                } else if ( fakes ) {
-                            
-                                    travel = false;
-                                    
-                                    // fake all clicks
-                                    $.each( fakes, fake );
-                                }
-                        
-                                // bubble
-                                node = node.parentNode;
-                            }
-                        };
-                    }()));
+                    // optimize touch for container
+                    Utils.optimizeTouch(this.get('container'));
                     
                 }
 
@@ -2188,7 +2232,7 @@ Galleria.prototype = {
         });
 
         // bind image navigation arrows
-        this.$( 'image-nav-right, image-nav-left' ).bind( CLICK(), function(e) {
+        this.$( 'image-nav-right, image-nav-left' ).bind( 'click', function(e) {
 
             // tune the clicknext option
             if ( self._options.clicknext ) {
@@ -3357,7 +3401,7 @@ this.prependChild( 'info', 'myElement' );
 
                     $( next.image ).css({
                         cursor: 'pointer'
-                    }).bind( CLICK(), function() {
+                    }).bind( 'click', function() {
 
                         // popup link
                         if ( data.link ) {
