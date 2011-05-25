@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4b4 2011-05-23
+ * @preserve Galleria v 1.2.4b5 2011-05-26
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -202,13 +202,29 @@ var undef,
                 };
                 
                 // function for setting transition css for all browsers
-                var setStyle = function( elem, value ) {
+                var setStyle = function( elem, value, suffix ) {
                     var css = {};
+                    suffix = suffix || 'transition';
                     $.each( 'webkit moz ms o'.split(' '), function() {
-                        css[ '-' + this + '-transition' ] = value;
+                        css[ '-' + this + '-' + suffix ] = value;
                     });
                     elem.css( css );
                 };
+                
+                // clear styles
+                var clearStyle = function( elem ) {
+                    setStyle( elem, 'initial', 'transition' );
+                    if ( Galleria.WEBKIT ) {
+                        setStyle( elem, 'translate3d(0,0,0)', 'transform' );
+                        if ( elem.data('revert') ) {
+                            elem.css( elem.data('revert') );
+                            elem.data('revert', null);
+                        }
+                    }
+                };
+                
+                // various variables
+                var change, strings, easing, syntax, revert, form;
                 
                 // the actual animation method
                 return function( elem, to, options ) {
@@ -239,28 +255,32 @@ var undef,
                     if ( options.stop ) {
                         // clear the animation
                         elem.unbind( endEvent );
-                        setStyle(elem, 'none');
+                        clearStyle( elem );
                     }
                     
                     // see if there is a change
-                    var match = true
+                    change = false;
                     $.each( to, function( key, val ) {
                         if ( Utils.parseValue( elem.css(key) ) != Utils.parseValue( val ) ) {
-                            match = false;
+                            change = true;
+                            return false;
                         }
                     });
-                    if (match) {
+                    if ( !change ) {
                         window.setTimeout( function() {
                             options.complete.call( elem[0] );
-                        }, options.duration);
+                        }, options.duration );
                         return;
                     }
                     
                     // the css strings to be applied
-                    var strings = [];
+                    strings = [];
                 
                     // the easing bezier
-                    var easing = options.easing in easings ? easings[ options.easing ] : easings._default;
+                    easing = options.easing in easings ? easings[ options.easing ] : easings._default;
+                    
+                    // the syntax
+                    syntax = ' ' + options.duration + 'ms' + ' cubic-bezier('  + easing.join(',') + ')';
                     
                     // add a tiny timeout so that the browsers catches any css changes before animating
                     window.setTimeout(function() {
@@ -270,24 +290,49 @@ var undef,
                             return function() {
                                 
                                 // clear the animation
-                                setStyle(elem, 'none');
+                                clearStyle(elem);
                                 
                                 // run the complete method
                                 options.complete.call(elem[0]);
                             };
                         }( elem )));
                         
+                        // do the webkit translate3d for better performance on iOS
+                        if( Galleria.WEBKIT ) {
+                            
+                            revert = {};
+                            form = [0,0,0];
+
+                            $.each( ['left', 'top'], function(i, m) {
+                                if ( m in to ) {
+                                    form[ i ] = ( Utils.parseValue( to[ m ] ) - Utils.parseValue(elem.css( m )) ) + 'px';
+                                    revert[ m ] = to[ m ];
+                                    delete to[ m ];
+                                }
+                            });
+
+                            if ( form[0] || form[1]) {
+                                
+                                elem.data('revert', revert);
+                                
+                                strings.push('-webkit-transform' + syntax);
+                                
+                                // 3d animate
+                                setStyle( elem, 'translate3d(' + form.join(',') + ')', 'transform');
+                            }
+                        }
+                        
                         // push the animation props
                         $.each(to, function( p, val ) {
-                            strings.push(p + ' ' + options.duration + 'ms' + ' cubic-bezier('  + easing.join(',') + ')');
+                            strings.push(p + syntax);
                         });
-                        
+
                         // set the animation styles
                         setStyle( elem, strings.join(',') );
                         
                         // animate
                         elem.css( to );
-                        
+
                     },1 );
                 };
             }()),
@@ -303,7 +348,10 @@ var undef,
             revertStyles : function() {
                 $.each( Utils.array( arguments ), function( i, elem ) {
 
-                    elem = $( elem ).removeAttr( 'style' );
+                    elem = $( elem );
+                    elem.removeAttr( 'style' );
+                    
+                    elem.attr('style',''); // "fixes" webkit bug
 
                     if ( elem.data( 'styles' ) ) {
                         elem.attr( 'style', elem.data('styles') ).data( 'styles', null );
@@ -660,89 +708,9 @@ var undef,
     }()),
 
     // the transitions holder
-    _transitions = {
-
-        fade: function(params, complete) {
-            $(params.next).css('opacity',0).show();
-            Utils.animate(params.next, {
-                opacity: 1
-            },{
-                duration: params.speed,
-                complete: complete
-            });
-            if (params.prev) {
-                $(params.prev).css('opacity',1).show();
-                Utils.animate(params.prev, {
-                    opacity: 0
-                },{
-                    duration: params.speed
-                });
-            }
-        },
-
-        flash: function(params, complete) {
-            $(params.next).css('opacity', 0);
-            if (params.prev) {
-                Utils.animate( params.prev, {
-                    opacity: 0
-                },{
-                    duration: params.speed/2,
-                    complete: function() {
-                        Utils.animate( params.next, {
-                            opacity:1
-                        },{
-                            duration: params.speed,
-                            complete: complete
-                        });
-                    }
-                });
-            } else {
-                Utils.animate( params.next, {
-                    opacity: 1
-                },{
-                    duration: params.speed,
-                    complete: complete
-                });
-            }
-        },
-
-        pulse: function(params, complete) {
-            if (params.prev) {
-                $(params.prev).hide();
-            }
-            $(params.next).css('opacity', 0);
-            Utils.animate(params.next, {
-                opacity:1
-            },{
-                duration: params.speed,
-                complete: complete
-            });
-        },
-
-        slide: function(params, complete) {
-            var image  = $(params.next).parent(),
-                images = this.$('images'), // ??
-                width  = this._stageWidth,
-                easing = this.getOptions( 'easing' );
-            
-            image.css({
-                left: width * ( params.rewind ? -1 : 1 )
-            });
-            
-            Utils.animate( images, {
-                left: width * ( params.rewind ? 1 : -1 )
-            },{
-                duration: params.speed,
-                complete: function() {
-                    images.add(image).css('left', 0);
-                    complete();
-                }
-            });
-    
-        },
-
-        fadeslide: function(params, complete) {
-
+    _transitions = (function() {
+        
+        var _slide = function(params, complete, fade) {
             var x = 0,
                 easing = this.getOptions('easing'),
                 distance = this.getStageWidth();
@@ -750,11 +718,11 @@ var undef,
             if (params.prev) {
                 x = Utils.parseValue( $(params.prev).css('left') );
                 $(params.prev).css({
-                    opacity: 1,
-                    left: x
+                    left: x,
+                    opacity: 1
                 });
                 Utils.animate(params.prev, {
-                    opacity: 0,
+                    opacity: fade ? 0 : 1,
                     left: x + ( distance * ( params.rewind ? 1 : -1 ) )
                 },{
                     duration: params.speed,
@@ -767,7 +735,7 @@ var undef,
 
             $(params.next).css({
                 left: x + ( distance * ( params.rewind ? -1 : 1 ) ),
-                opacity: 0
+                opacity: fade ? 0 : 1
             });
             Utils.animate(params.next, {
                 opacity: 1,
@@ -778,8 +746,76 @@ var undef,
                 queue: false,
                 easing: easing
             });
-        }
-    };
+        };
+        
+        return {
+
+            fade: function(params, complete) {
+                $(params.next).css('opacity',0).show();
+                Utils.animate(params.next, {
+                    opacity: 1
+                },{
+                    duration: params.speed,
+                    complete: complete
+                });
+                if (params.prev) {
+                    $(params.prev).css('opacity',1).show();
+                    Utils.animate(params.prev, {
+                        opacity: 0
+                    },{
+                        duration: params.speed
+                    });
+                }
+            },
+
+            flash: function(params, complete) {
+                $(params.next).css('opacity', 0);
+                if (params.prev) {
+                    Utils.animate( params.prev, {
+                        opacity: 0
+                    },{
+                        duration: params.speed/2,
+                        complete: function() {
+                            Utils.animate( params.next, {
+                                opacity:1
+                            },{
+                                duration: params.speed,
+                                complete: complete
+                            });
+                        }
+                    });
+                } else {
+                    Utils.animate( params.next, {
+                        opacity: 1
+                    },{
+                        duration: params.speed,
+                        complete: complete
+                    });
+                }
+            },
+
+            pulse: function(params, complete) {
+                if (params.prev) {
+                    $(params.prev).hide();
+                }
+                $(params.next).css('opacity', 0);
+                Utils.animate(params.next, {
+                    opacity:1
+                },{
+                    duration: params.speed,
+                    complete: complete
+                });
+            },
+
+            slide: function(params, complete) {
+                _slide.apply( this, Utils.array( arguments ) );
+            },
+
+            fadeslide: function(params, complete) {
+                _slide.apply( this, Utils.array( arguments ).concat( [true] ) );
+            }
+        };
+    })();
 
 /**
     The main Galleria class
@@ -1861,6 +1897,7 @@ Galleria.prototype = {
             pauseOnInteraction: true,
             popupLinks: false,
             preload: 2,
+            protect: false,
             queue: true,
             show: 0,
             showInfo: true,
@@ -2057,7 +2094,7 @@ Galleria.prototype = {
                 one = true;
 
                 // bind clicknext
-                if ( this._options.clicknext ) {
+                if ( this._options.clicknext && !Galleria.TOUCH ) {
                     $.each( this._data, function( i, data ) {
                         delete data.link;
                     });
@@ -2077,7 +2114,7 @@ Galleria.prototype = {
                         
                         var swipeStart = 0,
                             swipeMoved = 0,
-                            threshold = 100,
+                            threshold = 50,
                             multi = false;
                         
                         images.bind('touchstart', function(e) {
@@ -2196,6 +2233,7 @@ Galleria.prototype = {
         
         // add a notouch class on the container to prevent unwanted :hovers on touch devices
         this.$( 'container' ).addClass( Galleria.TOUCH ? 'touch' : 'notouch' );
+
 
         // add images to the controls
         $.each( new Array(2), function(i) {
@@ -3402,7 +3440,7 @@ this.prependChild( 'info', 'myElement' );
 
                     $( next.image ).css({
                         cursor: 'pointer'
-                    }).bind( 'click', function() {
+                    }).bind( 'mouseup', function() {
 
                         // popup link
                         if ( data.link ) {
