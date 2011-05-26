@@ -89,7 +89,11 @@
     Galleria.loadTheme('galleria.classic.js');
     
     // Initialize Galleria
-    $('#galleria').galleria();
+    $('#galleria').galleria({
+        easing: 'galleriaOut',
+        transitionSpeed: 500,
+        transition: 'fadeslide'
+    });
 
     </script>
     </body>
