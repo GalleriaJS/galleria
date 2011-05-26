@@ -197,8 +197,13 @@ var undef,
                 var easings = {
                     _default: [0.25, 0.1, 0.25, 1],
                     galleria: [0.645, 0.045, 0.355, 1],
-                    galleriaIn: [0.55, 0.055, 0.675, 0.19],
-                    galleriaOut: [0.215, 0.61, 0.355, 1]
+                    galleriaIn: [0.55, 0.085, 0.68, 0.53],
+                    galleriaOut: [0.25, 0.46, 0.45, 0.94],
+                    ease: [0.25, 0, 0.25, 1],
+                    linear: [0.25, 0.25, 0.75, 0.75],
+    				'ease-in': [0.42, 0, 1, 1],
+    				'ease-out': [0, 0, 0.58, 1],
+    				'ease-in-out': [0.42, 0, 0.58, 1]
                 };
                 
                 // function for setting transition css for all browsers
@@ -4616,18 +4621,18 @@ Galleria.Picture.prototype = {
 $.extend( $.easing, {
 
     galleria: function (_, t, b, c, d) {
-        if ((t/=d/2) < 1) {
-            return c/2*t*t*t + b;
-        }
-        return c/2*((t-=2)*t*t + 2) + b;
+		if ((t/=d/2) < 1) {
+		    return c/2*t*t*t + b;
+		}
+		return c/2*((t-=2)*t*t + 2) + b;
     },
 
     galleriaIn: function (_, t, b, c, d) {
-        return c*(t/=d)*t*t + b;
+        return c*(t/=d)*t + b;
     },
 
     galleriaOut: function (_, t, b, c, d) {
-        return c*((t=t/d-1)*t*t + 1) + b;
+        return -c *(t/=d)*(t-2) + b;
     }
 
 });
