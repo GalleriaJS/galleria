@@ -229,7 +229,7 @@ var undef,
                 };
                 
                 // various variables
-                var change, strings, easing, syntax, revert, form;
+                var change, strings, easing, syntax, revert, form, css;
                 
                 // the actual animation method
                 return function( elem, to, options ) {
@@ -266,10 +266,12 @@ var undef,
                     // see if there is a change
                     change = false;
                     $.each( to, function( key, val ) {
-                        if ( Utils.parseValue( elem.css(key) ) != Utils.parseValue( val ) ) {
+                        css = elem.css( key );
+                        if ( Utils.parseValue( css ) != Utils.parseValue( val ) ) {
                             change = true;
-                            return false;
                         }
+                        // also add computed styles for FF
+                        elem.css( key, css );
                     });
                     if ( !change ) {
                         window.setTimeout( function() {
