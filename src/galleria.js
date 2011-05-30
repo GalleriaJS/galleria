@@ -201,9 +201,9 @@ var undef,
                     galleriaOut: [0.25, 0.46, 0.45, 0.94],
                     ease: [0.25, 0, 0.25, 1],
                     linear: [0.25, 0.25, 0.75, 0.75],
-    				'ease-in': [0.42, 0, 1, 1],
-    				'ease-out': [0, 0, 0.58, 1],
-    				'ease-in-out': [0.42, 0, 0.58, 1]
+                    'ease-in': [0.42, 0, 1, 1],
+                    'ease-out': [0, 0, 0.58, 1],
+                    'ease-in-out': [0.42, 0, 0.58, 1]
                 };
                 
                 // function for setting transition css for all browsers
@@ -2233,7 +2233,7 @@ Galleria.prototype = {
                         }
 
                         swipeStart = swipeStop = [0,0];
-                    }
+                    };
                 
                 images.bind(ev.start, function(e) {
 
@@ -2461,7 +2461,7 @@ Galleria.prototype = {
 	},
 
     // the internal _run method should be called after loading data into galleria
-    // makes sure the gallery has proper measurements before triggering init
+    // makes sure the gallery has proper measurements before postrun & ready
     _run : function() {
 
         var self = this;
@@ -4249,7 +4249,7 @@ Galleria.log = function() {
 
 Galleria.ready = function( fn ) {
     Galleria.ready.callbacks.push( fn );
-}
+};
 
 Galleria.ready.callbacks = [];
 
