@@ -699,7 +699,7 @@ var undef,
                             return ready && doc.styleSheets.length > length;
                         },
                         success: function() {
-                            Utils.addTimer( 'css', function() {
+                            window.setTimeout( function() {
                                 callback.call( link, link );
                             }, 100);
                         },
@@ -4399,7 +4399,9 @@ Galleria.Picture.prototype = {
         }
 
         // begin preload and insert in cache when done
-        $( image ).load( onload ).attr( 'src', src );
+        $( image ).load( onload ).error( function() {
+            Galleria.raise('image could not load: '+ src);
+        }).attr( 'src', src );
 
         return image;
 
