@@ -20,6 +20,7 @@ Changelog
 * Improved the Galleria.TOUCH boolean to reflect an actual touch event
 * Improved the classic theme, other themes will also be improved
 * Fixed a webkit bug where the scrollbar sometimes disappeared after returning from fullscreen
+* Added a Galleria.ready function to attach plugins and other functions to each gallery when initialized
 
 1.2.3
 -----

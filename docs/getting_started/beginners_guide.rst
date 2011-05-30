@@ -46,7 +46,7 @@ The HTML file should look something like::
     <!doctype html>
     <html>
         <head>
-            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
         </head>
         <body>
             <script>
@@ -84,7 +84,7 @@ The HTML file should look something like::
     <!doctype html>
     <html>
         <head>
-            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
             <script src="galleria/galleria-1.2.3.min.js"></script>
         </head>
         <body>
@@ -151,7 +151,7 @@ The complete code example:
     <!doctype html>
     <html>
         <head>
-            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
             <script src="galleria/galleria-1.2.3.min.js"></script>
         </head>
         <body>

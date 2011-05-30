@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4b5 2011-05-26
+ * @preserve Galleria v 1.2.4b6 2011-05-30
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -871,6 +871,9 @@ var Galleria = function() {
 
     // internal init flag
     this._initialized = false;
+    
+    // internal firstrun flag
+    this._firstrun = false;
 
     // global stagewidth/height
     this._stageWidth = 0;
@@ -2062,154 +2065,6 @@ Galleria.prototype = {
             });
         });
 
-        // postrun some stuff after the gallery is ready
-        // make sure it only runs once
-        var one = false;
-
-        this.bind( Galleria.READY, (function(one) {
-
-            return function() {
-
-                // show counter
-                Utils.show( this.get('counter') );
-
-                // bind carousel nav
-                if ( this._options.carousel ) {
-                    this._carousel.bindControls();
-                }
-
-                // start autoplay
-                if ( this._options.autoplay ) {
-
-                    this.pause();
-
-                    if ( typeof this._options.autoplay === 'number' ) {
-                        this._playtime = this._options.autoplay;
-                    }
-
-                    this.trigger( Galleria.PLAY );
-                    this._playing = true;
-                }
-                // if second load, just do the show and return
-                if ( one ) {
-                    if ( typeof this._options.show === 'number' ) {
-                        this.show( this._options.show );
-                    }
-                    return;
-                }
-
-                one = true;
-
-                // bind clicknext
-                if ( this._options.clicknext && !Galleria.TOUCH ) {
-                    $.each( this._data, function( i, data ) {
-                        delete data.link;
-                    });
-                    this.$( 'stage' ).css({ cursor : 'pointer' }).bind( 'click', function(e) {
-                        // pause if options is set
-                        if ( self._options.pauseOnInteraction ) {
-                            self.pause();
-                        }
-                        self.next();
-                    });
-                }
-                
-                // bind swipe gesture
-                if ( this._options.swipe ) {
-                    
-                    (function( images ) {
-                        
-                        var swipeStart = 0,
-                            swipeMoved = 0,
-                            threshold = 50,
-                            multi = false;
-                        
-                        images.bind('touchstart', function(e) {
-                            
-                            if (e.originalEvent.touches.length) {
-                                return;
-                            }
-                            
-                            swipeStart = swipeMoved = e.originalEvent.touches[0].pageX;
-                            
-                        }).bind('touchmove', function(e) {
-                            
-                            if (e.originalEvent.touches.length > 1) {
-                                return;
-                            }
-                            
-                            e.preventDefault();
-                            swipeMoved = e.originalEvent.touches[0].pageX;
-                            
-                            if (!swipeStart) {
-                                swipeStart = swipeMoved;
-                            }
-                        
-                        }).bind('touchend', function(e) {
-                            
-                            // if multitouch (possibly zooming), abort
-                            if ( e.originalEvent.touches.length || multi ) {
-                                multi = !multi;
-                                return;
-                            }
-                            
-                            e.preventDefault();
-
-                            if ( swipeStart - swipeMoved > threshold ) {
-                                self.next();
-                            } else if ( swipeMoved - swipeStart > threshold ) {
-                                self.prev();
-                            }
-                            
-                            swipeStart = swipeMoved = 0;
-                            
-                        });
-                        
-                    }( self.$( 'images' ) ));
-                    
-                    // optimize touch for container
-                    Utils.optimizeTouch(this.get('container'));
-                    
-                }
-
-                // initialize the History plugin
-                if ( Galleria.History ) {
-
-                    // bind the show method
-                    Galleria.History.change(function(e) {
-
-                        // grab history ID
-                        var val = parseInt( e.value.replace( /\//, '' ), 10 );
-
-                        // if ID is NaN, the user pressed back from the first image
-                        // return to previous address
-                        if (isNaN(val)) {
-                            window.history.go(-1);
-
-                        // else show the image
-                        } else {
-                            self.show( val, undef, true );
-                        }
-                    });
-                }
-
-                // call the theme init method
-                Galleria.theme.init.call( this, this._options );
-
-                // call the extend option
-                this._options.extend.call( this, this._options );
-
-                // show the initial image
-                // first test for permalinks in history
-                if ( /^[0-9]{1,4}$/.test( HASH ) && Galleria.History ) {
-                    this.show( HASH, undef, true );
-
-                } else if( this._data[ this._options.show ] ) {
-                    this.show( this._options.show );
-                }
-            };
-        }( one )));
-
         // build the gallery frame
         this.append({
             'info-text' :
@@ -2321,6 +2176,84 @@ Galleria.prototype = {
                 this.updateCarousel();
             });
         }
+        
+        // bind swipe gesture
+        if ( this._options.swipe ) {
+            
+            (function( images ) {
+                
+                var swipeStart = [0,0],
+                    swipeStop = [0,0],
+                    limitX = 30,
+                    limitY = 70,
+                    multi = false,
+                    tid = 0,
+                    data,
+                    ev = {
+                        start: 'touchstart',
+                        move: 'touchmove',
+                        stop: 'touchend'
+                    },
+                    getData = function(e) {
+                        return e.originalEvent.touches ? e.originalEvent.touches[0] : e;
+                    },
+                    moveHandler = function( e ) {
+                        
+                        if ( e.originalEvent.touches && e.originalEvent.touches.length > 1 ) {
+                            return;
+                        }
+
+                        data = getData( e );
+                        swipeStop = [ data.pageX, data.pageY ];
+
+                        if ( !swipeStart[0] ) {
+                            swipeStart = swipeStop;
+                        }
+
+                        if ( Math.abs( swipeStart[0] - swipeStop[0] ) > 10 ) {
+                            e.preventDefault();
+                        }
+                    },
+                    upHandler = function( e ) {
+                        
+                        images.unbind( ev.move, moveHandler );
+                        
+                        // if multitouch (possibly zooming), abort
+                        if ( ( e.originalEvent.touches && e.originalEvent.touches.length ) || multi ) {
+                            multi = !multi;
+                            return;
+                        }
+
+                        if ( Utils.timestamp() - tid < 1000 && 
+                             Math.abs( swipeStart[0] - swipeStop[0] ) > limitX &&
+                             Math.abs( swipeStart[1] - swipeStop[1] ) < limitY ) {
+
+                            e.preventDefault(); 
+                            self[ swipeStart[0] > swipeStop[0] ? 'next' : 'prev' ]();
+                        }
+
+                        swipeStart = swipeStop = [0,0];
+                    }
+                
+                images.bind(ev.start, function(e) {
+
+                    if ( e.originalEvent.touches && e.originalEvent.touches.length > 1 ) {
+                        return;
+                    }
+                    
+                    data = getData(e);
+                    tid = Utils.timestamp();
+                    swipeStart = swipeStop = [ data.pageX, data.pageY ];
+                    images.bind(ev.move, moveHandler ).one(ev.stop, upHandler);
+                    
+                });
+                
+            }( self.$( 'images' ) ));
+            
+        }
+        
+        // optimize touch for container
+        Utils.optimizeTouch(this.get('container'));
 
         return this;
     },
@@ -2528,7 +2461,7 @@ Galleria.prototype = {
 	},
 
     // the internal _run method should be called after loading data into galleria
-    // makes sure the gallery has proper measurements before triggering ready
+    // makes sure the gallery has proper measurements before triggering init
     _run : function() {
 
         var self = this;
@@ -2558,7 +2491,94 @@ Galleria.prototype = {
                 // save the instance
                 _galleries.push( self );
 
+                // postrun some stuff after the gallery is ready
+
+                // show counter
+                Utils.show( self.get('counter') );
+
+                // bind carousel nav
+                if ( self._options.carousel ) {
+                    self._carousel.bindControls();
+                }
+
+                // start autoplay
+                if ( self._options.autoplay ) {
+
+                    self.pause();
+
+                    if ( typeof self._options.autoplay === 'number' ) {
+                        self._playtime = self._options.autoplay;
+                    }
+
+                    self.trigger( Galleria.PLAY );
+                    self._playing = true;
+                }
+                // if second load, just do the show and return
+                if ( self._firstrun ) {
+                    if ( typeof self._options.show === 'number' ) {
+                        self.show( self._options.show );
+                    }
+                    return;
+                }
+
+                self._firstrun = true;
+
+                // bind clicknext
+                if ( self._options.clicknext && !Galleria.TOUCH ) {
+                    $.each( self._data, function( i, data ) {
+                        delete data.link;
+                    });
+                    self.$( 'stage' ).css({ cursor : 'pointer' }).bind( 'click', function(e) {
+                        // pause if options is set
+                        if ( self._options.pauseOnInteraction ) {
+                            self.pause();
+                        }
+                        self.next();
+                    });
+                }
+
+                // initialize the History plugin
+                if ( Galleria.History ) {
+
+                    // bind the show method
+                    Galleria.History.change(function(e) {
+
+                        // grab history ID
+                        var val = parseInt( e.value.replace( /\//, '' ), 10 );
+
+                        // if ID is NaN, the user pressed back from the first image
+                        // return to previous address
+                        if (isNaN(val)) {
+                            window.history.go(-1);
+
+                        // else show the image
+                        } else {
+                            self.show( val, undef, true );
+                        }
+                    });
+                }
+
+                // Trigger Galleria.ready
+                $.each( Galleria.ready.callbacks, function() {
+                    this.call( self, self._options );
+                });
+
                 self.trigger( Galleria.READY );
+
+                // call the theme init method
+                Galleria.theme.init.call( self, self._options );
+
+                // call the extend option
+                self._options.extend.call( self, self._options );
+
+                // show the initial image
+                // first test for permalinks in history
+                if ( /^[0-9]{1,4}$/.test( HASH ) && Galleria.History ) {
+                    self.show( HASH, undef, true );
+
+                } else if( self._data[ self._options.show ] ) {
+                    self.show( self._options.show );
+                }
             },
 
             error: function() {
@@ -2609,6 +2629,11 @@ Galleria.prototype = {
 
         // use the data_config set by option
         config = config || this._options.dataConfig;
+        
+        // if source is a true object, make it into an array
+        if( /^function Object/.test( source.constructor ) ) {
+            source = [source];
+        }
 
         // check if the data is an array already
         if ( source.constructor === Array ) {
@@ -2622,6 +2647,7 @@ Galleria.prototype = {
             }
             return this;
         }
+        
         // loop through images and set data
         $( source ).find( selector ).each( function( i, img ) {
             img = $( img );
@@ -3398,19 +3424,19 @@ this.prependChild( 'info', 'myElement' );
     _show : function() {
 
         // shortcuts
-        var self   = this,
-            queue  = this._queue[ 0 ],
-            data   = this.getData( queue.index );
+        var self = this,
+            queue = this._queue[ 0 ],
+            data = this.getData( queue.index );
 
         if ( !data ) {
             return;
         }
 
-        var src    = this.isFullscreen() && 'big' in data ? data.big : data.image, // use big image if fullscreen mode
+        var src = this.isFullscreen() && 'big' in data ? data.big : data.image, // use big image if fullscreen mode
             active = this._controls.getActive(),
-            next   = this._controls.getNext(),
+            next = this._controls.getNext(),
             cached = next.isCached( src ),
-            thumb  = this._thumbnails[ queue.index ];
+            thumb = this._thumbnails[ queue.index ];
 
         // to be fired when loading & transition is complete:
         var complete = (function( data, next, active, queue, thumb ) {
@@ -3477,8 +3503,8 @@ this.prependChild( 'info', 'myElement' );
 
                 // trigger IMAGE event
                 self.trigger({
-                    type:        Galleria.IMAGE,
-                    index:       queue.index,
+                    type: Galleria.IMAGE,
+                    index: queue.index,
                     imageTarget: next.image,
                     thumbTarget: thumb.image
                 });
@@ -3569,10 +3595,10 @@ this.prependChild( 'info', 'myElement' );
 
                     } else {
                         var params = {
-                            prev:   active.image,
-                            next:   next.image,
+                            prev: active.image,
+                            next: next.image,
                             rewind: queue.rewind,
-                            speed:  self._options.transitionSpeed || 400
+                            speed: self._options.transitionSpeed || 400
                         };
 
                         // call the transition function and send some stuff
@@ -4168,10 +4194,10 @@ Galleria.loadTheme = function( src, options ) {
 */
 
 Galleria.get = function( index ) {
-    if ( !!_galleries[ index ] ) {
-        return _galleries[ index ];
+    if ( !!_instances[ index ] ) {
+        return _instances[ index ];
     } else if ( typeof index !== 'number' ) {
-        return _galleries;
+        return _instances;
     } else {
         Galleria.raise('Gallery index ' + index + ' not found');
     }
@@ -4215,6 +4241,19 @@ Galleria.log = function() {
 };
 
 /**
+    A ready method for adding callbacks when a gallery is ready
+    Each method is call before the extend option for every instance
+
+    @param {function} callback The function to call
+*/
+
+Galleria.ready = function( fn ) {
+    Galleria.ready.callbacks.push( fn );
+}
+
+Galleria.ready.callbacks = [];
+
+/**
     Method for raising errors
 
     @param {string} msg The message to throw
@@ -4249,7 +4288,7 @@ Galleria.raise = function( msg, fatal ) {
                         position: 'absolute',
                         top: 0,
                         left: 0,
-                        zIndex: 50000
+                        zIndex: 100000
                     });
                 }
 
@@ -4424,10 +4463,10 @@ Galleria.Picture.prototype = {
             },
             success: function() {
                 // call success
-                window.setTimeout(function() { callback.call( self, self ); }, 50 );
+                window.setTimeout(function() { callback.call( self, self ); }, 1 );
             },
             error: function() {
-                window.setTimeout(function() { callback.call( self, self ); }, 50 );
+                window.setTimeout(function() { callback.call( self, self ); }, 1 );
                 Galleria.raise('image not loaded in 30 seconds: '+ src);
             },
             timeout: 30000
