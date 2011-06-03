@@ -16,14 +16,21 @@
             
             /* This rule is read by Galleria to define the gallery height: */
             #galleria{height:320px;}
+            body .galleria-images .galleria-image img{border:1px solid #fff;}
             
         </style>
+        
+        <link rel="stylesheet" href="../../../../mediaelement/build/mediaelementplayer.css">
         
         <!-- load jQuery -->
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
         
+        <script src="../../../../mediaelement/build/mediaelement-and-player.js"></script>
+        
         <!-- load Galleria -->
         <script src="../../galleria.js"></script>
+        
+        <script src="video.js"></script>
 
     </head>
 <body>
@@ -82,14 +89,41 @@
         </div>
         
         <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>.</p>
+        <a id="fs">fullscreen</a>
+        <a id="load">load</a>
     </div>
+    
+    
     <script>
-
     // Load the classic theme
     Galleria.loadTheme('galleria.classic.js');
     
     // Initialize Galleria
-    $('#galleria').galleria();
+    $('#galleria').galleria({
+        easing: 'galleriaOut',
+        transition: 'fadeslide',
+        imageMargin: 2,
+        dataConfig: function(img) {
+            return {
+                video: 'http://mediaelementjs.com/media/echo-hereweare.mp4'
+            }
+        },
+        extend: function() {
+            $('#load').click(this.proxy(function() {
+                this.load({
+                    image: 'http://aino.se/media/i/logoneg.png'
+                });
+            }));
+        }
+    });
+    
+    Galleria.get(0).bind('ready', function() {
+        console.log('ready', this)
+    })
+    
+    Galleria.ready(function() {
+        console.log('ready again', this)
+    })
 
     </script>
     </body>

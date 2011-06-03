@@ -36,7 +36,8 @@ Galleria.Flickr = function( api_key ) {
         imageSize: 'medium',           // photo size ( thumb,small,medium,big,original )
         thumbSize: 'thumb',            // thumbnail size ( thumb,small,medium,big,original )
         sort: 'interestingness-desc',  // sort option ( date-posted-asc, date-posted-desc, date-taken-asc, date-taken-desc, interestingness-desc, interestingness-asc, relevance )
-        description: false             // set this to true to get description as caption
+        description: false,            // set this to true to get description as caption
+        complete: function(){}         // callback to be called inside the Galleria.prototype.load
     };
 };
 
@@ -355,6 +356,7 @@ Galleria.prototype.load = function() {
             self._data = data;
             loader.remove();
             self.trigger( Galleria.DATA );
+            f.options.complete.call(f, data);
 
         });
     } else {

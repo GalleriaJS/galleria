@@ -50,7 +50,7 @@
     text-align: right;
     color: #fff;
     font: normal 11px/1 arial,sans-serif;
-    z-index: 2;
+    z-index: 1;
 }
 .galleria-loader {
     background: #000;

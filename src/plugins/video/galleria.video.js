@@ -29,12 +29,18 @@
         onload = function() {
 
             this.addElement('video').prependChild('stage','video');
+            
+            var z = Galleria.utils.parseValue(this.$('image-nav-left').css('z-index'));
 
             var video = this.$('video').css({
                     position: 'absolute',
                     top: 0,
                     left: 0,
-                    zIndex: 2
+                    right: 0,
+                    bottom: 0,
+                    zIndex: z,
+                    background: 'url(mediaelement/i/play.png) no-repeat 50% 50%'
+                    
                 }).hide(),
 
                 insert = function() {
@@ -81,12 +87,14 @@
 
             this.bind('image', function( e ) {
                 if ( elem ) {
+                    
                     elem.attr({
                         width: this.getStageWidth(),
                         height: this.getStageHeight()
-                    });
-                    $(e.imageTarget).unbind('click').click(function() {
-                        video.fadeIn(200);
+                    }).hide();
+                    
+                    video.show().bind('touchend mouseup', function() {
+                        elem.fadeIn(200);
                         instance = new mejs.MediaElementPlayer(elem, {
                             features: ['playpause','progress','current','volume'],
                             success: function( player ) {

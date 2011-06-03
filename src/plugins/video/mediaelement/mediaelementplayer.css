@@ -1,7 +1,9 @@
 .mejs-container {
 	position: relative;
 	background: #000;
-	font-family: Helvetica, Arial;
+	font-family: arial, sans-serif;
+	width:100%!important;
+	height:100%!important;
 }
 
 .mejs-container-fullscreen {
@@ -46,14 +48,16 @@
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	width: 100px;
-	height: 100px;
-	margin: -50px 0 0 -50px;
-	background: url(bigplay.png) top left no-repeat;
+	width: 80px;
+	height: 80px;
+	margin: -40px 0 0 -40px;
+	background: url(i/play.png) top left no-repeat;
+	opacity:.8;
 }
-.mejs-overlay:hover .mejs-overlay-button{
-	background-position: 0 -100px ;
+.mejs-overlay-button:hover{
+    opacity:1;
 }
+
 .mejs-overlay-loading {
 	position: absolute;
 	top: 50%;
@@ -83,15 +87,12 @@
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
-	bottom: 0;
-	left: 0;
-	background: url(background.png);
-	background: rgba(0, 0, 0, 0.7);
-	background: -webkit-gradient(linear, left top, left bottom, from(rgba(50,50,50,0.7)), to(rgba(0,0,0,0.7))); 
-	background: -moz-linear-gradient(top,  rgba(50,50,50,0.7),  rgba(0,0,0,0.7)); 	
-	background: linear-gradient(rgba(50,50,50,0.7),  rgba(0,0,0,0.7)); 	
+	bottom: 12px;
+	left: 12px;
+	right:12px;
+	background: rgba(0,0,0,.5);
+	border-radius: 8px; 
 	height: 30px;
-	width: 100%;
 }
 .mejs-container .mejs-controls  div {
 	list-style-type: none;
@@ -112,11 +113,17 @@
 	font-size: 0px;
 	line-height: 0;
 	text-decoration: none;
-	margin: 7px 5px;
+	margin: 7px;
 	height: 16px;
 	width: 16px;
 	background: transparent url(controls.png) 0 0 no-repeat;
+	opacity:.7;
 }
+.mejs-controls .mejs-button span:hover{
+    opacity:1;
+}
+
+
 /* End: CONTROL BAR */
 
 /* Start: Time (current / duration) */
@@ -131,8 +138,8 @@
 	padding: auto 4px;
 }
 .mejs-container .mejs-controls .mejs-time span {
-	font-size: 11px;
-	color: #fff;
+	font-size: 10px;
+	color: rgba(255,255,255,.7);
 	line-height: 12px;
 	display: block;
 	float: left;
