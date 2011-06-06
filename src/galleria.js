@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4b6 2011-05-30
+ * @preserve Galleria v 1.2.4b7 2011-06-07
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -218,7 +218,7 @@ var undef,
                 
                 // clear styles
                 var clearStyle = function( elem ) {
-                    setStyle( elem, 'initial', 'transition' );
+                    setStyle( elem, 'none', 'transition' );
                     if ( Galleria.WEBKIT ) {
                         setStyle( elem, 'translate3d(0,0,0)', 'transform' );
                         if ( elem.data('revert') ) {
@@ -706,7 +706,7 @@ var undef,
                         error: function() {
                             Galleria.raise( 'Theme CSS could not load', true );
                         },
-                        timeout: 3000
+                        timeout: 10000
                     });
                 }
                 return link;
@@ -717,42 +717,54 @@ var undef,
     // the transitions holder
     _transitions = (function() {
         
-        var _slide = function(params, complete, fade) {
-            var x = 0,
-                easing = this.getOptions('easing'),
+        var _slide = function(params, complete, fade, door) {
+            
+            var easing = this.getOptions('easing'),
                 distance = this.getStageWidth();
+                
+            $(params.next).css({
+                left: distance * ( params.rewind ? -1 : 1 ),
+                opacity: fade ? 0 : 1
+            });
+            Utils.animate(params.next, {
+                opacity: 1,
+                left: 0
+            }, {
+                duration: params.speed,
+                complete: (function( elems ) {
+                    return function() {
+                        complete();
+                        window.setTimeout( (function( elems ) {
+                            return function() {
+                                elems.css({
+                                    left: 0
+                                });
+                            };
+                        }( elems )), 1);
+                    };
+                }( $( params.next ).add( params.prev ) )),
+                queue: false,
+                easing: easing
+            });
+
+            if (door) {
+                params.rewind = !params.rewind;
+            }
 
             if (params.prev) {
-                x = Utils.parseValue( $(params.prev).css('left') );
                 $(params.prev).css({
-                    left: x,
+                    left: 0,
                     opacity: 1
                 });
                 Utils.animate(params.prev, {
                     opacity: fade ? 0 : 1,
-                    left: x + ( distance * ( params.rewind ? 1 : -1 ) )
+                    left: distance * ( params.rewind ? 1 : -1 )
                 },{
                     duration: params.speed,
                     queue: false,
                     easing: easing
                 });
             }
-
-            x = Utils.parseValue( $(params.next).css('left') );
-
-            $(params.next).css({
-                left: x + ( distance * ( params.rewind ? -1 : 1 ) ),
-                opacity: fade ? 0 : 1
-            });
-            Utils.animate(params.next, {
-                opacity: 1,
-                left: x
-            }, {
-                duration: params.speed,
-                complete: complete,
-                queue: false,
-                easing: easing
-            });
         };
         
         return {
@@ -805,7 +817,7 @@ var undef,
                 if (params.prev) {
                     $(params.prev).hide();
                 }
-                $(params.next).css('opacity', 0);
+                $(params.next).css('opacity', 0).show();
                 Utils.animate(params.next, {
                     opacity:1
                 },{
@@ -820,6 +832,10 @@ var undef,
 
             fadeslide: function(params, complete) {
                 _slide.apply( this, Utils.array( arguments ).concat( [true] ) );
+            },
+            
+            doorslide: function(params, complete) {
+                _slide.apply( this, Utils.array( arguments ).concat( [false, true] ) );
             }
         };
     })();
@@ -1513,6 +1529,11 @@ var Galleria = function() {
         },
 
         hide : function() {
+            
+            if ( !self._options.idleMode ) {
+                return;
+            }
+            
             self.trigger( Galleria.IDLE_ENTER );
 
             $.each( idle.trunk, function(i, elem) {
@@ -1888,6 +1909,7 @@ Galleria.prototype = {
             easing: 'galleria',
             extend: function(options) {},
             height: 'auto',
+            idleMode: true, // 1.2.4 toggles idleMode 
             idleTime: 3000,
             idleSpeed: 200,
             imageCrop: false,
@@ -1895,6 +1917,7 @@ Galleria.prototype = {
             imagePan: false,
             imagePanSmoothness: 12,
             imagePosition: '50%',
+            initialTransition: undef, // 1.2.4, replaces transitionInitial
             keepSource: false,
             lightbox: false, // 1.2.3
             lightboxFadeSpeed: 200,
@@ -1921,11 +1944,14 @@ Galleria.prototype = {
             thumbQuality: 'auto',
             thumbnails: true,
             transition: 'fade',
-            transitionInitial: undef,
+            transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
             useCanvas: false, // 1.2.4
             width: 'auto'
         };
+        
+        // legacy support for transitionInitial
+        this._options.initialTransition = this._options.initialTransition || this._options.transitionInitial;
 
         // turn off debug
         if ( options && options.debug === false ) {
@@ -3585,18 +3611,17 @@ this.prependChild( 'info', 'myElement' );
                         thumbTarget: self._thumbnails[ queue.index ].image
                     });
 
-                    var transition = active.image === null && self._options.transitionInitial ?
-                        self._options.transitionInitial : self._options.transition;
+                    var transition = active.image === null && self._options.initialTransition ?
+                        self._options.initialTransition : self._options.transition;
 
                     // validate the transition
                     if ( transition in _transitions === false ) {
-
                         complete();
 
                     } else {
                         var params = {
-                            prev: active.image,
-                            next: next.image,
+                            prev: active.container,
+                            next: next.container,
                             rewind: queue.rewind,
                             speed: self._options.transitionSpeed || 400
                         };

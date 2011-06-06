@@ -6,7 +6,7 @@ Changelog
 -----
 * Improved overall error messages
 * Galleria now prints debug messages to the Galleria container for easier debugging
-* Debug is now true by default - set default to false when deploying
+* Debug is now true by default - set debug to false when deploying
 * Changed lightbox image to use the bigger image if available
 * Fixed a link bug that caused the link destination to be mixed up between images
 * Added a rel attribute in the HTML that can be used to provide a big image for fullscreen view
@@ -15,12 +15,14 @@ Changelog
 * Added canvas rescaling support for better thumbnail generation on the client. Still experimental; set useCanvas to true if you want to try it.
 * Fixed a rounding error in IE9 that caused the thumbnails to stretch
 * Added CSS3 animations (including hardware optimized for iOS) with jQuery fallbacks for all transitions and other animations
-* Added a swipe option (default true) to activate swipe gesture for navigating
+* Added a swipe option (default true) to activate swipe gesture for navigating on touch devices
 * Improved the touchstart event for a better mobile experience in general
-* Improved the Galleria.TOUCH boolean to reflect an actual touch event
+* Improved the Galleria.TOUCH boolean to detect if the document supports an actual touch event
 * Improved the classic theme, other themes will also be improved
 * Fixed a webkit bug where the scrollbar sometimes disappeared after returning from fullscreen
-* Added a Galleria.ready function to attach plugins and other functions to each gallery when initialized
+* Added a Galleria.ready function to simplify customizations and attaching plugins to each gallery when initialized
+* Added a new transition: 'doorslide' that will slide the images in opposite directions
+* Added 'idleMode' option, set this to false to prevent the gallery from entering idle mode at all
 
 1.2.3
 -----
