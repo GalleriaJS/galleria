@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4b7 2011-06-07
+ * @preserve Galleria v 1.2.4 2011-07-07
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -762,7 +762,10 @@ var undef,
                 },{
                     duration: params.speed,
                     queue: false,
-                    easing: easing
+                    easing: easing,
+                    complete: function() {
+                        $(this).css('opacity', 0);
+                    }
                 });
             }
         };
@@ -3482,6 +3485,7 @@ this.prependChild( 'info', 'myElement' );
                     zIndex: 0,
                     opacity: 0
                 });
+
                 $( next.container ).css({
                     zIndex: 1,
                     opacity: 1
