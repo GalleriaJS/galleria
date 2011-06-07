@@ -3610,8 +3610,7 @@ this.prependChild( 'info', 'myElement' );
                         imageTarget: next.image,
                         thumbTarget: self._thumbnails[ queue.index ].image
                     });
-
-                    var transition = active.image === null && self._options.initialTransition ?
+                    var transition = active.image === null && self._options.initialTransition !== undef ?
                         self._options.initialTransition : self._options.transition;
 
                     // validate the transition
