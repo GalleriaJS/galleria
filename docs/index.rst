@@ -25,7 +25,16 @@ Themes
     themes/classic.rst
     themes/miniml.rst
     themes/twelve.rst
+    themes/folio.rst
     themes/fullscreen.rst
+    
+Plugins
+=======
+
+.. toctree::
+    :maxdepth: 1
+
+    plugins/flickr
 
 
 References & Guides
