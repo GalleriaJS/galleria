@@ -1,5 +1,5 @@
 =================
-transitionInitial
+initialTransition
 =================
 
     | type: **String**

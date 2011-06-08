@@ -60,7 +60,11 @@ List of options
 
 - :doc:`extend` Add custom functionality to the gallery.
 
+- :doc:`fullscreenDoubleTap` Enabled fullscreen toggle on double-tap for touch devices
+
 - :doc:`height` Manually set a gallery height.
+
+- :doc:`idleMode` Option for turning on/off idle mode.
 
 - :doc:`idleTime` Defines how long delay before Galleria goes into idle mode.
 
@@ -76,6 +80,8 @@ List of options
   effect should be.
 
 - :doc:`imagePosition` Positions the image.
+
+- :doc:`initialTransition` Sets a different transition on the the first image.
 
 - :doc:`keepSource` Lets you keep the source elements.
 
@@ -110,6 +116,8 @@ List of options
 
 - :doc:`showImagenav` Toggles the image navigation arrows.
 
+- :doc:`swipe` Enables the swipe gesture for navigating on touch devices.
+
 - :doc:`thumbCrop` Same as image_crop for thumbnails.
 
 - :doc:`thumbFit` Lets you fit thumbnails according to width.
@@ -122,8 +130,6 @@ List of options
 - :doc:`thumbnails` Sets how and if thumbnails should be created.
 
 - :doc:`transition` Defines what transition to use.
-
-- :doc:`transitionInitial` Sets a different transition on the the first image.
 
 - :doc:`transitionSpeed` Defines the speed of the transition.
 

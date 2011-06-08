@@ -23,6 +23,7 @@ Changelog
 * Added a Galleria.ready function to simplify customizations and attaching plugins to each gallery when initialized
 * Added a new transition: 'doorslide' that will slide the images in opposite directions
 * Added 'idleMode' option, set this to false to prevent the gallery from entering idle mode at all
+* Added 'fullscreenDoubleTap' option (default true) that listens for the double-tap event on touch devices and toggle fullscreen mode if it happens.
 
 1.2.3
 -----

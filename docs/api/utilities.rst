@@ -9,6 +9,13 @@ Static methods are exposed using ``Galleria.fn()``.
 
 .. highlight:: javascript
 
+Galleria.ready( function )
+----------------------------------------
+
+    | returns null
+
+Use this to bind custom functionality to each gallery instance onload. Works the same way as the extend option.
+
 Galleria.log( msg [,msg,...] )
 ------------------------------
 
@@ -86,3 +93,5 @@ Galleria.addTransition( name, function )
 
 This method provides an interface for developing your own transition. See the
 transitions documentation for more information about that.
+
+

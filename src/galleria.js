@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4 2011-07-07
+ * @preserve Galleria v 1.2.4 2011-06-07
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -291,11 +291,10 @@ var undef,
                     
                     // add a tiny timeout so that the browsers catches any css changes before animating
                     window.setTimeout(function() {
-                        
+
                         // attach the end event
                         elem.one(endEvent, (function( elem ) {
                             return function() {
-                                
                                 // clear the animation
                                 clearStyle(elem);
                                 
@@ -1911,6 +1910,7 @@ Galleria.prototype = {
             debug: undef,
             easing: 'galleria',
             extend: function(options) {},
+            fullscreenDoubleTap: true, // 1.2.4 toggles fullscreen on double-tap for touch devices
             height: 'auto',
             idleMode: true, // 1.2.4 toggles idleMode 
             idleTime: 3000,
@@ -2214,7 +2214,7 @@ Galleria.prototype = {
                 var swipeStart = [0,0],
                     swipeStop = [0,0],
                     limitX = 30,
-                    limitY = 70,
+                    limitY = 100,
                     multi = false,
                     tid = 0,
                     data,
@@ -2278,6 +2278,32 @@ Galleria.prototype = {
                 });
                 
             }( self.$( 'images' ) ));
+            
+            // double-tap/click fullscreen toggle
+            
+            if ( this._options.fullscreenDoubleTap ) {
+                
+                this.$('stage').bind('touchstart', (function() {
+                    var last, cx, cy, lx, ly, now,
+                        getData = function(e) {
+                            return e.originalEvent.touches ? e.originalEvent.touches[0] : e;
+                        };
+                    return function(e) {
+                        now = Galleria.utils.timestamp();
+                        cx = getData(e).pageX;
+                        cy = getData(e).pageY;
+                        if ( ( now - last < 500 ) && ( cx - lx < 20) && ( cy - ly < 20) ) {
+                            self.toggleFullscreen();
+                            e.preventDefault();
+                            self.$('stage').unbind( 'touchend', arguments.callee );
+                            return;
+                        }
+                        last = now;
+                        lx = cx;
+                        ly = cy;
+                    };
+                }()));
+            }
             
         }
         
@@ -3326,8 +3352,9 @@ this.prependChild( 'info', 'myElement' );
             margin:   this._options.imageMargin,
             position: this._options.imagePosition
         }, options );
+        
 
-       ( image || this._controls.getActive() ).scale( options );
+        ( image || this._controls.getActive() ).scale( options );
 
         return this;
     },
@@ -3385,7 +3412,7 @@ this.prependChild( 'info', 'myElement' );
         };
 
         if ( Galleria.WEBKIT && !width && !height ) {
-            Utils.addTimer( 'scale', scale, 5 );// webkit is too fast
+            Utils.addTimer( 'scale', scale, 10 );// webkit is too fast
         } else {
             scale.call( self );
         }
@@ -3484,12 +3511,13 @@ this.prependChild( 'info', 'myElement' );
                 $( active.container ).css({
                     zIndex: 0,
                     opacity: 0
-                });
+                }).show();
 
                 $( next.container ).css({
                     zIndex: 1,
                     opacity: 1
-                });
+                }).show();
+                
                 self._controls.swap();
 
                 // add pan according to option
