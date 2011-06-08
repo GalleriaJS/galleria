@@ -719,16 +719,18 @@ var undef,
         var _slide = function(params, complete, fade, door) {
             
             var easing = this.getOptions('easing'),
-                distance = this.getStageWidth();
+                distance = this.getStageWidth(),
+                from = { left: distance * ( params.rewind ? -1 : 1 ) },
+                to = { left: 0 };
+            
+            if ( fade ) {
+                from.opacity = 0;
+                to.opacity = 1;
+            }
                 
-            $(params.next).css({
-                left: distance * ( params.rewind ? -1 : 1 ),
-                opacity: fade ? 0 : 1
-            });
-            Utils.animate(params.next, {
-                opacity: 1,
-                left: 0
-            }, {
+            $(params.next).css(from);
+            Utils.animate(params.next, to, {
+                stop: true,
                 duration: params.speed,
                 complete: (function( elems ) {
                     return function() {
@@ -739,7 +741,7 @@ var undef,
                                     left: 0
                                 });
                             };
-                        }( elems )), 1);
+                        }( elems )), 100);
                     };
                 }( $( params.next ).add( params.prev ) )),
                 queue: false,
@@ -751,14 +753,17 @@ var undef,
             }
 
             if (params.prev) {
-                $(params.prev).css({
-                    left: 0,
-                    opacity: 1
-                });
-                Utils.animate(params.prev, {
-                    opacity: fade ? 0 : 1,
-                    left: distance * ( params.rewind ? 1 : -1 )
-                },{
+                
+                from = { left: 0 };
+                to = { left: distance * ( params.rewind ? 1 : -1 ) };
+                
+                if ( fade ) {
+                    from.opacity = 1;
+                    to.opacity = 0;
+                }
+                
+                $(params.prev).css(from);
+                Utils.animate(params.prev, to, {
                     duration: params.speed,
                     queue: false,
                     easing: easing,
