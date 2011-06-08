@@ -89,13 +89,13 @@ Get photos from a photoset by ID.
 
 
 .gallery( gallery_id[, callback] )
--------------------------------
+----------------------------------
 
 Get photos from a gallery by ID
 
 
 .groupsearch( group[, callback] )
--------------------------------
+---------------------------------
 
 Search groups and fetch photos from the first group found
 Useful if you know the exact name of a group and want to show the groups photos.
