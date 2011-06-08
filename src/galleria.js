@@ -304,7 +304,7 @@ var undef,
                         }( elem )));
                         
                         // do the webkit translate3d for better performance on iOS
-                        if( Galleria.WEBKIT ) {
+                        if( Galleria.WEBKIT && Galleria.TOUCH ) {
                             
                             revert = {};
                             form = [0,0,0];
@@ -729,19 +729,15 @@ var undef,
             }
                 
             $(params.next).css(from);
+            
             Utils.animate(params.next, to, {
-                stop: true,
                 duration: params.speed,
                 complete: (function( elems ) {
                     return function() {
                         complete();
-                        window.setTimeout( (function( elems ) {
-                            return function() {
-                                elems.css({
-                                    left: 0
-                                });
-                            };
-                        }( elems )), 100);
+                        elems.css({
+                            left: 0
+                        });
                     };
                 }( $( params.next ).add( params.prev ) )),
                 queue: false,
@@ -3620,8 +3616,6 @@ this.prependChild( 'info', 'myElement' );
 
                 complete: function( next ) {
 
-                    Utils.show( next.container );
-
                     // toggle low quality for IE
                     if ( 'image' in active ) {
                         Utils.toggleQuality( active.image, false );
@@ -4725,10 +4719,10 @@ Galleria.Picture.prototype = {
 $.extend( $.easing, {
 
     galleria: function (_, t, b, c, d) {
-		if ((t/=d/2) < 1) {
-		    return c/2*t*t*t + b;
-		}
-		return c/2*((t-=2)*t*t + 2) + b;
+        if ((t/=d/2) < 1) {
+            return c/2*t*t*t + b;
+        }
+        return c/2*((t-=2)*t*t + 2) + b;
     },
 
     galleriaIn: function (_, t, b, c, d) {
