@@ -1751,7 +1751,7 @@ var Galleria = function() {
             if ( event ) {
                 $( lightbox.elems.box ).css( to );
             } else {
-                Utils.animate( lightbox.elems.box, to, {
+                $( lightbox.elems.box ).animate( to, {
                     duration: self._options.lightboxTransitionSpeed,
                     easing: self._options.easing,
                     complete: function() {
