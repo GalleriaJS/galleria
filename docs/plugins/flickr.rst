@@ -1,3 +1,5 @@
+.. highlight:: javascript
+
 *************
 Flickr Plugin
 *************
