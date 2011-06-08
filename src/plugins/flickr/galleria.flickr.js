@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria Flickr Plugin 2011-05-30
+ * @preserve Galleria Flickr Plugin 2011-06-07
  * http://galleria.aino.se
  *
  * Copyright 2011, Aino
@@ -9,6 +9,16 @@
 /*global jQuery, Galleria, window */
 
 (function($) {
+    
+// The script path
+var PATH = (function(src) {
+    var slices = src.split('/');
+    if (slices.length == 1) {
+        return '';
+    }
+    slices.pop();
+    return slices.join('/') + '/';
+}( $('script:last').attr('src') ));
     
 /**
     
@@ -321,7 +331,12 @@ Galleria.prototype.load = function() {
         f,
         opts = $.extend({}, self._options.flickrOptions),
         loader = typeof opts.loader !== 'undefined' ? 
-            opts.loader : $('<div>').addClass('flickr-loader').text('Loading...');
+            opts.loader : $('<div>').css({
+                width: 48,
+                height: 48,
+                opacity: 0.7,
+                background:'#000 url('+PATH+'loader.gif) no-repeat 50% 50%'
+            });
         
     if ( flickr.length ) {
         

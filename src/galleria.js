@@ -3489,8 +3489,7 @@ this.prependChild( 'info', 'myElement' );
                 $( next.container ).css({
                     zIndex: 1,
                     opacity: 1
-                }).show();
-                
+                });
                 self._controls.swap();
 
                 // add pan according to option
