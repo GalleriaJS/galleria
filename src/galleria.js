@@ -219,7 +219,7 @@ var undef,
                 // clear styles
                 var clearStyle = function( elem ) {
                     setStyle( elem, 'none', 'transition' );
-                    if ( Galleria.WEBKIT ) {
+                    if ( Galleria.WEBKIT && Galleria.TOUCH ) {
                         setStyle( elem, 'translate3d(0,0,0)', 'transform' );
                         if ( elem.data('revert') ) {
                             elem.css( elem.data('revert') );
@@ -3416,7 +3416,7 @@ this.prependChild( 'info', 'myElement' );
                 complete.call( self );
             }
         };
-
+        
         if ( Galleria.WEBKIT && !width && !height ) {
             Utils.addTimer( 'scale', scale, 10 );// webkit is too fast
         } else {
