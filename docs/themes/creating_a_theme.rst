@@ -49,12 +49,12 @@ Creata a simple theme step by step
             this.$('container').css('background-color', options._my_color);
 
             // bind a loader animation:
-            this.bind(Galleria.LOADSTART, function(e) {
+            this.bind('loadstart', function(e) {
                 if (!e.cached) {
                     this.$('loader').show();
                 }
             });
-            this.bind(Galleria.LOADFINISH, function(e) {
+            this.bind('loadfinish', function(e) {
                 this.$('loader').hide();
             });
         }

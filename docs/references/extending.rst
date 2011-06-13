@@ -13,9 +13,35 @@ There are several ways you can access the methods:
 
 - use the ``extend`` option
 
+- use the Galleria.ready function
+
 - fetch the Galleria instance
 
 - create and/or modify an existing theme
+
+Using Galleria.ready
+====================
+
+The easiest way to add global customizations to all your galleries on the page is to use the Galleria.ready function. 
+The way it works is that you bind methods to Galleria and when each gallery is ready, it runs those methods in the same order they where added.
+
+Example on how to print out the current image index::
+    
+    // bind the method to Galleria.ready
+    Galleria.ready(function(options) {
+        
+        // this = the gallery instance
+        // options = the gallery options
+        
+        this.bind('image', function(e) {
+            Galleria.log(e.index) // the image index
+        });
+    });
+    
+    // now call galleria on all containers with the className 'galleria'
+    // the method above will be called on all galleries when initialized
+    $('.galleria').galleria();
+    
 
 
 Using the extend option
@@ -51,17 +77,26 @@ Fetching the Galleria instance
 ==============================
 
 Another option for extending galleria is to fetch the instance from anywhere on
-your page. You can do that using the static ``Galleria.get( [index] )``
+your page using the static ``Galleria.get( [index] )``
 function. If you only have one galleria gallery, ``Galleria.get(0)`` will
 return the first (and only) gallery. If you call ``.get`` without specifying an
-index, it will return an array with all galleries initiated. Example::
+index, it will return an array with all galleries initiated. 
+
+Note that in order for thie method to function properly, the gallery must be initialized completely.
+So this mostly makes sence in a click event or some other trigger that runs later in the timeline.
+
+Use **Galleria.ready** if you are uncertain whether the gallery is initialized or not.
+
+Example::
 
     $('#images').galleria(); // initialize the galleria
     
-    var gallery = Galleria.get(0); // gallery is now the first galleria instance
+    // do something when someone clicks an element with the ID 'mylink'
+    $('#mylink').click(function() {
     
-    $('#play').click(function() {
+        var gallery = Galleria.get(0); // gallery is now the first galleria instance
         gallery.play(); // will start slideshow when the element #play is clicked
+        
     });
 
 
