@@ -82,7 +82,7 @@ function. If you only have one galleria gallery, ``Galleria.get(0)`` will
 return the first (and only) gallery. If you call ``.get`` without specifying an
 index, it will return an array with all galleries initiated. 
 
-Note that in order for thie method to function properly, the gallery must be initialized completely.
+Note that in order for this method to function properly, the gallery must be initialized completely.
 So this mostly makes sence in a click event or some other trigger that runs later in the timeline.
 
 Use **Galleria.ready** if you are uncertain whether the gallery is initialized or not.
