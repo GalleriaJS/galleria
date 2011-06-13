@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4 2011-06-07
+ * @preserve Galleria v 1.2.4 2011-06-12
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -2196,9 +2196,14 @@ Galleria.prototype = {
         if ( !this._options.keep_source && !IE ) {
             this._target.innerHTML = '';
         }
+        
+        // re-append the errors, if they happened before clearing
+        if ( this.get( 'errors' ) ) {
+            this.appendChild( 'target', 'errors' );
+        }
 
         // append the gallery frame
-        this.$( 'target' ).append( this.get( 'container' ) );
+        this.appendChild( 'target', 'container' );
 
         // parse the carousel on each thumb load
         if ( this._options.carousel ) {
@@ -2284,7 +2289,7 @@ Galleria.prototype = {
             
             if ( this._options.fullscreenDoubleTap ) {
                 
-                this.$('stage').bind('touchstart', (function() {
+                this.$( 'stage' ).bind( 'touchstart', (function() {
                     var last, cx, cy, lx, ly, now,
                         getData = function(e) {
                             return e.originalEvent.touches ? e.originalEvent.touches[0] : e;
@@ -2296,7 +2301,7 @@ Galleria.prototype = {
                         if ( ( now - last < 500 ) && ( cx - lx < 20) && ( cy - ly < 20) ) {
                             self.toggleFullscreen();
                             e.preventDefault();
-                            self.$('stage').unbind( 'touchend', arguments.callee );
+                            self.$( 'stage' ).unbind( 'touchend', arguments.callee );
                             return;
                         }
                         last = now;
@@ -2309,7 +2314,7 @@ Galleria.prototype = {
         }
         
         // optimize touch for container
-        Utils.optimizeTouch(this.get('container'));
+        Utils.optimizeTouch( this.get( 'container' ) );
 
         return this;
     },
@@ -2319,7 +2324,7 @@ Galleria.prototype = {
 
     _createThumbnails : function() {
 
-        this.get('total').innerHTML = this.getDataLength();
+        this.get( 'total' ).innerHTML = this.getDataLength();
 
         var i,
             src,
@@ -4348,6 +4353,7 @@ Galleria.raise = function( msg, fatal ) {
                 }
 
                 cont.append( html );
+                
             });
         };
 
