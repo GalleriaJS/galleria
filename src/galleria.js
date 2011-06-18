@@ -177,6 +177,11 @@ var undef,
                     var props = 'transition WebkitTransition MozTransition OTransition'.split(' '),
                         i;
                     
+                    // disable css3 animations in opera until stable
+                    if ( window.opera ) {
+                        return false;
+                    }
+                    
                     for ( i = 0; props[i]; i++ ) {
                         if ( typeof style[ props[ i ] ] !== 'undefined' ) {
                             return props[ i ];
@@ -2715,23 +2720,13 @@ Galleria.prototype = {
             var data = {},
                 parent = img.parent(),
                 href = parent.attr( 'href' ),
-                rel  = parent.attr( 'rel' ),
-                reg  = /\.(png|gif|jpg|jpeg)(\?.*)?$/i;
+                rel  = parent.attr( 'rel' );
 
-            // check if it's a link to another image
-            if ( reg.test( href ) ) {
-
-                data.image = href;
-
-                if ( reg.test( rel ) ) {
-                    data.big = rel;
-                } else {
-                    data.big = href;
-                }
-
-            // else assign the href as a link if it exists
-            } else if ( href ) {
-                data.link = href;
+            if ( href ) {
+                data.image = data.big = href;
+            }
+            if ( rel ) {
+                data.big = rel;
             }
 
             // mix default extractions with the hrefs and config
@@ -4427,6 +4422,7 @@ Galleria.Picture.prototype = {
 
         var i = 0,
             self = this,
+            reload = false,
 
             // create the image
             image = new Image(),
@@ -4434,10 +4430,20 @@ Galleria.Picture.prototype = {
             onload = function() {
 
                 // force chrome to reload the image in case of cache bug
-                // set a limit just in case
-                if ( ( !this.width || !this.height ) && i < 1000 ) {
-                    i++;
-                    $( image ).load( onload ).attr( 'src', src+'?'+new Date().getTime() );
+                // one time is enough, with a timeout
+                if ( ( !this.width || !this.height ) ) {
+                    if ( !reload ) {
+                        reload = true;
+                        window.setTimeout((function(image, src) {
+                            return function() {
+                                image.attr('src', src + '?' + Utils.timestamp() );
+                            };
+                        }( $(this), this.src )), 50);
+                    } else {
+                        Galleria.raise('Could not extract width/height from image: ' + src + 
+                            '. Traced measures: width:' + this.width + 'px, height: ' + this.height + 'px.');
+                    }
+                    return;
                 }
 
                 self.original = {
@@ -4461,7 +4467,16 @@ Galleria.Picture.prototype = {
 
         // begin preload and insert in cache when done
         $( image ).load( onload ).error( function() {
-            Galleria.raise('image could not load: '+ src);
+            if ( !reload ) {
+                reload = true;
+                window.setTimeout((function(image, src) {
+                    return function() {
+                        image.attr('src', src + '?' + Utils.timestamp() );
+                    };
+                }( $(this), src )), 50);
+            } else {
+                Galleria.raise('Could not load image: ' + src);
+            }
         }).attr( 'src', src );
 
         return image;
