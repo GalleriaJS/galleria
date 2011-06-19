@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.4 2011-06-12
+ * @preserve Galleria v 1.2.5a1 2011-06-19
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -44,7 +44,7 @@ var undef,
     },
 
     // list of Galleria events
-    _eventlist = 'data ready thumbnail loadstart loadfinish image play pause progress ' + 
+    _eventlist = 'data ready thumbnail loadstart loadfinish image play pause progress ' +
               'fullscreen_enter fullscreen_exit idle_enter idle_exit rescale ' +
               'lightbox_open lightbox_close lightbox_image',
 
@@ -168,28 +168,28 @@ var undef,
                 elem.className = className;
                 return elem;
             },
-            
+
             // CSS3 transitions, added in 1.2.4
             animate : (function() {
-                
+
                 // detect transition
                 var transition = (function( style ) {
                     var props = 'transition WebkitTransition MozTransition OTransition'.split(' '),
                         i;
-                    
+
                     // disable css3 animations in opera until stable
                     if ( window.opera ) {
                         return false;
                     }
-                    
+
                     for ( i = 0; props[i]; i++ ) {
                         if ( typeof style[ props[ i ] ] !== 'undefined' ) {
                             return props[ i ];
                         }
                     }
                     return false;
-                }(( document.body || document.documentElement).style ));
-                
+                }(( doc.body || doc.documentElement).style ));
+
                 // map transitionend event
                 var endEvent = {
                     MozTransition: 'transitionend',
@@ -210,7 +210,7 @@ var undef,
                     'ease-out': [0, 0, 0.58, 1],
                     'ease-in-out': [0.42, 0, 0.58, 1]
                 };
-                
+
                 // function for setting transition css for all browsers
                 var setStyle = function( elem, value, suffix ) {
                     var css = {};
@@ -220,7 +220,7 @@ var undef,
                     });
                     elem.css( css );
                 };
-                
+
                 // clear styles
                 var clearStyle = function( elem ) {
                     setStyle( elem, 'none', 'transition' );
@@ -232,42 +232,42 @@ var undef,
                         }
                     }
                 };
-                
+
                 // various variables
                 var change, strings, easing, syntax, revert, form, css;
-                
+
                 // the actual animation method
                 return function( elem, to, options ) {
-                    
+
                     // extend defaults
                     options = $.extend({
                         duration: 400,
                         complete: function(){},
                         stop: false
                     }, options);
-                
+
                     // cache jQuery instance
                     elem = $( elem );
-                    
+
                     if ( !options.duration ) {
                         elem.css( to );
                         options.complete.call( elem[0] );
                         return;
                     }
 
-                    // fallback to jQuery’s animate if transition is not supported
+                    // fallback to jQuery's animate if transition is not supported
                     if ( !transition ) {
                         elem.animate(to, options);
                         return;
                     }
-                    
+
                     // stop
                     if ( options.stop ) {
                         // clear the animation
                         elem.unbind( endEvent );
                         clearStyle( elem );
                     }
-                    
+
                     // see if there is a change
                     change = false;
                     $.each( to, function( key, val ) {
@@ -284,16 +284,16 @@ var undef,
                         }, options.duration );
                         return;
                     }
-                    
+
                     // the css strings to be applied
                     strings = [];
-                
+
                     // the easing bezier
                     easing = options.easing in easings ? easings[ options.easing ] : easings._default;
-                    
+
                     // the syntax
                     syntax = ' ' + options.duration + 'ms' + ' cubic-bezier('  + easing.join(',') + ')';
-                    
+
                     // add a tiny timeout so that the browsers catches any css changes before animating
                     window.setTimeout(function() {
 
@@ -302,15 +302,15 @@ var undef,
                             return function() {
                                 // clear the animation
                                 clearStyle(elem);
-                                
+
                                 // run the complete method
                                 options.complete.call(elem[0]);
                             };
                         }( elem )));
-                        
+
                         // do the webkit translate3d for better performance on iOS
                         if( Galleria.WEBKIT && Galleria.TOUCH ) {
-                            
+
                             revert = {};
                             form = [0,0,0];
 
@@ -323,16 +323,16 @@ var undef,
                             });
 
                             if ( form[0] || form[1]) {
-                                
+
                                 elem.data('revert', revert);
-                                
+
                                 strings.push('-webkit-transform' + syntax);
-                                
+
                                 // 3d animate
                                 setStyle( elem, 'translate3d(' + form.join(',') + ')', 'transform');
                             }
                         }
-                        
+
                         // push the animation props
                         $.each(to, function( p, val ) {
                             strings.push(p + syntax);
@@ -340,7 +340,7 @@ var undef,
 
                         // set the animation styles
                         setStyle( elem, strings.join(',') );
-                        
+
                         // animate
                         elem.css( to );
 
@@ -361,7 +361,7 @@ var undef,
 
                     elem = $( elem );
                     elem.removeAttr( 'style' );
-                    
+
                     elem.attr('style',''); // "fixes" webkit bug
 
                     if ( elem.data( 'styles' ) ) {
@@ -421,13 +421,13 @@ var undef,
                     elem.css( style );
                 }
             },
-            
-            
+
+
             // enhanced click for mobile devices
             // we bind a touchstart and hijack any click event in the bubble
             // then we execute the click directly and save it in a separate data object for later
             optimizeTouch: (function() {
-                
+
                 var node,
                     evs,
                     fakes,
@@ -443,48 +443,48 @@ var undef,
                     fake = function() {
                         this.handler.call(node, this.evt);
                     };
-                    
+
                 return function( elem ) {
-                    
+
                     $(elem).bind('touchstart', function( e ) {
 
                         node = e.target;
                         travel = true;
-                        
+
                         while( node.parentNode && node != e.currentTarget && travel ) {
-            
+
                             evs =   $(node).data('events');
                             fakes = $(node).data('fakes');
-            
+
                             if (evs && 'click' in evs) {
-                
+
                                 travel = false;
                                 e.preventDefault();
-                
+
                                 // fake the click and save the event object
                                 $(node).click(handler).click();
-                
+
                                 // remove the faked click
                                 evs.click.pop();
-                
+
                                 // attach the faked event
                                 $.each( evs.click, attach);
-                
+
                                 // save the faked clicks in a new data object
                                 $(node).data('fakes', evs.click);
-                
+
                                 // remove all clicks
                                 delete evs.click;
 
                             } else if ( fakes ) {
-                
+
                                 travel = false;
                                 e.preventDefault();
-                        
+
                                 // fake all clicks
                                 $.each( fakes, fake );
                             }
-            
+
                             // bubble
                             node = node.parentNode;
                         }
@@ -720,21 +720,21 @@ var undef,
 
     // the transitions holder
     _transitions = (function() {
-        
+
         var _slide = function(params, complete, fade, door) {
-            
+
             var easing = this.getOptions('easing'),
                 distance = this.getStageWidth(),
                 from = { left: distance * ( params.rewind ? -1 : 1 ) },
                 to = { left: 0 };
-            
+
             if ( fade ) {
                 from.opacity = 0;
                 to.opacity = 1;
             }
-                
+
             $(params.next).css(from);
-            
+
             Utils.animate(params.next, to, {
                 duration: params.speed,
                 complete: (function( elems ) {
@@ -754,15 +754,15 @@ var undef,
             }
 
             if (params.prev) {
-                
+
                 from = { left: 0 };
                 to = { left: distance * ( params.rewind ? 1 : -1 ) };
-                
+
                 if ( fade ) {
                     from.opacity = 1;
                     to.opacity = 0;
                 }
-                
+
                 $(params.prev).css(from);
                 Utils.animate(params.prev, to, {
                     duration: params.speed,
@@ -774,7 +774,7 @@ var undef,
                 });
             }
         };
-        
+
         return {
 
             fade: function(params, complete) {
@@ -841,7 +841,7 @@ var undef,
             fadeslide: function(params, complete) {
                 _slide.apply( this, Utils.array( arguments ).concat( [true] ) );
             },
-            
+
             doorslide: function(params, complete) {
                 _slide.apply( this, Utils.array( arguments ).concat( [false, true] ) );
             }
@@ -865,7 +865,7 @@ var undef,
 var Galleria = function() {
 
     var self = this;
-    
+
     // the theme used
     this._theme = undef;
 
@@ -895,7 +895,7 @@ var Galleria = function() {
 
     // internal init flag
     this._initialized = false;
-    
+
     // internal firstrun flag
     this._firstrun = false;
 
@@ -1212,7 +1212,7 @@ var Galleria = function() {
         // you can bind multiple elementIDs using { elemID : function } or { elemID : string }
         // you can also bind single DOM elements using bind(elem, string)
         bind: function( elem, value ) {
-            
+
             // todo: revise if alternative tooltip is needed for mobile devices
             if (Galleria.TOUCH) {
                 return;
@@ -1369,7 +1369,7 @@ var Galleria = function() {
                 left: self.prev
             });
 
-            // swap to big image if it’s different from the display image
+            // swap to big image if it's different from the display image
 
             if ( data && data.big && data.image !== data.big ) {
                 var big    = new Galleria.Picture(),
@@ -1537,11 +1537,11 @@ var Galleria = function() {
         },
 
         hide : function() {
-            
+
             if ( !self._options.idleMode ) {
                 return;
             }
-            
+
             self.trigger( Galleria.IDLE_ENTER );
 
             $.each( idle.trunk, function(i, elem) {
@@ -1553,7 +1553,7 @@ var Galleria = function() {
                 }
 
                 elem.data('idle').complete = false;
-                
+
                 Utils.animate( elem, data.to, {
                     duration: self._options.idleSpeed
                 });
@@ -1580,7 +1580,7 @@ var Galleria = function() {
                 self.trigger( Galleria.IDLE_EXIT );
 
                 Utils.clearTimer( 'idle' );
-                
+
                 Utils.animate( elem, data.from, {
                     duration: self._options.idleSpeed/2,
                     complete: function() {
@@ -1588,7 +1588,7 @@ var Galleria = function() {
                         $(this).data('idle').complete = true;
                     }
                 });
-                
+
             }
             idle.addTimer();
         }
@@ -1695,7 +1695,7 @@ var Galleria = function() {
             $( el.image ).append( lightbox.image.container );
 
             $( DOM().body ).append( el.overlay, el.box );
-            
+
             Utils.optimizeTouch( el.box );
 
             // add the prev/next nav and bind some controls
@@ -1725,7 +1725,7 @@ var Galleria = function() {
 
             });
             $( el.overlay ).bind( 'click', lightbox.hide );
-            
+
             // the lightbox animation is slow on ipad
             if ( Galleria.IPAD ) {
                 self._options.lightboxTransitionSpeed = 0;
@@ -1918,7 +1918,7 @@ Galleria.prototype = {
             extend: function(options) {},
             fullscreenDoubleTap: true, // 1.2.4 toggles fullscreen on double-tap for touch devices
             height: 'auto',
-            idleMode: true, // 1.2.4 toggles idleMode 
+            idleMode: true, // 1.2.4 toggles idleMode
             idleTime: 3000,
             idleSpeed: 200,
             imageCrop: false,
@@ -1958,7 +1958,7 @@ Galleria.prototype = {
             useCanvas: false, // 1.2.4
             width: 'auto'
         };
-        
+
         // legacy support for transitionInitial
         this._options.initialTransition = this._options.initialTransition || this._options.transitionInitial;
 
@@ -2127,7 +2127,7 @@ Galleria.prototype = {
         this.setCounter('&#8211;');
 
         Utils.hide( self.get('tooltip') );
-        
+
         // add a notouch class on the container to prevent unwanted :hovers on touch devices
         this.$( 'container' ).addClass( Galleria.TOUCH ? 'touch' : 'notouch' );
 
@@ -2201,7 +2201,7 @@ Galleria.prototype = {
         if ( !this._options.keep_source && !IE ) {
             this._target.innerHTML = '';
         }
-        
+
         // re-append the errors, if they happened before clearing
         if ( this.get( 'errors' ) ) {
             this.appendChild( 'target', 'errors' );
@@ -2216,12 +2216,12 @@ Galleria.prototype = {
                 this.updateCarousel();
             });
         }
-        
+
         // bind swipe gesture
         if ( this._options.swipe ) {
-            
+
             (function( images ) {
-                
+
                 var swipeStart = [0,0],
                     swipeStop = [0,0],
                     limitX = 30,
@@ -2238,7 +2238,7 @@ Galleria.prototype = {
                         return e.originalEvent.touches ? e.originalEvent.touches[0] : e;
                     },
                     moveHandler = function( e ) {
-                        
+
                         if ( e.originalEvent.touches && e.originalEvent.touches.length > 1 ) {
                             return;
                         }
@@ -2255,45 +2255,45 @@ Galleria.prototype = {
                         }
                     },
                     upHandler = function( e ) {
-                        
+
                         images.unbind( ev.move, moveHandler );
-                        
+
                         // if multitouch (possibly zooming), abort
                         if ( ( e.originalEvent.touches && e.originalEvent.touches.length ) || multi ) {
                             multi = !multi;
                             return;
                         }
 
-                        if ( Utils.timestamp() - tid < 1000 && 
+                        if ( Utils.timestamp() - tid < 1000 &&
                              Math.abs( swipeStart[0] - swipeStop[0] ) > limitX &&
                              Math.abs( swipeStart[1] - swipeStop[1] ) < limitY ) {
 
-                            e.preventDefault(); 
+                            e.preventDefault();
                             self[ swipeStart[0] > swipeStop[0] ? 'next' : 'prev' ]();
                         }
 
                         swipeStart = swipeStop = [0,0];
                     };
-                
+
                 images.bind(ev.start, function(e) {
 
                     if ( e.originalEvent.touches && e.originalEvent.touches.length > 1 ) {
                         return;
                     }
-                    
+
                     data = getData(e);
                     tid = Utils.timestamp();
                     swipeStart = swipeStop = [ data.pageX, data.pageY ];
                     images.bind(ev.move, moveHandler ).one(ev.stop, upHandler);
-                    
+
                 });
-                
+
             }( self.$( 'images' ) ));
-            
+
             // double-tap/click fullscreen toggle
-            
+
             if ( this._options.fullscreenDoubleTap ) {
-                
+
                 this.$( 'stage' ).bind( 'touchstart', (function() {
                     var last, cx, cy, lx, ly, now,
                         getData = function(e) {
@@ -2315,9 +2315,9 @@ Galleria.prototype = {
                     };
                 }()));
             }
-            
+
         }
-        
+
         // optimize touch for container
         Utils.optimizeTouch( this.get( 'container' ) );
 
@@ -2548,7 +2548,7 @@ Galleria.prototype = {
                 self._stageWidth  = self.$( 'stage' ).width();
                 self._stageHeight = self.$( 'stage' ).height();
 
-                return( self._stageWidth && 
+                return( self._stageWidth &&
                         self._stageHeight > 50 ); // what is an acceptable height?
             },
 
@@ -2695,7 +2695,7 @@ Galleria.prototype = {
 
         // use the data_config set by option
         config = config || this._options.dataConfig;
-        
+
         // if source is a true object, make it into an array
         if( /^function Object/.test( source.constructor ) ) {
             source = [source];
@@ -2713,7 +2713,7 @@ Galleria.prototype = {
             }
             return this;
         }
-        
+
         // loop through images and set data
         $( source ).find( selector ).each( function( i, img ) {
             img = $( img );
@@ -3353,7 +3353,7 @@ this.prependChild( 'info', 'myElement' );
             margin:   this._options.imageMargin,
             position: this._options.imagePosition
         }, options );
-        
+
 
         ( image || this._controls.getActive() ).scale( options );
 
@@ -3411,7 +3411,7 @@ this.prependChild( 'info', 'myElement' );
                 complete.call( self );
             }
         };
-        
+
         if ( Galleria.WEBKIT && !width && !height ) {
             Utils.addTimer( 'scale', scale, 10 );// webkit is too fast
         } else {
@@ -3518,7 +3518,7 @@ this.prependChild( 'info', 'myElement' );
                     zIndex: 1,
                     opacity: 1
                 }).show();
-                
+
                 self._controls.swap();
 
                 // add pan according to option
@@ -4082,7 +4082,7 @@ $.extend( Galleria, {
     IPHONE:  /iphone/.test( NAV ),
     IPAD:    /ipad/.test( NAV ),
     ANDROID: /android/.test( NAV ),
-    TOUCH:   ('ontouchstart' in document)
+    TOUCH:   ('ontouchstart' in doc)
 
 });
 
@@ -4093,7 +4093,7 @@ $.extend( Galleria, {
 
     @param {Object} theme Object that should contain all your theme settings.
     <ul>
-        <li>name – name of the theme</li>
+        <li>name - name of the theme</li>
         <li>author - name of the author</li>
         <li>css - css file name (not path)</li>
         <li>defaults - default options to apply, including theme-specific options</li>
@@ -4324,9 +4324,9 @@ Galleria.raise = function( msg, fatal ) {
 
         echo = function( msg ) {
 
-            var html = '<div style="padding:4px;margin:0 0 2px;background:#' + 
+            var html = '<div style="padding:4px;margin:0 0 2px;background:#' +
                 ( fatal ? '811' : '222' ) + '";>' +
-                ( fatal ? '<strong>' + type + ': </strong>' : '' ) + 
+                ( fatal ? '<strong>' + type + ': </strong>' : '' ) +
                 msg + '</div>';
 
             $.each( _instances, function() {
@@ -4348,7 +4348,7 @@ Galleria.raise = function( msg, fatal ) {
                 }
 
                 cont.append( html );
-                
+
             });
         };
 
@@ -4440,7 +4440,7 @@ Galleria.Picture.prototype = {
                             };
                         }( $(this), this.src )), 50);
                     } else {
-                        Galleria.raise('Could not extract width/height from image: ' + src + 
+                        Galleria.raise('Could not extract width/height from image: ' + src +
                             '. Traced measures: width:' + this.width + 'px, height: ' + this.height + 'px.');
                     }
                     return;
@@ -4605,12 +4605,12 @@ Galleria.Picture.prototype = {
         Utils.wait({
             until: function() {
 
-                width  = options.width || 
-                         $container.width() || 
+                width  = options.width ||
+                         $container.width() ||
                          Utils.parseValue( $container.css('width') );
 
-                height = options.height || 
-                         $container.height() || 
+                height = options.height ||
+                         $container.height() ||
                          Utils.parseValue( $container.css('height') );
 
                 return width && height;
@@ -4736,7 +4736,7 @@ Galleria.Picture.prototype = {
     }
 };
 
-// our own easings 
+// our own easings
 $.extend( $.easing, {
 
     galleria: function (_, t, b, c, d) {
