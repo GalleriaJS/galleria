@@ -53,9 +53,11 @@ This presentation of the Galleria HTML structure is good to have when building C
         <div class="galleria-stage">
             <div class="galleria-images">
                 <div class="galleria-image">
+                    <div class="galleria-layer"></div>
                     <img>
                 </div>
                 <div class="galleria-image">
+                    <div class="galleria-layer"></div>
                     <img>
                 </div>
             </div>

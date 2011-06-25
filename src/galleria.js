@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.5a1 2011-06-19
+ * @preserve Galleria v 1.2.5a2 2011-06-25
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -525,10 +525,10 @@ var undef,
                             options.error();
                             return false;
                         }
-                        window.setTimeout(fn, 2);
+                        window.setTimeout(fn, 10);
                     };
 
-                window.setTimeout(fn, 2);
+                window.setTimeout(fn, 10);
             },
 
             toggleQuality : function( img, force ) {
@@ -892,6 +892,9 @@ var Galleria = function() {
 
     // the internal thumbnails array
     this._thumbnails = [];
+
+    // the internal layers array
+    this._layers = [];
 
     // internal init flag
     this._initialized = false;
@@ -1380,6 +1383,7 @@ var Galleria = function() {
                 self.trigger( {
                     type: Galleria.LOADSTART,
                     cached: cached,
+                    rewind: false,
                     index: index,
                     imageTarget: self.getActiveImage(),
                     thumbTarget: thumb
@@ -1392,6 +1396,7 @@ var Galleria = function() {
                                 type: Galleria.LOADFINISH,
                                 cached: cached,
                                 index: index,
+                                rewind: false,
                                 imageTarget: big.image,
                                 thumbTarget: thumb
                             });
@@ -1928,6 +1933,7 @@ Galleria.prototype = {
             imagePosition: '50%',
             initialTransition: undef, // 1.2.4, replaces transitionInitial
             keepSource: false,
+            layerFollow: true,
             lightbox: false, // 1.2.3
             lightboxFadeSpeed: 200,
             lightboxTransitionSpeed: 200,
@@ -1939,7 +1945,6 @@ Galleria.prototype = {
             pauseOnInteraction: true,
             popupLinks: false,
             preload: 2,
-            protect: false,
             queue: true,
             show: 0,
             showInfo: true,
@@ -2131,19 +2136,22 @@ Galleria.prototype = {
         // add a notouch class on the container to prevent unwanted :hovers on touch devices
         this.$( 'container' ).addClass( Galleria.TOUCH ? 'touch' : 'notouch' );
 
-
         // add images to the controls
-        $.each( new Array(2), function(i) {
+        $.each( new Array(2), function( i ) {
 
             // create a new Picture instance
             var image = new Galleria.Picture();
 
-            // apply some styles
+            // apply some styles, create & prepend overlay
             $( image.container ).css({
                 position: 'absolute',
                 top: 0,
                 left: 0
-            });
+            }).prepend( self._layers[i] = $( Utils.create('galleria-layer') ).css({
+                position: 'absolute',
+                top:0, left:0, right:0, bottom:0,
+                zIndex:2
+            })[0] );
 
             // append the image
             self.$( 'images' ).append( image.container );
@@ -3344,6 +3352,19 @@ this.prependChild( 'info', 'myElement' );
     // an internal helper for scaling according to options
     _scaleImage : function( image, options ) {
 
+        image = image || this._controls.getActive();
+
+        var self = this,
+
+            complete,
+
+            scaleLayer = function( img ) {
+                $( img.container ).children(':first').css({
+                    top: Math.max(0, Utils.parseValue( img.image.style.top )),
+                    left: Math.max(0, Utils.parseValue( img.image.style.left ))
+                });
+            };
+
         options = $.extend({
             width:    this._stageWidth,
             height:   this._stageHeight,
@@ -3354,9 +3375,19 @@ this.prependChild( 'info', 'myElement' );
             position: this._options.imagePosition
         }, options );
 
+        if ( this._options.layerFollow && this._options.imageCrop !== true ) {
 
-        ( image || this._controls.getActive() ).scale( options );
-
+            if ( typeof options.complete == 'function' ) {
+                complete = options.complete;
+                options.complete = function() {
+                    complete.call( image, image );
+                    scaleLayer( image );
+                };
+            } else {
+                options.complete = scaleLayer;
+            }
+        }
+        image.scale( options );
         return this;
     },
 
@@ -3508,6 +3539,9 @@ this.prependChild( 'info', 'myElement' );
                 // optimize quality
                 Utils.toggleQuality( next.image, self._options.imageQuality );
 
+                // remove old layer
+                self._layers[ self._controls.active ].innerHTML = '';
+
                 // swap
                 $( active.container ).css({
                     zIndex: 0,
@@ -3606,12 +3640,17 @@ this.prependChild( 'info', 'myElement' );
             type: Galleria.LOADSTART,
             cached: cached,
             index: queue.index,
+            rewind: queue.rewind,
             imageTarget: next.image,
             thumbTarget: thumb.image
         });
 
         // begin loading the next image
         next.load( src, function( next ) {
+
+            // add layer HTML
+            $( self._layers[ 1-self._controls.active ] ).html( data.layer || '' ).hide();
+
             self._scaleImage( next, {
 
                 complete: function( next ) {
@@ -3633,11 +3672,17 @@ this.prependChild( 'info', 'myElement' );
                     self.setInfo( queue.index );
                     self.setCounter( queue.index );
 
+                    // show the layer now
+                    if ( data.layer ) {
+                        $( self._layers[ 1-self._controls.active ] ).show();
+                    }
+
                     // trigger the LOADFINISH event
                     self.trigger({
                         type: Galleria.LOADFINISH,
                         cached: cached,
                         index: queue.index,
+                        rewind: queue.rewind,
                         imageTarget: next.image,
                         thumbTarget: self._thumbnails[ queue.index ].image
                     });
@@ -3647,7 +3692,6 @@ this.prependChild( 'info', 'myElement' );
                     // validate the transition
                     if ( transition in _transitions === false ) {
                         complete();
-
                     } else {
                         var params = {
                             prev: active.container,
@@ -4524,7 +4568,7 @@ Galleria.Picture.prototype = {
         // save the instance
         var self = this;
 
-        $( this.container ).empty(true);
+        $( this.container ).find( 'img' ).remove();
 
         // add the image to cache and hide it
         this.image = this.add( src );

@@ -1,6 +1,6 @@
-===================
-fullscreenDoubleTap
-===================
+=====
+swipe
+=====
 
     | type: **Boolean**
     | default: **true**
