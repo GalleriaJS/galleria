@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.5a2 2011-06-25
+ * @preserve Galleria v 1.2.5a3 2011-06-26
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -19,6 +19,7 @@ var undef,
 
 // internal constants
     DEBUG = true,
+    TIMEOUT = 30000,
     NAV = navigator.userAgent.toLowerCase(),
     HASH = window.location.hash.replace(/#\//, ''),
     IE    = (function() {
@@ -1325,6 +1326,8 @@ var Galleria = function() {
 
         scrolled: 0,
 
+        crop: self._options.imageCrop,
+
         active: false,
 
         keymap: self._keyboard.map,
@@ -1371,6 +1374,10 @@ var Galleria = function() {
                 right: self.next,
                 left: self.prev
             });
+
+            if ( self._options.fullscreenCrop !== undef ) {
+                self._options.imageCrop = self._options.fullscreenCrop;
+            }
 
             // swap to big image if it's different from the display image
 
@@ -1454,6 +1461,10 @@ var Galleria = function() {
             // detach all keyboard events and apply the old keymap
             self.detachKeyboard();
             self.attachKeyboard( fullscreen.keymap );
+
+            if ( self._options.fullscreenCrop !== undef ) {
+                self._options.imageCrop = fullscreen.crop;
+            }
 
             self.rescale(function() {
                 Utils.addTimer('fullscreen_exit', function() {
@@ -1921,7 +1932,9 @@ Galleria.prototype = {
             debug: undef,
             easing: 'galleria',
             extend: function(options) {},
+            fullscreenCrop: undef, // 1.2.5
             fullscreenDoubleTap: true, // 1.2.4 toggles fullscreen on double-tap for touch devices
+            fullscreenTransition: undef, // 1.2.5
             height: 'auto',
             idleMode: true, // 1.2.4 toggles idleMode
             idleTime: 3000,
@@ -1931,9 +1944,10 @@ Galleria.prototype = {
             imagePan: false,
             imagePanSmoothness: 12,
             imagePosition: '50%',
+            imageTimeout: undef, // 1.2.5
             initialTransition: undef, // 1.2.4, replaces transitionInitial
             keepSource: false,
-            layerFollow: true,
+            layerFollow: true, // 1.2.5
             lightbox: false, // 1.2.3
             lightboxFadeSpeed: 200,
             lightboxTransitionSpeed: 200,
@@ -1957,6 +1971,7 @@ Galleria.prototype = {
             thumbMargin: 0,
             thumbQuality: 'auto',
             thumbnails: true,
+            touchTransition: undef, // 1.2.5
             transition: 'fade',
             transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
@@ -1970,6 +1985,11 @@ Galleria.prototype = {
         // turn off debug
         if ( options && options.debug === false ) {
             DEBUG = false;
+        }
+
+        // set timeout
+        if ( options && typeof options.imageTimeout === 'number' ) {
+            TIMEOUT = options.imageTimeout;
         }
 
         // hide all content
@@ -3386,7 +3406,11 @@ this.prependChild( 'info', 'myElement' );
             } else {
                 options.complete = scaleLayer;
             }
+
+        } else {
+            $( image.container ).children(':first').css({ top: 0, left: 0 });
         }
+
         image.scale( options );
         return this;
     },
@@ -3686,8 +3710,20 @@ this.prependChild( 'info', 'myElement' );
                         imageTarget: next.image,
                         thumbTarget: self._thumbnails[ queue.index ].image
                     });
-                    var transition = active.image === null && self._options.initialTransition !== undef ?
-                        self._options.initialTransition : self._options.transition;
+
+                    var transition = self._options.transition;
+
+                    // can JavaScript loop through objects in order? yes.
+                    $.each({
+                        initial: active.image === null,
+                        touch: Galleria.TOUCH,
+                        fullscreen: self.isFullscreen()
+                    }, function( type, arg ) {
+                        if ( arg && self._options[ type + 'Transition' ] !== undef ) {
+                            transition = self._options[ type + 'Transition' ];
+                            return false;
+                        }
+                    });
 
                     // validate the transition
                     if ( transition in _transitions === false ) {
@@ -4589,9 +4625,9 @@ Galleria.Picture.prototype = {
             },
             error: function() {
                 window.setTimeout(function() { callback.call( self, self ); }, 1 );
-                Galleria.raise('image not loaded in 30 seconds: '+ src);
+                Galleria.raise('image not loaded in ' + Math.round( TIMEOUT/1000 ) + ' seconds: '+ src);
             },
-            timeout: 30000
+            timeout: TIMEOUT
         });
 
         // return the container
