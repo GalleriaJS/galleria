@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.5a3 2011-06-26
+ * @preserve Galleria v 1.2.5a4 2011-07-24
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -153,6 +153,19 @@ var undef,
 
     // canvas holder
     _canvas = false,
+
+    // instance pool, holds the galleries until themeLoad is triggered
+    _pool = [],
+
+    // themeLoad trigger
+    _themeLoad = function( theme ) {
+        Galleria.theme = theme;
+
+        // run the instances we have in the pool
+        $.each( _pool, function( i, instance ) {
+            instance._init.call( instance );
+        });
+    },
 
     // the Utils singleton
     Utils = (function() {
@@ -847,7 +860,7 @@ var undef,
                 _slide.apply( this, Utils.array( arguments ).concat( [false, true] ) );
             }
         };
-    })();
+    }());
 
 /**
     The main Galleria class
@@ -1951,7 +1964,7 @@ Galleria.prototype = {
             lightbox: false, // 1.2.3
             lightboxFadeSpeed: 200,
             lightboxTransitionSpeed: 200,
-            linkSourceTmages: true,
+            linkSourceImages: true,
             maxScaleRatio: undef,
             minScaleRatio: undef,
             overlayOpacity: 0.85,
@@ -1996,22 +2009,11 @@ Galleria.prototype = {
         $( this._target ).children().hide();
 
         // now we just have to wait for the theme...
-        // is 5 seconds enough?
         if ( typeof Galleria.theme === 'object' ) {
             this._init();
         } else {
-            Utils.wait({
-                until: function() {
-                    return typeof Galleria.theme === 'object';
-                },
-                success: function() {
-                    self._init.call( self );
-                },
-                error: function() {
-                    Galleria.raise( 'No theme found.', true );
-                },
-                timeout: 5000
-            });
+            // push the instance into the pool and run it when the theme is ready
+            _pool.push( this );
         }
     },
 
@@ -2552,7 +2554,7 @@ Galleria.prototype = {
 
             this._thumbnails.push( thumb );
         }
-	},
+    },
 
     // the internal _run method should be called after loading data into galleria
     // makes sure the gallery has proper measurements before postrun & ready
@@ -2560,7 +2562,7 @@ Galleria.prototype = {
 
         var self = this;
 
-		self._createThumbnails();
+        self._createThumbnails();
 
         // make sure we have a stageHeight && stageWidth
 
@@ -2803,35 +2805,33 @@ Galleria.prototype = {
 
     /**
         Adds and/or removes images from the gallery
-		Works just like Array.splice
-		https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/splice
+        Works just like Array.splice
+        https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/splice
 
         @example this.splice( 2, 4 ); // removes 4 images after the second image
 
         @returns Instance
     */
 
-	splice: function() {
-		Array.prototype.splice.apply( this._data, Utils.array( arguments ) );
-		return this._parseData()._createThumbnails();
-	},
+    splice: function() {
+        Array.prototype.splice.apply( this._data, Utils.array( arguments ) );
+        return this._parseData()._createThumbnails();
+    },
 
-	/**
+    /**
         Append images to the gallery
-		Works just like Array.push
-		https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push
+        Works just like Array.push
+        https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push
 
-        @example this.push({
-            image: 'image1.jpg'
-        }); // appends the image to the gallery
+        @example this.push({ image: 'image1.jpg' }); // appends the image to the gallery
 
         @returns Instance
     */
 
-	push: function() {
-		Array.prototype.push.apply( this._data, Utils.array( arguments ) );
-		return this._parseData()._createThumbnails();
-	},
+    push: function() {
+        Array.prototype.push.apply( this._data, Utils.array( arguments ) );
+        return this._parseData()._createThumbnails();
+    },
 
     _getActive: function() {
         return this._controls.getActive();
@@ -3970,11 +3970,11 @@ this.prependChild( 'info', 'myElement' );
             played = 0,
             interval = 20,
             now = Utils.timestamp(),
-			timer_id = 'play' + this._id;
+            timer_id = 'play' + this._id;
 
         if ( this._playing ) {
 
-			Utils.clearTimer( timer_id );
+            Utils.clearTimer( timer_id );
 
             var fn = function() {
 
@@ -3999,6 +3999,19 @@ this.prependChild( 'info', 'myElement' );
             };
             Utils.addTimer( timer_id, fn, interval );
         }
+    },
+
+    /**
+        Modivy the slideshow delay
+
+        @param {number} delay the number of milliseconds between slides,
+
+        @returns Instance
+    */
+
+    setPlaytime: function( delay ) {
+        this._playtime = delay;
+        return this;
     },
 
     setIndex: function( val ) {
@@ -4208,7 +4221,9 @@ Galleria.addTheme = function( theme ) {
 
                 // we found the css
                 css = true;
-                Galleria.theme = theme;
+
+                // the themeload trigger
+                _themeLoad( theme );
 
                 return false;
             }
@@ -4228,7 +4243,10 @@ Galleria.addTheme = function( theme ) {
 
                     Utils.addTimer( "css", function() {
                         Utils.loadCSS( css, 'galleria-theme', function() {
-                            Galleria.theme = theme;
+
+                            // the themeload trigger
+                            _themeLoad( theme );
+
                         });
                     }, 1);
 
@@ -4242,7 +4260,7 @@ Galleria.addTheme = function( theme ) {
     } else {
 
         // pass
-        Galleria.theme = theme;
+        _themeLoad( theme );
     }
     return theme;
 };
@@ -4258,64 +4276,55 @@ Galleria.addTheme = function( theme ) {
 Galleria.loadTheme = function( src, options ) {
 
     var loaded = false,
-        length = _galleries.length;
+        length = _galleries.length,
+        err = window.setTimeout( function() {
+            Galleria.raise( "Theme at " + src + " could not load, check theme path.", true );
+        }, 5000 );
 
     // first clear the current theme, if exists
     Galleria.theme = undef;
 
     // load the theme
     Utils.loadScript( src, function() {
-        loaded = true;
-    } );
 
-    // set a 2 sec timeout, then display a hard error if no theme is loaded
-    Utils.wait({
-        until: function() {
-            return loaded;
-        },
-        error: function() {
-            Galleria.raise( "Theme at " + src + " could not load, check theme path.", true );
-        },
-        success: function() {
+        window.clearTimeout( err );
 
-            // check for existing galleries and reload them with the new theme
-            if ( length ) {
+        // check for existing galleries and reload them with the new theme
+        if ( length ) {
 
-                // temporary save the new galleries
-                var refreshed = [];
+            // temporary save the new galleries
+            var refreshed = [];
 
-                // refresh all instances
-                // when adding a new theme to an existing gallery, all options will be resetted but the data will be kept
-                // you can apply new options as a second argument
-                $.each( Galleria.get(), function(i, instance) {
+            // refresh all instances
+            // when adding a new theme to an existing gallery, all options will be resetted but the data will be kept
+            // you can apply new options as a second argument
+            $.each( Galleria.get(), function(i, instance) {
 
-                    // mix the old data and options into the new instance
-                    var op = $.extend( instance._original.options, {
-                        data_source: instance._data
-                    }, options);
+                // mix the old data and options into the new instance
+                var op = $.extend( instance._original.options, {
+                    data_source: instance._data
+                }, options);
 
-                    // remove the old container
-                    instance.$('container').remove();
+                // remove the old container
+                instance.$('container').remove();
 
-                    // create a new instance
-                    var g = new Galleria();
+                // create a new instance
+                var g = new Galleria();
 
-                    // move the id
-                    g._id = instance._id;
+                // move the id
+                g._id = instance._id;
 
-                    // initialize the new instance
-                    g.init( instance._original.target, op );
+                // initialize the new instance
+                g.init( instance._original.target, op );
 
-                    // push the new instance
-                    refreshed.push( g );
-                });
+                // push the new instance
+                refreshed.push( g );
+            });
 
-                // now overwrite the old holder with the new instances
-                _galleries = refreshed;
+            // now overwrite the old holder with the new instances
+            _galleries = refreshed;
+        }
 
-            }
-        },
-        timeout: 2000
     });
 };
 
