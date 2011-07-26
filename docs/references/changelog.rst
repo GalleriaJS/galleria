@@ -11,6 +11,8 @@ Changelog
 * Added 'layer' in data model – a HTML layer above the image that follows the image transitions and position.
 * Improved events for handling loading of themes
 * Fixed many alpha bugs in IE when using Utils.hide and Utils.show
+* Added dummy option so you can show a fallback image if the active image could not be fetched
+* Added a setPlaytime method that lets you change the slideshow interval anytime
 
 1.2.4
 -----
