@@ -174,7 +174,7 @@ var undef,
         return {
 
             array : function( obj ) {
-                return Array.prototype.slice.call(obj);
+                return Array.prototype.slice.call(obj, 0);
             },
 
             create : function( className, nodeName ) {
@@ -4448,17 +4448,15 @@ Galleria.utils = Utils;
     @example Galleria.log("hello", document.body, [1,2,3]);
 */
 
-Galleria.log = function() {
-    try {
-        window.console.log.apply( window.console, Utils.array( arguments ) );
-    } catch( e ) {
-        try {
-            window.opera.postError.apply( window.opera, arguments );
-        } catch( er ) {
-              window.alert( Utils.array( arguments ).split(', ') );
+Galleria.log = (function() {
+    if( 'console' in window && 'log' in window.console ) {
+        return window.console.log;
+    } else {
+        return function() {
+            window.alert( Utils.array( arguments ).join(', ') );
         }
     }
-};
+}());
 
 /**
     A ready method for adding callbacks when a gallery is ready
