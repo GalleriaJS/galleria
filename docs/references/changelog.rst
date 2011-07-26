@@ -9,6 +9,8 @@ Changelog
 * Removed translate3d and use regular css3 transitions for desktop webkit to prevent resize bugs
 * Removed css3 animations in Opera since the implementation is still buggy
 * Added 'layer' in data model – a HTML layer above the image that follows the image transitions and position.
+* Improved events for handling loading of themes
+* Fixed many alpha bugs in IE when using Utils.hide and Utils.show
 
 1.2.4
 -----

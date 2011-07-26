@@ -408,15 +408,28 @@ var undef,
                 Utils.revertStyles.apply( Utils, Utils.array( arguments ) );
             },
 
-            hide : function( elem, speed, callback ) {
-                callback = callback || function(){};
-                var $elem;
+            elem : function( elem ) {
                 if (elem instanceof $) {
-                    $elem = elem;
-                    elem = elem[0];
+                    return {
+                        $: elem,
+                        dom: elem[0]
+                    };
                 } else {
-                    $elem = $(elem);
+                    return {
+                        $: $(elem),
+                        dom: elem
+                    }
                 }
+            },
+
+            hide : function( elem, speed, callback ) {
+
+                callback = callback || function(){};
+
+                var el = Utils.elem( elem ),
+                    $elem = el.$;
+
+                elem = el.dom;
 
                 // save the value if not exist
                 if (! $elem.data('opacity') ) {
@@ -450,14 +463,13 @@ var undef,
             },
 
             show : function( elem, speed, callback ) {
+
                 callback = callback || function(){};
-                var $elem;
-                if (elem instanceof $) {
-                    $elem = elem;
-                    elem = elem[0];
-                } else {
-                    $elem = $(elem);
-                }
+
+                var el = Utils.elem( elem ),
+                    $elem = el.$;
+
+                elem = el.dom;
 
                 // bring back saved opacity
                 var saved = parseFloat( $elem.data('opacity') ) || 1,
@@ -467,7 +479,7 @@ var undef,
                 if (speed) {
 
                     if ( IE < 9 ) {
-                        $elem.css('opacity',0);
+                        $elem.css('opacity', 0);
                         elem.style.visibility = 'visible';
                     }
 
