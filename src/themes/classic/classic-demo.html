@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <title>Galleria Classic Theme</title>
         <style>
-        
+
             /* Demo styles */
             html,body{background:#222;margin:0;}
             body{border-top:4px solid #000;}
@@ -13,15 +13,15 @@
             p{margin:0 0 20px}
             a {color:#22BCB9;text-decoration:none;}
             .cred{margin-top:20px;font-size:11px;}
-            
+
             /* This rule is read by Galleria to define the gallery height: */
-            #galleria{height:320px;}
-            
+            #galleria{height:320px}
+
         </style>
 
         <!-- load jQuery -->
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-        
+
         <!-- load Galleria -->
         <script src="../../galleria.js"></script>
 
@@ -30,13 +30,13 @@
     <div class="content">
         <h1>Galleria Classic Theme</h1>
         <p>Demonstrating a basic gallery example.</p>
-        
+
         <!-- Adding gallery images. We use resized thumbnails here for better performance, but it’s not necessary -->
-        
+
         <div id="galleria">
             <a href="http://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Locomotives-Roundhouse2.jpg/800px-Locomotives-Roundhouse2.jpg">
             	<img title="Locomotives Roundhouse"
-            	     alt="Steam locomotives of the Chicago &amp; North Western Railway." 
+            	     alt="Steam locomotives of the Chicago &amp; North Western Railway."
             	     src="http://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Locomotives-Roundhouse2.jpg/100px-Locomotives-Roundhouse2.jpg">
         	</a>
             <a href="http://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Icebergs_in_the_High_Arctic_-_20050907.jpg/1000px-Icebergs_in_the_High_Arctic_-_20050907.jpg">
@@ -80,16 +80,17 @@
                 <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Antennae%2C_Hubble_images.jpg/100px-Antennae%2C_Hubble_images.jpg">
             </a>
         </div>
-        
+
         <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>.</p>
     </div>
-    
+
     <script>
+
     // Load the classic theme
-    Galleria.loadTheme('galleria.classic.js');
-    
-    // Initialize Galleria
-    $('#galleria').galleria();
+	Galleria.loadTheme('galleria.classic.js');
+
+	// Initialize Galleria
+	$('#galleria').galleria();
 
     </script>
     </body>
