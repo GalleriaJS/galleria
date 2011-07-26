@@ -20,9 +20,10 @@ var undef,
 // internal constants
     DEBUG = true,
     TIMEOUT = 30000,
+    DUMMY = false,
     NAV = navigator.userAgent.toLowerCase(),
     HASH = window.location.hash.replace(/#\//, ''),
-    IE    = (function() {
+    IE = (function() {
 
         var v = 3,
             div = doc.createElement( 'div' ),
@@ -35,7 +36,7 @@ var undef,
         return v > 4 ? v : undef;
 
     }() ),
-    DOM   = function() {
+    DOM = function() {
         return {
             html:  doc.documentElement,
             body:  doc.body,
@@ -418,7 +419,7 @@ var undef,
                     return {
                         $: $(elem),
                         dom: elem
-                    }
+                    };
                 }
             },
 
@@ -2012,6 +2013,7 @@ Galleria.prototype = {
             dataSelector: 'img',
             dataSource: this._target,
             debug: undef,
+            dummy: undef, /* 1.2.5 */
             easing: 'galleria',
             extend: function(options) {},
             fullscreenCrop: undef, // 1.2.5
@@ -2072,6 +2074,11 @@ Galleria.prototype = {
         // set timeout
         if ( options && typeof options.imageTimeout === 'number' ) {
             TIMEOUT = options.imageTimeout;
+        }
+
+        // set dummy
+        if ( options && typeof options.dummy === 'string' ) {
+            DUMMY = options.dummy;
         }
 
         // hide all content
@@ -4609,7 +4616,7 @@ Galleria.Picture.prototype = {
                     width: this.width
                 };
 
-                self.cache[ src ] = src; // will override old cache
+                self.cache[ this.src ] = this.src; // will override old cache
                 self.loaded = true;
             };
 
@@ -4633,7 +4640,11 @@ Galleria.Picture.prototype = {
                     };
                 }( $(this), src )), 50);
             } else {
-                Galleria.raise('Could not load image: ' + src);
+                if ( DUMMY ) {
+                    $( this ).attr( 'src', DUMMY );
+                } else {
+                    Galleria.raise('Could not load image: ' + src);
+                }
             }
         }).attr( 'src', src );
 
