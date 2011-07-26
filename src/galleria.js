@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.5a4 2011-07-25
+ * @preserve Galleria v 1.2.5a5 2011-07-26
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -362,6 +362,19 @@ var undef,
                 };
             }()),
 
+            removeAlpha : function( elem ) {
+                if ( IE < 9 && elem ) {
+
+                    var style = elem.style,
+                        currentStyle = elem.currentStyle,
+                        filter = currentStyle && currentStyle.filter || style.filter || "";
+
+                    if ( /alpha/.test( filter ) ) {
+                        style.filter = filter.replace( /alpha\([^)]*\)/i, '' );
+                    }
+                }
+            },
+
             forceStyles : function( elem, styles ) {
                 elem = $(elem);
                 if ( elem.attr( 'style' ) ) {
@@ -396,49 +409,93 @@ var undef,
             },
 
             hide : function( elem, speed, callback ) {
-                elem = $(elem);
+                callback = callback || function(){};
+                var $elem;
+                if (elem instanceof $) {
+                    $elem = elem;
+                    elem = elem[0];
+                } else {
+                    $elem = $(elem);
+                }
 
                 // save the value if not exist
-                if (! elem.data('opacity') ) {
-                    elem.data('opacity', elem.css('opacity') );
+                if (! $elem.data('opacity') ) {
+                    $elem.data('opacity', $elem.css('opacity') );
                 }
 
                 // always hide
                 var style = { opacity: 0 };
 
                 if (speed) {
+
+                    var complete = IE < 9 && elem ? function() {
+                        Utils.removeAlpha( elem );
+                        elem.style.visibility = 'hidden';
+                        callback.call( elem );
+                    } : callback;
+
                     Utils.animate( elem, style, {
                         duration: speed,
-                        complete: callback,
+                        complete: complete,
                         stop: true
                     });
                 } else {
-                    elem.css( style );
+                    if ( IE < 9 && elem ) {
+                        Utils.removeAlpha( elem );
+                        elem.style.visibility = 'hidden';
+                    } else {
+                        $elem.css( style );
+                    }
                 }
             },
 
             show : function( elem, speed, callback ) {
-                elem = $(elem);
+                callback = callback || function(){};
+                var $elem;
+                if (elem instanceof $) {
+                    $elem = elem;
+                    elem = elem[0];
+                } else {
+                    $elem = $(elem);
+                }
 
                 // bring back saved opacity
-                var saved = parseFloat( elem.data('opacity') ) || 1,
+                var saved = parseFloat( $elem.data('opacity') ) || 1,
                     style = { opacity: saved };
 
                 // animate or toggle
                 if (speed) {
+
+                    if ( IE < 9 ) {
+                        $elem.css('opacity',0);
+                        elem.style.visibility = 'visible';
+                    }
+
+                    var complete = IE < 9 && elem ? function() {
+                        if ( style.opacity == 1 ) {
+                            Utils.removeAlpha( elem );
+                        }
+                        callback.call( elem );
+                    } : callback;
+
                     Utils.animate( elem, style, {
                         duration: speed,
-                        complete: callback,
+                        complete: complete,
                         stop: true
                     });
                 } else {
-                    elem.css( style );
+                    if ( IE < 9 && style.opacity == 1 && elem ) {
+                        Utils.removeAlpha( elem );
+                        elem.style.visibility = 'visible';
+                    } else {
+                        $elem.css( style );
+                    }
                 }
             },
 
 
             // enhanced click for mobile devices
-            // we bind a touchstart and hijack any click event in the bubble
+            // we bind a touchend and hijack any click event in the bubble
             // then we execute the click directly and save it in a separate data object for later
             optimizeTouch: (function() {
 
@@ -460,7 +517,7 @@ var undef,
 
                 return function( elem ) {
 
-                    $(elem).bind('touchstart', function( e ) {
+                    $(elem).bind('touchend', function( e ) {
 
                         node = e.target;
                         travel = true;
@@ -2015,6 +2072,8 @@ Galleria.prototype = {
             // push the instance into the pool and run it when the theme is ready
             _pool.push( this );
         }
+
+        return this;
     },
 
     // this method should only be called once per instance
@@ -3573,8 +3632,7 @@ this.prependChild( 'info', 'myElement' );
                 }).show();
 
                 $( next.container ).css({
-                    zIndex: 1,
-                    opacity: 1
+                    zIndex: 1
                 }).show();
 
                 self._controls.swap();
@@ -4002,7 +4060,7 @@ this.prependChild( 'info', 'myElement' );
     },
 
     /**
-        Modivy the slideshow delay
+        Modify the slideshow delay
 
         @param {number} delay the number of milliseconds between slides,
 
@@ -4041,11 +4099,10 @@ this.prependChild( 'info', 'myElement' );
         if ( IE ) { // weird IE bug
 
             var count = this.$( 'counter' ),
-                opacity = count.css( 'opacity' ),
-                style = count.attr('style');
+                opacity = count.css( 'opacity' );
 
-            if ( style && parseInt( opacity, 10 ) === 1) {
-                count.attr('style', style.replace(/filter[^\;]+\;/i,''));
+            if ( parseInt( opacity, 10 ) === 1) {
+                Utils.removeAlpha( count[0] );
             } else {
                 this.$( 'counter' ).css( 'opacity', opacity );
             }
@@ -4165,7 +4222,7 @@ $.extend( Galleria, {
     IE8:     IE === 8,
     IE7:     IE === 7,
     IE6:     IE === 6,
-    IE:      !!IE,
+    IE:      IE,
     WEBKIT:  /webkit/.test( NAV ),
     SAFARI:  /safari/.test( NAV ),
     CHROME:  /chrome/.test( NAV ),
@@ -4849,11 +4906,9 @@ $.extend( $.easing, {
 $.fn.galleria = function( options ) {
 
     return this.each(function() {
-
-        var gallery = new Galleria();
-        gallery.init( this, options );
-
+        $( this ).data( 'galleria', new Galleria().init( this, options ) );
     });
+
 };
 
 // Expose
