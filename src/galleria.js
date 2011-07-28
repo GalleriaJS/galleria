@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.5a5 2011-07-26
+ * @preserve Galleria v 1.2.5b1 2011-07-28
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -18,6 +18,7 @@ var undef,
     $win   = $( window ),
 
 // internal constants
+    VERSION = 1.25,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -182,6 +183,21 @@ var undef,
                 var elem = doc.createElement( nodeName );
                 elem.className = className;
                 return elem;
+            },
+
+            getScriptPath : function( src ) {
+
+                // the currently executing script is always the last
+                src = src || $('script:last').attr('src');
+                var slices = src.split('/');
+
+                if (slices.length == 1) {
+                    return '';
+                }
+
+                slices.pop();
+
+                return slices.join('/') + '/';
             },
 
             // CSS3 transitions, added in 1.2.4
@@ -2587,7 +2603,7 @@ Galleria.prototype = {
 
                 // preload all images here
                 if ( o.preload === 'all' ) {
-                    thumb.add( data.image );
+                    thumb.preload( data.image );
                 }
 
             // create empty spans if thumbnails is set to 'empty'
@@ -3721,7 +3737,7 @@ this.prependChild( 'info', 'myElement' );
                 for ( i = this._options.preload; i > 0; i-- ) {
                     p = new Galleria.Picture();
                     ndata = self.getData( n );
-                    p.add( this.isFullscreen() && 'big' in ndata ? ndata.big : ndata.image );
+                    p.preload( this.isFullscreen() && 'big' in ndata ? ndata.big : ndata.image );
                     n = self.getNext( n );
                 }
             } catch(e) {}
@@ -4442,8 +4458,7 @@ Galleria.utils = Utils;
 
 /**
     A helper metod for cross-browser logging.
-    It uses the console log if available otherwise it falls back to the opera
-    debugger and finally <code>alert()</code>
+    It uses the console log if available otherwise it falls back to alert
 
     @example Galleria.log("hello", document.body, [1,2,3]);
 */
@@ -4454,7 +4469,7 @@ Galleria.log = (function() {
     } else {
         return function() {
             window.alert( Utils.array( arguments ).join(', ') );
-        }
+        };
     }
 }());
 
@@ -4466,6 +4481,9 @@ Galleria.log = (function() {
 */
 
 Galleria.ready = function( fn ) {
+    $.each( _galleries, function( i, gallery ) {
+        fn.call( gallery, gallery._options );
+    });
     Galleria.ready.callbacks.push( fn );
 };
 
@@ -4531,7 +4549,17 @@ Galleria.raise = function( msg, fatal ) {
         fatal = false;
         echo( 'Image gallery could not load.' );
     }
+};
 
+// Add the version
+Galleria.version = VERSION;
+
+// The requires method
+Galleria.requires = function( version, msg ) {
+    msg = msg || 'You need to upgrade Galleria to version ' + version + ' to use one or more components.';
+    if ( Galleria.version < version ) {
+        Galleria.raise(msg, true);
+    }
 };
 
 /**
@@ -4570,8 +4598,8 @@ Galleria.Picture = function( id ) {
     // flag when the image is ready
     this.ready = false;
 
-    // flag when the image is loaded
-    this.loaded = false;
+    // placeholder for the timeout
+    this.tid = null;
 
 };
 
@@ -4579,76 +4607,6 @@ Galleria.Picture.prototype = {
 
     // the inherited cache object
     cache: {},
-
-    // creates a new image and adds it to cache when loaded
-    add: function( src ) {
-
-        var i = 0,
-            self = this,
-            reload = false,
-
-            // create the image
-            image = new Image(),
-
-            onload = function() {
-
-                // force chrome to reload the image in case of cache bug
-                // one time is enough, with a timeout
-                if ( ( !this.width || !this.height ) ) {
-                    if ( !reload ) {
-                        reload = true;
-                        window.setTimeout((function(image, src) {
-                            return function() {
-                                image.attr('src', src + '?' + Utils.timestamp() );
-                            };
-                        }( $(this), this.src )), 50);
-                    } else {
-                        Galleria.raise('Could not extract width/height from image: ' + src +
-                            '. Traced measures: width:' + this.width + 'px, height: ' + this.height + 'px.');
-                    }
-                    return;
-                }
-
-                self.original = {
-                    height: this.height,
-                    width: this.width
-                };
-
-                self.cache[ this.src ] = this.src; // will override old cache
-                self.loaded = true;
-            };
-
-        // force a block display
-        $( image ).css( 'display', 'block');
-
-        if ( self.cache[ src ] ) {
-            // no need to onload if the image is cached
-            image.src = src;
-            onload.call( image );
-            return image;
-        }
-
-        // begin preload and insert in cache when done
-        $( image ).load( onload ).error( function() {
-            if ( !reload ) {
-                reload = true;
-                window.setTimeout((function(image, src) {
-                    return function() {
-                        image.attr('src', src + '?' + Utils.timestamp() );
-                    };
-                }( $(this), src )), 50);
-            } else {
-                if ( DUMMY ) {
-                    $( this ).attr( 'src', DUMMY );
-                } else {
-                    Galleria.raise('Could not load image: ' + src);
-                }
-            }
-        }).attr( 'src', src );
-
-        return image;
-
-    },
 
     // show the image on stage
     show: function() {
@@ -4677,6 +4635,21 @@ Galleria.Picture.prototype = {
     },
 
     /**
+        Preloads an image into the cache
+
+        @param {string} src The image source path, ex '/path/to/img.jpg'
+
+        @returns Galleria.Picture
+    */
+
+    preload: function( src ) {
+        var cache = this.cache;
+        $( new Image() ).load(function() {
+            cache[ this.src ] = this.src;
+        }).attr( 'src', src );
+    },
+
+    /**
         Loads an image and call the callback when ready.
         Will also add the image to cache.
 
@@ -4688,34 +4661,99 @@ Galleria.Picture.prototype = {
 
     load: function(src, callback) {
 
-        // save the instance
-        var self = this;
+        // set a load timeout for debugging
+        this.tid = window.setTimeout( (function(src) {
+            return function() {
+                Galleria.raise('Image not loaded in ' + Math.round( TIMEOUT/1000 ) + ' seconds: '+ src);
+            };
+        }( src )), TIMEOUT );
 
-        $( this.container ).find( 'img' ).remove();
+        this.image = new Image();
 
-        // add the image to cache and hide it
-        this.image = this.add( src );
+        var i = 0,
+            reload = false,
+
+            // some jquery cache
+            $container = $( this.container ),
+            $image = $( this.image ),
+
+            // the onload method
+            onload = (function( self, callback ) {
+
+                return function() {
+
+                    // force chrome to reload the image in case of cache bug
+                    // one time is enough, with a timeout
+                    if ( ( !this.width || !this.height ) ) {
+                        if ( !reload ) {
+                            reload = true;
+                            window.setTimeout((function(image, src) {
+                                return function() {
+                                    image.attr('src', src + '?' + Utils.timestamp() );
+                                };
+                            }( $(this), this.src )), 50);
+                        } else {
+                            Galleria.raise('Could not extract width/height from image: ' + src +
+                                '. Traced measures: width:' + this.width + 'px, height: ' + this.height + 'px.');
+                        }
+                        return;
+                    }
+
+                    // save the original size
+                    self.original = {
+                        height: this.height,
+                        width: this.width
+                    };
+
+                    self.cache[ this.src ] = this.src; // will override old cache
+
+                    // clear the debug timeout
+                    window.clearTimeout( self.tid );
+
+                    if (typeof callback == 'function' ) {
+                        callback.call( self, self );
+                    }
+
+                };
+            }( this, callback ));
+
+        // remove any previous images
+        $container.find( 'img' ).remove();
+
+        // append the image
+        $image.css( 'display', 'block').appendTo( this.container );
+
+        // hide it for now
         Utils.hide( this.image );
 
-        // append the image into the container
-        $( this.container ).append( this.image );
+        if ( this.cache[ src ] ) {
 
-        // check for loaded image using a timeout
-        Utils.wait({
-            until: function() {
-                // TODO this should be properly tested in Opera
-                return self.loaded && self.image.complete && self.original.width && self.image.width;
-            },
-            success: function() {
-                // call success
-                window.setTimeout(function() { callback.call( self, self ); }, 1 );
-            },
-            error: function() {
-                window.setTimeout(function() { callback.call( self, self ); }, 1 );
-                Galleria.raise('image not loaded in ' + Math.round( TIMEOUT/1000 ) + ' seconds: '+ src);
-            },
-            timeout: TIMEOUT
-        });
+            // no need to load if the image is cached, just call onload and set source
+            this.image.src = src;
+
+            onload.call( this.image );
+            return this.container;
+        }
+
+        // begin load and insert in cache when done
+        $( this.image ).load( onload ).error( function() {
+            if ( !reload ) {
+                reload = true;
+                // reload the image with a timestamp
+                window.setTimeout((function(image, src) {
+                    return function() {
+                        image.attr('src', src + '?' + Utils.timestamp() );
+                    };
+                }( $(this), src )), 50);
+            } else {
+                // apply the dummy image if it exists
+                if ( DUMMY ) {
+                    $( this ).attr( 'src', DUMMY );
+                } else {
+                    Galleria.raise('Image not found: ' + src);
+                }
+            }
+        }).attr( 'src', src );
 
         // return the container
         return this.container;
@@ -4771,7 +4809,6 @@ Galleria.Picture.prototype = {
         // wait for the width/height
         Utils.wait({
             until: function() {
-
                 width  = options.width ||
                          $container.width() ||
                          Utils.parseValue( $container.css('width') );

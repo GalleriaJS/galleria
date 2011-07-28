@@ -13,6 +13,10 @@ Changelog
 * Fixed many alpha bugs in IE when using Utils.hide and Utils.show
 * Added dummy option so you can show a fallback image if the active image could not be fetched
 * Added a setPlaytime method that lets you change the slideshow interval anytime
+* Fixed logging bug in IE
+* Added the instance into $.data so you can use $(target).data('galleria').anyApiMethod()
+* Added version and a static .requires(version) method
+* Reworked the image load methods to work more efficient and cross-browser friendly
 
 1.2.4
 -----
