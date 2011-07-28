@@ -4711,7 +4711,9 @@ Galleria.Picture.prototype = {
                     window.clearTimeout( self.tid );
 
                     if (typeof callback == 'function' ) {
-                        callback.call( self, self );
+                        window.setTimeout(function() {
+                            callback.call( self, self );
+                        },1);
                     }
 
                 };
