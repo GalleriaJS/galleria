@@ -962,7 +962,7 @@ var undef,
 
 */
 
-var Galleria = function() {
+Galleria = function() {
 
     var self = this;
 
@@ -4454,6 +4454,10 @@ Galleria.addTransition = function( name, fn ) {
     _transitions[name] = fn;
 };
 
+/**
+    The Galleria utilites
+*/
+
 Galleria.utils = Utils;
 
 /**
@@ -4554,7 +4558,15 @@ Galleria.raise = function( msg, fatal ) {
 // Add the version
 Galleria.version = VERSION;
 
-// The requires method
+/**
+    A method for checking what version of Galleria the user has installed and throws a readable error if the user needs to upgrade.
+    Useful when building plugins that requires a certain version to function.
+
+    @param {number} version The minimum version required
+
+    @param {string} [msg] Optional message to display. If not specified, Galleria will throw a generic error.
+*/
+
 Galleria.requires = function( version, msg ) {
     msg = msg || 'You need to upgrade Galleria to version ' + version + ' to use one or more components.';
     if ( Galleria.version < version ) {
@@ -4970,9 +4982,6 @@ $.fn.galleria = function( options ) {
     });
 
 };
-
-// Expose
-window.Galleria = Galleria;
 
 // phew
 

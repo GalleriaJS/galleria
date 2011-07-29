@@ -1,0 +1,3 @@
+#! /bin/bash
+
+java -jar src/jsrun.jar src/app/run.js -d=html -t=src/templates/jsdoc ../../src/galleria.js
