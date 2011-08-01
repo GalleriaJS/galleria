@@ -2731,19 +2731,17 @@ Galleria.prototype = {
                 if ( Galleria.History ) {
 
                     // bind the show method
-                    Galleria.History.change(function(e) {
-
-                        // grab history ID
-                        var val = parseInt( e.value.replace( /\//, '' ), 10 );
+                    Galleria.History.change(function( value ) {
 
                         // if ID is NaN, the user pressed back from the first image
                         // return to previous address
-                        if (isNaN(val)) {
-                            window.history.go(-1);
+                        if ( isNaN( value ) ) {
+                            //window.history.go(-1);
+                            console.log(value)
 
                         // else show the image
                         } else {
-                            self.show( val, undef, true );
+                            self.show( value, undef, true );
                         }
                     });
                 }
@@ -3609,7 +3607,7 @@ this.prependChild( 'info', 'myElement' );
 
         // do the history thing and return
         if ( !_history && Galleria.History ) {
-            Galleria.History.value( index.toString() );
+            Galleria.History.set( index.toString() );
             return;
         }
 

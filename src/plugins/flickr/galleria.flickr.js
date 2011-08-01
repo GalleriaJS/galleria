@@ -5,23 +5,18 @@
  * Copyright 2011, Aino
  * Licensed under the MIT license.
  */
- 
+
 /*global jQuery, Galleria, window */
 
 (function($) {
-    
+
+Galleria.requires(1.25, 'The Flickr Plugin requires Galleria version 1.2.5 or later.');
+
 // The script path
-var PATH = (function(src) {
-    var slices = src.split('/');
-    if (slices.length == 1) {
-        return '';
-    }
-    slices.pop();
-    return slices.join('/') + '/';
-}( $('script:last').attr('src') ));
-    
+var PATH = Galleria.utils.getScriptPath();
+
 /**
-    
+
     @class
     @constructor
 
@@ -38,7 +33,7 @@ var PATH = (function(src) {
 */
 
 Galleria.Flickr = function( api_key ) {
-    
+
     this.api_key = api_key || '2a2ce06c15780ebeb0b706650fc890b2';
 
     this.options = {
@@ -47,16 +42,17 @@ Galleria.Flickr = function( api_key ) {
         thumbSize: 'thumb',            // thumbnail size ( thumb,small,medium,big,original )
         sort: 'interestingness-desc',  // sort option ( date-posted-asc, date-posted-desc, date-taken-asc, date-taken-desc, interestingness-desc, interestingness-asc, relevance )
         description: false,            // set this to true to get description as caption
-        complete: function(){}         // callback to be called inside the Galleria.prototype.load
+        complete: function(){},        // callback to be called inside the Galleria.prototype.load
+        backlink: false                // set this to true if you want to pass a link back to the original image
     };
 };
 
 Galleria.Flickr.prototype = {
-    
+
     // bring back the constructor reference
-    
+
     constructor: Galleria.Flickr,
-    
+
     /**
         Search for anything at Flickr
 
@@ -80,7 +76,7 @@ Galleria.Flickr.prototype = {
 
         @returns Instance
     */
-    
+
     tags: function( tag, callback ) {
         return this._find({
             tags: tag
@@ -116,7 +112,7 @@ Galleria.Flickr.prototype = {
 
         @returns Instance
     */
-    
+
     set: function( photoset_id, callback ) {
         return this._find({
             photoset_id: photoset_id,
@@ -132,7 +128,7 @@ Galleria.Flickr.prototype = {
 
         @returns Instance
     */
-    
+
     gallery: function( gallery_id, callback ) {
         return this._find({
             gallery_id: gallery_id,
@@ -167,7 +163,7 @@ Galleria.Flickr.prototype = {
 
         @returns Instance
     */
-    
+
     group: function ( group_id, callback ) {
         return this._find({
             group_id: group_id,
@@ -182,15 +178,15 @@ Galleria.Flickr.prototype = {
 
         @returns Instance
     */
-    
+
     setOptions: function( options ) {
         $.extend(this.options, options);
         return this;
     },
-    
+
 
     // call Flickr and raise errors
-    
+
     _call: function( params, callback ) {
 
         var url = 'http://api.flickr.com/services/rest/?';
@@ -216,37 +212,37 @@ Galleria.Flickr.prototype = {
         });
         return scope;
     },
-    
-    
+
+
     // "hidden" way of getting a big image (~1024) from flickr
-    
+
     _getBig: function( photo ) {
-        
+
         if ( photo.url_l ) {
             return photo.url_l;
         } else if ( parseInt( photo.width_o, 10 ) > 1280 ) {
-            
+
             return 'http://farm'+photo.farm + '.static.flickr.com/'+photo.server +
                 '/' + photo.id + '_' + photo.secret + '_b.jpg';
         }
-        
+
         return photo.url_o || photo.url_z || photo.url_m;
-        
+
     },
-    
-    
+
+
     // get image size by option name
-    
+
     _getSize: function( photo, size ) {
-        
+
         var img;
-        
+
         switch(size) {
-            
+
             case 'thumb':
                 img = photo.url_t;
                 break;
-            
+
             case 'small':
                 img = photo.url_s;
                 break;
@@ -258,7 +254,7 @@ Galleria.Flickr.prototype = {
             case 'original':
                 img = photo.url_o ? photo.url_o : this._getBig( photo );
                 break;
-            
+
             default:
                 img = photo.url_z || photo.url_m;
                 break;
@@ -268,7 +264,7 @@ Galleria.Flickr.prototype = {
 
 
     // ask flickr for photos, parse the result and call the callback with the galleria-ready data array
-    
+
     _find: function( params, callback ) {
 
         params = $.extend({
@@ -286,15 +282,16 @@ Galleria.Flickr.prototype = {
                 i;
 
             for ( i=0; i<len; i++ ) {
-                
+
                 photo = photos[i];
-                
+
                 gallery.push({
                     thumb: this._getSize( photo, this.options.thumbSize ),
                     image: this._getSize( photo, this.options.imageSize ),
                     big: this._getBig( photo ),
                     title: photos[i].title,
-                    description: this.options.description && photos[i].description ? photos[i].description._content : ''
+                    description: this.options.description && photos[i].description ? photos[i].description._content : '',
+                    link: this.options.backlink ? 'http://flickr.com/photos/' + photo.owner + '/' + photo.id : ''
                 });
             }
             callback.call( this, gallery );
@@ -317,57 +314,57 @@ var load = Galleria.prototype.load;
 // fake-extend the load prototype using the flickr data
 
 Galleria.prototype.load = function() {
-    
+
     // pass if no data is provided or flickr option not found
     if ( arguments.length || typeof this._options.flickr !== 'string' ) {
         load.apply( this, Galleria.utils.array( arguments ) );
         return;
     }
-    
+
     // define some local vars
     var self = this,
         args = Galleria.utils.array( arguments ),
         flickr = this._options.flickr.split(':'),
         f,
         opts = $.extend({}, self._options.flickrOptions),
-        loader = typeof opts.loader !== 'undefined' ? 
+        loader = typeof opts.loader !== 'undefined' ?
             opts.loader : $('<div>').css({
                 width: 48,
                 height: 48,
                 opacity: 0.7,
                 background:'#000 url('+PATH+'loader.gif) no-repeat 50% 50%'
             });
-        
+
     if ( flickr.length ) {
-        
+
         // validate the method
         if ( typeof Galleria.Flickr.prototype[ flickr[0] ] !== 'function' ) {
             Galleria.raise( flickr[0] + ' method not found in Flickr plugin' );
             return load.apply( this, args );
         }
-        
+
         // validate the argument
         if ( !flickr[1] ) {
             Galleria.raise( 'No flickr argument found' );
             return load.apply( this, args );
         }
-        
+
         // apply the preloader
         window.setTimeout(function() {
             self.$( 'target' ).append( loader );
         },100);
-        
+
         // create the instance
         f = new Galleria.Flickr();
-        
+
         // apply Flickr options
         if ( typeof self._options.flickrOptions === 'object' ) {
             f.setOptions( self._options.flickrOptions );
         }
-        
+
         // call the flickr method and trigger the DATA event
         f[ flickr[0] ]( flickr[1], function( data ) {
-            
+
             self._data = data;
             loader.remove();
             self.trigger( Galleria.DATA );
@@ -375,7 +372,7 @@ Galleria.prototype.load = function() {
 
         });
     } else {
-        
+
         // if flickr array not found, pass
         load.apply( this, args );
     }
