@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-/*global jQuery, navigator, Galleria, Image */
+/*global jQuery, navigator, Galleria:true, Image */
 
 (function( $ ) {
 
@@ -2736,8 +2736,7 @@ Galleria.prototype = {
                         // if ID is NaN, the user pressed back from the first image
                         // return to previous address
                         if ( isNaN( value ) ) {
-                            //window.history.go(-1);
-                            console.log(value)
+                            window.history.go(-1);
 
                         // else show the image
                         } else {

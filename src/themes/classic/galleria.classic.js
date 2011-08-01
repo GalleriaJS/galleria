@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria Classic Theme 2011-02-14
+ * @preserve Galleria Classic Theme 2011-08-01
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -8,9 +8,9 @@
 
 /*global jQuery, Galleria */
 
-(function($) {
-
 Galleria.requires(1.25, 'This version of Classic theme requires Galleria 1.2.5 or later');
+
+(function($) {
 
 Galleria.addTheme({
     name: 'classic',

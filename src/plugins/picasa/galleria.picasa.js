@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria Picasa Plugin 2011-06-10
+ * @preserve Galleria Picasa Plugin 2011-08-01
  * http://galleria.aino.se
  *
  * Copyright 2011, Aino
@@ -8,9 +8,9 @@
 
 /*global jQuery, Galleria, window */
 
-(function($) {
-
 Galleria.requires(1.25, 'The Picasa Plugin requires Galleria version 1.2.5 or later.');
+
+(function($) {
 
 // The script path
 var PATH = Galleria.utils.getScriptPath();
@@ -64,7 +64,7 @@ Galleria.Picasa.prototype = {
     },
 
     /**
-        Get a user’s public photos
+        Get a user's public photos
 
         @param {String} username The username to fetch photos from
         @param {Function} [callback] The callback to be called when the data is ready

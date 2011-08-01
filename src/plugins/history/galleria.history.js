@@ -1,15 +1,15 @@
 /**
-* @preserve Galleria History Plugin 2011-07-30
-* http://galleria.aino.se
-*
-* Copyright 2011, Aino
-* Licensed under the MIT license.
-*
-*/
-
-/* Note: non-functional alpha, prototype only */
+ * @preserve Galleria History Plugin 2011-08-01
+ * http://galleria.aino.se
+ *
+ * Copyright 2011, Aino
+ * Licensed under the MIT license.
+ *
+ */
 
 /*global jQuery, Galleria, window */
+
+Galleria.requires(1.25, 'The History Plugin requires Galleria version 1.2.5 or later.');
 
 (function( $, window ) {
 
@@ -21,13 +21,21 @@
 
             loc = window.location,
 
-            support = false,
+            doc = window.document,
 
-            iframe = support ? null : $('<iframe tabindex="-1" title="empty">').hide().attr( 'src', 'javascript:0' ),
+            ie = Galleria.IE,
+
+            support = 'onhashchange' in window && ( doc.mode === undefined || doc.mode > 7 ),
+
+            iframe,
 
             get = function( winloc ) {
-                winloc = winloc || iframe.location;
-                return parseInt( target.hash.substr(2), 10 );
+                if( iframe && !support && Galleria.IE ) {
+                    winloc = winloc || iframe.location;
+                }  else {
+                    winloc = loc;
+                }
+                return parseInt( winloc.hash.substr(2), 10 );
             },
 
             saved = get( loc ),
@@ -38,41 +46,57 @@
                 $.each( callbacks, function( i, fn ) {
                     fn.call( window, get() );
                 });
+            },
+
+            ready = function() {
+                $.each( onloads, function(i, fn) {
+                    fn();
+                });
+
+                init = true;
+            },
+
+            setHash = function( val ) {
+                return '/' + val;
             };
+
+        // always remove support if IE < 8
+        if ( support && ie < 8 ) {
+            support = false;
+        }
 
         if ( !support ) {
 
             $(function() {
-                iframe.one('load', function() {
 
-                    iframe = this.contentWindow;
+                var interval = window.setInterval(function() {
 
-                    saved = get();
+                    var hash = get();
 
-                    $.each( onloads, function(i, fn) {
-                        fn();
-                    });
+                    if ( !isNaN( hash ) && hash != saved ) {
+                        saved = hash;
+                        loc.hash = setHash( hash );
+                        onchange();
+                    }
 
-                    init = true;
+                }, 50);
 
-                    window.setInterval(function() {
+                if ( ie ) {
 
-                        var hash = get();
+                    $('<iframe tabindex="-1" title="empty">').hide().attr( 'src', 'about:blank' ).one('load', function() {
 
-                        if ( !isNaN( hash ) && hash != saved ) {
-                            saved = hash;
-                            onchange();
-                        }
+                        iframe = this.contentWindow;
 
-                        if ( hash != get( loc ) ) {
-                            loc.hash = hash;
-                        }
+                        ready();
 
-                    }, 50);
+                    }).insertAfter(doc.body);
 
-                }).appendTo(document.body);
+                } else {
+                    ready();
+                }
             });
-
+        } else {
+            ready();
         }
 
         return {
@@ -85,25 +109,29 @@
                     window.onhashchange = onchange;
                 }
             },
+
             set: function( val ) {
 
-                if ( !support ) {
+                if ( isNaN( val ) ) {
+                    return;
+                }
+
+                if ( !support && ie ) {
 
                     this.ready(function() {
 
-                        var doc = iframe.document;
-                        doc.title = window.document.title;
-                        doc.open();
-                        doc.close();
-                        iframe.location.hash = '/' + val;
+                        var idoc = iframe.document;
+                        idoc.open();
+                        idoc.close();
 
-                        console.log(iframe.location.hash)
+                        iframe.location.hash = setHash( val );
 
                     });
                 }
 
-                loc.hash = '/'+val;
+                loc.hash = setHash( val );
             },
+
             ready: function(fn) {
                 if (!init) {
                     onloads.push(fn);
@@ -114,5 +142,5 @@
         };
     }());
 
-}(jQuery, this));
+}( jQuery, this ));
 
