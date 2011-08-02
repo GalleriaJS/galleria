@@ -3472,7 +3472,9 @@ this.prependChild( 'info', 'myElement' );
             scaleLayer = function( img ) {
                 $( img.container ).children(':first').css({
                     top: Math.max(0, Utils.parseValue( img.image.style.top )),
-                    left: Math.max(0, Utils.parseValue( img.image.style.left ))
+                    left: Math.max(0, Utils.parseValue( img.image.style.left )),
+                    width: Utils.parseValue( img.image.width ),
+                    height: Utils.parseValue( img.image.height )
                 });
             };
 
