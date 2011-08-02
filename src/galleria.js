@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.5b1 2011-07-28
+ * @preserve Galleria v 1.2.5b2 2011-08-02
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -4652,10 +4652,11 @@ Galleria.Picture.prototype = {
     */
 
     preload: function( src ) {
-        var cache = this.cache;
-        $( new Image() ).load(function() {
-            cache[ this.src ] = this.src;
-        }).attr( 'src', src );
+        $( new Image() ).load((function(src, cache) {
+            return function() {
+                cache[ src ] = src;
+            };
+        }( src, this.cache ))).attr( 'src', src );
     },
 
     /**
@@ -4687,7 +4688,7 @@ Galleria.Picture.prototype = {
             $image = $( this.image ),
 
             // the onload method
-            onload = (function( self, callback ) {
+            onload = (function( self, callback, src ) {
 
                 return function() {
 
@@ -4700,7 +4701,7 @@ Galleria.Picture.prototype = {
                                 return function() {
                                     image.attr('src', src + '?' + Utils.timestamp() );
                                 };
-                            }( $(this), this.src )), 50);
+                            }( $(this), src )), 50);
                         } else {
                             Galleria.raise('Could not extract width/height from image: ' + src +
                                 '. Traced measures: width:' + this.width + 'px, height: ' + this.height + 'px.');
@@ -4714,7 +4715,7 @@ Galleria.Picture.prototype = {
                         width: this.width
                     };
 
-                    self.cache[ this.src ] = this.src; // will override old cache
+                    self.cache[ src ] = src; // will override old cache
 
                     // clear the debug timeout
                     window.clearTimeout( self.tid );
@@ -4726,7 +4727,7 @@ Galleria.Picture.prototype = {
                     }
 
                 };
-            }( this, callback ));
+            }( this, callback, src ));
 
         // remove any previous images
         $container.find( 'img' ).remove();
