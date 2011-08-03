@@ -4,7 +4,7 @@
 Picasa Plugin
 *************
 
-The Galleria Picasa Plugin is a small but useful plugin to allow your gallery to communicate with the Picasa API using some really simple commands. Galleria optimizes the Picasa data behind the scenes to make the Gallery rendering as good as possible. You can also control some aspects of the data conversion, like image sizes, sorting, captions etc. 
+The Galleria Picasa Plugin is a small but useful plugin to allow your gallery to communicate with the Picasa API using some really simple commands. Galleria optimizes the Picasa data behind the scenes to make the Gallery rendering as good as possible. You can also control some aspects of the data conversion, like image sizes, sorting, captions etc.
 
 How to install the plugin
 =========================
@@ -47,7 +47,7 @@ When using the picasa plugin as a Galleria option like this, you simply apply a 
             dataSource: data
         });
     });
-    
+
 **Example on how to inject Picasa data into an existing gallery and apply options**
 
 ::
@@ -59,7 +59,7 @@ When using the picasa plugin as a Galleria option like this, you simply apply a 
     }).search('milan', function(data) {
         Galleria.get(0).load( data ); // reloads the first galleria instance with the new data
     });
-    
+
 
 Methods
 =======
@@ -77,7 +77,7 @@ Fetch a user’s public photos using the username like displayed in the URL (not
 
 
 .useralbum( username, albumID, [, callback] )
--------------------------------
+---------------------------------------------
 
 Get photos from a user album
 
@@ -108,7 +108,7 @@ imageSize
 
 The size to fetch for the main image. The bigger size, the slower downloads and interaction. Use this to match image sizes with your gallery layout.
 
-You can apply any number here, and the plugin will fetch the closest match. 
+You can apply any number here, and the plugin will fetch the closest match.
 And since Picasa has many different sizes cached, it will most often be a very close match.
 
 You can also define sizes using the same syntax as the Flickr Plugin:

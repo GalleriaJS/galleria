@@ -11,7 +11,7 @@ Options
 
 .. highlight:: javascript
 
-The Galleria options covers most of the gallery customizations you will need for each implementation. 
+The Galleria options covers most of the gallery customizations you will need for each implementation.
 Below you will find a summary of all options available. Click on a option title for more explanations and examples.
 
 These options are the standard options that you can use for all themes. However, themes can add new options and set/modify default values on their own. Please check each theme documentation for full coverage. Custom options for each theme starts with an underscore.
@@ -56,9 +56,13 @@ List of options
 
 - :doc:`debug` Set this to false to prevent debug messages.
 
+- :doc:`dummy` Defines a dummy image that will be used if the image can’t be found.
+
 - :doc:`easing` Defines the easing mode globally.
 
 - :doc:`extend` Add custom functionality to the gallery.
+
+- :doc:`fullscreenCrop` Sets how Galleria should crop when in fullscreen mode.
 
 - :doc:`fullscreenDoubleTap` Enabled fullscreen toggle on double-tap for touch devices
 
@@ -81,9 +85,13 @@ List of options
 
 - :doc:`imagePosition` Positions the image.
 
+- :doc`imageTimeout` Sets a timeout for fetching images.
+
 - :doc:`initialTransition` Sets a different transition on the the first image.
 
 - :doc:`keepSource` Lets you keep the source elements.
+
+- :doc:`layerFollow` Boolean for controlling if the layer will follow the image size or not.
 
 - :doc:`lightbox` Helper for attaching a lightbox when the user clicks on an image.
 

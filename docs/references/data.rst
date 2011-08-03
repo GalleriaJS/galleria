@@ -15,9 +15,9 @@ At the time of writing (1.2.5), you can only define a layer using the dataConfig
 
 Read more about the layer and view examples here: http://galleriajs.tumblr.com/post/8091630096/introducing-in-1-2-5-html-layer
 
-**********
+
 Definition
-**********
+==========
 
 The image data object that Galleria uses is defined like this:
 
