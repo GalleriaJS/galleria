@@ -10,6 +10,11 @@ There are several ways of defining this data and this document attempts to expla
 The data structure is best defined using a JSON array, since JavaScript plays well with JSON and Galleria uses it internally.
 But the beginner will most likely start with plain HTML that Galleria reads and converts to a data structure.
 
+Please note that 1.2.5 introduced a new entity called "layer". This can contain any HTML that will follow the image, also during transitions.
+At the time of writing (1.2.5), you can only define a layer using the dataConfig option or JSON.
+
+Read more about the layer and view examples here: http://galleriajs.tumblr.com/post/8091630096/introducing-in-1-2-5-html-layer
+
 **********
 Definition
 **********
