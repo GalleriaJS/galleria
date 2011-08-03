@@ -4699,40 +4699,42 @@ Galleria.Picture.prototype = {
 
                 return function() {
 
-                    // force chrome to reload the image in case of cache bug
-                    // one time is enough, with a timeout
-                    if ( ( !this.width || !this.height ) ) {
-                        if ( !reload ) {
-                            reload = true;
-                            window.setTimeout((function(image, src) {
-                                return function() {
-                                    image.attr('src', src + '?' + Utils.timestamp() );
-                                };
-                            }( $(this), src )), 50);
-                        } else {
-                            Galleria.raise('Could not extract width/height from image: ' + src +
-                                '. Traced measures: width:' + this.width + 'px, height: ' + this.height + 'px.');
-                        }
-                        return;
-                    }
+                    var complete = function() {
 
-                    // save the original size
-                    self.original = {
-                        height: this.height,
-                        width: this.width
+                        // save the original size
+                        self.original = {
+                            height: this.height,
+                            width: this.width
+                        };
+
+                        self.cache[ src ] = src; // will override old cache
+
+                        // clear the debug timeout
+                        window.clearTimeout( self.tid );
+
+                        if (typeof callback == 'function' ) {
+                            window.setTimeout(function() {
+                                callback.call( self, self );
+                            },1);
+                        }
                     };
 
-                    self.cache[ src ] = src; // will override old cache
-
-                    // clear the debug timeout
-                    window.clearTimeout( self.tid );
-
-                    if (typeof callback == 'function' ) {
-                        window.setTimeout(function() {
-                            callback.call( self, self );
-                        },1);
+                    // Delay the callback to "fix" the Adblock Bug
+                    // http://code.google.com/p/adblockforchrome/issues/detail?id=3701
+                    if ( ( !this.width || !this.height ) ) {
+                        window.setTimeout( (function( img ) {
+                            return function() {
+                                if ( img.width && img.height ) {
+                                    complete.call( img );
+                                } else {
+                                    Galleria.raise('Could not extract width/height from image: ' + img.src +
+                                        '. Traced measures: width:' + img.width + 'px, height: ' + img.height + 'px.');
+                                }
+                            };
+                        }( this )), 2);
+                    } else {
+                        complete.call( this );
                     }
-
                 };
             }( this, callback, src ));
 
