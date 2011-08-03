@@ -27,7 +27,7 @@ The image data object that Galleria uses is defined like this:
 * **title** – the image title (optional)
 * **description** – the image description (optional)
 * **link** – the image link url (optional)
-* **layer** – A layer of HTML that will be displayed on top of the image
+* **layer** – A layer of HTML that will be displayed on top of the image (optional)
 * **original** a reference to the original IMG element (optional)
 
 You can provide this data to Galleria in a number of ways. The easiest way to start is probably by using plain HTML, but you’ll get more control using JSON.
