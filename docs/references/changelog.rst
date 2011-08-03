@@ -20,6 +20,9 @@ Changelog
 * Fixed so that the carousel follows any initial index set by the show option
 * Fixed a rendering bug in some environments where the image was right-aligned
 * Added the History plugin
+* Added a fullscreenCrop option for separate cropping in fullscreen mode
+* Added the Picasa plugin
+* Added an imageTimeout option for setting a custom timeout for Galleria when fetching images
 
 1.2.4
 -----
