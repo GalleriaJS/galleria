@@ -26,8 +26,8 @@ I'll be saving this file as demo.html but you can give it any name you like.
 Installing jQuery
 =================
 
-Galleria is built on top of the jQuery JavaScript framework and you **must** include this in order for Galleria to work. 
-A number of large enterprises like Google provide hosted copies of jQuery. 
+Galleria is built on top of the jQuery JavaScript framework and you **must** include this in order for Galleria to work.
+A number of large enterprises like Google provide hosted copies of jQuery.
 
 Add the following inside the ``<head>`` element in your HTML to include the latest minified version of jQuery::
 
@@ -56,7 +56,7 @@ The HTML file should look something like::
     </html>
 
 
-If you don't see any text after reloading the page: the path to the jQuery file is probably wrong. 
+If you don't see any text after reloading the page: the path to the jQuery file is probably wrong.
 
 If it does work, you can remove the ``<script>`` tag inside the body and move along.
 
@@ -64,14 +64,14 @@ If it does work, you can remove the ``<script>`` tag inside the body and move al
 Installing Galleria
 ===================
 
-Now that we have a HTML template and jQuery in place, it's time to install Galleria itself! 
+Now that we have a HTML template and jQuery in place, it's time to install Galleria itself!
 
 1. Download the latest version from the Galleria website.
 2. Extract the galleria.zip file and place the "galleria" directory where you have your HTML files.
 3. Add the following code beneath the jQuery script tag we added earlier::
 
-    <script src="galleria/galleria-1.2.4.min.js"></script>
-    
+    <script src="galleria/galleria-1.2.5.min.js"></script>
+
 To make sure Gallery works properly add the following code inside the ``<body>`` tag::
 
     <script>
@@ -85,7 +85,7 @@ The HTML file should look something like::
     <html>
         <head>
             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-            <script src="galleria/galleria-1.2.4.min.js"></script>
+            <script src="galleria/galleria-1.2.5.min.js"></script>
         </head>
         <body>
             <script>
@@ -102,7 +102,7 @@ If it does work, you can remove ``<script>`` tag inside the body and move along.
 Adding images
 =============
 
-Now we need to add a few images for Galleria to display. There are several ways of doing so, 
+Now we need to add a few images for Galleria to display. There are several ways of doing so,
 but the simplest one is probably to just add images as HTML.
 
 Add the following markup inside the ``<body>`` tag::
@@ -117,7 +117,7 @@ Add the following markup inside the ``<body>`` tag::
 Load a theme
 ============
 
-Galleria requires a theme to function. In this guide, we will use the included classic theme, 
+Galleria requires a theme to function. In this guide, we will use the included classic theme,
 but you can download and try other themes later on.
 
 A theme is included using a javascript function called ``Galleria.loadTheme``. Insert the following code **after the images** in the source code::
@@ -129,7 +129,7 @@ A theme is included using a javascript function called ``Galleria.loadTheme``. I
 Set dimensions and fire up the gallery
 ======================================
 
-All we need to do now is set dimensions and apply Galleria. 
+All we need to do now is set dimensions and apply Galleria.
 Add the following script after the loadTheme function we just inserted::
 
         $("#gallery").galleria({
@@ -137,8 +137,8 @@ Add the following script after the loadTheme function we just inserted::
             height: 500
         });
     </script>
-    
-As you can see, we just applied galleria to the '#gallery' container where the images are, and set dimensions to 500x500 pixels. 
+
+As you can see, we just applied galleria to the '#gallery' container where the images are, and set dimensions to 500x500 pixels.
 You can change the width & height to any dimensions you see fit for your design.
 
 .. _complete_code:
@@ -152,7 +152,7 @@ The complete code example:
     <html>
         <head>
             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-            <script src="galleria/galleria-1.2.4.min.js"></script>
+            <script src="galleria/galleria-1.2.5.min.js"></script>
         </head>
         <body>
             <div id="gallery">

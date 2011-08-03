@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.5b2 2011-08-02
+ * @preserve Galleria v 1.2.5 2011-08-03
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -2336,8 +2336,13 @@ Galleria.prototype = {
 
         // parse the carousel on each thumb load
         if ( this._options.carousel ) {
+            var count = 0,
+                show = this._options.show;
             this.bind( Galleria.THUMBNAIL, function() {
                 this.updateCarousel();
+                if ( ++count == this.getDataLength() && typeof show == 'number' && show > 0 ) {
+                    this._carousel.follow( show );
+                }
             });
         }
 
@@ -4932,7 +4937,7 @@ Galleria.Picture.prototype = {
 
                 // apply position
                 $( self.image ).css({
-                    position : 'relative',
+                    position : 'absolute',
                     top :  getPosition(pos.top, 'height', height),
                     left : getPosition(pos.left, 'width', width)
                 });

@@ -17,6 +17,9 @@ Changelog
 * Added the instance into $.data so you can use $(target).data('galleria').anyApiMethod()
 * Added version and a static .requires(version) method
 * Reworked the image load methods to work more efficient and cross-browser friendly
+* Fixed so that the carousel follows any initial index set by the show option
+* Fixed a rendering bug in some environments where the image was right-aligned
+* Added the History plugin
 
 1.2.4
 -----
