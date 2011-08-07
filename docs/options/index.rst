@@ -64,7 +64,9 @@ List of options
 
 - :doc:`fullscreenCrop` Sets how Galleria should crop when in fullscreen mode.
 
-- :doc:`fullscreenDoubleTap` Enabled fullscreen toggle on double-tap for touch devices
+- :doc:`fullscreenDoubleTap` Enabled fullscreen toggle on double-tap for touch devices.
+
+- :doc:`fullscreenTransition` Defines a different transition for fullscreen mode.
 
 - :doc:`height` Manually set a gallery height.
 
@@ -136,6 +138,8 @@ List of options
   for thumbnails
 
 - :doc:`thumbnails` Sets how and if thumbnails should be created.
+
+- :doc:`touchTransition` Defines a different transition when a touch device is detected.
 
 - :doc:`transition` Defines what transition to use.
 

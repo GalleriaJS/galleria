@@ -1419,13 +1419,13 @@ Galleria = function() {
     };
 
     // internal fullscreen control
-    // added in 1.195
-    // still kind of experimental
     var fullscreen = this._fullscreen = {
 
         scrolled: 0,
 
-        crop: self._options.imageCrop,
+        crop: undef,
+
+        transition: undef,
 
         active: false,
 
@@ -1459,7 +1459,9 @@ Galleria = function() {
                     padding:0
                 },
 
-                data = self.getData();
+                data = self.getData(),
+
+                options = self._options;
 
             Utils.forceStyles( DOM().html, htmlbody );
             Utils.forceStyles( DOM().body, htmlbody );
@@ -1474,12 +1476,21 @@ Galleria = function() {
                 left: self.prev
             });
 
-            if ( self._options.fullscreenCrop !== undef ) {
-                self._options.imageCrop = self._options.fullscreenCrop;
-            }
+            // temporarily save the crop & transition
+            fullscreen.crop = options.imageCrop;
+            fullscreen.transition = options.transition;
+
+            // set fullscreen options
+            $.each({
+                'fullscreenCrop': 'imageCrop',
+                'fullscreenTransition': 'imageTransition'
+            }, function( key, val ) {
+                if ( options[ key ] != undef ) {
+                    options[ val ] = options[ key ];
+                }
+            });
 
             // swap to big image if it's different from the display image
-
             if ( data && data.big && data.image !== data.big ) {
                 var big    = new Galleria.Picture(),
                     cached = big.isCached( data.big ),
@@ -1561,16 +1572,16 @@ Galleria = function() {
             self.detachKeyboard();
             self.attachKeyboard( fullscreen.keymap );
 
-            if ( self._options.fullscreenCrop !== undef ) {
-                self._options.imageCrop = fullscreen.crop;
-            }
+            // bring back cached options
+            self._options.imageCrop = fullscreen.crop;
+            self._options.transition = fullscreen.transition;
 
+            // return to original image
             var big = self.getData().big,
                 image = self._controls.getActive().image;
 
             if ( big && big == image.src ) {
 
-                // return to the original image
                 window.setTimeout(function(src) {
                     return function() {
                         image.src = src;
@@ -2044,12 +2055,12 @@ Galleria.prototype = {
             dataSelector: 'img',
             dataSource: this._target,
             debug: undef,
-            dummy: undef, /* 1.2.5 */
+            dummy: undef, // 1.2.5
             easing: 'galleria',
             extend: function(options) {},
             fullscreenCrop: undef, // 1.2.5
             fullscreenDoubleTap: true, // 1.2.4 toggles fullscreen on double-tap for touch devices
-            fullscreenTransition: undef, // 1.2.5
+            fullscreenTransition: undef, // 1.2.6
             height: 'auto',
             idleMode: true, // 1.2.4 toggles idleMode
             idleTime: 3000,
@@ -2086,7 +2097,7 @@ Galleria.prototype = {
             thumbMargin: 0,
             thumbQuality: 'auto',
             thumbnails: true,
-            touchTransition: undef, // 1.2.5
+            touchTransition: undef, // 1.2.6
             transition: 'fade',
             transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
@@ -2130,7 +2141,10 @@ Galleria.prototype = {
     // for manipulation of data, use the .load method
 
     _init: function() {
-        var self = this;
+
+        var self = this,
+            options = this._options;
+
         if ( this._initialized ) {
             Galleria.raise( 'Init failed: Gallery instance already initialized.' );
             return this;
@@ -2144,7 +2158,12 @@ Galleria.prototype = {
         }
 
         // merge the theme & caller options
-        $.extend( true, this._options, Galleria.theme.defaults, this._original.options );
+        $.extend( true, options, Galleria.theme.defaults, this._original.options );
+
+        // set touch transition
+        if ( typeof options.touchTransition === 'string' && Galleria.TOUCH ) {
+            options.transition = options.touchTransition;
+        }
 
         // check for canvas support
         (function( can ) {
@@ -2190,8 +2209,8 @@ Galleria.prototype = {
 
                         // first check if options is set
 
-                        if ( self._options[ m ] && typeof self._options[ m ] === 'number' ) {
-                            num[ m ] = self._options[ m ];
+                        if ( options[ m ] && typeof options[ m ] === 'number' ) {
+                            num[ m ] = options[ m ];
                         } else {
 
                             // else extract the measures from different sources and grab the highest value
@@ -2218,7 +2237,6 @@ Galleria.prototype = {
                             self._run();
                         }, 1);
                     } else {
-
                         self._run();
                     }
                 },
@@ -2310,12 +2328,12 @@ Galleria.prototype = {
         this.$( 'image-nav-right, image-nav-left' ).bind( 'click', function(e) {
 
             // tune the clicknext option
-            if ( self._options.clicknext ) {
+            if ( options.clicknext ) {
                 e.stopPropagation();
             }
 
             // pause if options is set
-            if ( self._options.pauseOnInteraction ) {
+            if ( options.pauseOnInteraction ) {
                 self.pause();
             }
 
@@ -2327,7 +2345,7 @@ Galleria.prototype = {
 
         // hide controls if chosen to
         $.each( ['info','counter','image-nav'], function( i, el ) {
-            if ( self._options[ 'show' + el.substr(0,1).toUpperCase() + el.substr(1).replace(/-/,'') ] === false ) {
+            if ( options[ 'show' + el.substr(0,1).toUpperCase() + el.substr(1).replace(/-/,'') ] === false ) {
                 Utils.moveOut( self.get( el.toLowerCase() ) );
             }
         });
@@ -2337,7 +2355,7 @@ Galleria.prototype = {
 
         // now it's usually safe to remove the content
         // IE will never stop loading if we remove it, so let's keep it hidden for IE (it's usually fast enough anyway)
-        if ( !this._options.keep_source && !IE ) {
+        if ( !options.keepSource && !IE ) {
             this._target.innerHTML = '';
         }
 
@@ -2350,9 +2368,9 @@ Galleria.prototype = {
         this.appendChild( 'target', 'container' );
 
         // parse the carousel on each thumb load
-        if ( this._options.carousel ) {
+        if ( options.carousel ) {
             var count = 0,
-                show = this._options.show;
+                show = options.show;
             this.bind( Galleria.THUMBNAIL, function() {
                 this.updateCarousel();
                 if ( ++count == this.getDataLength() && typeof show == 'number' && show > 0 ) {
@@ -2362,7 +2380,7 @@ Galleria.prototype = {
         }
 
         // bind swipe gesture
-        if ( this._options.swipe ) {
+        if ( options.swipe ) {
 
             (function( images ) {
 
@@ -2436,7 +2454,7 @@ Galleria.prototype = {
 
             // double-tap/click fullscreen toggle
 
-            if ( this._options.fullscreenDoubleTap ) {
+            if ( options.fullscreenDoubleTap ) {
 
                 this.$( 'stage' ).bind( 'touchstart', (function() {
                     var last, cx, cy, lx, ly, now,
