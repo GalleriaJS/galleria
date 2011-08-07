@@ -4,14 +4,14 @@
 Flickr Plugin
 *************
 
-The Galleria Flickr Plugin is a small but useful plugin to allow your gallery to communicate with the Flickr API using some really simple commands. Galleria optimizes the Flickr data behind the scenes to make the Gallery rendering as good as possible. You can also control some aspects of the data conversion, like image sizes, sorting, captions etc. 
+The Galleria Flickr Plugin is a small but useful plugin to allow your gallery to communicate with the Flickr API using some really simple commands. Galleria optimizes the Flickr data behind the scenes to make the Gallery rendering as good as possible. You can also control some aspects of the data conversion, like image sizes, sorting, captions etc.
 
 How to install the plugin
 =========================
 
 Just include it in the head as a script tag, f.ex::
 
-    <script src="plugins/galleria.flickr.min.js"></script>
+    <script src="plugins/flickr/galleria.flickr.min.js"></script>
 
 Examples
 ========
@@ -47,7 +47,7 @@ When using the flickr plugin as a Galleria option like this, you simply apply a 
             dataSource: data
         });
     });
-    
+
 **Example on how to inject Flickr data into an existing gallery and apply options**
 
 ::
@@ -59,7 +59,7 @@ When using the flickr plugin as a Galleria option like this, you simply apply a 
     }).search('milan', function(data) {
         Galleria.get(0).load( data ); // reloads the first galleria instance with the new data
     });
-    
+
 
 Methods
 =======
@@ -156,7 +156,7 @@ sort
 
     | type: **String**
     | default: 'interestingness-desc'
-    
+
 Sets in what order the photos will be shown. Available options:
 
 * date-posted-asc

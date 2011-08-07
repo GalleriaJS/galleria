@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.5 2011-08-03
+ * @preserve Galleria v 1.2.6a1 2011-08-07
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -18,7 +18,7 @@ var undef,
     $win   = $( window ),
 
 // internal constants
-    VERSION = 1.25,
+    VERSION = 1.26,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -1565,6 +1565,20 @@ Galleria = function() {
                 self._options.imageCrop = fullscreen.crop;
             }
 
+            var big = self.getData().big,
+                image = self._controls.getActive().image;
+
+            if ( big && big == image.src ) {
+
+                // return to the original image
+                window.setTimeout(function(src) {
+                    return function() {
+                        image.src = src;
+                    };
+                }( self.getData().image ), 1 );
+
+            }
+
             self.rescale(function() {
                 Utils.addTimer('fullscreen_exit', function() {
 
@@ -1579,6 +1593,7 @@ Galleria = function() {
 
                 self.trigger( Galleria.FULLSCREEN_EXIT );
             });
+
 
             $win.unbind('resize', fullscreen.scale);
         }
@@ -4700,6 +4715,8 @@ Galleria.Picture.prototype = {
                 return function() {
 
                     var complete = function() {
+
+                        $( this ).unbind( 'load' );
 
                         // save the original size
                         self.original = {

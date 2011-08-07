@@ -2,6 +2,11 @@
 Changelog
 *********
 
+1.2.6
+-----
+* Fixed a fullscreen bug on the first image when using a bigger photo
+* Fixed so that the image will return to it’s original source when exiting fullscreen
+
 1.2.5
 -----
 * Removed the need for having .jpg .gif .png as file ending for Galleria to recognize the file as an image
