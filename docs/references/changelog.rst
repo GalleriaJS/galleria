@@ -6,6 +6,11 @@ Changelog
 -----
 * Fixed a fullscreen bug on the first image when using a bigger photo
 * Fixed so that the image will return to it’s original source when exiting fullscreen
+* Added a warning if the page is in quirks mode (IE only)
+* Fixed a rendering error that caused a blank image if the user moved images really fast using the slide transition
+* Added fullscreenTransition and touchTransition options
+* Lightbox now also preloads the next two big images for faster navigation while in lightbox mode
+* Layer now inherits lightbox, link or clicknext events set on image or stage
 
 1.2.5
 -----

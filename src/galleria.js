@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.6a1 2011-08-07
+ * @preserve Galleria v 1.2.6a2 2011-08-08
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -165,7 +165,9 @@ var undef,
 
         // run the instances we have in the pool
         $.each( _pool, function( i, instance ) {
-            instance._init.call( instance );
+            if ( !instance._initialized ) {
+                instance._init.call( instance );
+            }
         });
     },
 
@@ -831,6 +833,8 @@ var undef,
             if ( fade ) {
                 from.opacity = 0;
                 to.opacity = 1;
+            } else {
+                from.opacity = 1;
             }
 
             $(params.next).css(from);
@@ -1968,9 +1972,20 @@ Galleria = function() {
             $win.unbind('resize', lightbox.rescale );
 
             var data = self.getData(index),
-                total = self.getDataLength();
+                total = self.getDataLength(),
+                n = self.getNext( index ),
+                ndata, p, i;
 
             Utils.hide( lightbox.elems.info );
+
+            try {
+                for ( i = self._options.preload; i > 0; i-- ) {
+                    p = new Galleria.Picture();
+                    ndata = self.getData( n );
+                    p.preload( 'big' in ndata ? ndata.big : ndata.image );
+                    n = self.getNext( n );
+                }
+            } catch(e) {}
 
             lightbox.image.load( data.big || data.image, function( image ) {
 
@@ -2185,6 +2200,11 @@ Galleria.prototype = {
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
 
+            // Warn for quirks mode
+            if ( Galleria.QUIRK ) {
+                Galleria.raise('Your page is in Quirks mode, Galleria may not render correctly. Please validate your HTML.');
+            }
+
             // save the new data
             this._original.data = this._data;
 
@@ -2226,6 +2246,7 @@ Galleria.prototype = {
                         $container[ m ]( num[ m ] );
 
                     });
+
                     return testHeight() && num.width && num.height > 10;
 
                 },
@@ -3803,7 +3824,7 @@ this.prependChild( 'info', 'myElement' );
         next.load( src, function( next ) {
 
             // add layer HTML
-            $( self._layers[ 1-self._controls.active ] ).html( data.layer || '' ).hide();
+            var layer = $( self._layers[ 1-self._controls.active ] ).html( data.layer || '' ).hide();
 
             self._scaleImage( next, {
 
@@ -3828,7 +3849,17 @@ this.prependChild( 'info', 'myElement' );
 
                     // show the layer now
                     if ( data.layer ) {
-                        $( self._layers[ 1-self._controls.active ] ).show();
+                        layer.show();
+                        // inherit click events set on image or stage
+                        if ( data.link || self._options.clicknext ) {
+                            layer.css( 'cursor', 'pointer' ).one( 'click', function() {
+                                if ( data.link ) {
+                                    $( next.image ).trigger( 'mouseup' );
+                                } else {
+                                    self.$( 'stage' ).trigger( 'click' );
+                                }
+                            });
+                        }
                     }
 
                     // trigger the LOADFINISH event
