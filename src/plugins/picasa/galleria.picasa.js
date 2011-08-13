@@ -285,7 +285,7 @@ Galleria.prototype.load = function() {
         // create the instance
         p = new Galleria.Picasa();
 
-        // apply Flickr options
+        // apply Picasa options
         if ( typeof self._options.picasaOptions === 'object' ) {
             p.setOptions( self._options.picasaOptions );
         }
@@ -313,7 +313,7 @@ Galleria.prototype.load = function() {
 
     } else {
 
-        // if flickr array not found, pass
+        // if Picasa array not found, pass
         load.apply( this, args );
     }
 };
