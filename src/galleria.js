@@ -4908,9 +4908,14 @@ Galleria.Picture.prototype = {
             },
             success: function() {
                 // calculate some cropping
-                var newWidth = ( width - options.margin * 2 ) / self.original.width,
-                    newHeight = ( height - options.margin * 2 ) / self.original.height,
-                    cropMap = {
+                if( options.margin instanceof Array ) {
+                	var newWidth = ( width - options.margin[1] * 2 ) / self.original.width,
+                    	newHeight = ( height - options.margin[0] * 2 ) / self.original.height;
+				}else { 
+	                var newWidth = ( width - options.margin * 2 ) / self.original.width,
+	                    newHeight = ( height - options.margin * 2 ) / self.original.height;
+	            }                
+                var cropMap = {
                         'true'  : Math.max( newWidth, newHeight ),
                         'width' : newWidth,
                         'height': newHeight,
