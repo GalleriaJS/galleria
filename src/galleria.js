@@ -2271,7 +2271,7 @@ Galleria.prototype = {
                         Galleria.raise('Could not extract a stage height from the CSS. Traced height: ' + testHeight() + 'px.', true);
                     }
                 },
-                timeout: 2000
+                timeout: 10000
             });
         });
 
