@@ -3518,6 +3518,12 @@ this.prependChild( 'info', 'myElement' );
     _scaleImage : function( image, options ) {
 
         image = image || this._controls.getActive();
+        
+        // janpub (JH) fix:
+        // image might be unselected yet
+        // e.g. when external logics rescales the gallery on window resize events 
+        if(!image)
+          return;
 
         var self = this,
 
