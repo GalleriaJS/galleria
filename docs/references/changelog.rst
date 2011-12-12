@@ -11,6 +11,8 @@ Changelog
 * Added fullscreenTransition and touchTransition options
 * Lightbox now also preloads the next two big images for faster navigation while in lightbox mode
 * Layer now inherits lightbox, link or clicknext events set on image or stage
+* Fixed a load issue in webkit causing a width/height error for cached images in debug mode
+* Increased CSS load timeout
 
 1.2.5
 -----
