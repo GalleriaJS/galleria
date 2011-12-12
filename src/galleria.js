@@ -4785,24 +4785,41 @@ Galleria.Picture.prototype = {
                         }
                     };
 
-                    // Delay the callback to "fix" the Adblock Bug
-                    // http://code.google.com/p/adblockforchrome/issues/detail?id=3701
                     if ( ( !this.width || !this.height ) ) {
-                        window.setTimeout( (function( img ) {
-                            return function() {
-                                if ( img.width && img.height ) {
+                        // create an element which will be offscreen but will be visible to the browser as having dimensions
+						var dummyContainer = $('<div />').appendTo('body').css({'position':'relative','left':'-9999px'});
+						// keep track of the element of the Galleria Stage to which this <img /> belongs
+						var orgParent = $(this).parent();
+						// keep track of the image that is being scrutinised for its dimensions
+						var img = $(this).appendTo(dummyContainer);
+
+	                    // create a timer that wil wait 20ms for the image to load (e.g. bad net connection)
+                        var timer = window.setInterval( (function( img, dummyContainer, orgParent ) {
+	                        // will either return an error - cause the image did not load or will
+	                        // pass the downloaded image to the complete() function
+	                        return function() {
+		                        // confirming that the image downloaded and dimensions could be discerned
+                                if ( img.width() && img.height() ) {
+	                                // put it back to where we took it from
+	                                img.appendTo(orgParent);
+	                                // we don't want excess elements building up in memory for no reason - perform cleanup
+	                                dummyContainer.remove();
+	                                // more cleanup, clear the timer for use later if need be
+	                                clearInterval(timer);
+	                                // pass the image to where it needs to go
                                     complete.call( img );
                                 } else {
                                     Galleria.raise('Could not extract width/height from image: ' + img.src +
                                         '. Traced measures: width:' + img.width + 'px, height: ' + img.height + 'px.');
                                 }
                             };
-                        }( this )), 2);
+	                    // updated the self-executing lambda to receive the needed stuff for correct checking
+                        })( img, dummyContainer, orgParent ), 20);
                     } else {
                         complete.call( this );
                     }
                 };
-            }( this, callback, src ));
+            })( this, callback, src );
 
         // remove any previous images
         $container.find( 'img' ).remove();
