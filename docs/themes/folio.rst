@@ -4,7 +4,7 @@
 Folio
 ******
 
-You can also change thumbnail width using css, just add something like this anywhere in your CSS::
+You can change thumbnail width using css, just add something like this anywhere in your CSS::
 
     body .galleria-thumbnails .galleria-image { width:100px }
 
@@ -31,7 +31,7 @@ Theme-specific options
     {
         // Shows navigation as cursor for webkit
         _webkitCursor: true,
-        
+
         // Animates the thumnails
         _animate: true
     }

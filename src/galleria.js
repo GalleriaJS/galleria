@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.6b1 2011-12-12
+ * @preserve Galleria v 1.2.6 2011-12-12
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -877,7 +877,10 @@ var undef,
         return {
 
             fade: function(params, complete) {
-                $(params.next).css('opacity',0).show();
+                $(params.next).css({
+                    opacity: 0,
+                    left: 0
+                }).show();
                 Utils.animate(params.next, {
                     opacity: 1
                 },{
@@ -895,7 +898,10 @@ var undef,
             },
 
             flash: function(params, complete) {
-                $(params.next).css('opacity', 0);
+                $(params.next).css({
+                    opacity: 0,
+                    left: 0
+                });
                 if (params.prev) {
                     Utils.animate( params.prev, {
                         opacity: 0
@@ -924,7 +930,10 @@ var undef,
                 if (params.prev) {
                     $(params.prev).hide();
                 }
-                $(params.next).css('opacity', 0).show();
+                $(params.next).css({
+                    opacity: 0,
+                    left: 0
+                }).show();
                 Utils.animate(params.next, {
                     opacity:1
                 },{
@@ -1475,19 +1484,13 @@ Galleria = function() {
                 left: self.prev
             });
 
-            // temporarily save the crop & transition
+            // temporarily save the crop
             fullscreen.crop = options.imageCrop;
-            fullscreen.transition = options.transition;
 
             // set fullscreen options
-            $.each({
-                'fullscreenCrop': 'imageCrop',
-                'fullscreenTransition': 'imageTransition'
-            }, function( key, val ) {
-                if ( options[ key ] != undef ) {
-                    options[ val ] = options[ key ];
-                }
-            });
+            if ( options.fullscreenCrop != undef ) {
+                options.imageCrop = options.fullscreenCrop;
+            }
 
             // swap to big image if it's different from the display image
             if ( data && data.big && data.image !== data.big ) {
@@ -1573,7 +1576,7 @@ Galleria = function() {
 
             // bring back cached options
             self._options.imageCrop = fullscreen.crop;
-            self._options.transition = fullscreen.transition;
+            //self._options.transition = fullscreen.transition;
 
             // return to original image
             var big = self.getData().big,
@@ -2169,11 +2172,6 @@ Galleria.prototype = {
 
         // merge the theme & caller options
         $.extend( true, options, Galleria.theme.defaults, this._original.options );
-
-        // set touch transition
-        if ( typeof options.touchTransition === 'string' && Galleria.TOUCH ) {
-            options.transition = options.touchTransition;
-        }
 
         // check for canvas support
         (function( can ) {
@@ -4817,7 +4815,7 @@ Galleria.Picture.prototype = {
 
         if ( this.cache[ src ] ) {
 
-            // no need to load if the image is cached, just call onload and set source
+            // quick load on cache
             $( this.image ).load( onload ).attr( 'src', src );
 
             return this.container;

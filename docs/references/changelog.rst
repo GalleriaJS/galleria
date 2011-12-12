@@ -13,6 +13,7 @@ Changelog
 * Layer now inherits lightbox, link or clicknext events set on image or stage
 * Fixed a load issue in webkit causing a width/height error for cached images in debug mode
 * Increased CSS load timeout
+* Fixed a positioning bug in IE when the images where positioned far to the left when entering fullscreen mode using a different transition
 
 1.2.5
 -----
