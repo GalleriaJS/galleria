@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.6a2 2011-08-08
+ * @preserve Galleria v 1.2.6b1 2011-12-12
  * http://galleria.aino.se
  *
  * Copyright (c) 2011, Aino
@@ -735,11 +735,6 @@ var undef,
 
                 // save the length of stylesheets to check against
                 length = doc.styleSheets.length;
-
-                // add timestamp if DEBUG is true
-                if ( DEBUG ) {
-                    href += '?' + Utils.timestamp();
-                }
 
                 // check for existing id
                 if( $('#'+id).length ) {
@@ -2295,7 +2290,7 @@ Galleria.prototype = {
 
         Utils.hide( this.$( 'counter' ).append(
             this.get( 'current' ),
-            document.createTextNode(' / '),
+            doc.createTextNode(' / '),
             this.get( 'total' )
         ) );
 
@@ -4816,9 +4811,8 @@ Galleria.Picture.prototype = {
         if ( this.cache[ src ] ) {
 
             // no need to load if the image is cached, just call onload and set source
-            this.image.src = src;
+            $( this.image ).load( onload ).attr( 'src', src );
 
-            onload.call( this.image );
             return this.container;
         }
 
