@@ -1,5 +1,7 @@
 <!DOCTYPE html>
+<html>
 <head>
+    <!-- everything here is 100% free to use as you wish -->
     <meta charset="utf-8">
     <title>Galleria – Photo categories</title>
 
@@ -50,12 +52,16 @@
         // create a flickr instance
         var flickr = new Galleria.Flickr();
 
-        // create & cache some elements and vars
-        var elem = $('#galleria'),
-            loader = $('<div>', {
-                id: 'loader'
-            }).appendTo('#gallery'),
-            set;
+        // cache the gallery
+        var elem = $('#galleria');
+
+        // create and append the loader growl
+        var loader = $('<div>', {
+            id: 'loader'
+        }).appendTo('#gallery');
+
+        // a local var used later
+        var set;
 
         // set flickr to fetch description and increase the photo limit
         flickr.setOptions({
@@ -69,7 +75,7 @@
             e.preventDefault();
 
             // toggle active class
-            $(this).addClass('active').siblings('.active').removeClass('active')
+            $(this).addClass('active').siblings('.active').removeClass('active');
 
             // extract the set id from the link href
             set = this.href.split('/');
@@ -115,3 +121,4 @@
         $('#menu a:first-child').click();
     </script>
 </body>
+</html>
