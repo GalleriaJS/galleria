@@ -2005,7 +2005,7 @@ Galleria = function() {
                 lightbox.rescale();
             });
 
-            $( lightbox.elems.overlay ).show();
+            $( lightbox.elems.overlay ).show().css( 'visibility', 'visible' );
             $( lightbox.elems.box ).show();
         }
     };
@@ -2764,20 +2764,6 @@ Galleria.prototype = {
                 }
 
                 self._firstrun = true;
-
-                // bind clicknext
-                if ( self._options.clicknext && !Galleria.TOUCH ) {
-                    $.each( self._data, function( i, data ) {
-                        delete data.link;
-                    });
-                    self.$( 'stage' ).css({ cursor : 'pointer' }).bind( 'click', function(e) {
-                        // pause if options is set
-                        if ( self._options.pauseOnInteraction ) {
-                            self.pause();
-                        }
-                        self.next();
-                    });
-                }
 
                 // initialize the History plugin
                 if ( Galleria.History ) {
@@ -3700,7 +3686,10 @@ this.prependChild( 'info', 'myElement' );
             active = this._controls.getActive(),
             next = this._controls.getNext(),
             cached = next.isCached( src ),
-            thumb = this._thumbnails[ queue.index ];
+            thumb = this._thumbnails[ queue.index ],
+            mousetrigger = function() {
+                $( next.image ).trigger( 'mouseup' );
+            };
 
         // to be fired when loading & transition is complete:
         var complete = (function( data, next, active, queue, thumb ) {
@@ -3737,11 +3726,20 @@ this.prependChild( 'info', 'myElement' );
 
                 // make the image link or add lightbox
                 // link takes precedence over lightbox if both are detected
-                if ( data.link || self._options.lightbox ) {
+                if ( data.link || self._options.lightbox || self._options.clicknext ) {
 
                     $( next.image ).css({
                         cursor: 'pointer'
                     }).bind( 'mouseup', function() {
+
+                        // clicknext
+                        if ( self._options.clicknext && !Galleria.TOUCH ) {
+                            if ( self._options.pauseOnInteraction ) {
+                                self.pause();
+                            }
+                            self.next();
+                            return;
+                        }
 
                         // popup link
                         if ( data.link ) {
@@ -3850,15 +3848,9 @@ this.prependChild( 'info', 'myElement' );
                     // show the layer now
                     if ( data.layer ) {
                         layer.show();
-                        // inherit click events set on image or stage
-                        if ( data.link || self._options.clicknext ) {
-                            layer.css( 'cursor', 'pointer' ).one( 'click', function() {
-                                if ( data.link ) {
-                                    $( next.image ).trigger( 'mouseup' );
-                                } else {
-                                    self.$( 'stage' ).trigger( 'click' );
-                                }
-                            });
+                        // inherit click events set on image
+                        if ( data.link || self._options.lightbox || self._options.clicknext ) {
+                            layer.css( 'cursor', 'pointer' ).unbind( 'mouseup' ).mouseup( mousetrigger );
                         }
                     }
 
