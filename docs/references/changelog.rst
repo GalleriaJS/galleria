@@ -2,6 +2,12 @@
 Changelog
 *********
 
+1.2.7
+-----
+* Fixed an issue with double events when using clicknext and layer.
+* Moved the clicknext target from the stage to the image element
+* Fixed an IE bug that made the overlay invinsible when calling lightbox multiple times.
+
 1.2.6
 -----
 * Fixed a fullscreen bug on the first image when using a bigger photo
