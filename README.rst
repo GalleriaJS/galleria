@@ -3,7 +3,7 @@ Galleria
 ********
 **A JavaScript image gallery for the fastidious.**
 
-Info & demos: http://galleria.aino.se/
+Info & demos: http://galleria.io
 
 Updates via twitter: http://twitter.com/galleriajs
 
