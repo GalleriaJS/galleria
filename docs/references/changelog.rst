@@ -7,6 +7,7 @@ Changelog
 * Fixed an issue with double events when using clicknext and layer.
 * Moved the clicknext target from the stage to the image element
 * Fixed an IE bug that made the overlay invinsible when calling lightbox multiple times.
+* Fixed an IE9 bug that made the lightbox navigation work incorrectly
 
 1.2.6
 -----

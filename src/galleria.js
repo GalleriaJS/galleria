@@ -1797,7 +1797,7 @@ Galleria = function() {
                 appends = {};
 
             // IE8 fix for IE's transparent background event "feature"
-            if ( IE === 8 ) {
+            if ( IE && IE > 7 ) {
                 cssMap.nextholder += 'background:#000;filter:alpha(opacity=0);';
                 cssMap.prevholder += 'background:#000;filter:alpha(opacity=0);';
             }
