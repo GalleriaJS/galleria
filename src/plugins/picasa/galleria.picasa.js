@@ -2,7 +2,7 @@
  * @preserve Galleria Picasa Plugin 2011-08-01
  * http://galleria.aino.se
  *
- * Copyright 2011, Aino
+ * Copyright (c) 2012, Aino
  * Licensed under the MIT license.
  */
 
