@@ -8,6 +8,7 @@ Changelog
 * Moved the clicknext target from the stage to the image element
 * Fixed an IE bug that made the overlay invinsible when calling lightbox multiple times.
 * Fixed an IE9 bug that made the lightbox navigation work incorrectly
+* Fixed a timer that caused iOS5 to not trigger the fullscreen_close event in some setups
 
 1.2.6
 -----

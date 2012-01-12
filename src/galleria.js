@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7a2 2012-01-09
+ * @preserve Galleria v 1.2.7a2 2012-01-12
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -112,6 +112,7 @@ var undef,
         trunk: {},
 
         add: function( id, fn, delay, loop ) {
+            id = id || new Date().getTime();
             loop = loop || false;
             this.clear( id );
             if ( loop ) {
@@ -1603,7 +1604,6 @@ Galleria = function() {
                     }
 
                 }, 50);
-
                 self.trigger( Galleria.FULLSCREEN_EXIT );
             });
 
@@ -3606,7 +3606,7 @@ this.prependChild( 'info', 'myElement' );
         };
 
         if ( Galleria.WEBKIT && !width && !height ) {
-            Utils.addTimer( 'scale', scale, 10 );// webkit is too fast
+            Utils.addTimer( false, scale, 10 );// webkit is too fast
         } else {
             scale.call( self );
         }
