@@ -3605,7 +3605,7 @@ this.prependChild( 'info', 'myElement' );
             }
         };
 
-        if ( Galleria.WEBKIT && !width && !height ) {
+        if ( Galleria.WEBKIT && !Galleria.TOUCH && !width && !height ) {
             Utils.addTimer( false, scale, 10 );// webkit is too fast
         } else {
             scale.call( self );
