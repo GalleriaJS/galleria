@@ -145,4 +145,6 @@ List of options
 
 - :doc:`transitionSpeed` Defines the speed of the transition.
 
+- :doc:`userThumbStyles` Disable certain inline styles of thumbnails.
+
 - :doc:`width` Manually set a gallery width.
