@@ -2115,7 +2115,8 @@ Galleria.prototype = {
             transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
             useCanvas: false, // 1.2.4
-            width: 'auto'
+            width: 'auto',
+            userThumbStyles: false
         };
 
         // legacy support for transitionInitial
@@ -2333,10 +2334,12 @@ Galleria.prototype = {
             height: '100%'
         });
 
-        this.$( 'thumbnails, thumbnails-list' ).css({
-            overflow: 'hidden',
-            position: 'relative'
-        });
+        if ( !options.userThumbStyles ) {
+            this.$( 'thumbnails, thumbnails-list' ).css({
+                overflow: 'hidden',
+                position: 'relative'
+            });
+        }
 
         // bind image navigation arrows
         this.$( 'image-nav-right, image-nav-left' ).bind( 'click', function(e) {
@@ -2626,7 +2629,7 @@ Galleria.prototype = {
             if ( o.thumbnails === true ) {
 
                 // add a new Picture instance
-                thumb = new Galleria.Picture(i);
+                thumb = new Galleria.Picture(i, self._options.userThumbStyles);
 
                 // get source from thumb or image
                 src = data.thumb || data.image;
@@ -4644,7 +4647,7 @@ Galleria.requires = function( version, msg ) {
     @param {number} [id] Optional id to keep track of instances
 */
 
-Galleria.Picture = function( id ) {
+Galleria.Picture = function( id, userThumbStyles ) {
 
     // save the id
     this.id = id || null;
@@ -4655,11 +4658,15 @@ Galleria.Picture = function( id ) {
     // Create a new container
     this.container = Utils.create('galleria-image');
 
-    // add container styles
-    $( this.container ).css({
-        overflow: 'hidden',
-        position: 'relative' // for IE Standards mode
-    });
+    this.userThumbStyles = (userThumbStyles === undefined ? false : userThumbStyles);
+
+	// add container styles
+    if (!this.userThumbStyles) {
+        $( this.container ).css({
+            overflow: 'hidden',
+            position: 'relative' // for IE Standards mode
+        });
+    }
 
     // saves the original measurements
     this.original = {
@@ -4953,53 +4960,55 @@ Galleria.Picture.prototype = {
                 }
 
                 // calculate image_position
-                var pos = {},
-                    mix = {},
-                    getPosition = function(value, measure, margin) {
-                        var result = 0;
-                        if (/\%/.test(value)) {
-                            var flt = parseInt( value, 10 ) / 100,
-                                m = self.image[ measure ] || $( self.image )[ measure ]();
-
-                            result = Math.ceil( m * -1 * flt + margin * flt );
-                        } else {
-                            result = Utils.parseValue( value );
+                if ( !self.userThumbStyles ) {
+                    var pos = {},
+                        mix = {},
+                        getPosition = function(value, measure, margin) {
+                            var result = 0;
+                            if (/\%/.test(value)) {
+                                var flt = parseInt( value, 10 ) / 100,
+                                    m = self.image[ measure ] || $( self.image )[ measure ]();
+ 
+                                result = Math.ceil( m * -1 * flt + margin * flt );
+                            } else {
+                                result = Utils.parseValue( value );
+                            }
+                            return result;
+                        },
+                        positionMap = {
+                            'top': { top: 0 },
+                            'left': { left: 0 },
+                            'right': { left: '100%' },
+                            'bottom': { top: '100%' }
+                        };
+ 
+                    $.each( options.position.toLowerCase().split(' '), function( i, value ) {
+                        if ( value === 'center' ) {
+                            value = '50%';
                         }
-                        return result;
-                    },
-                    positionMap = {
-                        'top': { top: 0 },
-                        'left': { left: 0 },
-                        'right': { left: '100%' },
-                        'bottom': { top: '100%' }
-                    };
-
-                $.each( options.position.toLowerCase().split(' '), function( i, value ) {
-                    if ( value === 'center' ) {
-                        value = '50%';
-                    }
-                    pos[i ? 'top' : 'left'] = value;
-                });
-
-                $.each( pos, function( i, value ) {
-                    if ( positionMap.hasOwnProperty( value ) ) {
-                        $.extend( mix, positionMap[ value ] );
-                    }
-                });
-
-                pos = pos.top ? $.extend( pos, mix ) : mix;
-
-                pos = $.extend({
-                    top: '50%',
-                    left: '50%'
-                }, pos);
-
-                // apply position
-                $( self.image ).css({
-                    position : 'absolute',
-                    top :  getPosition(pos.top, 'height', height),
-                    left : getPosition(pos.left, 'width', width)
-                });
+                        pos[i ? 'top' : 'left'] = value;
+                    });
+ 
+                    $.each( pos, function( i, value ) {
+                        if ( positionMap.hasOwnProperty( value ) ) {
+                            $.extend( mix, positionMap[ value ] );
+                        }
+                    });
+ 
+                    pos = pos.top ? $.extend( pos, mix ) : mix;
+ 
+                    pos = $.extend({
+                        top: '50%',
+                        left: '50%'
+                    }, pos);
+ 
+                    // apply position
+                    $( self.image ).css({
+                        position : 'absolute',
+                        top :  getPosition(pos.top, 'height', height),
+                        left : getPosition(pos.left, 'width', width)
+                    });
+                }
 
                 // show the image
                 self.show();
