@@ -2713,6 +2713,8 @@ Galleria.prototype = {
         // make sure we have a stageHeight && stageWidth
 
         Utils.wait({
+            
+            timeout: 10000,
 
             until: function() {
 
