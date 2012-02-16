@@ -2240,7 +2240,7 @@ Galleria.prototype = {
 
                     });
 
-                    return testHeight() && num.width && num.height > 10;
+                    return testHeight() && num.width && num.height > 50;
 
                 },
                 success: function() {
