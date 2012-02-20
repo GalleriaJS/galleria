@@ -9,6 +9,9 @@ Changelog
 * Fixed an IE bug that made the overlay invinsible when calling lightbox multiple times.
 * Fixed an IE9 bug that made the lightbox navigation work incorrectly
 * Fixed a timer that caused iOS5 to not trigger the fullscreen_close event in some setups
+* Added support for HTML5 data attributes for passing data to Galleria. We will continue to have legacy support, but this is now the recommended way to pass data.
+* The event object passed at image, thumbnail, loadstart and loadfinish events now also contains the current gallery data, passed as 'data'
+* Added video support for Vimeo and Youtube video URLs. Se the image data reference for implementation instructions.
 
 1.2.6
 -----
