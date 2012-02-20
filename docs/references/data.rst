@@ -11,7 +11,6 @@ The data structure is best defined using a JSON array, since JavaScript plays we
 But the beginner will most likely start with plain HTML that Galleria reads and converts to a data structure.
 
 Please note that 1.2.5 introduced a new entity called "layer". This can contain any HTML that will follow the image, also during transitions.
-At the time of writing (1.2.5), you can only define a layer using the dataConfig option or JSON.
 
 Read more about the layer and view examples here: http://galleriajs.tumblr.com/post/8091630096/introducing-in-1-2-5-html-layer
 
@@ -59,7 +58,7 @@ Captions & meta data
 
 If you want to extract meta data from the HTML source such as title & description, you can provide this as ``<img>`` attributes::
 
-    <img src="image.jpg" data-title="My image title" data-description="My description" data-link="http://my.destination.com">
+    <img src="image.jpg" data-title="My image title" data-description="My <strong>description</strong>" data-link="http://my.destination.com">
 
 Now you’ll get the following data::
 
@@ -68,7 +67,7 @@ Now you’ll get the following data::
         image: 'image.jpg',
         big: 'image.jpg',
         title: 'My title',
-        description: 'My description',
+        description: 'My <strong>description</strong>',
         link: 'http://my.destination.com',
         original: [IMG element]
     }
@@ -129,11 +128,24 @@ After Galleria parsed this, it will give you::
         }
     }
 
-If you want Galleria to fetch a thumbnail for you, just provide an element with a 'video' class instead:
+If you want Galleria to fetch a thumbnail for you, just provide an element with a 'video' class instead::
 
    <a href="http://www.youtube.com/watch?v=VDVVAuz1v7U"><span class="video">Watch this at YouTube</span></a>
 
 Galleria will first add an empty image as thumbnail, then fetch the thumbnail from the provider and swap the src when ready.
+
+
+Adding a layer above the image/video
+------------------------------------
+
+Galleria also supports a layer of HTML content that can will be placed above the image or video.
+The layer will follow the transitions (unless you disable it using the layerFollow option) and expand on fullscreen.
+
+A layer can be defined using the data-layer attribute::
+
+    <img data-big="big.jpg" data-layer="<h2>A title</h2><p>Some content</p>">
+
+You can also define a layer using JSON or dataConfig, read further for more information about these extraction methods.
 
 
 2. Using HTML with dataConfig

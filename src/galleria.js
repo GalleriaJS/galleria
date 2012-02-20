@@ -2179,11 +2179,6 @@ Galleria.prototype = {
             DUMMY = options.dummy;
         }
 
-        // force opaque to youtube
-        $.extend( this._options.youtube, {
-            wmode: 'opaque'
-        });
-
         // hide all content
         $( this._target ).children().hide();
 
@@ -2993,7 +2988,7 @@ Galleria.prototype = {
             }
 
             // alternative extraction from HTML5 data attribute, added in 1.2.7
-            $.each('big title description link'.split(' '), function(i, val) {
+            $.each('big title description link layer'.split(' '), function(i, val) {
                 if ( elem.data(val) ) {
                     data[ val ] = elem.data(val);
                 }
@@ -3055,7 +3050,10 @@ Galleria.prototype = {
                                 $.each(self._options[ result.provider ], function( key, val ) {
                                     arr.push( key + '=' + val );
                                 });
-                                return str + arr.join('&amp;');
+                                if ( result.provider == 'youtube' ) {
+                                    arr = ['wmode=opaque'].concat(arr);
+                                }
+                                return str + arr.join('&');
                             }
                             return '';
                         }());
@@ -4901,13 +4899,15 @@ Galleria.Picture.prototype = {
         }
 
         if( this.isIframe ) {
-            var id = 'if'+new Date().getTime(),
-                html = '<iframe src="'+src+'" frameborder="0" id="'+id+'" allowFullScreen></iframe>',
-                wrap = $('<div>').html(html);
+            var id = 'if'+new Date().getTime();
 
-            this.image = wrap.find('iframe').clone().css({ visibility: 'hidden' })[0];
-
-            wrap = null;
+            this.image = $('<iframe>', {
+                src: src,
+                frameborder: 0,
+                id: id,
+                allowfullscreen: true,
+                css: { visibility: 'hidden' }
+            })[0];
 
             $( this.container ).find( 'iframe,img' ).remove();
 
