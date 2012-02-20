@@ -10,8 +10,10 @@ Changelog
 * Fixed an IE9 bug that made the lightbox navigation work incorrectly
 * Fixed a timer that caused iOS5 to not trigger the fullscreen_close event in some setups
 * Added support for HTML5 data attributes for passing data to Galleria. We will continue to have legacy support, but this is now the recommended way to pass data.
-* The event object passed at image, thumbnail, loadstart and loadfinish events now also contains the current gallery data, passed as 'data'
+* The event object passed at image, thumbnail, loadstart and loadfinish events now also contains the current gallery data, passed as 'galleriaData'
 * Added video support for Vimeo and Youtube video URLs. Se the image data reference for implementation instructions.
+* Removed the description attribute for Picasa, since google only uses one caption. Instead, we now extract the caption as title (instead of the file name).
+* Added youtube and vimeo options for setting custom player parameters for each provider
 
 1.2.6
 -----

@@ -36,7 +36,6 @@ Galleria.Picasa = function() {
         max: 30,                       // photos to return
         imageSize: 'medium',           // photo size ( thumb,small,medium,big,original ) or a number
         thumbSize: 'thumb',            // thumbnail size ( thumb,small,medium,big,original ) or a number
-        description: false,            // set this to true to get description as caption
         complete: function(){}         // callback to be called inside the Galleria.prototype.load
     };
 
@@ -218,8 +217,7 @@ Galleria.Picasa.prototype = {
                 thumb: img[0].url,
                 image: img[1].url,
                 big: img[2].url,
-                title: this.title.$t,
-                description: self.options.description ? this.summary.$t : ''
+                title: this.summary.$t
             });
         });
 

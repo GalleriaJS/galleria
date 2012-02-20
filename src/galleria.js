@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7b1 2012-02-20
+ * @preserve Galleria v 1.2.7b2 2012-02-20
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -18,7 +18,7 @@ var undef,
     $win   = $( window ),
 
 // internal constants
-    VERSION = 1.26,
+    VERSION = 1.27,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -48,8 +48,8 @@ var undef,
 
     // list of Galleria events
     _eventlist = 'data ready thumbnail loadstart loadfinish image play pause progress ' +
-              'fullscreen_enter fullscreen_exit idle_enter idle_exit rescale ' +
-              'lightbox_open lightbox_close lightbox_image',
+                 'fullscreen_enter fullscreen_exit idle_enter idle_exit rescale ' +
+                 'lightbox_open lightbox_close lightbox_image',
 
     _events = (function() {
 
@@ -111,7 +111,7 @@ var undef,
             var match = url.match(/https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i);
             return match && match[2] ? {
                 id: match[2],
-                url: 'http://www.youtube.com/embed/'+match[2]+'?wmode=opaque',
+                url: 'http://www.youtube.com/embed/'+match[2],
                 provider: 'youtube'
             } : false;
         },
@@ -1527,7 +1527,7 @@ Galleria = function() {
                     index: index,
                     imageTarget: self.getActiveImage(),
                     thumbTarget: thumb,
-                    data: data
+                    galleriaData: data
                 });
 
                 big.load( data.big, function( big ) {
@@ -1604,7 +1604,7 @@ Galleria = function() {
             var big = self.getData().big,
                 image = self._controls.getActive().image;
 
-            if ( big && big == image.src ) {
+            if ( !self.getData().iframe && image && big && big == image.src ) {
 
                 window.setTimeout(function(src) {
                     return function() {
@@ -1702,7 +1702,7 @@ Galleria = function() {
 
         hide : function() {
 
-            if ( !self._options.idleMode ) {
+            if ( !self._options.idleMode || self.getData().iframe ) {
                 return;
             }
 
@@ -1827,6 +1827,10 @@ Galleria = function() {
             $.each(cssMap, function( key, value ) {
                 css += '.galleria-'+prefix+key+'{'+value+'}';
             });
+
+            css += '.galleria-'+prefix+'box.iframe .galleria-'+prefix+'prevholder,'+
+                   '.galleria-'+prefix+'box.iframe .galleria-'+prefix+'nextholder{'+
+                   'width:100px;height:100px;top:50%;margin-top:-70px}';
 
             Utils.insertStyleTag( css );
 
@@ -2006,14 +2010,18 @@ Galleria = function() {
                 }
             } catch(e) {}
 
+            lightbox.image.isIframe = !!data.iframe;
+
+            $(lightbox.elems.box).toggleClass( 'iframe', !!data.iframe );
+
             lightbox.image.load( data.big || data.image, function( image ) {
 
-                lightbox.width = image.original.width;
-                lightbox.height = image.original.height;
+                lightbox.width = image.isIframe ? $(window).width() : image.original.width;
+                lightbox.height = image.isIframe ? $(window).height() : image.original.height;
 
                 $( image.image ).css({
-                    width: '100.5%',
-                    height: '100.5%',
+                    width: image.isIframe ? '100%' : '100.5%',
+                    height: image.isIframe ? '100%' : '100.5%',
                     top: 0,
                     zIndex: 99998
                 });
@@ -2136,7 +2144,21 @@ Galleria.prototype = {
             transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
             useCanvas: false, // 1.2.4
-            width: 'auto'
+            vimeo: {
+                title: 0,
+                byline: 0,
+                portrait: 0,
+                color: 'aaaaaa'
+            },
+            width: 'auto',
+            youtube: {
+                modestbranding: 1,
+                autohide: 1,
+                color: 'white',
+                hd: 1,
+                rel: 0,
+                showinfo: 0
+            }
         };
 
         // legacy support for transitionInitial
@@ -2156,6 +2178,11 @@ Galleria.prototype = {
         if ( options && typeof options.dummy === 'string' ) {
             DUMMY = options.dummy;
         }
+
+        // force opaque to youtube
+        $.extend( this._options.youtube, {
+            wmode: 'opaque'
+        });
 
         // hide all content
         $( this._target ).children().hide();
@@ -2566,7 +2593,7 @@ Galleria.prototype = {
                         type: Galleria.THUMBNAIL,
                         thumbTarget: image,
                         index: index,
-                        data: self.getData( index )
+                        galleriaData: self.getData( index )
                     });
                 };
             },
@@ -2627,10 +2654,10 @@ Galleria.prototype = {
                             ( o.thumbQuality === 'auto' && thumb.original.width < thumb.width * 3 )
                         );
 
-                        if( 'video' in data ) {
+                        if( data.video_id ) {
 
                             if( data.thumb == 'vimeo' ) {
-                                $.getJSON('http://vimeo.com/api/v2/video/' + data.video.id + '.json?callback=?', (function( img ) {
+                                $.getJSON('http://vimeo.com/api/v2/video/' + data.video_id + '.json?callback=?', (function( img ) {
                                     return function(data) {
                                         try {
                                             img.src = data[0].thumbnail_medium;
@@ -2640,7 +2667,7 @@ Galleria.prototype = {
                                     };
                                 }( thumb.image )));
                             } else if( data.thumb == 'youtube' ) {
-                                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + data.video.id + '?v=2&alt=json-in-script&callback=?', (function( img ) {
+                                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + data.video_id + '?v=2&alt=json-in-script&callback=?', (function( img ) {
                                     return function(data) {
                                         try {
                                             img.src = data.entry.media$group.media$thumbnail[0].url;
@@ -2657,7 +2684,7 @@ Galleria.prototype = {
                             type: Galleria.THUMBNAIL,
                             thumbTarget: thumb.image,
                             index: thumb.data.order,
-                            data: self.getData( thumb.data.order )
+                            galleriaData: self.getData( thumb.data.order )
                         });
                     }
                 });
@@ -2956,7 +2983,7 @@ Galleria.prototype = {
                 }
                 return false;
             }()) ) {
-                data.image = data.big = data.video = href;
+                data.video = href;
             } else {
                 data.image = data.big = href;
             }
@@ -3022,10 +3049,22 @@ Galleria.prototype = {
                 $.each( _videoUrls, function( key, fn ) {
                     result = fn( href );
                     if( result ) {
+                        result.url += (function() {
+                            if ( typeof self._options[ result.provider ] == 'object' ) {
+                                var str = '?', arr = [];
+                                $.each(self._options[ result.provider ], function( key, val ) {
+                                    arr.push( key + '=' + val );
+                                });
+                                return str + arr.join('&amp;');
+                            }
+                            return '';
+                        }());
+
                         $.extend( current, {
                             image: result.url,
                             big: result.url,
-                            video: result
+                            iframe: true,
+                            video_id: result.id
                         });
                         if( !('thumb' in current) || !current.thumb ) {
                             current.thumb = result.provider;
@@ -3825,6 +3864,8 @@ this.prependChild( 'info', 'myElement' );
                     $( active.container ).find( 'iframe' ).remove();
                 }
 
+                self.$('container').toggleClass('iframe', !!data.iframe);
+
                 $( next.container ).css({
                     zIndex: 1
                 }).show();
@@ -3885,7 +3926,7 @@ this.prependChild( 'info', 'myElement' );
                     index: queue.index,
                     imageTarget: next.image,
                     thumbTarget: thumb.image,
-                    data: data
+                    galleriaData: data
                 });
             };
         }( data, next, active, queue, thumb ));
@@ -3915,7 +3956,7 @@ this.prependChild( 'info', 'myElement' );
         // show the next image, just in case
         Utils.show( next.container );
 
-        next.isIframe = !!( 'video' in data );
+        next.isIframe = !!data.iframe;
 
         // add active classes
         $( self._thumbnails[ queue.index ].container )
@@ -3931,7 +3972,7 @@ this.prependChild( 'info', 'myElement' );
             rewind: queue.rewind,
             imageTarget: next.image,
             thumbTarget: thumb.image,
-            data: data
+            galleriaData: data
         });
 
         // begin loading the next image
@@ -3978,7 +4019,7 @@ this.prependChild( 'info', 'myElement' );
                         rewind: queue.rewind,
                         imageTarget: next.image,
                         thumbTarget: self._thumbnails[ queue.index ].image,
-                        data: self.getData( queue.index )
+                        galleriaData: self.getData( queue.index )
                     });
 
                     var transition = self._options.transition;
@@ -4860,15 +4901,13 @@ Galleria.Picture.prototype = {
         }
 
         if( this.isIframe ) {
-            var id = 'if'+new Date().getTime();
-            this.image = $('<iframe>', {
-                frameborder: 0,
-                frameBorder: 0,
-                allowfullscreen: true,
-                src: src,
-                css: { visibility: 'hidden' },
-                id: id
-            })[0];
+            var id = 'if'+new Date().getTime(),
+                html = '<iframe src="'+src+'" frameborder="0" id="'+id+'" allowFullScreen></iframe>',
+                wrap = $('<div>').html(html);
+
+            this.image = wrap.find('iframe').clone().css({ visibility: 'hidden' })[0];
+
+            wrap = null;
 
             $( this.container ).find( 'iframe,img' ).remove();
 
@@ -5029,7 +5068,8 @@ Galleria.Picture.prototype = {
         }, options);
 
         if( this.isIframe ) {
-            $( self.image ).width(options.width).height(options.height);
+            $( self.image ).width(options.width).height(options.height).removeAttr('width').removeAttr('height');
+            $(window).trigger('resize');
             options.complete.call(self, self);
             return this.container;
         }

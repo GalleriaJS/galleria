@@ -145,4 +145,8 @@ List of options
 
 - :doc:`transitionSpeed` Defines the speed of the transition.
 
+- :doc:`vimeo` Sets options for the Vimeo player
+
 - :doc:`width` Manually set a gallery width.
+
+- :doc:`youtube` Sets options for the YouTube player
