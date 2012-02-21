@@ -145,6 +145,8 @@ List of options
 
 - :doc:`transitionSpeed` Defines the speed of the transition.
 
+- :doc:`userThumbStyles` Disable certain inline styles of thumbnails.
+
 - :doc:`vimeo` Sets options for the Vimeo player
 
 - :doc:`width` Manually set a gallery width.
