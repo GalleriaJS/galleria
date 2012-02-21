@@ -26,8 +26,9 @@ The image data object that Galleria uses is defined like this:
 * **title** – the image title (optional)
 * **description** – the image description (optional)
 * **link** – the image link url (optional)
-* **layer** – A layer of HTML that will be displayed on top of the image (optional)
+* **layer** – A layer of HTML that will be displayed on top of the content (optional)
 * **video** – An URL to a video, as per 1.2.7 we support Vimeo and Youtube URLs.
+* **iframe** – An URL to be displayed in an iframe.
 * **original** a reference to the original IMG element (optional)
 
 You can provide this data to Galleria in a number of ways. The easiest way to start is probably by using plain HTML, but you’ll get more control using JSON.
@@ -91,7 +92,7 @@ Now you’ll get the following data::
 Separate fullscreen image
 -------------------------
 
-You can also specify a separate larger image for fullscreen & lightbox using the data-big attribute on the IMG tag:
+You can also specify a separate larger image for fullscreen & lightbox using the data-big attribute on the IMG tag::
 
    <a href="thumb.jpg"><img data-big="big.jpg" src="image.jpg"></a>
 
@@ -114,29 +115,46 @@ You can provide your custom thumbnail, or Galleria will fetch a thumbnail from t
 
 How to add a youtube movie with a custom thumbnail::
 
-   <a href="http://www.youtube.com/watch?v=VDVVAuz1v7U"><img src="thumb.jpg"></a>
+   <a href="http://www.youtube.com/watch?v=GCZrz8siv4Q"><img src="thumb.jpg"></a>
 
-After Galleria parsed this, it will give you::
+Galleria will parse the video URL and other options set and create the iframe URL for you::
 
     {
         thumb: 'thumb.jpg',
-        image: 'http://www.youtube.com/embed/qTcXxVOM4B0?wmode=opaque',
-        video: {
-            id: VDVVAuz1v7U,
-            provider: 'youtube',
-            url: 'http://www.youtube.com/embed/qTcXxVOM4B0?wmode=opaque'
-        }
+        iframe: 'http://www.youtube.com/embed/GCZrz8siv4Q?wmode=opaque'
     }
 
-If you want Galleria to fetch a thumbnail for you, just provide an element with a 'video' class instead::
+You can also add display options using the **vimeo** and **youtube** options.
 
-   <a href="http://www.youtube.com/watch?v=VDVVAuz1v7U"><span class="video">Watch this at YouTube</span></a>
+If you want Galleria to fetch thumbnails from the provider API’s, just provide an element with a 'video' class instead of a thumbnail::
+
+   <a href="http://www.youtube.com/watch?v=GCZrz8siv4Q"><span class="video">Watch this at YouTube</span></a>
 
 Galleria will first add an empty image as thumbnail, then fetch the thumbnail from the provider and swap the src when ready.
 
+Displaying iframes
+------------------
 
-Adding a layer above the image/video
-------------------------------------
+Since version 1.2.7, Galleria also supports iframes to be displayed instead of an image. Here’s how to add an iframe::
+
+    <a href="http://aino.com"><img class="iframe" src="thumb.jpg"></a>
+
+This will give you::
+
+    {
+        thumb: 'thumb.jpg',
+        iframe: 'http://aino.com'
+    }
+
+You can also skip the thumbnail by adding an element with the class 'iframe'::
+
+    <a href="http://aino.com"><span class="iframe">Check out aino.com</span></a>
+
+The thumbnail container will then get the class 'frame', so you can style it as you wish.
+
+
+Adding a layer above the content
+--------------------------------
 
 Galleria also supports a layer of HTML content that can will be placed above the image or video.
 The layer will follow the transitions (unless you disable it using the layerFollow option) and expand on fullscreen.
@@ -200,9 +218,14 @@ Providing JSON data to Galleria is really easy::
             layer: '<div><h2>This image is gr8</h2><p>And this text will be on top of the image</p>'
         },
         {
-            video: 'http://www.youtube.com/watch?v=qTcXxVOM4B0',
+            video: 'http://www.youtube.com/watch?v=GCZrz8siv4Q',
             title: 'My second title',
             description: 'My second description'
+        },
+        {
+            thumb: 'thumb.jpg',
+            iframe: 'http://aino.com',
+            title: 'My third title'
         }
     ];
     $('#galleria').galleria({

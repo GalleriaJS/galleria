@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7b2 2012-02-20
+ * @preserve Galleria v 1.2.7b2 2012-02-21
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -24,6 +24,8 @@ var undef,
     DUMMY = false,
     NAV = navigator.userAgent.toLowerCase(),
     HASH = window.location.hash.replace(/#\//, ''),
+    F = function(){},
+    FALSE = function() { return false; },
     IE = (function() {
 
         var v = 3,
@@ -105,24 +107,55 @@ var undef,
         return type;
     },
 
-    // video URL parsers
-    _videoUrls = {
-        youtube: function(url) {
-            var match = url && url.match(/https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i);
-            return match && match[2] ? {
-                id: match[2],
-                url: 'http://www.youtube.com/embed/'+match[2],
-                provider: 'youtube'
-            } : false;
+    // video providers
+    _video = {
+        youtube: {
+            reg: /https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i,
+            embed: function(id) {
+                return 'http://www.youtube.com/embed/'+id;
+            },
+            getThumb: function( id, success, fail ) {
+                fail = fail || F;
+                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script&callback=?', function(data) {
+                    try {
+                        success( data.entry.media$group.media$thumbnail[0].url );
+                    } catch(e) {
+                        fail();
+                    }
+                }).error(fail);
+            }
         },
-        vimeo: function(url) {
-            var match = url && url.match(/https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i);
-            return match && match[2] ? {
-                id: match[2],
-                url: 'http://player.vimeo.com/video/'+match[2],
-                provider: 'vimeo'
-            } : false;
+        vimeo: {
+            reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
+            embed: function(id) {
+                return 'http://player.vimeo.com/video/'+id;
+            },
+            getThumb: function( id, success, fail ) {
+                fail = fail || F;
+                $.getJSON('http://vimeo.com/api/v2/video/' + id + '.json?callback=?', function(data) {
+                    try {
+                        success( data[0].thumbnail_medium );
+                    } catch(e) {
+                        fail();
+                    }
+                }).error(fail);
+            }
         }
+    },
+
+    // utility for testing the video URL and getting the video ID
+    _videoTest = function( url ) {
+        var match;
+        for ( var v in _video ) {
+            match = url && url.match( _video[v].reg );
+            if( match && match.length ) {
+                return {
+                    id: match[2],
+                    provider: v
+                };
+            }
+        }
+        return false;
     },
 
     // the internal timeouts object
@@ -296,7 +329,7 @@ var undef,
                     // extend defaults
                     options = $.extend({
                         duration: 400,
-                        complete: function(){},
+                        complete: F,
                         stop: false
                     }, options);
 
@@ -464,7 +497,7 @@ var undef,
 
             hide : function( elem, speed, callback ) {
 
-                callback = callback || function(){};
+                callback = callback || F;
 
                 var el = Utils.elem( elem ),
                     $elem = el.$;
@@ -504,7 +537,7 @@ var undef,
 
             show : function( elem, speed, callback ) {
 
-                callback = callback || function(){};
+                callback = callback || F;
 
                 var el = Utils.elem( elem ),
                     $elem = el.$;
@@ -627,8 +660,8 @@ var undef,
 
             wait : function(options) {
                 options = $.extend({
-                    until : function() { return false; },
-                    success : function() {},
+                    until : FALSE,
+                    success : F,
                     error : function() { Galleria.raise('Could not complete wait function.'); },
                     timeout: 3000
                 }, options);
@@ -746,7 +779,7 @@ var undef,
                     id = undef;
                 }
 
-                callback = callback || function() {}; // dirty
+                callback = callback || F; // dirty
 
                 // if already present, return
                 if ( link ) {
@@ -2014,7 +2047,7 @@ Galleria = function() {
 
             $(lightbox.elems.box).toggleClass( 'iframe', !!data.iframe );
 
-            lightbox.image.load( data.big || data.image, function( image ) {
+            lightbox.image.load( data.iframe || data.big || data.image, function( image ) {
 
                 lightbox.width = image.isIframe ? $(window).width() : image.original.width;
                 lightbox.height = image.isIframe ? $(window).height() : image.original.height;
@@ -2554,6 +2587,7 @@ Galleria.prototype = {
             src,
             thumb,
             data,
+            special,
 
             $container,
 
@@ -2625,7 +2659,8 @@ Galleria.prototype = {
                             arr = ['Width', 'Height'],
                             m,
                             css,
-                            data = self.getData( thumb.index );
+                            data = self.getData( thumb.index ),
+                            special = data.thumb.split(':');
 
                         // calculate shrinked positions
                         $.each(arr, function( i, measure ) {
@@ -2649,29 +2684,13 @@ Galleria.prototype = {
                             ( o.thumbQuality === 'auto' && thumb.original.width < thumb.width * 3 )
                         );
 
-                        if( data.video_id ) {
-
-                            if( data.thumb == 'vimeo' ) {
-                                $.getJSON('http://vimeo.com/api/v2/video/' + data.video_id + '.json?callback=?', (function( img ) {
-                                    return function(data) {
-                                        try {
-                                            img.src = data[0].thumbnail_medium;
-                                        } catch(e) {
-                                            img.style.backgroundColor = '#333';
-                                        }
-                                    };
-                                }( thumb.image )));
-                            } else if( data.thumb == 'youtube' ) {
-                                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + data.video_id + '?v=2&alt=json-in-script&callback=?', (function( img ) {
-                                    return function(data) {
-                                        try {
-                                            img.src = data.entry.media$group.media$thumbnail[0].url;
-                                        } catch(e) {
-                                            img.style.backgroundColor = '#333';
-                                        }
-                                    };
-                                }( thumb.image )));
-                            }
+                        // get "special" thumbs from provider
+                        if( data.iframe && special.length == 2 && special[0] in _video ) {
+                            _video[ special[0] ].getThumb( special[1], (function(img) {
+                                return function(src) {
+                                    img.src = src;
+                                };
+                            }( thumb.image ) ));
                         }
 
                         // trigger the THUMBNAIL event
@@ -2694,7 +2713,7 @@ Galleria.prototype = {
 
             data = this._data[ i ];
 
-            if ( o.thumbnails === true ) {
+            if ( o.thumbnails === true && (data.thumb || data.image) ) {
 
                 // add a new Picture instance
                 thumb = new Galleria.Picture(i);
@@ -2725,14 +2744,16 @@ Galleria.prototype = {
                 }
 
                 // load the thumbnail
-                if ( src == 'vimeo' || src == 'youtube') {
-                    thumb.video = src;
-                    thumb.load('data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D', {
-                        height: thumb.data.height,
-                        width: thumb.data.height*1.25
-                    }, onThumbLoad);
-                } else {
-                    thumb.load( src, onThumbLoad );
+                special = src.split(':');
+                if ( special.length == 2 ) {
+                    if ( special[0] in _video ) {
+                        thumb.load('data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D', {
+                            height: thumb.data.height,
+                            width: thumb.data.height*1.25
+                        }, onThumbLoad);
+                    } else {
+                        thumb.load( src, onThumbLoad );
+                    }
                 }
 
                 // preload all images here
@@ -2741,7 +2762,7 @@ Galleria.prototype = {
                 }
 
             // create empty spans if thumbnails is set to 'empty'
-            } else if ( optval === 'empty' || optval === 'numbers' ) {
+            } else if ( data.iframe || optval === 'empty' || optval === 'numbers' ) {
 
                 thumb = {
                     container:  Utils.create( 'galleria-image' ),
@@ -2753,6 +2774,10 @@ Galleria.prototype = {
                 // create numbered thumbnails
                 if ( optval === 'numbers' ) {
                     $( thumb.image ).text( i + 1 );
+                }
+
+                if( data.iframe ) {
+                    $( thumb.image ).addClass('iframe');
                 }
 
                 this.$( 'thumbnails' ).append( thumb.container );
@@ -2958,8 +2983,8 @@ Galleria.prototype = {
             return this;
         }
 
-        // add .video to the selector (1.2.7)
-        selector += ',.video';
+        // add .video and .iframe to the selector (1.2.7)
+        selector += ',.video,.iframe';
 
         // loop through images and set data
         $( source ).find( selector ).each( function( i, elem ) {
@@ -2970,15 +2995,10 @@ Galleria.prototype = {
                 href = parent.attr( 'href' ),
                 rel  = parent.attr( 'rel' );
 
-            if( elem.hasClass('video') || (function() {
-                for( var i in _videoUrls ) {
-                    if( _videoUrls[i]( href ) ) {
-                        return true;
-                    }
-                }
-                return false;
-            }()) ) {
+            if( href && ( elem[0].nodeName == 'IMG' || elem.hasClass('video') ) && _videoTest( href ) ) {
                 data.video = href;
+            } else if( href && elem.hasClass('iframe') ) {
+                data.iframe = href;
             } else {
                 data.image = data.big = href;
             }
@@ -2988,7 +3008,7 @@ Galleria.prototype = {
             }
 
             // alternative extraction from HTML5 data attribute, added in 1.2.7
-            $.each('big title description link layer'.split(' '), function(i, val) {
+            $.each( 'big title description link layer'.split(' '), function( i, val ) {
                 if ( elem.data(val) ) {
                     data[ val ] = elem.data(val);
                 }
@@ -3039,37 +3059,31 @@ Galleria.prototype = {
             }
             // parse video
             if ( 'video' in data ) {
-                var href = data.video,
-                    result;
-                $.each( _videoUrls, function( key, fn ) {
-                    result = fn( href );
-                    if( result ) {
-                        result.url += (function() {
-                            if ( typeof self._options[ result.provider ] == 'object' ) {
-                                var str = '?', arr = [];
-                                $.each(self._options[ result.provider ], function( key, val ) {
-                                    arr.push( key + '=' + val );
-                                });
-                                if ( result.provider == 'youtube' ) {
-                                    arr = ['wmode=opaque'].concat(arr);
-                                }
-                                return str + arr.join('&');
-                            }
-                            return '';
-                        }());
+                var result = _videoTest( data.video );
 
-                        $.extend( current, {
-                            image: result.url,
-                            big: result.url,
-                            iframe: true,
-                            video_id: result.id
-                        });
-                        if( !('thumb' in current) || !current.thumb ) {
-                            current.thumb = result.provider;
+                if ( result ) {
+                    current.iframe = _video[ result.provider ].embed( result.id ) + (function() {
+
+                        // add options
+                        if ( typeof self._options[ result.provider ] == 'object' ) {
+                            var str = '?', arr = [];
+                            $.each( self._options[ result.provider ], function( key, val ) {
+                                arr.push( key + '=' + val );
+                            });
+
+                            // small youtube specifics, perhaps move to _video later
+                            if ( result.provider == 'youtube' ) {
+                                arr = ['wmode=opaque'].concat(arr);
+                            }
+                            return str + arr.join('&');
                         }
-                        return false;
+                        return '';
+                    }());
+                    delete current.video;
+                    if( !('thumb' in current) || !current.thumb ) {
+                        current.thumb = result.provider+':'+result.id;
                     }
-                });
+                }
             }
         });
 
@@ -3491,7 +3505,7 @@ $(document).mousemove(function(e) {
 
     proxy : function( fn, scope ) {
         if ( typeof fn !== 'function' ) {
-            return function() {};
+            return F;
         }
         scope = scope || this;
         return function() {
@@ -3827,7 +3841,7 @@ this.prependChild( 'info', 'myElement' );
             return;
         }
 
-        var src = this.isFullscreen() && 'big' in data ? data.big : data.image, // use big image if fullscreen mode
+        var src = data.iframe || ( this.isFullscreen() && 'big' in data ? data.big : data.image ), // use big image if fullscreen mode
             active = this._controls.getActive(),
             next = this._controls.getNext(),
             cached = next.isCached( src ),
@@ -5061,7 +5075,7 @@ Galleria.Picture.prototype = {
             min: undef,
             max: undef,
             margin: 0,
-            complete: function() {},
+            complete: F,
             position: 'center',
             crop: false,
             canvas: false
@@ -5102,11 +5116,15 @@ Galleria.Picture.prototype = {
                 // calculate some cropping
                 var newWidth = ( width - options.margin * 2 ) / self.original.width,
                     newHeight = ( height - options.margin * 2 ) / self.original.height,
+                    min = Math.min( newWidth, newHeight ),
+                    max = Math.max( newWidth, newHeight ),
                     cropMap = {
-                        'true'  : Math.max( newWidth, newHeight ),
+                        'true'  : max,
                         'width' : newWidth,
                         'height': newHeight,
-                        'false' : Math.min( newWidth, newHeight )
+                        'false' : min,
+                        'landscape': self.original.width > self.original.height ? max : min,
+                        'portrait': self.original.width < self.original.height ? max : min
                     },
                     ratio = cropMap[ options.crop.toString() ],
                     canvasKey = '';
