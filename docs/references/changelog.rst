@@ -16,6 +16,8 @@ Changelog
 * Added youtube and vimeo options for setting custom player parameters for each provider
 * Added iframe support, now you can place any website URL as iframe, as long as the site allows it.
 * Added two more crops: 'portrait' and 'landscape'. 'landscape' is the most useful - it crops landscape pictures but not portrait. 'portrait' crops the other way around.
+* Removed the debug message for "image not loaded in 30 seconds", as it was causing much more confusion than good
+* Added a "wait" option, this defines how long Galleria should wait when trying to extract measurements before throwing an error. Set this to **true** for infinity.
 
 1.2.6
 -----
