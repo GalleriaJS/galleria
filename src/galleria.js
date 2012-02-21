@@ -2753,7 +2753,7 @@ Galleria.prototype = {
                         }, onThumbLoad);
                     }
                 } else {
-                        thumb.load( src, onThumbLoad );
+                    thumb.load( src, onThumbLoad );
                 }
 
                 // preload all images here
