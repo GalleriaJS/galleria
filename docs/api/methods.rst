@@ -7,7 +7,7 @@ API Methods
 Using the API
 =============
 
-The Galleria methods are exposed in the instance. You have access to all methods listed here in the :doc:`../options/extend` option or by retrieveing the instance using ``Galleria.get``.
+The Galleria methods are exposed in the instance. You have access to all methods listed here in the :doc:`../options/extend` option or inside the ``Galleria.ready`` function.
 Read more about how to use the Galleria instance in :doc:`../references/extending`
 
 
@@ -164,7 +164,7 @@ Removes all panning effects set by ``addPan()``.
 
 .refreshImage()
 ---------------
-    
+
     | returns **Galleria**
 
 Refreshes the image scale & position. Useful if you f.ex. change imageCrop options at run time and need to reposition the image accordingly.
@@ -186,7 +186,7 @@ Examples::
 
     this.splice( 0, 2 ); // removes two images after the first
     this.splice( -2, 2 ); // removes the last two images
-    
+
 
 .push( element1, ..., elementN )
 --------------------------------------------------------
@@ -239,9 +239,9 @@ Example::
 
     // appends the element to the stage
     this.prependChild('stage','mystuff');
-    
 
-.setOptions( key, value ) 
+
+.setOptions( key, value )
 -------------------------
 
     | returns **Galleria**
@@ -252,7 +252,7 @@ Example::
 
     this.setOptions( 'transition', 'slide' );
 
-You can also manipulate several options by applying an object. This example demonstrates how to alter the image positions and then 
+You can also manipulate several options by applying an object. This example demonstrates how to alter the image positions and then
 use refreshImage to apply the new options to the active image::
 
     this.setOptions({
@@ -278,20 +278,20 @@ Sets the captions to display data taken from the index or the active image if
 no index is specified. Example::
 
     this.bind('thumbnail', function(e) {
-    
+
         $(e.thumbTarget).hover(this.proxy(function() {
-        
+
             this.setInfo(e.thumbOrder); // sets the caption to display data from the hovered image
             this.setCounter(e.index); // sets the counter to display the index of the hovered image
-            
+
         }, this.proxy(function() {
-        
+
             this.setInfo(); // reset the caption to display the currently active data
             this.setCounter(); // reset the caption to display the currently active data
-            
+
         }));
     });
-    
+
 
 Retrieval
 =========

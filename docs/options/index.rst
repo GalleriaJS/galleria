@@ -147,4 +147,8 @@ List of options
 
 - :doc:`userThumbStyles` Disable certain inline styles of thumbnails.
 
+- :doc:`vimeo` Sets options for the Vimeo player
+
 - :doc:`width` Manually set a gallery width.
+
+- :doc:`youtube` Sets options for the YouTube player

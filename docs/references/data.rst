@@ -11,7 +11,6 @@ The data structure is best defined using a JSON array, since JavaScript plays we
 But the beginner will most likely start with plain HTML that Galleria reads and converts to a data structure.
 
 Please note that 1.2.5 introduced a new entity called "layer". This can contain any HTML that will follow the image, also during transitions.
-At the time of writing (1.2.5), you can only define a layer using the dataConfig option or JSON.
 
 Read more about the layer and view examples here: http://galleriajs.tumblr.com/post/8091630096/introducing-in-1-2-5-html-layer
 
@@ -28,6 +27,7 @@ The image data object that Galleria uses is defined like this:
 * **description** – the image description (optional)
 * **link** – the image link url (optional)
 * **layer** – A layer of HTML that will be displayed on top of the image (optional)
+* **video** – An URL to a video, as per 1.2.7 we support Vimeo and Youtube URLs.
 * **original** a reference to the original IMG element (optional)
 
 You can provide this data to Galleria in a number of ways. The easiest way to start is probably by using plain HTML, but you’ll get more control using JSON.
@@ -58,7 +58,7 @@ Captions & meta data
 
 If you want to extract meta data from the HTML source such as title & description, you can provide this as ``<img>`` attributes::
 
-    <img src="image.jpg" title="My image title" alt="My description" longdesc="http://my.destination.com">
+    <img src="image.jpg" data-title="My image title" data-description="My <strong>description</strong>" data-link="http://my.destination.com">
 
 Now you’ll get the following data::
 
@@ -67,7 +67,7 @@ Now you’ll get the following data::
         image: 'image.jpg',
         big: 'image.jpg',
         title: 'My title',
-        description: 'My description',
+        description: 'My <strong>description</strong>',
         link: 'http://my.destination.com',
         original: [IMG element]
     }
@@ -91,11 +91,11 @@ Now you’ll get the following data::
 Separate fullscreen image
 -------------------------
 
-You can also specify a separate larger image for fullscreen & lightbox, using the rel attribute of the anchor tag:
+You can also specify a separate larger image for fullscreen & lightbox using the data-big attribute on the IMG tag:
 
-    <a href="image.jpg" rel="big.jpg"><img src="thumb.jpg"></a>
+   <a href="thumb.jpg"><img data-big="big.jpg" src="image.jpg"></a>
 
-Thi will give you::
+This will give you::
 
     {
         thumb: 'thumb.jpg',
@@ -104,19 +104,68 @@ Thi will give you::
         original: [IMG element]
     }
 
+Adding video in the slideshow
+-----------------------------
+
+Since version 1.2.7 Galleria supports Youtube and Vimeo embeds. The way it works is that you pass a full URL to the movie
+and then Galleria will parse and create the video frame for you.
+
+You can provide your custom thumbnail, or Galleria will fetch a thumbnail from the provider.
+
+How to add a youtube movie with a custom thumbnail::
+
+   <a href="http://www.youtube.com/watch?v=VDVVAuz1v7U"><img src="thumb.jpg"></a>
+
+After Galleria parsed this, it will give you::
+
+    {
+        thumb: 'thumb.jpg',
+        image: 'http://www.youtube.com/embed/qTcXxVOM4B0?wmode=opaque',
+        video: {
+            id: VDVVAuz1v7U,
+            provider: 'youtube',
+            url: 'http://www.youtube.com/embed/qTcXxVOM4B0?wmode=opaque'
+        }
+    }
+
+If you want Galleria to fetch a thumbnail for you, just provide an element with a 'video' class instead::
+
+   <a href="http://www.youtube.com/watch?v=VDVVAuz1v7U"><span class="video">Watch this at YouTube</span></a>
+
+Galleria will first add an empty image as thumbnail, then fetch the thumbnail from the provider and swap the src when ready.
+
+
+Adding a layer above the image/video
+------------------------------------
+
+Galleria also supports a layer of HTML content that can will be placed above the image or video.
+The layer will follow the transitions (unless you disable it using the layerFollow option) and expand on fullscreen.
+
+A layer can be defined using the data-layer attribute::
+
+    <img data-big="big.jpg" data-layer="<h2>A title</h2><p>Some content</p>">
+
+You can also define a layer using JSON or dataConfig, read further for more information about these extraction methods.
+
 
 2. Using HTML with dataConfig
 =============================
 
 You can also use the dataConfig option combined with HTML to obtain richer data from other sources to provide HTML captions or other custom data types.
 
+This is also useful if you want to add a richer markup for better accessibility.
+
 An example on how to use the dataConfig option to extract HTML captions from ``<p>`` tags::
 
     <div id="galleria">
-        <img src="myimage.jpg">
-        <p>My caption is <strong>gr8</strong></p>
-        <img src="myimage2.jpg">
-        <p>My other caption is also <em>gr8</em></p>
+        <li>
+            <img src="myimage.jpg">
+            <p>My caption is <strong>gr8</strong></p>
+        </li>
+        <li>
+            <img src="myimage2.jpg">
+            <p>My other caption is also <em>gr8</em></p>
+        </li>
     </div>
     <script>
     $('#galleria').galleria({
@@ -151,13 +200,9 @@ Providing JSON data to Galleria is really easy::
             layer: '<div><h2>This image is gr8</h2><p>And this text will be on top of the image</p>'
         },
         {
-            thumb: 'thumb2.jpg',
-            image: 'image2.jpg',
-            big: 'big2.jpg',
+            video: 'http://www.youtube.com/watch?v=qTcXxVOM4B0',
             title: 'My second title',
-            description: 'My second description',
-            link: '/product.html',
-            layer: '<div><h2>This image is also gr8</h2><p>Good luck with Galleria!</p>'
+            description: 'My second description'
         }
     ];
     $('#galleria').galleria({

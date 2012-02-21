@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7a2 2012-01-12
+ * @preserve Galleria v 1.2.7b2 2012-02-20
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -18,7 +18,7 @@ var undef,
     $win   = $( window ),
 
 // internal constants
-    VERSION = 1.26,
+    VERSION = 1.27,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -48,8 +48,8 @@ var undef,
 
     // list of Galleria events
     _eventlist = 'data ready thumbnail loadstart loadfinish image play pause progress ' +
-              'fullscreen_enter fullscreen_exit idle_enter idle_exit rescale ' +
-              'lightbox_open lightbox_close lightbox_image',
+                 'fullscreen_enter fullscreen_exit idle_enter idle_exit rescale ' +
+                 'lightbox_open lightbox_close lightbox_image',
 
     _events = (function() {
 
@@ -103,6 +103,26 @@ var undef,
         }
 
         return type;
+    },
+
+    // video URL parsers
+    _videoUrls = {
+        youtube: function(url) {
+            var match = url && url.match(/https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i);
+            return match && match[2] ? {
+                id: match[2],
+                url: 'http://www.youtube.com/embed/'+match[2],
+                provider: 'youtube'
+            } : false;
+        },
+        vimeo: function(url) {
+            var match = url && url.match(/https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i);
+            return match && match[2] ? {
+                id: match[2],
+                url: 'http://player.vimeo.com/video/'+match[2],
+                provider: 'vimeo'
+            } : false;
+        }
     },
 
     // the internal timeouts object
@@ -1506,7 +1526,8 @@ Galleria = function() {
                     rewind: false,
                     index: index,
                     imageTarget: self.getActiveImage(),
-                    thumbTarget: thumb
+                    thumbTarget: thumb,
+                    galleriaData: data
                 });
 
                 big.load( data.big, function( big ) {
@@ -1583,7 +1604,7 @@ Galleria = function() {
             var big = self.getData().big,
                 image = self._controls.getActive().image;
 
-            if ( big && big == image.src ) {
+            if ( !self.getData().iframe && image && big && big == image.src ) {
 
                 window.setTimeout(function(src) {
                     return function() {
@@ -1681,7 +1702,7 @@ Galleria = function() {
 
         hide : function() {
 
-            if ( !self._options.idleMode ) {
+            if ( !self._options.idleMode || self.getData().iframe ) {
                 return;
             }
 
@@ -1806,6 +1827,10 @@ Galleria = function() {
             $.each(cssMap, function( key, value ) {
                 css += '.galleria-'+prefix+key+'{'+value+'}';
             });
+
+            css += '.galleria-'+prefix+'box.iframe .galleria-'+prefix+'prevholder,'+
+                   '.galleria-'+prefix+'box.iframe .galleria-'+prefix+'nextholder{'+
+                   'width:100px;height:100px;top:50%;margin-top:-70px}';
 
             Utils.insertStyleTag( css );
 
@@ -1985,14 +2010,18 @@ Galleria = function() {
                 }
             } catch(e) {}
 
+            lightbox.image.isIframe = !!data.iframe;
+
+            $(lightbox.elems.box).toggleClass( 'iframe', !!data.iframe );
+
             lightbox.image.load( data.big || data.image, function( image ) {
 
-                lightbox.width = image.original.width;
-                lightbox.height = image.original.height;
+                lightbox.width = image.isIframe ? $(window).width() : image.original.width;
+                lightbox.height = image.isIframe ? $(window).height() : image.original.height;
 
                 $( image.image ).css({
-                    width: '100.5%',
-                    height: '100.5%',
+                    width: image.isIframe ? '100%' : '100.5%',
+                    height: image.isIframe ? '100%' : '100.5%',
                     top: 0,
                     zIndex: 99998
                 });
@@ -2117,6 +2146,21 @@ Galleria.prototype = {
             useCanvas: false, // 1.2.4
             width: 'auto',
             userThumbStyles: false
+            vimeo: {
+                title: 0,
+                byline: 0,
+                portrait: 0,
+                color: 'aaaaaa'
+            },
+            width: 'auto',
+            youtube: {
+                modestbranding: 1,
+                autohide: 1,
+                color: 'white',
+                hd: 1,
+                rel: 0,
+                showinfo: 0
+            }
         };
 
         // legacy support for transitionInitial
@@ -2241,7 +2285,7 @@ Galleria.prototype = {
 
                     });
 
-                    return testHeight() && num.width && num.height > 10;
+                    return testHeight() && num.width && num.height > 50;
 
                 },
                 success: function() {
@@ -2547,7 +2591,8 @@ Galleria.prototype = {
                     self.trigger({
                         type: Galleria.THUMBNAIL,
                         thumbTarget: image,
-                        index: index
+                        index: index,
+                        galleriaData: self.getData( index )
                     });
                 };
             },
@@ -2583,7 +2628,8 @@ Galleria.prototype = {
                         var top = ['left', 'top'],
                             arr = ['Width', 'Height'],
                             m,
-                            css;
+                            css,
+                            data = self.getData( thumb.index );
 
                         // calculate shrinked positions
                         $.each(arr, function( i, measure ) {
@@ -2607,11 +2653,37 @@ Galleria.prototype = {
                             ( o.thumbQuality === 'auto' && thumb.original.width < thumb.width * 3 )
                         );
 
+                        if( data.video_id ) {
+
+                            if( data.thumb == 'vimeo' ) {
+                                $.getJSON('http://vimeo.com/api/v2/video/' + data.video_id + '.json?callback=?', (function( img ) {
+                                    return function(data) {
+                                        try {
+                                            img.src = data[0].thumbnail_medium;
+                                        } catch(e) {
+                                            img.style.backgroundColor = '#333';
+                                        }
+                                    };
+                                }( thumb.image )));
+                            } else if( data.thumb == 'youtube' ) {
+                                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + data.video_id + '?v=2&alt=json-in-script&callback=?', (function( img ) {
+                                    return function(data) {
+                                        try {
+                                            img.src = data.entry.media$group.media$thumbnail[0].url;
+                                        } catch(e) {
+                                            img.style.backgroundColor = '#333';
+                                        }
+                                    };
+                                }( thumb.image )));
+                            }
+                        }
+
                         // trigger the THUMBNAIL event
                         self.trigger({
                             type: Galleria.THUMBNAIL,
                             thumbTarget: thumb.image,
-                            index: thumb.data.order
+                            index: thumb.data.order,
+                            galleriaData: self.getData( thumb.data.order )
                         });
                     }
                 });
@@ -2630,6 +2702,9 @@ Galleria.prototype = {
 
                 // add a new Picture instance
                 thumb = new Galleria.Picture(i, self._options.userThumbStyles);
+
+                // save the index
+                thumb.index = i;
 
                 // get source from thumb or image
                 src = data.thumb || data.image;
@@ -2654,7 +2729,15 @@ Galleria.prototype = {
                 }
 
                 // load the thumbnail
-                thumb.load( src, onThumbLoad );
+                if ( src == 'vimeo' || src == 'youtube') {
+                    thumb.video = src;
+                    thumb.load('data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D', {
+                        height: thumb.data.height,
+                        width: thumb.data.height*1.25
+                    }, onThumbLoad);
+                } else {
+                    thumb.load( src, onThumbLoad );
+                }
 
                 // preload all images here
                 if ( o.preload === 'all' ) {
@@ -2669,6 +2752,7 @@ Galleria.prototype = {
                     image: Utils.create( 'img', 'span' ),
                     ready: true
                 };
+
 
                 // create numbered thumbnails
                 if ( optval === 'numbers' ) {
@@ -2716,6 +2800,8 @@ Galleria.prototype = {
         // make sure we have a stageHeight && stageWidth
 
         Utils.wait({
+
+            timeout: 10000,
 
             until: function() {
 
@@ -2876,39 +2962,60 @@ Galleria.prototype = {
             return this;
         }
 
+        // add .video to the selector (1.2.7)
+        selector += ',.video';
+
         // loop through images and set data
-        $( source ).find( selector ).each( function( i, img ) {
-            img = $( img );
+        $( source ).find( selector ).each( function( i, elem ) {
+
+            elem = $( elem );
             var data = {},
-                parent = img.parent(),
+                parent = elem.parent(),
                 href = parent.attr( 'href' ),
                 rel  = parent.attr( 'rel' );
 
-            if ( href ) {
+            if( elem.hasClass('video') || (function() {
+                for( var i in _videoUrls ) {
+                    if( _videoUrls[i]( href ) ) {
+                        return true;
+                    }
+                }
+                return false;
+            }()) ) {
+                data.video = href;
+            } else {
                 data.image = data.big = href;
             }
+
             if ( rel ) {
                 data.big = rel;
             }
+
+            // alternative extraction from HTML5 data attribute, added in 1.2.7
+            $.each('big title description link layer'.split(' '), function(i, val) {
+                if ( elem.data(val) ) {
+                    data[ val ] = elem.data(val);
+                }
+            });
 
             // mix default extractions with the hrefs and config
             // and push it into the data array
             self._data.push( $.extend({
 
-                title:       img.attr('title') || '',
-                thumb:       img.attr('src'),
-                image:       img.attr('src'),
-                big:         img.attr('src'),
-                description: img.attr('alt') || '',
-                link:        img.attr('longdesc'),
-                original:    img.get(0) // saved as a reference
+                title:       elem.attr('title') || '',
+                thumb:       elem.attr('src'),
+                image:       elem.attr('src'),
+                big:         elem.attr('src'),
+                description: elem.attr('alt') || '',
+                link:        elem.attr('longdesc'),
+                original:    elem.get(0) // saved as a reference
 
-            }, data, config( img ) ) );
+            }, data, config( elem ) ) );
 
         });
         // trigger the DATA event and return
         if ( this.getDataLength() ) {
-            this.trigger( Galleria.DATA );
+            this._parseData().trigger( Galleria.DATA );
         } else {
             Galleria.raise('Load failed: no data found.');
         }
@@ -2919,21 +3026,60 @@ Galleria.prototype = {
     // make sure the data works properly
     _parseData : function() {
 
-        var self = this;
+        var self = this,
+            current;
 
         $.each( this._data, function( i, data ) {
+
+            current = self._data[ i ];
+
             // copy image as thumb if no thumb exists
             if ( 'thumb' in data === false ) {
-                self._data[ i ].thumb = data.image;
+                current.thumb = data.image;
             }
             // copy image as big image if no biggie exists
             if ( !'big' in data ) {
-                self._data[ i ].big = data.image;
+                current.big = data.image;
+            }
+            // parse video
+            if ( 'video' in data ) {
+                var href = data.video,
+                    result;
+                $.each( _videoUrls, function( key, fn ) {
+                    result = fn( href );
+                    if( result ) {
+                        result.url += (function() {
+                            if ( typeof self._options[ result.provider ] == 'object' ) {
+                                var str = '?', arr = [];
+                                $.each(self._options[ result.provider ], function( key, val ) {
+                                    arr.push( key + '=' + val );
+                                });
+                                if ( result.provider == 'youtube' ) {
+                                    arr = ['wmode=opaque'].concat(arr);
+                                }
+                                return str + arr.join('&');
+                            }
+                            return '';
+                        }());
+
+                        $.extend( current, {
+                            image: result.url,
+                            big: result.url,
+                            iframe: true,
+                            video_id: result.id
+                        });
+                        if( !('thumb' in current) || !current.thumb ) {
+                            current.thumb = result.provider;
+                        }
+                        return false;
+                    }
+                });
             }
         });
 
         return this;
     },
+
 
     /**
         Adds and/or removes images from the gallery
@@ -3716,6 +3862,12 @@ this.prependChild( 'info', 'myElement' );
                     opacity: 0
                 }).show();
 
+                if( active.isIframe ) {
+                    $( active.container ).find( 'iframe' ).remove();
+                }
+
+                self.$('container').toggleClass('iframe', !!data.iframe);
+
                 $( next.container ).css({
                     zIndex: 1
                 }).show();
@@ -3775,7 +3927,8 @@ this.prependChild( 'info', 'myElement' );
                     type: Galleria.IMAGE,
                     index: queue.index,
                     imageTarget: next.image,
-                    thumbTarget: thumb.image
+                    thumbTarget: thumb.image,
+                    galleriaData: data
                 });
             };
         }( data, next, active, queue, thumb ));
@@ -3805,6 +3958,8 @@ this.prependChild( 'info', 'myElement' );
         // show the next image, just in case
         Utils.show( next.container );
 
+        next.isIframe = !!data.iframe;
+
         // add active classes
         $( self._thumbnails[ queue.index ].container )
             .addClass( 'active' )
@@ -3818,7 +3973,8 @@ this.prependChild( 'info', 'myElement' );
             index: queue.index,
             rewind: queue.rewind,
             imageTarget: next.image,
-            thumbTarget: thumb.image
+            thumbTarget: thumb.image,
+            galleriaData: data
         });
 
         // begin loading the next image
@@ -3864,7 +4020,8 @@ this.prependChild( 'info', 'myElement' );
                         index: queue.index,
                         rewind: queue.rewind,
                         imageTarget: next.image,
-                        thumbTarget: self._thumbnails[ queue.index ].image
+                        thumbTarget: self._thumbnails[ queue.index ].image,
+                        galleriaData: self.getData( queue.index )
                     });
 
                     var transition = self._options.transition;
@@ -4680,6 +4837,9 @@ Galleria.Picture = function( id, userThumbStyles ) {
     // placeholder for the timeout
     this.tid = null;
 
+    // flag for iframe Picture
+    this.isIframe = false;
+
 };
 
 Galleria.Picture.prototype = {
@@ -4739,7 +4899,41 @@ Galleria.Picture.prototype = {
         @returns The image container (jQuery object)
     */
 
-    load: function(src, callback) {
+    load: function(src, size, callback) {
+
+        if ( typeof size == 'function' ) {
+            callback = size;
+            size = null;
+        }
+
+        if( this.isIframe ) {
+            var id = 'if'+new Date().getTime();
+
+            this.image = $('<iframe>', {
+                src: src,
+                frameborder: 0,
+                id: id,
+                allowfullscreen: true,
+                css: { visibility: 'hidden' }
+            })[0];
+
+            $( this.container ).find( 'iframe,img' ).remove();
+
+            this.container.appendChild( this.image );
+
+            $('#'+id).load( (function( self, callback ) {
+                return function() {
+                    $(this).css( 'visibility', 'visible' );
+                    if( typeof callback == 'function' ) {
+                        window.setTimeout(function() {
+                            callback.call( self, self );
+                        }, 10);
+                    }
+                };
+            }( this, callback )));
+
+            return this.container;
+        }
 
         // set a load timeout for debugging
         this.tid = window.setTimeout( (function(src) {
@@ -4767,7 +4961,7 @@ Galleria.Picture.prototype = {
                         $( this ).unbind( 'load' );
 
                         // save the original size
-                        self.original = {
+                        self.original = size || {
                             height: this.height,
                             width: this.width
                         };
@@ -4804,7 +4998,7 @@ Galleria.Picture.prototype = {
             }( this, callback, src ));
 
         // remove any previous images
-        $container.find( 'img' ).remove();
+        $container.find( 'iframe,img' ).remove();
 
         // append the image
         $image.css( 'display', 'block').appendTo( this.container );
@@ -4866,6 +5060,8 @@ Galleria.Picture.prototype = {
 
     scale: function( options ) {
 
+        var self = this;
+
         // extend some defaults
         options = $.extend({
             width: 0,
@@ -4879,6 +5075,13 @@ Galleria.Picture.prototype = {
             canvas: false
         }, options);
 
+        if( this.isIframe ) {
+            $( self.image ).width(options.width).height(options.height).removeAttr('width').removeAttr('height');
+            $(window).trigger('resize');
+            options.complete.call(self, self);
+            return this.container;
+        }
+
         // return the element if no image found
         if (!this.image) {
             return this.container;
@@ -4887,7 +5090,6 @@ Galleria.Picture.prototype = {
         // store locale variables
         var width,
             height,
-            self = this,
             $container = $( self.container ),
             data;
 
