@@ -135,11 +135,11 @@ Galleria will first add an empty image as thumbnail, then fetch the thumbnail fr
 Displaying iframes
 ------------------
 
-Since version 1.2.7, Galleria also supports iframes to be displayed instead of an image. Here’s how to add an iframe:
+Since version 1.2.7, Galleria also supports iframes to be displayed instead of an image. Here’s how to add an iframe::
 
     <a href="http://aino.com"><img class="iframe" src="thumb.jpg"></a>
 
-This will give you:
+This will give you::
 
     {
         thumb: 'thumb.jpg',
