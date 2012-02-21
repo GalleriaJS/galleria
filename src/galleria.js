@@ -1702,7 +1702,7 @@ Galleria = function() {
 
         hide : function() {
 
-            if ( !self._options.idleMode || self.getData().iframe ) {
+            if ( !self._options.idleMode || self.getIndex() === false || self.getData().iframe ) {
                 return;
             }
 
