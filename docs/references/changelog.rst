@@ -14,6 +14,8 @@ Changelog
 * Added video support for Vimeo and Youtube video URLs. Se the image data reference for implementation instructions.
 * Removed the description attribute for Picasa, since google only uses one caption. Instead, we now extract the caption as title (instead of the file name).
 * Added youtube and vimeo options for setting custom player parameters for each provider
+* Added iframe support, now you can place any website URL as iframe, as long as the site allows it.
+* Added two more crops: 'portrait' and 'landscape'. 'landscape' is the most useful - it crops landscape pictures but not portrait. 'portrait' crops the other way around.
 
 1.2.6
 -----

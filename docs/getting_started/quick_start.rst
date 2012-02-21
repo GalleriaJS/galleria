@@ -48,7 +48,7 @@ If you want separate thumbnails (recommended), just add them as a link::
         <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
         <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" alt="Another text" title="Another title"></a>
     </div>
-    
+
 You may also add a separate larger image for fullscreen using the rel attribute::
 
     <div id="gallery">
@@ -82,7 +82,7 @@ You can also define the images as a JSON array::
         data_source: data
     });
     </script>
-    
+
 For a more in-depth explanation on how Galleria handles image data, read :doc:`/references/data`.
 
 

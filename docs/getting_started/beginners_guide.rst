@@ -70,7 +70,7 @@ Now that we have a HTML template and jQuery in place, it's time to install Galle
 2. Extract the galleria.zip file and place the "galleria" directory where you have your HTML files.
 3. Add the following code beneath the jQuery script tag we added earlier::
 
-    <script src="galleria/galleria-1.2.6.min.js"></script>
+    <script src="galleria/galleria-1.2.7.min.js"></script>
 
 To make sure Gallery works properly add the following code inside the ``<body>`` tag::
 
@@ -85,7 +85,7 @@ The HTML file should look something like::
     <html>
         <head>
             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-            <script src="galleria/galleria-1.2.6.min.js"></script>
+            <script src="galleria/galleria-1.2.7.min.js"></script>
         </head>
         <body>
             <script>
@@ -152,7 +152,7 @@ The complete code example:
     <html>
         <head>
             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-            <script src="galleria/galleria-1.2.6.min.js"></script>
+            <script src="galleria/galleria-1.2.7.min.js"></script>
         </head>
         <body>
             <div id="gallery">
