@@ -4,3 +4,5 @@ _build
 *.swp
 *.swo
 docs/jsdoc/html
+src/themes/folio
+src/index.html
