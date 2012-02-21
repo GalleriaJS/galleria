@@ -24,6 +24,8 @@ var undef,
     DUMMY = false,
     NAV = navigator.userAgent.toLowerCase(),
     HASH = window.location.hash.replace(/#\//, ''),
+    F = function(){},
+    FALSE = function() { return false; },
     IE = (function() {
 
         var v = 3,
@@ -113,7 +115,7 @@ var undef,
                 return 'http://www.youtube.com/embed/'+id;
             },
             getThumb: function( id, success, fail ) {
-                fail = fail || function(){};
+                fail = fail || F;
                 $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script&callback=?', function(data) {
                     try {
                         success( data.entry.media$group.media$thumbnail[0].url );
@@ -129,7 +131,7 @@ var undef,
                 return 'http://player.vimeo.com/video/'+id;
             },
             getThumb: function( id, success, fail ) {
-                fail = fail || function(){};
+                fail = fail || F;
                 $.getJSON('http://vimeo.com/api/v2/video/' + id + '.json?callback=?', function(data) {
                     try {
                         success( data[0].thumbnail_medium );
@@ -327,7 +329,7 @@ var undef,
                     // extend defaults
                     options = $.extend({
                         duration: 400,
-                        complete: function(){},
+                        complete: F,
                         stop: false
                     }, options);
 
@@ -495,7 +497,7 @@ var undef,
 
             hide : function( elem, speed, callback ) {
 
-                callback = callback || function(){};
+                callback = callback || F;
 
                 var el = Utils.elem( elem ),
                     $elem = el.$;
@@ -535,7 +537,7 @@ var undef,
 
             show : function( elem, speed, callback ) {
 
-                callback = callback || function(){};
+                callback = callback || F;
 
                 var el = Utils.elem( elem ),
                     $elem = el.$;
@@ -658,8 +660,8 @@ var undef,
 
             wait : function(options) {
                 options = $.extend({
-                    until : function() { return false; },
-                    success : function() {},
+                    until : FALSE,
+                    success : F,
                     error : function() { Galleria.raise('Could not complete wait function.'); },
                     timeout: 3000
                 }, options);
@@ -777,7 +779,7 @@ var undef,
                     id = undef;
                 }
 
-                callback = callback || function() {}; // dirty
+                callback = callback || F; // dirty
 
                 // if already present, return
                 if ( link ) {
@@ -3503,7 +3505,7 @@ $(document).mousemove(function(e) {
 
     proxy : function( fn, scope ) {
         if ( typeof fn !== 'function' ) {
-            return function() {};
+            return F;
         }
         scope = scope || this;
         return function() {
@@ -5073,7 +5075,7 @@ Galleria.Picture.prototype = {
             min: undef,
             max: undef,
             margin: 0,
-            complete: function() {},
+            complete: F,
             position: 'center',
             crop: false,
             canvas: false
