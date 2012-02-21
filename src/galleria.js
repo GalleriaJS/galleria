@@ -108,7 +108,7 @@ var undef,
     // video URL parsers
     _videoUrls = {
         youtube: function(url) {
-            var match = url.match(/https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i);
+            var match = url && url.match(/https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i);
             return match && match[2] ? {
                 id: match[2],
                 url: 'http://www.youtube.com/embed/'+match[2],
@@ -116,7 +116,7 @@ var undef,
             } : false;
         },
         vimeo: function(url) {
-            var match = url.match(/https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i);
+            var match = url && url.match(/https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i);
             return match && match[2] ? {
                 id: match[2],
                 url: 'http://player.vimeo.com/video/'+match[2],
