@@ -105,24 +105,55 @@ var undef,
         return type;
     },
 
-    // video URL parsers
-    _videoUrls = {
-        ryoutube: /https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i,
-        rvimeo: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
-        _parse: function(provider, url, embed) {
-            var match = url && url.match(this['r'+provider]);
-            return match && match[2] ? {
-                id: match[2],
-                url: embed + match[2],
-                provider: provider
-            } : false;
+    // video providers
+    _video = {
+        youtube: {
+            reg: /https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i,
+            embed: function(id) {
+                return 'http://www.youtube.com/embed/'+id;
+            },
+            getThumb: function( id, success, fail ) {
+                fail = fail || function(){};
+                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script&callback=?', function(data) {
+                    try {
+                        success( data.entry.media$group.media$thumbnail[0].url );
+                    } catch(e) {
+                        fail();
+                    }
+                }).error(fail);
+            }
         },
-        youtube: function(url) {
-            return this._parse('youtube', url, 'http://www.youtube.com/embed/');
-        },
-        vimeo: function(url) {
-            return this._parse('vimeo', url, 'http://player.vimeo.com/video/');
+        vimeo: {
+            reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
+            embed: function(id) {
+                return 'http://player.vimeo.com/video/'+id;
+            },
+            getThumb: function( id, success, fail ) {
+                fail = fail || function(){};
+                $.getJSON('http://vimeo.com/api/v2/video/' + id + '.json?callback=?', function(data) {
+                    try {
+                        success( data[0].thumbnail_medium );
+                    } catch(e) {
+                        fail();
+                    }
+                }).error(fail);
+            }
         }
+    },
+
+    // utility for testing the video URL and getting the video ID
+    _videoTest = function( url ) {
+        var match;
+        for ( var v in _video ) {
+            match = url && url.match( _video[v].reg );
+            if( match && match.length ) {
+                return {
+                    id: match[2],
+                    provider: v
+                };
+            }
+        }
+        return false;
     },
 
     // the internal timeouts object
@@ -2573,17 +2604,6 @@ Galleria.prototype = {
             // cache the thumbnail option
             optval = typeof o.thumbnails === 'string' ? o.thumbnails.toLowerCase() : null,
 
-            // get special thumbs
-            getThumb = function(url, path, image) {
-                $.getJSON(url, function(data) {
-                    try {
-                        image.src = path(data);
-                    } catch(e) {
-                        image.style.backgroundColor = '#333';
-                    }
-                });
-            },
-
             // move some data into the instance
             // for some reason, jQuery cant handle css(property) when zooming in FF, breaking the gallery
             // so we resort to getComputedStyle for browsers who support it
@@ -2663,16 +2683,12 @@ Galleria.prototype = {
                         );
 
                         // get "special" thumbs from provider
-                        if( data.iframe && special.length == 2 ) {
-                            if( special[0] == 'vimeo' ) {
-                                getThumb('http://vimeo.com/api/v2/video/' + special[1] + '.json?callback=?', function(data) {
-                                    return data[0].thumbnail_medium;
-                                }, thumb.image);
-                            } else if( special[0] == 'youtube' ) {
-                                getThumb('http://gdata.youtube.com/feeds/api/videos/' + special[1] + '?v=2&alt=json-in-script&callback=?', function(data) {
-                                    return data.entry.media$group.media$thumbnail[0].url;
-                                }, thumb.image);
-                            }
+                        if( data.iframe && special.length == 2 && special[0] in _video ) {
+                            _video[ special[0] ].getThumb( special[1], (function(img) {
+                                return function(src) {
+                                    img.src = src;
+                                };
+                            }( thumb.image ) ));
                         }
 
                         // trigger the THUMBNAIL event
@@ -2728,7 +2744,7 @@ Galleria.prototype = {
                 // load the thumbnail
                 special = src.split(':');
                 if ( special.length == 2 ) {
-                    if ( special[0] == 'vimeo' || special[0] == 'youtube' ) {
+                    if ( special[0] in _video ) {
                         thumb.load('data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D', {
                             height: thumb.data.height,
                             width: thumb.data.height*1.25
@@ -2977,8 +2993,7 @@ Galleria.prototype = {
                 href = parent.attr( 'href' ),
                 rel  = parent.attr( 'rel' );
 
-            if( href && ( elem[0].nodeName == 'IMG' || elem.hasClass('video') ) &&
-                ( _videoUrls.vimeo( href ) || _videoUrls.youtube( href ) ) ) {
+            if( href && ( elem[0].nodeName == 'IMG' || elem.hasClass('video') ) && _videoTest( href ) ) {
                 data.video = href;
             } else if( href && elem.hasClass('iframe') ) {
                 data.iframe = href;
@@ -2991,7 +3006,7 @@ Galleria.prototype = {
             }
 
             // alternative extraction from HTML5 data attribute, added in 1.2.7
-            $.each('big title description link layer'.split(' '), function(i, val) {
+            $.each( 'big title description link layer'.split(' '), function( i, val ) {
                 if ( elem.data(val) ) {
                     data[ val ] = elem.data(val);
                 }
@@ -3042,31 +3057,31 @@ Galleria.prototype = {
             }
             // parse video
             if ( 'video' in data ) {
-                var result;
-                $.each( [ 'youtube', 'vimeo' ], function( i, provider ) {
-                    result = _videoUrls[provider]( data.video );
-                    if( result ) {
-                        result.url += (function() {
-                            if ( typeof self._options[ provider ] == 'object' ) {
-                                var str = '?', arr = [];
-                                $.each(self._options[ provider ], function( key, val ) {
-                                    arr.push( key + '=' + val );
-                                });
-                                if ( provider == 'youtube' ) {
-                                    arr = ['wmode=opaque'].concat(arr);
-                                }
-                                return str + arr.join('&');
+                var result = _videoTest( data.video );
+
+                if ( result ) {
+                    current.iframe = _video[ result.provider ].embed( result.id ) + (function() {
+
+                        // add options
+                        if ( typeof self._options[ result.provider ] == 'object' ) {
+                            var str = '?', arr = [];
+                            $.each( self._options[ result.provider ], function( key, val ) {
+                                arr.push( key + '=' + val );
+                            });
+
+                            // small youtube specifics, perhaps move to _video later
+                            if ( result.provider == 'youtube' ) {
+                                arr = ['wmode=opaque'].concat(arr);
                             }
-                            return '';
-                        }());
-                        current.iframe = result.url;
-                        delete current.video;
-                        if( !('thumb' in current) || !current.thumb ) {
-                            current.thumb = provider+':'+result.id;
+                            return str + arr.join('&');
                         }
-                        return false;
+                        return '';
+                    }());
+                    delete current.video;
+                    if( !('thumb' in current) || !current.thumb ) {
+                        current.thumb = result.provider+':'+result.id;
                     }
-                });
+                }
             }
         });
 
