@@ -213,9 +213,20 @@ var undef,
     // instance pool, holds the galleries until themeLoad is triggered
     _pool = [],
 
+    // The themes that have been loaded
+    _themes = {},
+
+    // default (most recently loaded) theme
+    _defaultTheme = undef,
+
     // themeLoad trigger
     _themeLoad = function( theme ) {
-        Galleria.theme = theme;
+
+        if (!(theme.name in _themes && _themes.hasOwnProperty(theme.name))) {
+            _themes[theme.name] = theme;
+        }
+
+        _defaultTheme = theme.name;
 
         // run the instances we have in the pool
         $.each( _pool, function( i, instance ) {
@@ -2213,7 +2224,7 @@ Galleria.prototype = {
         $( this._target ).children().hide();
 
         // now we just have to wait for the theme...
-        if ( typeof Galleria.theme === 'object' ) {
+        if (_defaultTheme !== undef && _defaultTheme in _themes && _themes.hasOwnProperty(_defaultTheme)) {
             this._init();
         } else {
             // push the instance into the pool and run it when the theme is ready
@@ -2238,13 +2249,13 @@ Galleria.prototype = {
 
         this._initialized = true;
 
-        if ( !Galleria.theme ) {
+        if (_defaultTheme === undef) {
             Galleria.raise( 'Init failed: No theme found.' );
             return this;
         }
 
         // merge the theme & caller options
-        $.extend( true, options, Galleria.theme.defaults, this._original.options );
+        $.extend( true, options, _themes[_defaultTheme].defaults, this._original.options );
 
         // check for canvas support
         (function( can ) {
@@ -2898,7 +2909,7 @@ Galleria.prototype = {
                 self.trigger( Galleria.READY );
 
                 // call the theme init method
-                Galleria.theme.init.call( self, self._options );
+                _themes[_defaultTheme].init.call( self, self._options );
 
                 // call the extend option
                 self._options.extend.call( self, self._options );
@@ -4601,7 +4612,7 @@ Galleria.loadTheme = function( src, options ) {
         }, 5000 );
 
     // first clear the current theme, if exists
-    Galleria.theme = undef;
+    _defaultTheme = undef;
 
     // load the theme
     Utils.loadScript( src, function() {
