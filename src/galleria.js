@@ -4571,7 +4571,7 @@ Galleria.addTheme = function( theme ) {
                     // we have a match
                     css = script.src.replace(/[^\/]*$/, '') + theme.css;
 
-                    Utils.addTimer( "css", function() {
+                    Utils.addTimer( undef, function() {
                         Utils.loadCSS( css, 'galleria-theme', function() {
 
                             // the themeload trigger
