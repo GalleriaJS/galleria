@@ -2752,9 +2752,9 @@ Galleria.prototype = {
                             height: thumb.data.height,
                             width: thumb.data.height*1.25
                         }, onThumbLoad);
-                    } else {
-                        thumb.load( src, onThumbLoad );
                     }
+                } else {
+                    thumb.load( src, onThumbLoad );
                 }
 
                 // preload all images here
