@@ -677,7 +677,7 @@ var undef,
                             return false;
                         }
 
-                        if (now >= start + options.timeout) {
+                        if (typeof options.timeout == 'number' && now >= start + options.timeout) {
                             options.error();
                             return false;
                         }
@@ -2183,6 +2183,7 @@ Galleria.prototype = {
                 portrait: 0,
                 color: 'aaaaaa'
             },
+            wait: 5000, // 1.2.7
             width: 'auto',
             youtube: {
                 modestbranding: 1,
@@ -2340,7 +2341,7 @@ Galleria.prototype = {
                         Galleria.raise('Could not extract a stage height from the CSS. Traced height: ' + testHeight() + 'px.', true);
                     }
                 },
-                timeout: 10000
+                timeout: typeof this._options.wait == 'number' ? this._options.wait : false
             });
         });
 
@@ -4840,9 +4841,6 @@ Galleria.Picture = function( id ) {
     // flag when the image is ready
     this.ready = false;
 
-    // placeholder for the timeout
-    this.tid = null;
-
     // flag for iframe Picture
     this.isIframe = false;
 
@@ -4941,13 +4939,6 @@ Galleria.Picture.prototype = {
             return this.container;
         }
 
-        // set a load timeout for debugging
-        this.tid = window.setTimeout( (function(src) {
-            return function() {
-                Galleria.raise('Image not loaded in ' + Math.round( TIMEOUT/1000 ) + ' seconds: '+ src);
-            };
-        }( src )), TIMEOUT );
-
         this.image = new Image();
 
         var i = 0,
@@ -4973,9 +4964,6 @@ Galleria.Picture.prototype = {
                         };
 
                         self.cache[ src ] = src; // will override old cache
-
-                        // clear the debug timeout
-                        window.clearTimeout( self.tid );
 
                         if (typeof callback == 'function' ) {
                             window.setTimeout(function() {

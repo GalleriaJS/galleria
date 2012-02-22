@@ -173,6 +173,13 @@ Refreshes the image scale & position. Useful if you f.ex. change imageCrop optio
 Manipulation
 ============
 
+.load( data )
+-------------
+
+    | returns **Galleria**
+
+Loads new data into the gallery. The data should be structured the same way as JSON would be when first initialized
+
 .splice( index, howMany[, element1[, ...[, elementN]]] )
 --------------------------------------------------------
 
