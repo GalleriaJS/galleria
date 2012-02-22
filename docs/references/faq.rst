@@ -21,14 +21,14 @@ So the business model we decided to take was to keep Galleria 100% free but also
 I get a "Fatal Error" when I run Galleria
 -----------------------------------------
 
-Galleria throws errors when something is not right. Some errors are considered critical for Galleria to run properly, and when they occur Galleria stops and throws a "Fatal Error". The most common reason is that Galleria needs a width and height to function. It tries to extract the measures from your CSS styles, but if it fails you will get a "Fatal Error: width & height not found", or something similar. So the first thing you can try is to pass width and height to galleria, like this::
+Galleria throws errors when something is not right. Some errors are considered critical for Galleria to run properly, and when they occur Galleria stops and throws a "Fatal Error".
+The most common error is that the path to the themes, images or scripts are wrong so please double check those and make sure you have the right permissions set.
 
-    $('#gallery').galleria({
-        width: 800,
-        height: 500
-    });
-    
-If that doesn’t help, please refer to the documentation and support sections of this site to debug further.
+Another common issue is that the gallery is hidden when it tries to initialize,
+then it will fail to extract correct measurements. Make sure the gallery is visible or try the :doc:`/options/wait` option.
+
+If you are experiencing other problems, you might want to optimize your gallery for better loading process.
+Please read through :doc:`/reference/optimize` to get information of the best way to optimize your gallery.
 
 
 The gallery does not work, instead I get a big list of images
@@ -39,6 +39,7 @@ This is probably because Galleria never gets initialized. Please make sure you a
 * targeting the correct element selector when calling Galleria
 * including jQuery in your document
 * including Galleria and not getting any error messages
+* make sure the path to the scripts are correct and you have the right permissions
 * calling Galleria after the images in the HTML source
 
 
@@ -65,6 +66,10 @@ This direction might change very soon since there is a lot of things happening o
 Can I use HTML captions?
 ------------------------
 
-Yes you can. In our examples, we extract captions from the ``title`` and ``alt`` attribute by default, but you can configure your gallery to fetch data from anywhere else using the ``dataConfig`` option. See the docs for more info and examples.
+Yes you can, just use the data-title and data-description attributes on the IMG tag. Read more at :doc:`/references/data` for much more information about how to pass data to Galleria.
 
 
+Do you have multi-license options for Premium themes?
+-----------------------------------------------------
+
+On the site you can only buy single-licenses, but we can do multi-license on request. Please email us at galleria@aino.se and explain your usage for a quote.

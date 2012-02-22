@@ -129,12 +129,3 @@ thumbSize
 The size to fetch for the thumbnail image. The bigger size, the slower downloads and interaction. Use this to match thumbnail sizes with your gallery layout. See imageSize for full list of available sizes.
 
 
-description
------------
-
-    | type: **Boolean**
-    | default: false
-
-The plugin fetches the title per default. If you also wish to fetch the description, set this option to true.
-
-
