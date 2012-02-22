@@ -76,7 +76,7 @@ Activate Galleria
 =================
 
 When the data is added, you need to load a theme and activate Galleria.
-Use the Galleria.loadTheme and then the galleria() function on the selected jQuery object:
+Use the Galleria.loadTheme and then the galleria() function on the selected jQuery object::
 
     <script>
         Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
