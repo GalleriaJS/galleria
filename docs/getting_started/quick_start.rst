@@ -9,54 +9,47 @@ Quick start
 Installation
 ============
 
-- Get the latest and greatest version of Galleria and jQuery
+- Get the latest versions of Galleria and jQuery
 
-- Place the galleria folder in your project.
+- Place the galleria folder and additional themes in your project
+
+- Include jQuery and Galleria on your web page and check the path to your theme
 
 
-Usage
-=====
-Include jQuery and Galleria on your web page.
+Add data
+========
 
-Use the static method ``Galleria.loadTheme()`` to load a Galleria theme::
-
-    <script>
-        Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
-    </script>
-
-You can also load the theme manually in your ``<head>`` tag::
-
-    <script src="galleria/themes/classic/galleria.classic.min.js"></script>
-
-If you are looking for more info on how to install and load themes, check out :doc:`../themes/using_themes`.
-
-Add images
-==========
-
-There are several ways of adding image data to your gallery, but the simplets
+There are several ways of adding image data to your gallery, but the simplest
 way is probably to add some HTML. Just put the images inside any container on
-the site::
+the site. You can also add titles and descriptions using data attributed on the IMG tag::
 
     <div id="gallery">
-        <img src="/img/pic1.jpg" alt="My description" title="My title">
-        <img src="/img/pic2.jpg" alt="Another text" title="Another title">
+        <img src="/img/pic1.jpg" data-title="My title" data-description="My description">
+        <img src="/img/pic2.jpg" data-title="Another title" data-description="My <em>HTML</em> description">
     </div>
 
 If you want separate thumbnails (recommended), just add them as a link::
 
     <div id="gallery">
-        <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
-        <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" alt="Another text" title="Another title"></a>
+        <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" data-title="My title" data-description="My description"></a>
+        <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" data-title="Another title" data-description="My <em>HTML</em> description"></a>
     </div>
 
-You may also add a separate larger image for fullscreen using the rel attribute::
+You may also add a separate larger image for fullscreen using the data-big attribute::
 
     <div id="gallery">
-        <a rel="img/big1.jpg" href="/img/large1.jpg"><img src="/img/thumb1.jpg" alt="My description" title="My title"></a>
-        <a rel="img/big2.jpg" href="/img/large2.jpg"><img src="/img/thumb2.jpg" alt="Another text" title="Another title"></a>
+        <a href="/img/large1.jpg"><img src="/img/thumb1.jpg" data-big="/img/big1.jpg" data-title="My title" data-description="My description"></a>
+        <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" data-big="/img/big2.jpg" data-title="Another title" data-description="My <em>HTML</em> description"></a>
     </div>
 
-You can also define the images as a JSON array::
+Adding video from YouTube or Vimeo is easy - just link an image to the video page. If you want Galleria to fetch a thumbnail, add an element with the class 'video' instead of a thumbnail::
+
+    <div id="gallery">
+        <a href="http://www.youtube.com/watch?v=GCZrz8siv4Q"><img src="/img/thumb1.jpg"></a>
+        <a href="http://vimeo.com/12309423"><span class="video">Watch this on Vimeo!</span></a>
+    </div>
+
+You can also define the data as a JSON array::
 
     <script>
     var data = [
@@ -69,64 +62,67 @@ You can also define the images as a JSON array::
             link: 'http://domain.com'
         },
         {
-            image: 'img2.jpg',
-            thumb: 'thumb2.jpg',
-            big: 'big2.jpg',
+            video: 'http://www.youtube.com/watch?v=GCZrz8siv4Q',
             title: 'my second image',
-            description: 'Another caption',
-            link: '/path/to/destination.html'
+            description: 'Another caption'
         }
     ];
-
-    $('#container').galleria({
-        data_source: data
-    });
     </script>
 
-For a more in-depth explanation on how Galleria handles image data, read :doc:`/references/data`.
+Then just pass this array as the :doc:`/options/dataSource` option. For a more in-depth explanation on how Galleria handles image data, read :doc:`/references/data`.
 
 
 Activate Galleria
 =================
 
-When DOM is ready, you can run Galleria. The best way to do this is to put the
-following code before closing the body tag::
+When the data is added, you need to load a theme and activate Galleria.
+Use the Galleria.loadTheme and then the galleria() function on the selected jQuery object:
 
     <script>
-        $('#gallery').galleria({
-            width:500,
-            height:500
-        });
+        Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
+        $('#gallery').galleria();
     </script>
+
+
+Adding options
+===============
 
 The galleria function takes one arguments, *options*. The options argument is
-an object with Galleria options that you can use, please view the options
-documentation for a complete list.
+an object with Galleria options that you can use, please visit :doc:`/options/index` for a complete list.
 
-Note that Galleria requires a height to function. If you don’t pass width/height as options,
-Galleria will try to detect dimensions automatically. However, if it fails to detect dimensions
-Galleria will throw a fatal error.
+Example options::
 
-
-More examples
-=============
-
-With extra options::
-
-    <script>
-        // crop images:
         $('#gallery').galleria({
-            imageCrop: true
-        });
-        // use a fading transition:
-        $('#gallery').galleria({
+            imageCrop: true,
             transition: 'fade'
         });
-    </script>
 
 
-Customize
-=========
+Optimize Galleria
+=================
 
-If you would like to add more advanced customizations, read :doc:`/references/extending`. *Good luck!*
+We strongly recommend you to read through :doc:`/references/optimize` to optimize your gallery.
 
+
+Using the API
+=============
+
+Further customizations can be done using the :doc:`/api/methods` and :doc:`/api/events`. You’ll have access to them using the Galleria.ready function::
+
+    Galleria.ready(function(options) {
+
+        // 'this' is the gallery instance
+        // 'options' is the gallery options
+
+        this.bind('image', function(e) {
+            Galleria.log('Now viewing ' + e.imageTarget.src);
+        });
+    });
+
+You can also access the methods inside the jQuery.data object of the element you attached the gallery to, f.ex::
+
+    $('#galleria').data('galleria').enterFullscreen();
+
+Read :doc:`/references/extending` for more information about using the API.
+
+*Good luck!*
