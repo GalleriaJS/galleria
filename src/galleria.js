@@ -2746,15 +2746,13 @@ Galleria.prototype = {
 
                 // load the thumbnail
                 special = src.split(':');
-                if ( special.length == 2 ) {
-                    if ( special[0] in _video ) {
-                        thumb.load('data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D', {
-                            height: thumb.data.height,
-                            width: thumb.data.height*1.25
-                        }, onThumbLoad);
-                    } else {
-                        thumb.load( src, onThumbLoad );
-                    }
+                if ( special.length == 2 && special[0] in _video ) {
+                    thumb.load('data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D', {
+                        height: thumb.data.height,
+                        width: thumb.data.height*1.25
+                    }, onThumbLoad);
+                } else {
+                    thumb.load( src, onThumbLoad );
                 }
 
                 // preload all images here
