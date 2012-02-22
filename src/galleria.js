@@ -1028,9 +1028,6 @@ Galleria = function() {
 
     var self = this;
 
-    // the theme used
-    this._theme = undef;
-
     // internal options
     this._options = {};
 
