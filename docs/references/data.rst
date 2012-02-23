@@ -108,7 +108,7 @@ This will give you::
 Adding video in the slideshow
 -----------------------------
 
-Since version 1.2.7 Galleria supports Youtube and Vimeo embeds. The way it works is that you pass a full URL to the movie
+Since version 1.2.7 Galleria supports Youtube, Vimeo and Dailymotion embeds. The way it works is that you pass a full URL to the movie
 and then Galleria will parse and create the video frame for you.
 
 You can provide your custom thumbnail, or Galleria will fetch a thumbnail from the provider.
@@ -124,7 +124,7 @@ Galleria will parse the video URL and other options set and create the iframe UR
         iframe: 'http://www.youtube.com/embed/GCZrz8siv4Q?wmode=opaque'
     }
 
-You can also add display options using the **vimeo** and **youtube** options.
+You can also add display options using the **vimeo**, **youtube** and **dailymotion** options.
 
 If you want Galleria to fetch thumbnails from the provider API’s, just provide an element with a 'video' class instead of a thumbnail::
 

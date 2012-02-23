@@ -42,7 +42,7 @@ You may also add a separate larger image for fullscreen using the data-big attri
         <a href="/img/large2.jpg"><img src="/img/thumb2.jpg" data-big="/img/big2.jpg" data-title="Another title" data-description="My <em>HTML</em> description"></a>
     </div>
 
-Adding video from YouTube or Vimeo is easy - just link an image to the video page. If you want Galleria to fetch a thumbnail, add an element with the class 'video' instead of a thumbnail::
+Adding video from YouTube, Vimeo or Dailymotion is easy - just link an image to the video page. If you want Galleria to fetch a thumbnail, add an element with the class 'video' instead of a thumbnail::
 
     <div id="gallery">
         <a href="http://www.youtube.com/watch?v=GCZrz8siv4Q"><img src="/img/thumb1.jpg"></a>
