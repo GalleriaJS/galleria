@@ -1924,7 +1924,7 @@ Galleria = function() {
 
             $( DOM().body ).append( el.overlay, el.box );
 
-            //Utils.optimizeTouch( el.box );
+            Utils.optimizeTouch( el.box );
 
             // add the prev/next nav and bind some controls
 

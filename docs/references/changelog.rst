@@ -11,13 +11,17 @@ Changelog
 * Fixed a timer that caused iOS5 to not trigger the fullscreen_close event in some setups
 * Added support for HTML5 data attributes for passing data to Galleria. We will continue to have legacy support, but this is now the recommended way to pass data.
 * The event object passed at image, thumbnail, loadstart and loadfinish events now also contains the current gallery data, passed as 'galleriaData'
-* Added video support for Vimeo and Youtube video URLs. Se the image data reference for implementation instructions.
+* Added video support for Vimeo, Youtube and Dailymotion video URLs. Se the image data reference for implementation instructions.
 * Removed the description attribute for Picasa, since google only uses one caption. Instead, we now extract the caption as title (instead of the file name).
-* Added youtube and vimeo options for setting custom player parameters for each provider
+* Added youtube, vimeo and dailymotion options for setting custom player parameters for each provider
 * Added iframe support, now you can place any website URL as iframe, as long as the site allows it.
 * Added two more crops: 'portrait' and 'landscape'. 'landscape' is the most useful - it crops landscape pictures but not portrait. 'portrait' crops the other way around.
 * Removed the debug message for "image not loaded in 30 seconds", as it was causing much more confusion than good
 * Added a "wait" option, this defines how long Galleria should wait when trying to extract measurements before throwing an error. Set this to **true** for infinity.
+* Added a destroy() method in the API
+* Added a new reference called "Galleria error messages" where we list all common errors, what causes them and how to solve them.
+* Fixed minor lightbox/clicknext bug for touch devices
+* Fixed a cross-domain issue when adding themes from other domains in firefox
 
 1.2.6
 -----
