@@ -89,7 +89,7 @@ List of options
 
 - :doc:`imagePosition` Positions the image.
 
-- :doc`imageTimeout` Sets a timeout for fetching images.
+- :doc:`imageTimeout` Sets a timeout for fetching images.
 
 - :doc:`initialTransition` Sets a different transition on the the first image.
 
