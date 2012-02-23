@@ -364,6 +364,15 @@ Method for grabbing the currently displayed image.
 Returns the data object for the image. You can specify index or it will assume
 the currently active image.
 
+
+.getDataLength()
+-------------------
+
+    | returns **Number**
+
+Returns the number of slides in the gallery.
+
+
 .getIndex()
 -----------
 
@@ -430,6 +439,15 @@ Removes all functions attached to a Galleria event.
     | returns **Galleria**
 
 Manually triggers a Galleria event.
+
+
+.destroy()
+----------
+
+    | returns **Galleria**
+
+Wipes out the galleria gallery and restores the original content.
+
 
 .attachKeyboard( map )
 ----------------------

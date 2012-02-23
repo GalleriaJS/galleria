@@ -2128,7 +2128,7 @@ Galleria.prototype = {
 
         // raise error if no target is detected
         if ( !this._target ) {
-             Galleria.raise('Target not found.', true);
+             Galleria.raise('Target not found', true);
              return;
         }
 
@@ -2257,7 +2257,7 @@ Galleria.prototype = {
         this._initialized = true;
 
         if ( !Galleria.theme ) {
-            Galleria.raise( 'Init failed: No theme found.' );
+            Galleria.raise( 'Init failed: No theme found.', true );
             return this;
         }
 
@@ -3112,7 +3112,8 @@ Galleria.prototype = {
     */
 
     destroy: function() {
-        var target = this.$('target').html( this._original.html );
+        this.get('target').innerHTML = this._original.html;
+        return this;
     },
 
     /**
@@ -4805,7 +4806,7 @@ Galleria.raise = function( msg, fatal ) {
         }
         _hasError = true;
         fatal = false;
-        echo( 'Image gallery could not load.' );
+        echo( 'Gallery could not load.' );
     }
 };
 
