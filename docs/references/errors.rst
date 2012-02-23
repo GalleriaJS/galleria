@@ -71,8 +71,7 @@ This warning will appear if you somehow managed to run the init function twice f
 What you can do
 ---------------
 
-1. Go through your JavaScript logic and make sure that you are not doing anything fishy with the instance.
-Use only public methods and avoid custom constructors and other non-supported techniques.
+1. Go through your JavaScript logic and make sure that you are not doing anything fishy with the instance. Use only public methods and avoid custom constructors and other non-supported techniques.
 2. Make sure you are not calling loadTheme() twice.
 
 
@@ -122,8 +121,7 @@ This message will appear if these requirements aren’t met within 5 seconds.
 What you can do
 ---------------
 
-1. Make sure that your gallery is visible so it can extract measures. If it is hidden in an accordion or
-inside a container with display: none, it will fail. You can try to set :doc:`/options/wait` to true if that is the case.
+1. Make sure that your gallery is visible so it can extract measures. If it is hidden in an accordion or inside a container with display: none, it will fail. You can try to set :doc:`/options/wait` to true if that is the case.
 2. Double-check the path to the theme CSS and make sure it works properly.
 3. If you have made a custom theme, make sure that the stage has a height.
 
