@@ -705,7 +705,7 @@ var undef,
 
             toggleQuality : function( img, force ) {
 
-                if ( ( IE !== 7 && IE !== 8 ) || !img ) {
+                if ( ( IE !== 7 && IE !== 8 ) || !img || img.nodeName.toUpperCase() != 'IMG' ) {
                     return;
                 }
 
@@ -4977,12 +4977,12 @@ Galleria.Picture.prototype = {
 
             $('#'+id).load( (function( self, callback ) {
                 return function() {
-                    $(this).css( 'visibility', 'visible' );
-                    if( typeof callback == 'function' ) {
-                        window.setTimeout(function() {
+                    window.setTimeout(function() {
+                        $( self.image ).css( 'visibility', 'visible' );
+                        if( typeof callback == 'function' ) {
                             callback.call( self, self );
-                        }, 10);
-                    }
+                        }
+                    }, 10);
                 };
             }( this, callback )));
 

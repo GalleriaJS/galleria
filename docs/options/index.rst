@@ -46,6 +46,8 @@ List of options
 - :doc:`clicknext` Helper for adding a click event on the entire stage to move
   forward.
 
+- :doc:`dailymotion` Adds player options for the Daliymotion video player
+
 - :doc:`dataConfig` Defines how Galleria should parse the HTML. Useful for adding custom HTML captions.
 
 - :doc:`dataSelector` Defines the selector Galleria should look for in the
