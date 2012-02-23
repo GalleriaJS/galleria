@@ -764,7 +764,15 @@ var undef,
 
                 var link,
                     ready = false,
-                    length;
+                    length,
+                    lastChance = function() {
+                        var fake = new Image();
+                        fake.onload = fake.onerror = function(e) {
+                            fake = null;
+                            ready = true;
+                        };
+                        fake.src = href;
+                    };
 
                 // look for manual css
                 $('link[rel=stylesheet]').each(function() {
@@ -818,30 +826,36 @@ var undef,
                                 return;
                             }
 
-                            // todo: test if IE really needs the readyState
                             link.onreadystatechange = function(e) {
                                 if ( !ready && (!this.readyState ||
                                     this.readyState === 'loaded' || this.readyState === 'complete') ) {
                                     ready = true;
                                 }
                             };
+
                         } else {
-                            // final test via ajax if not local
-                            if ( !( new RegExp('file://','i').test( href ) ) ) {
+
+                            // final test via ajax
+                            var dum = doc.createElement('a'),
+                                loc = window.location;
+
+                            dum.href = href;
+
+                            if ( loc.hostname == dum.hostname &&
+                                 loc.port == dum.port &&
+                                 loc.protocol == dum.protocol ) {
+
+                                // Same origin policy should apply
                                 $.ajax({
                                     url: href,
                                     success: function() {
                                         ready = true;
                                     },
-                                    error: function(e) {
-                                        // pass if origin is rejected in chrome for some reason
-                                        if( e.isRejected() && Galleria.WEBKIT ) {
-                                            ready = true;
-                                        }
-                                    }
+                                    error: lastChance
                                 });
+
                             } else {
-                                ready = true;
+                                lastChance();
                             }
                         }
                     }, 10);
@@ -1027,9 +1041,6 @@ var undef,
 Galleria = function() {
 
     var self = this;
-
-    // the theme used
-    this._theme = undef;
 
     // internal options
     this._options = {};
@@ -2109,6 +2120,9 @@ Galleria.prototype = {
         // save the target here
         this._target = this._dom.target = target.nodeName ? target : $( target ).get(0);
 
+        // save the original content for destruction
+        this._original.html = this._target.innerHTML;
+
         // push the instance
         _instances.push( this );
 
@@ -3089,6 +3103,17 @@ Galleria.prototype = {
         return this;
     },
 
+    /**
+        Destroy the Galleria instance and recover the original content
+
+        @example this.destroy();
+
+        @returns Instance
+    */
+
+    destroy: function() {
+        var target = this.$('target').html( this._original.html );
+    },
 
     /**
         Adds and/or removes images from the gallery
@@ -5247,7 +5272,9 @@ $.extend( $.easing, {
 $.fn.galleria = function( options ) {
 
     return this.each(function() {
-        $( this ).data( 'galleria', new Galleria().init( this, options ) );
+        if ( !$.data(this, 'galleria') ) { // fail silent if already run
+            $.data( this, 'galleria', new Galleria().init( this, options ) );
+        }
     });
 
 };
