@@ -86,6 +86,7 @@ Fetch a user’s public photos using the username like displayed in the URL (not
 -------------------------------
 
 Get photos from a photoset by ID.
+Note that the 'sort' option is not available in this API call, see more here: http://www.flickr.com/services/api/flickr.photosets.getPhotos.html
 
 
 .gallery( gallery_id[, callback] )
