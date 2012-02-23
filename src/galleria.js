@@ -140,6 +140,22 @@ var undef,
                     }
                 }).error(fail);
             }
+        },
+        dailymotion: {
+            reg: /https?:\/\/(?:www\.)?(dailymotion\.com)\/video\/([^_]+)/,
+            embed: function(id) {
+                return 'http://www.dailymotion.com/embed/video/'+id;
+            },
+            getThumb: function( id, success, fail ) {
+                fail = fail || F;
+                $.getJSON('https://api.dailymotion.com/video/'+id+'?fields=thumbnail_medium_url&callback=?', function(data) {
+                    try {
+                        success( data.thumbnail_medium_url );
+                    } catch(e) {
+                        fail();
+                    }
+                }).error(fail);
+            }
         }
     },
 
@@ -1908,7 +1924,7 @@ Galleria = function() {
 
             $( DOM().body ).append( el.overlay, el.box );
 
-            Utils.optimizeTouch( el.box );
+            //Utils.optimizeTouch( el.box );
 
             // add the prev/next nav and bind some controls
 
@@ -2140,6 +2156,13 @@ Galleria.prototype = {
             carouselSpeed: 400,
             carouselSteps: 'auto',
             clicknext: false,
+            dailymotion: {
+                foreground: '%23EEEEEE',
+                highlight: '%235BCEC5',
+                background: '%23222222',
+                logo: 0,
+                hideInfos: 1
+            },
             dataConfig : function( elem ) { return {}; },
             dataSelector: 'img',
             dataSource: this._target,
@@ -3941,7 +3964,9 @@ this.prependChild( 'info', 'myElement' );
                             return;
                         }
 
-                        self.openLightbox();
+                        if ( self._options.lightbox ) {
+                            self.openLightbox();
+                        }
 
                     });
                 }
@@ -4922,6 +4947,7 @@ Galleria.Picture.prototype = {
         Will also add the image to cache.
 
         @param {string} src The image source path, ex '/path/to/img.jpg'
+        @param {Object} [size] The forced size of the image, defined as an object { width: xx, height:xx }
         @param {Function} callback The function to be executed when the image is loaded & scaled
 
         @returns The image container (jQuery object)
