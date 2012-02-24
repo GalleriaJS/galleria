@@ -23,3 +23,13 @@ Example::
         theme: 'galleria.classic'
     });
     </script>
+
+Alternatively, it is possible to simply call 'loadTheme' directly before the gallery is initialized::
+
+    <script>
+    Galleria.loadTheme('themes/classic/galleria.classic.js');
+    $('#galleria-one').galleria(); // Will have the 'classic' theme
+
+    Galleria.loadTheme('themes/twelve/galleria.twelve.js');
+    $('#galleria-two').galleria(); // Will have the 'Twelve' theme
+    </script>
