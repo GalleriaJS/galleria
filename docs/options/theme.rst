@@ -9,7 +9,9 @@ The theme that should be used for this gallery.
 
 If undefined, this will default to the most recently loaded theme.
 
-The name should be in the same format as the theme's css/js files: 'galleria.themename'
+The name should be in the same format as the theme's css/js files: 'galleria.themename'.
+
+The theme must be loaded (either before or after) by calling 'Galleria.loadTheme'.
 
 .. highlight:: html
 
