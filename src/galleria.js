@@ -223,7 +223,7 @@ var undef,
     _themeLoad = function( theme ) {
 
         // fix the theme name so it can safely be used as an object property
-        var themeName = theme.css.replace(/(.*\/)?([^\/]+)\.\w+$/, '$2').replace(/[^\w]/, '');
+        var themeName = theme.css.replace(/(.*\/)?([^\/]+?)(\.min)?\.\w+$/, '$2').replace(/[^\w]/, '');
         if (!(themeName in _themes && _themes.hasOwnProperty(themeName))) {
             _themes[themeName] = theme;
         }
@@ -785,7 +785,7 @@ var undef,
                     length,
                     // reduce href to a valid css name for uniquely
                     // identifying it
-                    themeName = href.replace(/.*\/([^\/]+)\.\w+$/, '$1').replace(/[^\w]/, '');
+                    themeName = href.replace(/(.*\/)?([^\/]+?)(\.min)?\.\w+$/, '$2').replace(/[^\w]/, '');
 
                 // look for manual css
                 $('link[rel=stylesheet]').each(function() {
@@ -2413,7 +2413,7 @@ Galleria.prototype = {
         }
 
         // now we just have to wait for the theme...
-        if (this._theme !== undef) {
+        if (this._theme !== undef && (this._theme in _themes && _themes.hasOwnProperty(this._theme))) {
             this._init();
         } else {
             // push the instance into the pool and run it when the theme is ready
@@ -3101,7 +3101,7 @@ Galleria.prototype = {
                 self.trigger( Galleria.READY );
 
                 // call the theme init method
-                _themes[_defaultTheme].init.call( self, self._options );
+                _themes[self._theme].init.call( self, self._options );
 
                 // call the extend option
                 self._options.extend.call( self, self._options );
@@ -4803,8 +4803,8 @@ Galleria.loadTheme = function( src, options ) {
             Galleria.raise( "Theme at " + src + " could not load, check theme path.", true );
         }, 5000 );
 
-    // first clear the current theme, if exists
-    _defaultTheme = undef;
+    // Treat this theme as the new 'default'
+    _defaultTheme = src.replace(/(.*\/)?([^\/]+?)(\.min)?\.\w+$/, '$2').replace(/[^\w]/, '');
 
     // load the theme
     Utils.loadScript( src, function() {
