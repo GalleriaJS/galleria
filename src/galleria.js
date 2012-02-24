@@ -879,7 +879,6 @@ var undef,
                         return ready && doc.styleSheets.length > length;
                     },
                     success: function() {
-                        // TODO: Update CSS rules for stylesheet
                         Utils.prependCssId(link, themeName);
                         $(link).data('themeified', true);
 
@@ -964,8 +963,6 @@ var undef,
                             continue;
                         }
 
-                        var oldSelector = selectors[m];
-
                         // Prepend the id of the container element to all
                         // rules
                         position = selectors[m].indexOf(".galleria-container");
@@ -977,7 +974,6 @@ var undef,
                             }
                         }
 
-                        // TODO: Use correct '#id'
                         // note the space
                         if (position == -1) {
                             selectors[m] = id + " " + selectors[m];
@@ -1006,8 +1002,6 @@ var undef,
                             workerStyle = p.style;
                             workerStyle.cssText = style || '';
                         }
-
-                        console.log("Updating '" + oldSelector + "' to '" + selectors[m] + "' with CSS: " + workerStyle.cssText);
 
                         _insertRule(selectors[m], workerStyle.cssText, 0);
 
