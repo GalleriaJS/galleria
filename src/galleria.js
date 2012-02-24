@@ -222,16 +222,23 @@ var undef,
     // themeLoad trigger
     _themeLoad = function( theme ) {
 
-        if (!(theme.name in _themes && _themes.hasOwnProperty(theme.name))) {
-            _themes[theme.name] = theme;
+        // fix the theme name so it can safely be used as an object property
+        var themeName = theme.css.replace(/(.*\/)?([^\/]+)\.\w+$/, '$2').replace(/[^\w]/, '');
+        if (!(themeName in _themes && _themes.hasOwnProperty(themeName))) {
+            _themes[themeName] = theme;
         }
 
-        _defaultTheme = theme.name;
+        _defaultTheme = themeName;
 
         // run the instances we have in the pool
         $.each( _pool, function( i, instance ) {
             if ( !instance._initialized ) {
-                instance._init.call( instance );
+                if (instance._theme === undef) {
+                    instance._theme = _defaultTheme;
+                }
+                if (instance._theme == themeName) {
+                    instance._init.call( instance );
+                }
             }
         });
     },
@@ -775,7 +782,10 @@ var undef,
 
                 var link,
                     ready = false,
-                    length;
+                    length,
+                    // reduce href to a valid css name for uniquely
+                    // identifying it
+                    themeName = href.replace(/.*\/([^\/]+)\.\w+$/, '$1').replace(/[^\w]/, '');
 
                 // look for manual css
                 $('link[rel=stylesheet]').each(function() {
@@ -794,6 +804,12 @@ var undef,
 
                 // if already present, return
                 if ( link ) {
+
+                    if (!$(link).data('themeified')) {
+                        Utils.prependCssId(link, themeName);
+                        $(link).data('themeified') = true;
+                    }
+
                     callback.call( link, link );
                     return link;
                 }
@@ -858,24 +874,194 @@ var undef,
                     }, 10);
                 }
 
-                if ( typeof callback === 'function' ) {
+                Utils.wait({
+                    until: function() {
+                        return ready && doc.styleSheets.length > length;
+                    },
+                    success: function() {
+                        // TODO: Update CSS rules for stylesheet
+                        Utils.prependCssId(link, themeName);
+                        $(link).data('themeified', true);
 
-                    Utils.wait({
-                        until: function() {
-                            return ready && doc.styleSheets.length > length;
-                        },
-                        success: function() {
+                        if ( typeof callback === 'function' ) {
                             window.setTimeout( function() {
                                 callback.call( link, link );
                             }, 100);
-                        },
-                        error: function() {
-                            Galleria.raise( 'Theme CSS could not load', true );
-                        },
-                        timeout: 10000
-                    });
-                }
+                        }
+                    },
+                    error: function() {
+                        Galleria.raise( 'Theme CSS could not load', true );
+                    },
+                    timeout: 10000
+                });
+
                 return link;
+            },
+
+            prependCssId: function(element, id) {
+
+                var d      = document,
+                    p      = d.createElement('p'), // Have to hold the element (see notes)
+                    workerStyle = p.style, // worker style collection
+                    head,
+                    element, // The HTMLElement
+                    sheet, // browser agnostic access to styleSheet DOM element
+                    _rules, // browser agnostic access to 'rules' element of 'sheet'
+                    _insertRule, // browser agnostic access to 'insertRule' function of 'sheet'
+                    _deleteRule, // browser agnostic access to 'deleteRule' function of 'sheet'
+                    i,
+                    m,
+                    lastIndex,
+                    rule,
+                    style,
+                    selectors,
+                    position,
+                    validSelectors;
+
+                // Begin setting up private aliases to the important moving parts
+                // 1. The stylesheet object
+                // IE stores StyleSheet under the "styleSheet" property
+                // Safari doesn't populate sheet for xdomain link elements
+                sheet = element.sheet || element.styleSheet;
+
+                // 2. The style rules collection
+                // IE stores the rules collection under the "rules" property
+                _rules = sheet && ('cssRules' in sheet) ? 'cssRules' : 'rules';
+
+                // 3. The method to remove a rule from the stylesheet
+                // IE supports removeRule
+                _deleteRule = ('deleteRule' in sheet) ?
+                    function (i) { sheet.deleteRule(i); } :
+                    function (i) { sheet.removeRule(i); };
+
+                // 4. The method to add a new rule to the stylesheet
+                // IE supports addRule with different signature
+                _insertRule = ('insertRule' in sheet) ?
+                    function (sel,css,i) { sheet.insertRule(sel+" {"+css+"}",i); } :
+                    function (sel,css,i) { sheet.addRule(sel,css,i); };
+
+                // 5. Initialize the cssRules map from the element
+                // xdomain link elements forbid access to the cssRules collection, so this
+                // will throw an error.
+                lastIndex = sheet[_rules].length - 1;
+
+                id = "#" + id;
+
+                // for each rule in the sheet, in reverse order
+                for (index = lastIndex; index >= 0; --index) {
+
+                    rule = sheet[_rules][lastIndex];
+                    style = rule.style.cssText;
+                    // IE's addRule doesn't support multiple comma delimited selectors
+                    selectors = rule.selectorText.split(/\s*,\s*/);
+                    validSelectors = 0;
+
+                    _deleteRule(lastIndex);
+
+                    for (m = selectors.length - 1; m >= 0; --m) {
+                        // Some selector values can cause IE to hang
+                        if (!Utils.isValidSelector(selectors[m])) {
+                            continue;
+                        }
+
+                        var oldSelector = selectors[m];
+
+                        // Prepend the id of the container element to all
+                        // rules
+                        position = selectors[m].indexOf(".galleria-container");
+
+                        if (position == -1) {
+                            position = selectors[m].indexOf(".notouch");
+                            if (position == -1) {
+                                position = selectors[m].indexOf(".touch");
+                            }
+                        }
+
+                        // TODO: Use correct '#id'
+                        // note the space
+                        if (position == -1) {
+                            selectors[m] = id + " " + selectors[m];
+                        } else if (position == 0) {
+                            selectors[m] = id + selectors[m];
+                        } else {
+                            selectors[m] = selectors[m].substring(0, position) + id + selectors[m].substring(position);
+                        }
+
+                        /*
+                         * Opera throws an error if there's a syntax error in assigned
+                         * cssText. Avoid this using a worker style collection, then
+                         * assigning the resulting cssText.
+                         *
+                         * A very difficult to repro/isolate IE 9 beta (and Platform Preview 7) bug
+                         * was reduced to this line throwing the error:
+                         * "Invalid this pointer used as target for method call"
+                         * It appears that the style collection is corrupted. The error is
+                         * catchable, so in a best effort to work around it, replace the
+                         * p and workerStyle and try the assignment again.
+                         */
+                        try {
+                            workerStyle.cssText = style || '';
+                        } catch (e) {
+                            p = d.createElement('p');
+                            workerStyle = p.style;
+                            workerStyle.cssText = style || '';
+                        }
+
+                        console.log("Updating '" + oldSelector + "' to '" + selectors[m] + "' with CSS: " + workerStyle.cssText);
+
+                        _insertRule(selectors[m], workerStyle.cssText, 0);
+
+                        validSelectors++;
+                    }
+
+                    // if there is anything but one selector, we've changed the size of
+                    // the rules array, so adjust accordingly
+                    lastIndex += (validSelectors - 1);
+
+                }
+
+            },
+            
+            /**
+             * Determines if a CSS selector string is safe to use.  Used 
+             * in set to prevent IE from locking up when attempting to add a rule for a
+             * &quot;bad selector&quot;.
+             *
+             * Bad selectors are considered to be any string containing unescaped
+             * `~!@$%^&()+=|{}[];'"?< or space. Also forbidden are . or # followed by
+             * anything other than an alphanumeric.  Additionally -abc or .-abc or
+             * #_abc or '# ' all fail.  There are likely more failure cases, so
+             * please file a bug if you encounter one.
+             *
+             * @method isValidSelector
+             * @param sel {String} the selector string
+             * @return {Boolean}
+             * @static
+             */
+            isValidSelector : function (sel) {
+                var valid = false;
+
+                if (sel && typeof sel === "string") {
+
+                    // TEST: there should be nothing but white-space left after
+                    // these destructive regexs
+                    valid = !/\S/.test(
+                        // combinators
+                        sel.replace(/\s+|\s*[+~>]\s*/g,' ').
+                        // attribute selectors (contents not validated)
+                        replace(/([^ ])\[.*?\]/g,'$1').
+                        // pseudo-class|element selectors (contents of parens
+                        // such as :nth-of-type(2) or :not(...) not validated)
+                        replace(/([^ ])::?[a-z][a-z\-]+[a-z](?:\(.*?\))?/ig,'$1').
+                        // element tags
+                        replace(/(?:^| )[a-z0-6]+/ig,' ').
+                        // escaped characters
+                        replace(/\\./g, '').
+                        // class and id identifiers
+                        replace(/[.#]\w[\w\-]*/g, ''));
+                }
+
+                return valid;
             }
         };
     }()),
@@ -1078,6 +1264,8 @@ Galleria = function() {
 
     // target holder
     this._target = undef;
+
+    this._theme = undef;
 
     // instance id
     this._id = Math.random();
@@ -2174,6 +2362,7 @@ Galleria.prototype = {
             showCounter: true,
             showImagenav: true,
             swipe: true, // 1.2.4
+            theme: undef,
             thumbCrop: true,
             thumbEventType: 'click',
             thumbFit: true,
@@ -2223,8 +2412,14 @@ Galleria.prototype = {
         // hide all content
         $( this._target ).children().hide();
 
+        if (options && typeof options.theme !== 'undefined') {
+            this._theme = options.theme.replace(/[^\w]/, '');
+        } else {
+            this._theme = _defaultTheme;
+        }
+
         // now we just have to wait for the theme...
-        if (_defaultTheme !== undef && _defaultTheme in _themes && _themes.hasOwnProperty(_defaultTheme)) {
+        if (this._theme !== undef) {
             this._init();
         } else {
             // push the instance into the pool and run it when the theme is ready
@@ -2242,6 +2437,14 @@ Galleria.prototype = {
         var self = this,
             options = this._options;
 
+        if (_themes[this._theme] === undef) {
+            Galleria.raise( 'Init failed: No theme found.' );
+            return this;
+        }
+
+        // set the theme ID on the element
+        this.$( 'container' ).attr("id", this._theme);
+
         if ( this._initialized ) {
             Galleria.raise( 'Init failed: Gallery instance already initialized.' );
             return this;
@@ -2249,13 +2452,8 @@ Galleria.prototype = {
 
         this._initialized = true;
 
-        if (_defaultTheme === undef) {
-            Galleria.raise( 'Init failed: No theme found.' );
-            return this;
-        }
-
         // merge the theme & caller options
-        $.extend( true, options, _themes[_defaultTheme].defaults, this._original.options );
+        $.extend( true, options, _themes[this._theme].defaults, this._original.options );
 
         // check for canvas support
         (function( can ) {
