@@ -3828,7 +3828,7 @@ this.prependChild( 'info', 'myElement' );
             measures = undef;
         }
 
-        measures = $.extend( measures || {}, { width:0, height:0 });
+        measures = $.extend( { width:0, height:0 }, measures );
 
         var self = this,
             $container = this.$( 'container' );
