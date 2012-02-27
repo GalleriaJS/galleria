@@ -959,7 +959,7 @@ var undef,
 
                     for (m = selectors.length - 1; m >= 0; --m) {
                         // Some selector values can cause IE to hang
-                        if (!Utils.isValidSelector(selectors[m])) {
+                        if (IE !== undef && !Utils.isValidSelector(selectors[m])) {
                             continue;
                         }
 
