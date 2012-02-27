@@ -88,7 +88,7 @@ What you can do
 ---------------
 
 1. Make sure you are using loadTheme() the right way
-2. Post your issue at http://getsatisfaction.com/galleria/ for further assistance
+2. Post your issue at http://support.galleria.io for further assistance
 
 
 Your page is in Quirks mode, Galleria may not render correctly. Please validate your HTML.

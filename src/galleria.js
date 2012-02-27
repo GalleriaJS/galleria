@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7b3 2012-02-23
+ * @preserve Galleria v 1.2.7b4 2012-02-27
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -1356,6 +1356,10 @@ Galleria = function() {
 
         open: false,
 
+        timer: 'tooltip' + self._id,
+
+        swapTimer: 'swap' + self._id,
+
         init: function() {
 
             tooltip.initialized = true;
@@ -1420,11 +1424,11 @@ Galleria = function() {
 
                 $( elem ).hover(function() {
 
-                    Utils.clearTimer('switch_tooltip');
+                    Utils.clearTimer( tooltip.swapTimer );
                     self.$('container').unbind( 'mousemove', tooltip.move ).bind( 'mousemove', tooltip.move ).trigger( 'mousemove' );
                     tooltip.show( elem );
 
-                    Galleria.utils.addTimer( 'tooltip', function() {
+                    Utils.addTimer( tooltip.timer, function() {
                         self.$( 'tooltip' ).stop().show().animate({
                             opacity:1
                         });
@@ -1435,7 +1439,7 @@ Galleria = function() {
                 }, function() {
 
                     self.$( 'container' ).unbind( 'mousemove', tooltip.move );
-                    Utils.clearTimer( 'tooltip' );
+                    Utils.clearTimer( tooltip.timer );
 
                     self.$( 'tooltip' ).stop().animate({
                         opacity: 0
@@ -1443,7 +1447,7 @@ Galleria = function() {
 
                         self.$( 'tooltip' ).hide();
 
-                        Utils.addTimer('switch_tooltip', function() {
+                        Utils.addTimer( tooltip.swapTimer, function() {
                             tooltip.open = false;
                         }, 1000);
                     });
@@ -1615,7 +1619,7 @@ Galleria = function() {
             // init the first rescale and attach callbacks
             self.rescale(function() {
 
-                Utils.addTimer('fullscreen_enter', function() {
+                Utils.addTimer(false, function() {
                     // show the image after 50 ms
                     Utils.show( self.getActiveImage() );
 
@@ -1675,7 +1679,7 @@ Galleria = function() {
             }
 
             self.rescale(function() {
-                Utils.addTimer('fullscreen_exit', function() {
+                Utils.addTimer(false, function() {
 
                     // show the image after 50 ms
                     Utils.show( self.getActiveImage() );
@@ -1695,6 +1699,8 @@ Galleria = function() {
 
     // the internal idle object for controlling idle states
     var idle = this._idle = {
+
+        timer: 'idle' + self._id,
 
         trunk: [],
 
@@ -1740,7 +1746,7 @@ Galleria = function() {
 
             if (!idle.trunk.length) {
                 idle.removeEvent();
-                Utils.clearTimer('idle');
+                Utils.clearTimer( idle.timer );
             }
         },
 
@@ -1755,8 +1761,8 @@ Galleria = function() {
         },
 
         addTimer : function() {
-            Utils.addTimer('idle', function() {
-                self._idle.hide();
+            Utils.addTimer( idle.timer, function() {
+                idle.hide();
             }, self._options.idleTime );
         },
 
@@ -1786,10 +1792,10 @@ Galleria = function() {
 
         showAll : function() {
 
-            Utils.clearTimer('idle');
+            Utils.clearTimer( idle.timer );
 
-            $.each(self._idle.trunk, function( i, elem ) {
-                self._idle.show( elem );
+            $.each( idle.trunk, function( i, elem ) {
+                idle.show( elem );
             });
         },
 
@@ -1803,7 +1809,7 @@ Galleria = function() {
 
                 self.trigger( Galleria.IDLE_EXIT );
 
-                Utils.clearTimer( 'idle' );
+                Utils.clearTimer( idle.timer );
 
                 Utils.animate( elem, data.from, {
                     duration: self._options.idleSpeed/2,
@@ -2198,6 +2204,7 @@ Galleria.prototype = {
             popupLinks: false,
             preload: 2,
             queue: true,
+            responsive: false,
             show: 0,
             showInfo: true,
             showCounter: true,
@@ -2332,32 +2339,16 @@ Galleria.prototype = {
                 until: function() {
 
                     // keep trying to get the value
-                    $.each(['width', 'height'], function( i, m ) {
-
-                        // first check if options is set
-
-                        if ( options[ m ] && typeof options[ m ] === 'number' ) {
-                            num[ m ] = options[ m ];
-                        } else {
-
-                            // else extract the measures from different sources and grab the highest value
-                            num[ m ] = Math.max(
-                                Utils.parseValue( $container.css( m ) ),         // 1. the container css
-                                Utils.parseValue( self.$( 'target' ).css( m ) ), // 2. the target css
-                                $container[ m ](),                               // 3. the container jQuery method
-                                self.$( 'target' )[ m ]()                        // 4. the container jQuery method
-                            );
-                        }
-
-                        // apply the new measures
-                        $container[ m ]( num[ m ] );
-
-                    });
+                    num = self._getWH();
+                    $container.width( num.width ).height( num.height );
 
                     return testHeight() && num.width && num.height > 50;
 
                 },
                 success: function() {
+
+                    self._width = num.width;
+                    self._height = num.height;
 
                     // for some strange reason, webkit needs a single setTimeout to play ball
                     if ( Galleria.WEBKIT ) {
@@ -2507,6 +2498,15 @@ Galleria.prototype = {
             });
         }
 
+        // bind window resize for responsiveness
+        if ( options.responsive ) {
+            $win.bind( 'resize', function() {
+                if ( !self.isFullscreen() ) {
+                    self.resize();
+                }
+            });
+        }
+
         // bind swipe gesture
         if ( options.swipe ) {
 
@@ -2612,6 +2612,46 @@ Galleria.prototype = {
         Utils.optimizeTouch( this.get( 'container' ) );
 
         return this;
+    },
+
+    // parse width & height from CSS or options
+
+    _getWH : function() {
+
+        var $container = this.$( 'container' ),
+            $target = this.$( 'target' ),
+            self = this,
+            num = {},
+            arr;
+
+        $.each(['width', 'height'], function( i, m ) {
+
+            // first check if options is set
+            if ( self._options[ m ] && typeof self._options[ m ] === 'number' ) {
+                num[ m ] = self._options[ m ];
+            } else {
+
+                arr = [
+                    Utils.parseValue( $container.css( m ) ),         // the container css height
+                    Utils.parseValue( $target.css( m ) ),            // the target css height
+                    $container[ m ](),                               // the container jQuery method
+                    $target[ m ]()                                   // the target jQuery method
+                ];
+
+                // if first time, include the min-width & min-height
+                if ( !self[ '_'+m ] ) {
+                    arr.splice(arr.length,
+                        Utils.parseValue( $container.css( 'min-'+m ) ),
+                        Utils.parseValue( $target.css( 'min-'+m ) )
+                    );
+                }
+
+                // else extract the measures from different sources and grab the highest value
+                num[ m ] = Math.max.apply( Math, arr );
+            }
+        });
+
+        return num;
     },
 
     // Creates the thumbnails and carousel
@@ -2963,10 +3003,10 @@ Galleria.prototype = {
         Loads data into the gallery.
         You can call this method on an existing gallery to reload the gallery with new data.
 
-        @param {Array|string} source Optional JSON array of data or selector of where to find data in the document.
+        @param {Array|string} [source] Optional JSON array of data or selector of where to find data in the document.
         Defaults to the Galleria target or dataSource option.
 
-        @param {string} selector Optional element selector of what elements to parse.
+        @param {string} [selector] Optional element selector of what elements to parse.
         Defaults to 'img'.
 
         @param {Function} [config] Optional function to modify the data extraction proceedure from the selector.
@@ -3444,7 +3484,7 @@ $(document).mousemove(function(e) {
     /**
         Adds a panning effect to the image
 
-        @param img The optional image element. If not specified it takes the currently active image
+        @param [img] The optional image element. If not specified it takes the currently active image
 
         @returns Instance
     */
@@ -3535,7 +3575,7 @@ $(document).mousemove(function(e) {
         this.$( 'stage' ).unbind( 'mousemove', calculate ).bind( 'mousemove', calculate );
 
         // loop the loop
-        Utils.addTimer('pan', loop, 50, true);
+        Utils.addTimer( 'pan' + self._id, loop, 50, true);
 
         return this;
     },
@@ -3544,7 +3584,7 @@ $(document).mousemove(function(e) {
         Brings the scope into any callback
 
         @param fn The callback to bring the scope into
-        @param scope Optional scope to bring
+        @param [scope] Optional scope to bring
 
         @example $('#fullscreen').click( this.proxy(function() { this.enterFullscreen(); }) )
 
@@ -3573,7 +3613,7 @@ $(document).mousemove(function(e) {
 
         this.$( 'stage' ).unbind( 'mousemove' );
 
-        Utils.clearTimer( 'pan' );
+        Utils.clearTimer( 'pan' + this._id );
 
         return this;
     },
@@ -3770,6 +3810,39 @@ this.prependChild( 'info', 'myElement' );
     updateCarousel : function() {
         this._carousel.update();
         return this;
+    },
+
+    /**
+        Resize the entire gallery container
+
+        @param {Object} [measures] Optional object with width/height specified
+        @param {Function} [complete] The callback to be called when the scaling is complete
+
+        @returns Instance
+    */
+
+    resize : function( measures, complete ) {
+
+        if ( typeof measures == 'function' ) {
+            complete = measures;
+            measures = undef;
+        }
+
+        measures = $.extend( measures || {}, { width:0, height:0 });
+
+        var self = this,
+            $container = this.$( 'container' );
+
+        $.each( measures, function( m, val ) {
+            if ( !val ) {
+                $container[ m ]( 'auto' );
+                val = self._getWH()[ m ];
+            }
+            $container[ m ]( val );
+        });
+
+        return this.rescale( complete );
+
     },
 
     /**
@@ -4121,7 +4194,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Gets the next index
 
-        @param {number} base Optional starting point
+        @param {number} [base] Optional starting point
 
         @returns {number} the next index, or the first if you are at the first (looping)
     */
@@ -4134,7 +4207,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Gets the previous index
 
-        @param {number} base Optional starting point
+        @param {number} [base] Optional starting point
 
         @returns {number} the previous index, or the last if you are at the first (looping)
     */
@@ -4395,7 +4468,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Manually modify the counter
 
-        @param {number} index Optional data index to fectch,
+        @param {number} [index] Optional data index to fectch,
         if no index found it assumes the currently active index
 
         @returns Instance
@@ -4430,7 +4503,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Manually set captions
 
-        @param {number} index Optional data index to fectch and apply as caption,
+        @param {number} [index] Optional data index to fectch and apply as caption,
         if no index found it assumes the currently active index
 
         @returns Instance
@@ -4458,7 +4531,7 @@ this.prependChild( 'info', 'myElement' );
     /**
         Checks if the data contains any captions
 
-        @param {number} index Optional data index to fectch,
+        @param {number} [index] Optional data index to fectch,
         if no index found it assumes the currently active index.
 
         @returns {boolean}

@@ -22,6 +22,8 @@ Changelog
 * Added a new reference called "Galleria error messages" where we list all common errors, what causes them and how to solve them.
 * Fixed minor lightbox/clicknext bug for touch devices
 * Fixed a cross-domain issue when adding themes from other domains in firefox
+* Fixed some timer bugs for multiple galleries
+* Added a 'resize' method in the API and a new option called 'responsive'. Setting this to true will allow the entire gallery to scale according to dynamic CSS properties.
 
 1.2.6
 -----

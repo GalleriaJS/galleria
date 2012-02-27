@@ -67,7 +67,15 @@ image will be placed in a transition queue.
 Display
 =======
 
-.. _enterFullscreen:
+.resize( [measures] )
+----------------------------
+
+    | returns **Galleria**
+
+This will resize the entire gallery. 'measures' is an object with "width" and
+"height" that you can pass to force a certain size. If no width or height is
+passed, the gallery will extract new measures from the CSS.
+
 
 .enterFullscreen( [callback] )
 ------------------------------
