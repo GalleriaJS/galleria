@@ -398,56 +398,58 @@ var undef,
                     syntax = ' ' + options.duration + 'ms' + ' cubic-bezier('  + easing.join(',') + ')';
 
                     // add a tiny timeout so that the browsers catches any css changes before animating
-                    window.setTimeout(function() {
+                    window.setTimeout( (function(elem, endEvent, to, syntax) {
+                        return function() {
 
-                        // attach the end event
-                        elem.one(endEvent, (function( elem ) {
-                            return function() {
-                                // clear the animation
-                                clearStyle(elem);
+                            // attach the end event
+                            elem.one(endEvent, (function( elem ) {
+                                return function() {
+                                    // clear the animation
+                                    clearStyle(elem);
 
-                                // run the complete method
-                                options.complete.call(elem[0]);
-                            };
-                        }( elem )));
+                                    // run the complete method
+                                    options.complete.call(elem[0]);
+                                };
+                            }( elem )));
 
-                        // do the webkit translate3d for better performance on iOS
-                        if( Galleria.WEBKIT && Galleria.TOUCH ) {
+                            // do the webkit translate3d for better performance on iOS
+                            if( Galleria.WEBKIT && Galleria.TOUCH ) {
 
-                            revert = {};
-                            form = [0,0,0];
+                                revert = {};
+                                form = [0,0,0];
 
-                            $.each( ['left', 'top'], function(i, m) {
-                                if ( m in to ) {
-                                    form[ i ] = ( Utils.parseValue( to[ m ] ) - Utils.parseValue(elem.css( m )) ) + 'px';
-                                    revert[ m ] = to[ m ];
-                                    delete to[ m ];
+                                $.each( ['left', 'top'], function(i, m) {
+                                    if ( m in to ) {
+                                        form[ i ] = ( Utils.parseValue( to[ m ] ) - Utils.parseValue(elem.css( m )) ) + 'px';
+                                        revert[ m ] = to[ m ];
+                                        delete to[ m ];
+                                    }
+                                });
+
+                                if ( form[0] || form[1]) {
+
+                                    elem.data('revert', revert);
+
+                                    strings.push('-webkit-transform' + syntax);
+
+                                    // 3d animate
+                                    setStyle( elem, 'translate3d(' + form.join(',') + ')', 'transform');
                                 }
+                            }
+
+                            // push the animation props
+                            $.each(to, function( p, val ) {
+                                strings.push(p + syntax);
                             });
 
-                            if ( form[0] || form[1]) {
+                            // set the animation styles
+                            setStyle( elem, strings.join(',') );
 
-                                elem.data('revert', revert);
+                            // animate
+                            elem.css( to );
 
-                                strings.push('-webkit-transform' + syntax);
-
-                                // 3d animate
-                                setStyle( elem, 'translate3d(' + form.join(',') + ')', 'transform');
-                            }
-                        }
-
-                        // push the animation props
-                        $.each(to, function( p, val ) {
-                            strings.push(p + syntax);
-                        });
-
-                        // set the animation styles
-                        setStyle( elem, strings.join(',') );
-
-                        // animate
-                        elem.css( to );
-
-                    },1 );
+                        };
+                    }(elem, endEvent, to, syntax)), 2);
                 };
             }()),
 
@@ -2000,7 +2002,7 @@ Galleria = function() {
 
                         $( image.container ).show();
 
-                        Utils.show( image.image, speed );
+                        $( image.image ).animate({ opacity: 1 }, speed);
                         Utils.show( lightbox.elems.info, speed );
                     }
                 });
@@ -2086,13 +2088,13 @@ Galleria = function() {
                 lightbox.height = image.isIframe ? $(window).height() : image.original.height;
 
                 $( image.image ).css({
-                    width: image.isIframe ? '100%' : '100.5%',
-                    height: image.isIframe ? '100%' : '100.5%',
+                    width: image.isIframe ? '100%' : '100.1%',
+                    height: image.isIframe ? '100%' : '100.1%',
                     top: 0,
-                    zIndex: 99998
+                    zIndex: 99998,
+                    opacity: 0,
+                    visibility: 'visible'
                 });
-
-                Utils.hide( image.image );
 
                 lightbox.elems.title.innerHTML = data.title || '';
                 lightbox.elems.counter.innerHTML = (index + 1) + ' / ' + total;
