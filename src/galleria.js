@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7b4 2012-02-27
+ * @preserve Galleria v 1.2.7b5 2012-03-01
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -859,7 +859,8 @@ var undef,
 
                             dum.href = href;
 
-                            if ( loc.hostname == dum.hostname &&
+                            if ( !( /file/.test( loc.protocol ) ) &&
+                                 loc.hostname == dum.hostname &&
                                  loc.port == dum.port &&
                                  loc.protocol == dum.protocol ) {
 
@@ -1690,6 +1691,8 @@ Galleria = function() {
                         callback.call( self );
                     }
 
+                    $win.trigger( 'resize' );
+
                 }, 50);
                 self.trigger( Galleria.FULLSCREEN_EXIT );
             });
@@ -2181,7 +2184,7 @@ Galleria.prototype = {
             fullscreenCrop: undef, // 1.2.5
             fullscreenDoubleTap: true, // 1.2.4 toggles fullscreen on double-tap for touch devices
             fullscreenTransition: undef, // 1.2.6
-            height: 'auto',
+            height: 0,
             idleMode: true, // 1.2.4 toggles idleMode
             idleTime: 3000,
             idleSpeed: 200,
@@ -2230,7 +2233,7 @@ Galleria.prototype = {
                 color: 'aaaaaa'
             },
             wait: 5000, // 1.2.7
-            width: 'auto',
+            width: 0,
             youtube: {
                 modestbranding: 1,
                 autohide: 1,
@@ -2629,7 +2632,7 @@ Galleria.prototype = {
         $.each(['width', 'height'], function( i, m ) {
 
             // first check if options is set
-            if ( self._options[ m ] && typeof self._options[ m ] === 'number' ) {
+            if ( self._options[ m ] && typeof self._options[ m ] === 'number') {
                 num[ m ] = self._options[ m ];
             } else {
 
@@ -2652,6 +2655,12 @@ Galleria.prototype = {
                 num[ m ] = Math.max.apply( Math, arr );
             }
         });
+
+        // allow setting a height ratio instead of exact value
+        // useful when doing responsive galleries
+        if ( self._options.height && self._options.height < 2 ) {
+            num.height = num.width * self._options.height;
+        }
 
         return num;
     },
@@ -3833,14 +3842,24 @@ this.prependChild( 'info', 'myElement' );
         measures = $.extend( { width:0, height:0 }, measures );
 
         var self = this,
-            $container = this.$( 'container' );
+            $container = this.$( 'container' ),
+            aspect = this._options.responsive == 'aspect' && ( !measures.width || !measures.height ),
+            ratio;
 
         $.each( measures, function( m, val ) {
             if ( !val ) {
                 $container[ m ]( 'auto' );
-                val = self._getWH()[ m ];
+                measures[ m ] = self._getWH()[ m ];
             }
-            $container[ m ]( val );
+        });
+
+        // experimental aspect option, not documented yet. Use ratio-based height instead!
+        if ( aspect ) {
+            ratio = Math.min( measures.width/this._width, measures.height/this._height );
+        }
+
+        $.each( measures, function( m, val ) {
+            $container[ m ]( ratio ? ratio * self[ '_' + m ] : val );
         });
 
         return this.rescale( complete );
