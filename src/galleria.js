@@ -5256,7 +5256,8 @@ Galleria.Picture.prototype = {
                         'height': newHeight,
                         'false' : min,
                         'landscape': self.original.width > self.original.height ? max : min,
-                        'portrait': self.original.width < self.original.height ? max : min
+                        'portrait': self.original.width < self.original.height ? max : min,
+                        'fit'   : Math.min( min, 1.0 )
                     },
                     ratio = cropMap[ options.crop.toString() ],
                     canvasKey = '';
