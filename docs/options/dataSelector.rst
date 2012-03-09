@@ -25,7 +25,7 @@ Example::
     </div>
 
     <script>
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         dataSelector: "a",
         dataConfig: function(a) {
             // a is now the anchor element

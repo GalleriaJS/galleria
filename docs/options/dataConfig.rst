@@ -38,7 +38,7 @@ Example on how to alter the extraction logic:
         <span class="desc">My picture</span>
     </div>
     <script>
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         dataConfig: function(img) {
             // img is now the image element
             // the function should return an object with the new data
@@ -65,7 +65,7 @@ Example on how to add rich HTML captions:
         </div>
     </div>
     <script>
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         dataConfig: function(img) {
             return {
                 title: $(img).next('h2').html(), // tell Galleria to use the h2 as title

@@ -20,7 +20,7 @@ Examples
 
 ::
 
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         picasa: 'search:galleria'
     });
 
@@ -28,7 +28,7 @@ Examples
 
 ::
 
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         picasa: 'useralbum:galleriajs/Demo', // 'galleriajs' is the username and 'Demo' is the album ID
         picasaOptions: {
             sort: 'date-posted-asc'
@@ -43,7 +43,7 @@ When using the picasa plugin as a Galleria option like this, you simply apply a 
 
     var picasa = new Galleria.Picasa();
     picasa.search('sweden', function(data) {
-        $('#galleria').galleria({
+        Galleria.run('#galleria', {
             dataSource: data
         });
     });

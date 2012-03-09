@@ -68,7 +68,7 @@ Creata a simple theme step by step
 After the theme is created you can use the theme when calling Galleria::
 
     Galleria.loadTheme('/path/to/themes/galleria.my_theme.js');
-    $('#images').galleria();
+    Galleria.run('#galleria');
 
 
 The theme object explained:

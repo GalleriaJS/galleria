@@ -9,17 +9,64 @@ Static methods are exposed using ``Galleria.fn()``.
 
 .. highlight:: javascript
 
+Galleria.run( selector, options )
+--------------------------
+
+    | returns Galleria
+
+This function initializes the gallery. The first argument is the jQuery selector of
+element(s) you want to load the gallery to. The second argument (optional) is an object
+of configuration options::
+
+    Galleria.run('#galleria');
+    Galleria.run('#galleria', {
+        imageCrop: true,
+        transition: 'fade'
+    });
+
+
+Galleria.configure( options )
+--------------------------
+
+    | returns Galleria
+
+This function configures options to the gallery. The options you specify here will be
+applied to all instances on the page. If you want to apply options for a specific gallery,
+use the ``.setOptions()`` API call, or apply the options when calling ``Galleria.run()``.
+
+You can add multiple options like this::
+
+    Galleria.configure({
+        thumbCrop: true,
+        lightbox: true
+    });
+
+Or single options using key/value::
+
+    Galleria.configure('imageCrop', false);
+
+The options will be applied to the gallery no matter when it’s called. If the gallery
+is not yet ready, they will be applied when it is. If the gallery is already running,
+the options will be applied at run-time.
+
+
 Galleria.ready( function )
-----------------------------------------
+--------------------------
 
-    | returns null
+    | returns Galleria
 
-Use this to bind custom functionality to each gallery instance onload. Works the same way as the extend option.
+Use this function to bind bind custom functionality to each gallery instance
+when the gallery is loaded. Example::
+
+    Galleria.ready(function() {
+        Galleria.log('Gallery ready', this); // the Galleria instance
+    });
+
 
 Galleria.log( msg [,msg,...] )
 ------------------------------
 
-    | returns null
+    | returns Galleria
 
 A helper metod for cross-browser logging. It uses the console log if available
 otherwise it falls back to the opera debugger and finally ``alert()``
@@ -28,37 +75,27 @@ otherwise it falls back to the opera debugger and finally ``alert()``
 Galleria.raise( msg )
 ---------------------
 
-    | returns null
+    | returns Galleria
 
 This method will raise an error message if Galleria.debug is true. Useful if
 you have sensitive code that needs to throw an error if not completed when
 developing.
 
 
-.. _galleria_get:
-
 Galleria.get( [index] )
 -----------------------
 
-    | returns Galleria
+    | returns instance or array of instances
 
 Use this to fetch a galleria instance from anywhere on your page. If you only
 have one galleria gallery, ``Galleria.get(0)`` will return the first (and only)
 gallery. If you call ``Galleria.get()`` without specifying an index, it will
 return an array with all galleries initiated. Example::
 
-    $('#images').galleria(); // initialize the galleria
+    Galleria.run('#galleria'); // initialize the galleria
 
-    var gallery = Galleria.get(0); // gallery is now the first galleria instance
     $('#play').click(function() {
-        gallery.play(); // will start slideshow when the element #play is clicked
-    });
-
-    $('#images2').galleria() // initialize another gallery
-
-    var galleries = Galleria.get(); // galleries is now an array of all galleria instances
-    $('#fullscreen').click(function() {
-        galleries[1].enterFullscreen(); // will enter fullscreen mode for the second gallery
+        Galleria.get(0).play(); // will start slideshow when the element #play is clicked
     });
 
 
@@ -67,7 +104,7 @@ return an array with all galleries initiated. Example::
 Galleria.loadTheme( url[, options] )
 ------------------------------------
 
-    | returns null
+    | returns Galleria
 
 This methods loads a theme into galleria. It will insert the necessary scripts
 and styles into the document and provide a event that will hold the galleria
@@ -79,7 +116,7 @@ absolute path to the theme .js file. Example::
     Galleria.loadTheme('galleria/themes/classic/galleria.classic.js'):
 
     // initiate the gallery
-    $('#images').galleria();
+    Galleria.run('#galleria');
 
     // when the theme is fully loaded, galleria will run.
 

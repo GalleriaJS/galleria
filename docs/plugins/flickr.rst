@@ -20,7 +20,7 @@ Examples
 
 ::
 
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         flickr: 'search:galleria'
     });
 
@@ -28,7 +28,7 @@ Examples
 
 ::
 
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         flickr: 'set:308783',
         flickrOptions: {
             sort: 'date-posted-asc'
@@ -43,7 +43,7 @@ When using the flickr plugin as a Galleria option like this, you simply apply a 
 
     var flickr = new Galleria.Flickr();
     flickr.search('sweden', function(data) {
-        $('#galleria').galleria({
+        Galleria.run('#galleria', {
             dataSource: data
         });
     });

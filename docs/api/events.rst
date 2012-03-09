@@ -8,20 +8,36 @@ similar to jQuery's event model, except that it adds event.scope that refers to
 the current gallery scope of each event. Some events will add even further
 properties to the event object, specified here.
 
+In the callback, the ``this`` keyword inside the callback always refers to the gallery scope.
+
 .. highlight:: javascript
 
-Use ``.bind()`` to listen to the Galleria events. In the callback, the this
-keyword inside the callback always refers to the same gallery scope. Example::
+=====================
+How to use the events
+=====================
 
-    this.bind("thumbnail", function(e) {
+You can use the global ``Galleria.on()`` function to bind functions to events, f.ex::
+
+    Galleria.on('image', function(e) {
         Galleria.log(this); // the gallery scope
-        Galleria.log(e) // the event object
+        Galleria.log(e.imageTarget); // the currently active IMG element
     });
 
-    this.bind("loadstart", function(e) {
-        if ( !e.cached ) {
-            Galleria.log(e.target + ' is not cached. Begin preload...');
-        }
+Or you can use ``.bind()``  inside the ``Galleria.ready`` or ``extend`` to listen to
+the Galleria events. Example::
+
+    Galleria.ready(function() {
+
+        this.bind("thumbnail", function(e) {
+            Galleria.log(this); // the gallery scope
+            Galleria.log(e) // the event object
+        });
+
+        this.bind("loadstart", function(e) {
+            if ( !e.cached ) {
+                Galleria.log(e.target + ' is not cached. Begin preload...');
+            }
+        });
     });
 
 =======================

@@ -20,10 +20,16 @@ These options are the standard options that you can use for all themes. However,
 Using options
 =============
 
-Galleria options are defined using a flat object during initialization.::
+Galleria options are configured at anytime using the ``Galleria.configure`` function::
 
-    $('#galleria').galleria({
-        preload: 3,
+    Galleria.configure({
+        transition: 'fade',
+        imageCrop: true
+    });
+
+Or when calling ``Galleria.run``:
+
+    Galleria.run('#galleria', {
         transition: 'fade',
         imageCrop: true
     });

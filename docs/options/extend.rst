@@ -19,12 +19,10 @@ Example on how to add a play link by extending the theme:
 
     <a id="play" href="#">Play</a>
     <script>
-        $('#galleria').galleria({
-            extend: function(options) {
-
+        Galleria.run('#galleria', {
+            extend: function() {
                 var gallery = this; // "this" is the gallery instance
                 $('#play').click(function() {
-
                     gallery.play(); // call the play method
                 });
             }

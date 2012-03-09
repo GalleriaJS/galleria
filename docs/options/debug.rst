@@ -13,6 +13,6 @@ For deployment you can turn debug off to generate a more generic error message i
 
 Example::
 
-    $('#galleria').galleria({
+    Galleria.configure({
         debug: false // debug is now off for deployment
     });

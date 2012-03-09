@@ -107,7 +107,7 @@ but the simplest one is probably to just add images as HTML.
 
 Add the following markup inside the ``<body>`` tag::
 
-    <div id="gallery">
+    <div id="galleria">
         <img src="photo1.jpg">
         <img src="photo2.jpg">
         <img src="photo3.jpg">
@@ -132,10 +132,7 @@ Set dimensions and fire up the gallery
 All we need to do now is set dimensions and apply Galleria.
 Add the following script after the loadTheme function we just inserted::
 
-        $("#gallery").galleria({
-            width: 500,
-            height: 500
-        });
+        Galleria.run('#galleria');
     </script>
 
 As you can see, we just applied galleria to the '#gallery' container where the images are, and set dimensions to 500x500 pixels.
@@ -155,17 +152,14 @@ The complete code example:
             <script src="galleria/galleria-1.2.7.min.js"></script>
         </head>
         <body>
-            <div id="gallery">
+            <div id="galleria">
                 <img src="photo1.jpg">
                 <img src="photo2.jpg">
                 <img src="photo3.jpg">
             </div>
             <script>
                 Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
-                $("#gallery").galleria({
-                    width: 500,
-                    height: 500
-                });
+                Galleria.run('#galleria');
             </script>
         </body>
     </html>

@@ -17,13 +17,13 @@ This is very useful when programming responsive layouts.
 
 Setting a fixed height example::
 
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         height: 400
     });
 
 Setting a relative height (16/9 ratio) example::
 
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         height: 0.5625
     });
 

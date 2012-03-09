@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7b5 2012-03-01
+ * @preserve Galleria v 1.2.7b6 2012-03-09
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -16,6 +16,9 @@ var undef,
     doc    = window.document,
     $doc   = $( doc ),
     $win   = $( window ),
+
+// native prototypes
+    protoArray = Array.prototype,
 
 // internal constants
     VERSION = 1.27,
@@ -247,7 +250,7 @@ var undef,
         return {
 
             array : function( obj ) {
-                return Array.prototype.slice.call(obj, 0);
+                return protoArray.slice.call(obj, 0);
             },
 
             create : function( className, nodeName ) {
@@ -1102,7 +1105,7 @@ Galleria = function() {
     this._target = undef;
 
     // instance id
-    this._id = Math.random();
+    this._id = parseInt(Math.random()*10000, 10);
 
     // add some elements
     var divs =  'container stage images image-nav image-nav-left image-nav-right ' +
@@ -2233,7 +2236,7 @@ Galleria.prototype = {
                 color: 'aaaaaa'
             },
             wait: 5000, // 1.2.7
-            width: 0,
+            width: 'auto',
             youtube: {
                 modestbranding: 1,
                 autohide: 1,
@@ -2297,7 +2300,7 @@ Galleria.prototype = {
         }
 
         // merge the theme & caller options
-        $.extend( true, options, Galleria.theme.defaults, this._original.options );
+        $.extend( true, options, Galleria.theme.defaults, this._original.options, Galleria.configure.options );
 
         // check for canvas support
         (function( can ) {
@@ -2346,7 +2349,6 @@ Galleria.prototype = {
                     // keep trying to get the value
                     num = self._getWH();
                     $container.width( num.width ).height( num.height );
-
                     return testHeight() && num.width && num.height > 50;
 
                 },
@@ -2615,6 +2617,11 @@ Galleria.prototype = {
 
         // optimize touch for container
         Utils.optimizeTouch( this.get( 'container' ) );
+
+        // bind the ons
+        $.each( Galleria.on.binds, function(i, bind) {
+            self.bind( bind.type, bind.callback );
+        });
 
         return this;
     },
@@ -3021,7 +3028,7 @@ Galleria.prototype = {
         Defaults to 'img'.
 
         @param {Function} [config] Optional function to modify the data extraction proceedure from the selector.
-        See the data_config option for more information.
+        See the dataConfig option for more information.
 
         @returns Instance
     */
@@ -3049,7 +3056,7 @@ Galleria.prototype = {
         // use selector set by option
         selector = selector || this._options.dataSelector;
 
-        // use the data_config set by option
+        // use the dataConfig set by option
         config = config || this._options.dataConfig;
 
         // if source is a true object, make it into an array
@@ -3201,8 +3208,13 @@ Galleria.prototype = {
     */
 
     splice: function() {
-        Array.prototype.splice.apply( this._data, Utils.array( arguments ) );
-        return this._parseData()._createThumbnails();
+        var self = this,
+            args = Utils.array( arguments );
+        window.setTimeout(function() {
+            protoArray.splice.apply( self._data, args );
+            self._parseData()._createThumbnails();
+        },2);
+        return self;
     },
 
     /**
@@ -3216,8 +3228,13 @@ Galleria.prototype = {
     */
 
     push: function() {
-        Array.prototype.push.apply( this._data, Utils.array( arguments ) );
-        return this._parseData()._createThumbnails();
+        var self = this,
+            args = Utils.array( arguments );
+        window.setTimeout(function() {
+            protoArray.push.apply( self._data, args );
+            self._parseData()._createThumbnails();
+        },2);
+        return self;
     },
 
     _getActive: function() {
@@ -3960,7 +3977,7 @@ this.prependChild( 'info', 'myElement' );
 
         this._active = index;
 
-        Array.prototype.push.call( this._queue, {
+        protoArray.push.call( this._queue, {
             index : index,
             rewind : rewind
         });
@@ -4066,7 +4083,7 @@ this.prependChild( 'info', 'myElement' );
                 }
 
                 // remove the queued image
-                Array.prototype.shift.call( self._queue );
+                protoArray.shift.call( self._queue );
 
                 // if we still have images in the queue, show it
                 if ( self._queue.length ) {
@@ -4737,6 +4754,8 @@ Galleria.addTheme = function( theme ) {
     @param {string} src The relative path to the theme source file
 
     @param {Object} [options] Optional options you want to apply
+
+    @returns Galleria
 */
 
 Galleria.loadTheme = function( src, options ) {
@@ -4792,6 +4811,8 @@ Galleria.loadTheme = function( src, options ) {
         }
 
     });
+
+    return Galleria;
 };
 
 /**
@@ -4814,6 +4835,87 @@ Galleria.get = function( index ) {
 };
 
 /**
+
+    Configure Galleria options via a static function.
+    The options will be applied to all instances
+
+    @param {string|object} key The options to apply or a key
+
+    @param [value] If key is a string, this is the value
+
+    @returns Galleria
+
+*/
+
+Galleria.configure = function( key, value ) {
+
+    var opts = {};
+
+    if( typeof key == 'string' && value ) {
+        opts[key] = value;
+        key = opts;
+    } else {
+        $.extend( opts, key );
+    }
+
+    Galleria.configure.options = opts;
+
+    $.each( Galleria.get(), function(i, instance) {
+        instance.setOptions( opts );
+    });
+
+    return Galleria;
+};
+
+Galleria.configure.options = {};
+
+/**
+
+    Bind a Galleria event to the gallery
+
+    @param {string} type A string representing the galleria event
+
+    @param {function} callback The function that should run when the event is triggered
+
+    @returns Galleria
+
+*/
+
+Galleria.on = function( type, callback ) {
+    if ( !type ) {
+        return;
+    }
+    Galleria.on.binds.push({
+        type: type,
+        callback: callback || F
+    });
+    $.each( Galleria.get(), function(i, instance) {
+        instance.bind( type, callback );
+    });
+    return Galleria;
+};
+
+Galleria.on.binds = [];
+
+/**
+
+    Run Galleria
+    Alias for $(selector).galleria(options)
+
+    @param {string} selector A selector of element(s) to intialize galleria to
+
+    @param {object} options The options to apply
+
+    @returns Galleria
+
+*/
+
+Galleria.run = function( selector, options ) {
+    $( selector || '#galleria' ).galleria( options );
+    return Galleria;
+};
+
+/**
     Creates a transition to be used in your gallery
 
     @param {string} name The name of the transition that you will use as an option
@@ -4822,10 +4924,13 @@ Galleria.get = function( index ) {
     The function contains two arguments, params and complete.
     Use the params Object to integrate the transition, and then call complete when you are done.
 
+    @returns Galleria
+
 */
 
 Galleria.addTransition = function( name, fn ) {
     _transitions[name] = fn;
+    return Galleria;
 };
 
 /**
@@ -4839,6 +4944,8 @@ Galleria.utils = Utils;
     It uses the console log if available otherwise it falls back to alert
 
     @example Galleria.log("hello", document.body, [1,2,3]);
+
+    @returns Galleria
 */
 
 Galleria.log = (function() {
@@ -4849,6 +4956,7 @@ Galleria.log = (function() {
             window.alert( Utils.array( arguments ).join(', ') );
         };
     }
+    return Galleria;
 }());
 
 /**
@@ -4856,6 +4964,8 @@ Galleria.log = (function() {
     Each method is call before the extend option for every instance
 
     @param {function} callback The function to call
+
+    @returns Galleria
 */
 
 Galleria.ready = function( fn ) {
@@ -4863,6 +4973,7 @@ Galleria.ready = function( fn ) {
         fn.call( gallery, gallery._options );
     });
     Galleria.ready.callbacks.push( fn );
+    return Galleria;
 };
 
 Galleria.ready.callbacks = [];
@@ -4881,6 +4992,14 @@ Galleria.raise = function( msg, fatal ) {
 
         self = this,
 
+        css = {
+            color: '#fff',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 100000
+        },
+
         echo = function( msg ) {
 
             var html = '<div style="padding:4px;margin:0 0 2px;background:#' +
@@ -4897,18 +5016,15 @@ Galleria.raise = function( msg, fatal ) {
 
                     target.css( 'position', 'relative' );
 
-                    cont = this.addElement( 'errors' ).appendChild( 'target', 'errors' ).$( 'errors' ).css({
-                        color: '#fff',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        zIndex: 100000
-                    });
+                    cont = this.addElement( 'errors' ).appendChild( 'target', 'errors' ).$( 'errors' ).css(css);
                 }
-
                 cont.append( html );
 
             });
+
+            if ( !_instances.length ) {
+                $('<div>').css( css ).append( html ).appendTo( DOM().body );
+            }
         };
 
     // if debug is on, display errors and throw exception if fatal
@@ -4939,6 +5055,8 @@ Galleria.version = VERSION;
     @param {number} version The minimum version required
 
     @param {string} [msg] Optional message to display. If not specified, Galleria will throw a generic error.
+
+    @returns Galleria
 */
 
 Galleria.requires = function( version, msg ) {
@@ -4946,6 +5064,7 @@ Galleria.requires = function( version, msg ) {
     if ( Galleria.version < version ) {
         Galleria.raise(msg, true);
     }
+    return Galleria;
 };
 
 /**

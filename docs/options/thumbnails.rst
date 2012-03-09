@@ -17,7 +17,7 @@ Example on how to create numbered elements instead of thumbnails
 ::
 
     <script>
-    $('#galleria').galleria({
+    Galleria.configure({
         thumbnails: "numbers"
     });
     </script>

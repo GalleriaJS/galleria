@@ -186,7 +186,7 @@ An example on how to use the dataConfig option to extract HTML captions from ``<
         </li>
     </div>
     <script>
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         dataConfig: function(img) {
             return {
                 description: $(img).next('p').html()
@@ -228,7 +228,7 @@ Providing JSON data to Galleria is really easy::
             title: 'My third title'
         }
     ];
-    $('#galleria').galleria({
+    Galleria.run('#galleria', {
         dataSource: data
     });
 

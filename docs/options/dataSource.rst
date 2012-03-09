@@ -18,11 +18,11 @@ Examples:
 ::
 
     // Galleria will look for images in '#galleria':
-    $('#galleria').galleria();
+    Galleria.run('#galleria');
 
     // Galleria will look for images in '#images'
     // but use '#galleria' as gallery container:
-    $('#galleria').galleria({dataSource: '#images'});
+    Galleria.run('#galleria', { dataSource: '#images' });
 
 .. highlight:: html
 
@@ -38,7 +38,7 @@ Using custom data Array:
         { image: "/path/to/myimage2.jpg" },
     ];
 
-    $('#gallery').galleria({
+    Galleria.run('#galleria', {
         dataSource: data,
     });
     </script>
@@ -55,7 +55,7 @@ Placing the Galleria gallery in a different place and keep the thumbnails:
         <a href="myimg2.jpg"><img src="mythumb2.jpg"></a>
     </div>
     <script>
-    $('#gallery').galleria({
+    Galleria.run('#galleria', {
         dataSource: "#source",
         keepSource: true // this prevents galleria from clearing the data source container
     });

@@ -32,13 +32,13 @@ There are two ways of loading a theme in your document:
 -------------------------------
 
 This is probably the easiest way to load a theme. The theme path should be relative to the url you are loading the theme from, so assuming the previously defined structure, we would use the following JavaScript command to load the classic theme from the **index.html** file::
-    
+
     Galleria.loadTheme('galleria/themes/classic/galleria.classic.js');
 
 This command loads all theme specific files and holds the gallery initialization until all files are loaded and ready. So now we just have to fire upp Galleria::
 
-    $('#gallery').galleria();
-    
+    Galleria.run('#galleria');
+
 
 2. Loading a theme manually using ``<script>``
 ----------------------------------------------
@@ -63,13 +63,13 @@ You can switch themes at runtime, just fire another ``Galleria.loadTheme()`` fun
 
     <script>
         Galleria.loadTheme('galleria/classic/galleria.classic.js');
-        $('#galleria').galleria();
-        
+        Galleria.run('#galleria');
+
         $('<a>').click(function(e) {
-        
+
             e.preventDefault();
             Galleria.loadTheme('galleria/fullscreen/galleria.fullscreen.js');
-            
+
         }).text('Switch to fullscreen').appendTo('body');
     </script>
 

@@ -10,6 +10,6 @@ Think of it as a 404 for Galleria.
 
 Example::
 
-    $('#galleria').galleria({
+    Galleria.configure({
         dummy: '/images/noimage.jpg'
     });

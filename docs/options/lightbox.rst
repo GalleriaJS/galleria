@@ -14,6 +14,6 @@ Example on how to attach a lightbox to each image:
 
 ::
 
-    $('#galleria').galleria({
+    Galleria.configure({
         lightbox: true
     });

@@ -41,7 +41,7 @@ Example on how to print out the current image index::
 
     // now call galleria on all containers with the className 'galleria'
     // the method above will be called on all galleries when initialized
-    $('.galleria').galleria();
+    Galleria.run('#galleria');
 
 
 Fetching the Galleria instance
@@ -55,12 +55,12 @@ Use **Galleria.ready** if you are uncertain whether the gallery is initialized o
 
 The simplest way is to use the jQuery.data() method on the jQuery object since Galleria saves it’s instance inside it::
 
-    $('#galleria').galleria(); // initialize the galleria
+    Galleria.run('#galleria'); // initialize the galleria
 
     // do something when someone clicks an element with the ID 'mylink'
     $('#play').click(function() {
 
-        $('#gallery').data('galleria').play(); // will start slideshow attached to #image when the element #play is clicked
+        $('#galleria').data('galleria').play(); // will start slideshow attached to #image when the element #play is clicked
 
     });
 
@@ -71,7 +71,7 @@ index, it will return an array with all galleries initiated.
 
 Example::
 
-    $('#galleria').galleria(); // initialize the galleria
+    Galleria.run('#galleria'); // initialize the galleria
 
     // do something when someone clicks an element with the ID 'mylink'
     $('#play').click(function() {
@@ -89,7 +89,7 @@ Yet another way of accessing the instance, the extend option is a function that 
 after the theme init. Use this option to extend an existing theme with custom
 functionality. Example::
 
-    $('#images').galleria({
+    Galleria.run('#galleria', {
 
         extend: function(options) {
 
