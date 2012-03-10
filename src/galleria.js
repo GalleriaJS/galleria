@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7b6 2012-03-09
+ * @preserve Galleria v 1.2.7b7 2012-03-10
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -4149,6 +4149,14 @@ this.prependChild( 'info', 'myElement' );
         });
 
         // begin loading the next image
+        /*
+        var imgSrc = src;
+        src = data.thumb;
+        var hires = new Galleria.Picture();
+        hires.load(imgSrc, function(hires) {
+            next.image.src = hires.image.src;
+        });
+        */
         next.load( src, function( next ) {
 
             // add layer HTML
@@ -4944,8 +4952,6 @@ Galleria.utils = Utils;
     It uses the console log if available otherwise it falls back to alert
 
     @example Galleria.log("hello", document.body, [1,2,3]);
-
-    @returns Galleria
 */
 
 Galleria.log = (function() {
@@ -4956,7 +4962,6 @@ Galleria.log = (function() {
             window.alert( Utils.array( arguments ).join(', ') );
         };
     }
-    return Galleria;
 }());
 
 /**
@@ -5509,7 +5514,23 @@ $.extend( $.easing, {
 });
 
 // the plugin initializer
+var _useDomReady = false;
 $.fn.galleria = function( options ) {
+
+    var selector = this.selector;
+
+    // do domReady if element not found
+    if ( !$(this).length ) {
+        if ( !_useDomReady ) {
+            $(function() {
+                _useDomReady = true;
+                $( selector ).galleria( options );
+            });
+            return this;
+        } else {
+            Galleria.raise('Init failed: Galleria could not find the element "'+selector+'".');
+        }
+    }
 
     return this.each(function() {
         if ( !$.data(this, 'galleria') ) { // fail silent if already run

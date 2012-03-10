@@ -24,6 +24,11 @@ Changelog
 * Fixed a cross-domain issue when adding themes from other domains in firefox
 * Fixed some timer bugs for multiple galleries
 * Added a 'resize' method in the API and a new option called 'responsive'. Setting this to true will allow the entire gallery to scale according to dynamic CSS properties.
+* Made it possible to use a relative height, specified by a low number for height declaration that will be the ratio
+* Added Galleria.configure as a static option for adding options
+* Added Galleria.run as the official initialization method
+* Added Galleria.on as a static binder for events
+* Added a fallback that uses domReady if the element is not found on the first init
 
 1.2.6
 -----
