@@ -5518,10 +5518,10 @@ $.fn.galleria = function( options ) {
                 _useDomReady = true;
                 $( selector ).galleria( options );
             });
-            return this;
         } else {
             Galleria.raise('Init failed: Galleria could not find the element "'+selector+'".');
         }
+        return this;
     }
 
     return this.each(function() {
