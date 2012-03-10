@@ -4149,14 +4149,6 @@ this.prependChild( 'info', 'myElement' );
         });
 
         // begin loading the next image
-        /*
-        var imgSrc = src;
-        src = data.thumb;
-        var hires = new Galleria.Picture();
-        hires.load(imgSrc, function(hires) {
-            next.image.src = hires.image.src;
-        });
-        */
         next.load( src, function( next ) {
 
             // add layer HTML
