@@ -913,6 +913,7 @@ var undef,
                     lastIndex,
                     rule,
                     style,
+                    quotedStyle,
                     selectors,
                     position,
                     validSelectors;
@@ -950,7 +951,7 @@ var undef,
                 for (index = lastIndex; index >= 0; --index) {
 
                     rule = sheet[_rules][lastIndex];
-                    style = rule.style.cssText;
+                    style = Utils.getQuotedWebKitCssText('content', rule.style);
                     // IE's addRule doesn't support multiple comma delimited selectors
                     selectors = rule.selectorText.split(/\s*,\s*/);
                     validSelectors = 0;
@@ -960,6 +961,7 @@ var undef,
                     for (m = selectors.length - 1; m >= 0; --m) {
                         // Some selector values can cause IE to hang
                         if (IE !== undef && !Utils.isValidSelector(selectors[m])) {
+							console.log("Invalid: " + selectors[m] + ": {" + style + "}");
                             continue;
                         }
 
@@ -1003,7 +1005,20 @@ var undef,
                             workerStyle.cssText = style || '';
                         }
 
-                        _insertRule(selectors[m], workerStyle.cssText, 0);
+						quotedStyle = Utils.getQuotedWebKitCssText('content', workerStyle);
+
+						if (!quotedStyle) {
+							console.log("Skipping : " + selectors[m] + ": {" + quotedStyle + "}");
+							console.log("Should be: " + selectors[m] + ": {" + style + "}");
+							continue;
+						}
+
+
+                        _insertRule(
+                            selectors[m],
+                            quotedStyle,
+                            0
+                        );
 
                         validSelectors++;
                     }
@@ -1056,7 +1071,60 @@ var undef,
                 }
 
                 return valid;
+            },
+
+            /**
+             * Protect against WebKit bug #73152
+             *
+             * https://bugs.webkit.org/show_bug.cgi?id=73152
+             * solution derived from https://gist.github.com/1420621
+             *
+             * @param string property The property to escape (eg; "content")
+             * @param CSSValue style The style block to retrieve cssText from
+             */
+            getQuotedWebKitCssText : function (property, style)
+            {
+
+                var cssText = style.cssText,
+                    escapedStyleVals = [],
+                    styleValues,
+                    styleValue,
+                    styleValueCssText,
+                    escapedCssText,
+                    styleRegex;
+                
+                if (Galleria.WEBKIT && (styleValues = style.getPropertyCSSValue("content"))) {
+
+                    // make sure we have an array of values for the property
+                    if (styleValues.cssValueType !== styleValues.CSS_VALUE_LIST) {
+                        styleValues = [styleValues];
+                    }
+
+                    // for each value
+                    for (m = 0; m < styleValues.length; m++) {
+                        styleValue = styleValues[m];
+                        styleValueCssText = styleValue.cssText;
+
+                        // that isn't quoted
+                        if (styleValue.primitiveType === styleValue.CSS_STRING && !/^\s*["']/.test(styleValueCssText)) {
+                            // surround value with single quotes
+                            styleValueCssText = "'" + styleValueCssText + "'";
+                        }
+
+                        escapedStyleVals.push(styleValueCssText);
+                    }
+
+                    // reconstruct the property / values pair
+                    escapedCssText = "content:" + escapedStyleVals.join(" ");
+
+                    // replace the original with the new pair
+                    styleRegex = new RegExp("content: " + styleValues.cssText);
+                    cssText = cssText.replace(styleRegex, escapedCssText);
+                }
+
+                return cssText;
             }
+
         };
     }()),
 
