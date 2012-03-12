@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7b7 2012-03-10
+ * @preserve Galleria v 1.2.7b8 2012-03-12
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -2834,7 +2834,7 @@ Galleria.prototype = {
 
                 // grab & reset size for smoother thumbnail loads
                 if ( o.thumbFit && o.thumbCrop !== true ) {
-                    $container.css( { width: 0, height: 0 } );
+                    $container.css( { width: 'auto', height: 'auto' } );
                 } else {
                     $container.css( { width: thumb.data.width, height: thumb.data.height } );
                 }
@@ -4991,7 +4991,7 @@ Galleria.raise = function( msg, fatal ) {
 
         css = {
             color: '#fff',
-            position: 'fixed',
+            position: 'absolute',
             top: 0,
             left: 0,
             zIndex: 100000
@@ -5020,7 +5020,7 @@ Galleria.raise = function( msg, fatal ) {
             });
 
             if ( !_instances.length ) {
-                $('<div>').css( css ).append( html ).appendTo( DOM().body );
+                $('<div>').css( $.extend( css, { position: 'fixed' } ) ).append( html ).appendTo( DOM().body );
             }
         };
 
