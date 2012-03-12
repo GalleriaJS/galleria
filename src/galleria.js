@@ -5506,26 +5506,44 @@ $.extend( $.easing, {
 });
 
 // the plugin initializer
-var _useDomReady = false;
 $.fn.galleria = function( options ) {
 
     var selector = this.selector;
 
-    // do domReady if element not found
+    // try domReady if element not found
     if ( !$(this).length ) {
-        if ( !_useDomReady ) {
-            $(function() {
-                _useDomReady = true;
+
+        $(function() {
+            if ( $( selector ).length ) {
+
+                // if found on domReady, go ahead
                 $( selector ).galleria( options );
-            });
-        } else {
-            Galleria.raise('Init failed: Galleria could not find the element "'+selector+'".');
-        }
+
+            } else {
+
+                // if not, try fetching the element for 5 secs, then raise a warning.
+                Galleria.utils.wait({
+                    until: function() {
+                        return $( selector ).length;
+                    },
+                    success: function() {
+                        $( selector ).galleria( options );
+                    },
+                    error: function() {
+                        Galleria.raise('Init failed: Galleria could not find the element "'+selector+'".');
+                    },
+                    timeout: 5000
+                });
+
+            }
+        });
         return this;
     }
 
     return this.each(function() {
-        if ( !$.data(this, 'galleria') ) { // fail silent if already run
+
+        // fail silent if already run
+        if ( !$.data(this, 'galleria') ) {
             $.data( this, 'galleria', new Galleria().init( this, options ) );
         }
     });
