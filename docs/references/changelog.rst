@@ -29,6 +29,7 @@ Changelog
 * Added Galleria.run as the official initialization method
 * Added Galleria.on as a static binder for events
 * Added a fallback that uses domReady if the element is not found on the first init
+* Added support for native fullscreen in Firefox 10+, Chrome and Safari 5+. You can disable it by setting trueFullscreen to false
 
 1.2.6
 -----

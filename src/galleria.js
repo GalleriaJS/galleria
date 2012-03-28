@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7b8 2012-03-12
+ * @preserve Galleria v 1.2.7d1 2012-03-28
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -1530,7 +1530,66 @@ Galleria = function() {
 
         keymap: self._keyboard.map,
 
+        // The native fullscreen handler
+        os: {
+
+            callback: F,
+
+            support: (function() {
+                var html = DOM().html;
+                return html.requestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen;
+            }()),
+
+            enter: function(callback) {
+                fullscreen.os.callback = callback || F;
+                var html = DOM().html;
+                if (html.requestFullscreen) {
+                    html.requestFullscreen();
+                }
+                else if (html.mozRequestFullScreen) {
+                    html.mozRequestFullScreen();
+                }
+                else if (html.webkitRequestFullScreen) {
+                    html.webkitRequestFullScreen();
+                }
+            },
+
+            exit: function(callback) {
+                fullscreen.os.callback = callback || F;
+                if (doc.exitFullscreen) {
+                    doc.exitFullscreen();
+                }
+                else if (doc.mozCancelFullScreen) {
+                    doc.mozCancelFullScreen();
+                }
+                else if (doc.webkitCancelFullScreen) {
+                    doc.webkitCancelFullScreen();
+                }
+            },
+
+            listen: function() {
+                var handler = function() {
+                    if ( doc.fullscreen || doc.mozFullScreen || doc.webkitIsFullScreen ) {
+                        fullscreen._enter( fullscreen.os.callback );
+                    } else {
+                        fullscreen._exit(fullscreen.os.callback );
+                    }
+                };
+                doc.addEventListener( 'fullscreenchange', handler, false );
+                doc.addEventListener( 'mozfullscreenchange', handler, false );
+                doc.addEventListener( 'webkitfullscreenchange', handler, false );
+            }
+        },
+
         enter: function(callback) {
+            if ( self._options.trueFullscreen && fullscreen.os.support ) {
+                fullscreen.os.enter(callback);
+            } else {
+                fullscreen._enter(callback);
+            }
+        },
+
+        _enter: function(callback) {
 
             fullscreen.active = true;
 
@@ -1649,6 +1708,14 @@ Galleria = function() {
         },
 
         exit: function(callback) {
+            if ( self._options.trueFullscreen && fullscreen.os.support ) {
+                fullscreen.os.exit( callback );
+            } else {
+                fullscreen._exit( callback );
+            }
+        },
+
+        _exit: function(callback) {
 
             fullscreen.active = false;
 
@@ -1705,6 +1772,8 @@ Galleria = function() {
         }
     };
 
+    fullscreen.os.listen();
+
     // the internal idle object for controlling idle states
     var idle = this._idle = {
 
@@ -1746,7 +1815,7 @@ Galleria = function() {
             elem = jQuery(elem);
 
             $.each(idle.trunk, function(i, el) {
-                if ( el.length && !el.not(elem).length ) {
+                if ( el && el.length && !el.not(elem).length ) {
                     self._idle.show(elem);
                     self._idle.trunk.splice(i, 1);
                 }
@@ -2047,7 +2116,7 @@ Galleria = function() {
 
         show: function(index) {
 
-            lightbox.active = index = typeof index === 'number' ? index : self.getIndex();
+            lightbox.active = index = typeof index === 'number' ? index : self.getIndex() || 0;
 
             if ( !lightbox.initialized ) {
                 lightbox.init();
@@ -2228,6 +2297,7 @@ Galleria.prototype = {
             transition: 'fade',
             transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
+            trueFullscreen: true, // 1.2.7
             useCanvas: false, // 1.2.4
             vimeo: {
                 title: 0,
