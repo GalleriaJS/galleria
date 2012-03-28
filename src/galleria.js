@@ -5311,19 +5311,17 @@ Galleria.Picture.prototype = {
                     // Delay the callback to "fix" the Adblock Bug
                     // http://code.google.com/p/adblockforchrome/issues/detail?id=3701
                     if ( ( !this.width || !this.height ) ) {
-                        window.setTimeout( (function( img ) {
-                            return function() {
-                                if ( img.width && img.height ) {
-                                    complete.call( img );
-                                } else {
-                                    Galleria.raise('Could not extract width/height from image: ' + img.src +
-                                        '. Traced measures: width:' + img.width + 'px, height: ' + img.height + 'px.');
-                                }
-                            };
-                        }( this )), 2);
-                    } else {
-                        complete.call( this );
-                    }
+						$(this).load(function(response, status){
+							if (status == 'error') {
+								Galleria.raise('Could not extract width/height from image: ' + img.src + 
+									'. Traced measures: width:' + img.width + 'px, height: ' + img.height + 'px.');
+							}
+							else complete.call(this);
+						});
+					}
+					else {
+						complete.call(this);
+					}
                 };
             }( this, callback, src ));
 
