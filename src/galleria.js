@@ -1457,6 +1457,8 @@ Galleria = function() {
                             tooltip.open = false;
                         }, 1000);
                     });
+                }).click(function() {
+                    $( this ).trigger( 'mouseout' );
                 });
             };
 
