@@ -1542,39 +1542,42 @@ Galleria = function() {
                 return html.requestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen;
             }()),
 
-            enter: function(callback) {
+            enter: function( callback ) {
                 fullscreen.os.callback = callback || F;
                 var html = DOM().html;
-                if (html.requestFullscreen) {
+                if ( html.requestFullscreen ) {
                     html.requestFullscreen();
                 }
-                else if (html.mozRequestFullScreen) {
+                else if ( html.mozRequestFullScreen ) {
                     html.mozRequestFullScreen();
                 }
-                else if (html.webkitRequestFullScreen) {
+                else if ( html.webkitRequestFullScreen ) {
                     html.webkitRequestFullScreen();
                 }
             },
 
-            exit: function(callback) {
+            exit: function( callback ) {
                 fullscreen.os.callback = callback || F;
-                if (doc.exitFullscreen) {
+                if ( doc.exitFullscreen ) {
                     doc.exitFullscreen();
                 }
-                else if (doc.mozCancelFullScreen) {
+                else if ( doc.mozCancelFullScreen ) {
                     doc.mozCancelFullScreen();
                 }
-                else if (doc.webkitCancelFullScreen) {
+                else if ( doc.webkitCancelFullScreen ) {
                     doc.webkitCancelFullScreen();
                 }
             },
 
             listen: function() {
+                if ( !fullscreen.os.support ) {
+                    return;
+                }
                 var handler = function() {
                     if ( doc.fullscreen || doc.mozFullScreen || doc.webkitIsFullScreen ) {
                         fullscreen._enter( fullscreen.os.callback );
                     } else {
-                        fullscreen._exit(fullscreen.os.callback );
+                        fullscreen._exit( fullscreen.os.callback );
                     }
                 };
                 doc.addEventListener( 'fullscreenchange', handler, false );
@@ -1583,15 +1586,15 @@ Galleria = function() {
             }
         },
 
-        enter: function(callback) {
+        enter: function( callback ) {
             if ( self._options.trueFullscreen && fullscreen.os.support ) {
-                fullscreen.os.enter(callback);
+                fullscreen.os.enter( callback );
             } else {
-                fullscreen._enter(callback);
+                fullscreen._enter( callback );
             }
         },
 
-        _enter: function(callback) {
+        _enter: function( callback ) {
 
             fullscreen.active = true;
 
@@ -1709,7 +1712,7 @@ Galleria = function() {
             self.rescale();
         },
 
-        exit: function(callback) {
+        exit: function( callback ) {
             if ( self._options.trueFullscreen && fullscreen.os.support ) {
                 fullscreen.os.exit( callback );
             } else {
@@ -1717,7 +1720,7 @@ Galleria = function() {
             }
         },
 
-        _exit: function(callback) {
+        _exit: function( callback ) {
 
             fullscreen.active = false;
 
@@ -1774,6 +1777,7 @@ Galleria = function() {
         }
     };
 
+    // invoke the native listeners
     fullscreen.os.listen();
 
     // the internal idle object for controlling idle states
