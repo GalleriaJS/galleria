@@ -5347,7 +5347,7 @@ Galleria.Picture.prototype = {
 
         // remove any max/min scaling
         $.each('minWidth minHeight maxWidth maxHeight'.split(' '), function(i, prop) {
-            $image.css(prop, 'none');
+            $image.css(prop, /min/.test(prop) ? 0 : 'none');
         });
 
         if ( this.cache[ src ] ) {
