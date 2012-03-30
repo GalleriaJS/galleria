@@ -5511,9 +5511,6 @@ Galleria.Picture.prototype = {
                 }
 
                 // calculate image_position
-
-                self.image.style.maxWidth = 'auto';
-
                 var pos = {},
                     mix = {},
                     getPosition = function(value, measure, margin) {
