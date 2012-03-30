@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7d1 2012-03-28
+ * @preserve Galleria v 1.2.7d2 2012-03-30
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -5279,6 +5279,7 @@ Galleria.Picture.prototype = {
 
         var i = 0,
             reload = false,
+            resort = false,
 
             // some jquery cache
             $container = $( this.container ),
@@ -5299,6 +5300,8 @@ Galleria.Picture.prototype = {
                             width: this.width
                         };
 
+                        self.container.appendChild( this );
+
                         self.cache[ src ] = src; // will override old cache
 
                         if (typeof callback == 'function' ) {
@@ -5316,8 +5319,14 @@ Galleria.Picture.prototype = {
                                 if ( img.width && img.height ) {
                                     complete.call( img );
                                 } else {
-                                    Galleria.raise('Could not extract width/height from image: ' + img.src +
-                                        '. Traced measures: width:' + img.width + 'px, height: ' + img.height + 'px.');
+                                    // last resort, this should never happen but just in case it does...
+                                    if ( !resort ) {
+                                        $(new Image()).load( onload ).attr( 'src', img.src );
+                                        resort = true;
+                                    } else {
+                                        Galleria.raise('Could not extract width/height from image: ' + img.src +
+                                            '. Traced measures: width:' + img.width + 'px, height: ' + img.height + 'px.');
+                                    }
                                 }
                             };
                         }( this )), 2);
@@ -5331,21 +5340,26 @@ Galleria.Picture.prototype = {
         $container.find( 'iframe,img' ).remove();
 
         // append the image
-        $image.css( 'display', 'block').appendTo( this.container );
+        $image.css( 'display', 'block');
 
         // hide it for now
         Utils.hide( this.image );
 
+        // remove any max/min scaling
+        $.each('minWidth minHeight maxWidth maxHeight'.split(' '), function(i, prop) {
+            $image.css(prop, 'none');
+        });
+
         if ( this.cache[ src ] ) {
 
             // quick load on cache
-            $( this.image ).load( onload ).attr( 'src', src );
+            $image.load( onload ).attr( 'src', src );
 
             return this.container;
         }
 
         // begin load and insert in cache when done
-        $( this.image ).load( onload ).error( function() {
+        $image.load( onload ).error( function() {
             if ( !reload ) {
                 reload = true;
                 // reload the image with a timestamp
@@ -5437,6 +5451,7 @@ Galleria.Picture.prototype = {
                 return width && height;
             },
             success: function() {
+
                 // calculate some cropping
                 var newWidth = ( width - options.margin * 2 ) / self.original.width,
                     newHeight = ( height - options.margin * 2 ) / self.original.height,
@@ -5496,6 +5511,9 @@ Galleria.Picture.prototype = {
                 }
 
                 // calculate image_position
+
+                self.image.style.maxWidth = 'auto';
+
                 var pos = {},
                     mix = {},
                     getPosition = function(value, measure, margin) {
