@@ -1,5 +1,5 @@
 /**
- * @preserve Galleria v 1.2.7d2 2012-03-30
+ * @preserve Galleria v 1.2.7d2 2012-04-02
  * http://galleria.aino.se
  *
  * Copyright (c) 2012, Aino
@@ -1705,7 +1705,7 @@ Galleria = function() {
             // bind the scaling to the resize event
             $win.resize( function() {
                 fullscreen.scale();
-            } );
+            } ).resize();
         },
 
         scale : function() {
@@ -5347,7 +5347,7 @@ Galleria.Picture.prototype = {
 
         // remove any max/min scaling
         $.each('minWidth minHeight maxWidth maxHeight'.split(' '), function(i, prop) {
-            $image.css(prop, /min/.test(prop) ? 0 : 'none');
+            $image.css(prop, (/min/.test(prop) ? '0' : 'none'));
         });
 
         if ( this.cache[ src ] ) {
