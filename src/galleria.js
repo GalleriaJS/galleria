@@ -1688,24 +1688,20 @@ Galleria = function() {
             }
 
             // init the first rescale and attach callbacks
-            window.setTimeout(function() {
+            self.rescale(function() {
 
-                self.rescale(function() {
+                Utils.addTimer(false, function() {
+                    // show the image after 50 ms
+                    Utils.show( self.getActiveImage() );
 
-                    Utils.addTimer(false, function() {
-                        // show the image after 50 ms
-                        Utils.show( self.getActiveImage() );
+                    if (typeof callback === 'function') {
+                        callback.call( self );
+                    }
 
-                        if (typeof callback === 'function') {
-                            callback.call( self );
-                        }
+                }, 100);
 
-                    }, 100);
-
-                    self.trigger( Galleria.FULLSCREEN_ENTER );
-                });
-
-            }, 50);
+                self.trigger( Galleria.FULLSCREEN_ENTER );
+            });
 
             // bind the scaling to the resize event
             $win.resize( function() {
@@ -4004,6 +4000,7 @@ this.prependChild( 'info', 'myElement' );
             }
         };
 
+
         if ( Galleria.WEBKIT && !Galleria.TOUCH && !width && !height ) {
             Utils.addTimer( false, scale, 10 );// webkit is too fast
         } else {
@@ -5426,7 +5423,6 @@ Galleria.Picture.prototype = {
 
         if( this.isIframe ) {
             $( self.image ).width(options.width).height(options.height).removeAttr('width').removeAttr('height');
-            $(window).trigger('resize');
             options.complete.call(self, self);
             return this.container;
         }
