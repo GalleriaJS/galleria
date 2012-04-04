@@ -5422,7 +5422,8 @@ Galleria.Picture.prototype = {
         }, options);
 
         if( this.isIframe ) {
-            $( self.image ).width(options.width).height(options.height).removeAttr('width').removeAttr('height');
+            $( this.image ).width( options.width ).height( options.height ).removeAttr( 'width' ).removeAttr( 'height' );
+            $( this.container ).width( options.width ).height( options.height) ;
             options.complete.call(self, self);
             if( this.image.contentWindow ) {
                 $( this.image.contentWindow ).trigger('resize');
