@@ -2304,7 +2304,7 @@ Galleria.prototype = {
             transition: 'fade',
             transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
-            trueFullscreen: false, // 1.2.7
+            trueFullscreen: true, // 1.2.7
             useCanvas: false, // 1.2.4
             vimeo: {
                 title: 0,
@@ -5424,6 +5424,9 @@ Galleria.Picture.prototype = {
         if( this.isIframe ) {
             $( self.image ).width(options.width).height(options.height).removeAttr('width').removeAttr('height');
             options.complete.call(self, self);
+            if( this.image.contentWindow ) {
+                $( this.image.contentWindow ).trigger('resize');
+            }
             return this.container;
         }
 
