@@ -3064,15 +3064,15 @@ Galleria.prototype = {
                     });
                 }
 
-                // Trigger Galleria.ready
-                $.each( Galleria.ready.callbacks, function() {
-                    this.call( self, self._options );
-                });
-
                 self.trigger( Galleria.READY );
 
                 // call the theme init method
                 Galleria.theme.init.call( self, self._options );
+
+                // Trigger Galleria.ready
+                $.each( Galleria.ready.callbacks, function() {
+                    this.call( self, self._options );
+                });
 
                 // call the extend option
                 self._options.extend.call( self, self._options );

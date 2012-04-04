@@ -51,6 +51,7 @@ References & Guides
     references/dom
     references/faq
     references/changelog
+    references/errors
 
 
 Options

@@ -113,9 +113,9 @@ List of options
 
 - :doc:`minScaleRatio` Defines how much Galleria must scale.
 
-- :doc:`overlayOpacity` Sets how transparent the overlay should be.
-
 - :doc:`overlayBackground` Defines the background color of the overlay.
+
+- :doc:`overlayOpacity` Sets how transparent the overlay should be.
 
 - :doc:`pauseOnInteraction` Toggles if Galleria should stop playing if the
   user navigates.
@@ -126,11 +126,13 @@ List of options
 
 - :doc:`queue` Defines if Galleria should queue the slideshow.
 
+- :doc:`responsive` Sets Galleria in responsive mode.
+
 - :doc:`show` Lets you start the slideshow at any image index.
 
-- :doc:`showInfo` Toggles the caption.
-
 - :doc:`showCounter` Toggles the counter.
+
+- :doc:`showInfo` Toggles the caption.
 
 - :doc:`showImagenav` Toggles the image navigation arrows.
 
@@ -142,16 +144,18 @@ List of options
 
 - :doc:`thumbMargin` Same as :doc:`imageMargin` for thumbnails.
 
+- :doc:`thumbnails` Sets how and if thumbnails should be created.
+
 - :doc:`thumbQuality` Defines if and how IE should use bicubic image rendering
   for thumbnails
-
-- :doc:`thumbnails` Sets how and if thumbnails should be created.
 
 - :doc:`touchTransition` Defines a different transition when a touch device is detected.
 
 - :doc:`transition` Defines what transition to use.
 
 - :doc:`transitionSpeed` Defines the speed of the transition.
+
+- :doc:`trueFullscreen` Makes Galleria enter a native fullscreen mode where supported.
 
 - :doc:`vimeo` Sets options for the Vimeo player
 
