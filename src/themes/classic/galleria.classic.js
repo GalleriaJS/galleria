@@ -1,16 +1,15 @@
 /**
- * @preserve Galleria Classic Theme 2011-08-01
- * http://galleria.aino.se
+ * Galleria Classic Theme 2012-04-04
+ * http://galleria.io
  *
- * Copyright 2012, Aino
- * Licensed under the MIT license.
+ * Licensed under the MIT license
+ * https://raw.github.com/aino/galleria/master/LICENSE
+ *
  */
 
-/*global jQuery, Galleria */
-
-Galleria.requires(1.25, 'This version of Classic theme requires Galleria 1.2.5 or later');
-
 (function($) {
+
+/*global jQuery, Galleria */
 
 Galleria.addTheme({
     name: 'classic',
@@ -24,6 +23,8 @@ Galleria.addTheme({
         _toggleInfo: true
     },
     init: function(options) {
+
+        Galleria.requires(1.25, 'This version of Classic theme requires Galleria 1.2.5 or later');
 
         // add some elements
         this.addElement('info-link','info-close');

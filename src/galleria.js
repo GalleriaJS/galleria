@@ -1,14 +1,15 @@
 /**
- * @preserve Galleria v 1.2.7d2 2012-04-02
- * http://galleria.aino.se
+ * Galleria v 1.2.7 2012-04-04
+ * http://galleria.io
  *
- * Copyright (c) 2012, Aino
- * Licensed under the MIT license.
+ * Licensed under the MIT license
+ * https://raw.github.com/aino/galleria/master/LICENSE
+ *
  */
 
-/*global jQuery, navigator, Galleria:true, Image */
-
 (function( $ ) {
+
+/*global jQuery, navigator, Galleria:true, Image */
 
 // some references
 var undef,
