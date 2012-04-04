@@ -1688,29 +1688,29 @@ Galleria = function() {
             }
 
             // init the first rescale and attach callbacks
-            self.rescale(function() {
+            window.setTimeout(function() {
 
-                Utils.addTimer(false, function() {
-                    // show the image after 50 ms
-                    Utils.show( self.getActiveImage() );
+                self.rescale(function() {
 
-                    if (typeof callback === 'function') {
-                        callback.call( self );
-                    }
+                    Utils.addTimer(false, function() {
+                        // show the image after 50 ms
+                        Utils.show( self.getActiveImage() );
 
-                }, 100);
+                        if (typeof callback === 'function') {
+                            callback.call( self );
+                        }
 
-                self.trigger( Galleria.FULLSCREEN_ENTER );
-            });
+                    }, 100);
+
+                    self.trigger( Galleria.FULLSCREEN_ENTER );
+                });
+
+            }, 50);
 
             // bind the scaling to the resize event
             $win.resize( function() {
                 fullscreen.scale();
             } );
-
-            window.setTimeout(function() {
-                fullscreen.scale();
-            },50);
         },
 
         scale : function() {
