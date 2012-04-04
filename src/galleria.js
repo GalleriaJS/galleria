@@ -2304,7 +2304,7 @@ Galleria.prototype = {
             transition: 'fade',
             transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
-            trueFullscreen: true, // 1.2.7
+            trueFullscreen: false, // 1.2.7
             useCanvas: false, // 1.2.4
             vimeo: {
                 title: 0,
