@@ -1,16 +1,17 @@
 /**
- * @preserve Galleria Picasa Plugin 2011-08-01
- * http://galleria.aino.se
+ * Galleria Picasa Plugin 2012-04-04
+ * http://galleria.io
  *
- * Copyright (c) 2012, Aino
- * Licensed under the MIT license.
+ * Licensed under the MIT license
+ * https://raw.github.com/aino/galleria/master/LICENSE
+ *
  */
+
+(function($) {
 
 /*global jQuery, Galleria, window */
 
 Galleria.requires(1.25, 'The Picasa Plugin requires Galleria version 1.2.5 or later.');
-
-(function($) {
 
 // The script path
 var PATH = Galleria.utils.getScriptPath();
