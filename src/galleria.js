@@ -1706,7 +1706,11 @@ Galleria = function() {
             // bind the scaling to the resize event
             $win.resize( function() {
                 fullscreen.scale();
-            } ).resize();
+            } );
+
+            window.setTimeout(function() {
+                fullscreen.scale();
+            },50);
         },
 
         scale : function() {
