@@ -4116,7 +4116,9 @@ this.prependChild( 'info', 'myElement' );
                 self.$('container').toggleClass('iframe', !!data.iframe);
 
                 $( next.container ).css({
-                    zIndex: 1
+                    zIndex: 1,
+                    left: 0,
+                    top: 0
                 }).show();
 
                 self._controls.swap();
@@ -5425,9 +5427,11 @@ Galleria.Picture.prototype = {
             $( this.image ).width( options.width ).height( options.height ).removeAttr( 'width' ).removeAttr( 'height' );
             $( this.container ).width( options.width ).height( options.height) ;
             options.complete.call(self, self);
-            if( this.image.contentWindow ) {
-                $( this.image.contentWindow ).trigger('resize');
-            }
+            try {
+                if( this.image.contentWindow ) {
+                    $( this.image.contentWindow ).trigger('resize');
+                }
+            } catch(e) {}
             return this.container;
         }
 
