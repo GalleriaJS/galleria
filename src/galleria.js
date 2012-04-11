@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.7 2012-04-04
+ * Galleria v 1.2.8a 2012-04-11
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -22,7 +22,7 @@ var undef,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.27,
+    VERSION = 1.28,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -176,6 +176,76 @@ var undef,
             }
         }
         return false;
+    },
+
+    // native fullscreen handler
+    _nativeFullscreen = {
+
+        support: (function() {
+            var html = DOM().html;
+            return html.requestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen;
+        }()),
+
+        callback: F,
+
+        enter: function( instance, callback ) {
+
+            this.instance = instance;
+
+            this.callback = callback || F;
+
+            var html = DOM().html;
+            if ( html.requestFullscreen ) {
+                html.requestFullscreen();
+            }
+            else if ( html.mozRequestFullScreen ) {
+                html.mozRequestFullScreen();
+            }
+            else if ( html.webkitRequestFullScreen ) {
+                html.webkitRequestFullScreen();
+            }
+        },
+
+        exit: function( callback ) {
+
+            this.callback = callback || F;
+
+            if ( doc.exitFullscreen ) {
+                doc.exitFullscreen();
+            }
+            else if ( doc.mozCancelFullScreen ) {
+                doc.mozCancelFullScreen();
+            }
+            else if ( doc.webkitCancelFullScreen ) {
+                doc.webkitCancelFullScreen();
+            }
+        },
+
+        instance: null,
+
+        listen: function() {
+
+            if ( !this.support ) {
+                return;
+            }
+
+            var handler = function() {
+
+                if ( !_nativeFullscreen.instance ) {
+                    return;
+                }
+                var fs = _nativeFullscreen.instance._fullscreen;
+
+                if ( doc.fullscreen || doc.mozFullScreen || doc.webkitIsFullScreen ) {
+                    fs._enter( _nativeFullscreen.callback );
+                } else {
+                    fs._exit( _nativeFullscreen.callback );
+                }
+            };
+            doc.addEventListener( 'fullscreenchange', handler, false );
+            doc.addEventListener( 'mozfullscreenchange', handler, false );
+            doc.addEventListener( 'webkitfullscreenchange', handler, false );
+        }
     },
 
     // the internal timeouts object
@@ -1047,6 +1117,8 @@ var undef,
         };
     }());
 
+_nativeFullscreen.listen();
+
 /**
     The main Galleria class
 
@@ -1533,63 +1605,10 @@ Galleria = function() {
 
         keymap: self._keyboard.map,
 
-        // The native fullscreen handler
-        os: {
-
-            callback: F,
-
-            support: (function() {
-                var html = DOM().html;
-                return html.requestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen;
-            }()),
-
-            enter: function( callback ) {
-                fullscreen.os.callback = callback || F;
-                var html = DOM().html;
-                if ( html.requestFullscreen ) {
-                    html.requestFullscreen();
-                }
-                else if ( html.mozRequestFullScreen ) {
-                    html.mozRequestFullScreen();
-                }
-                else if ( html.webkitRequestFullScreen ) {
-                    html.webkitRequestFullScreen();
-                }
-            },
-
-            exit: function( callback ) {
-                fullscreen.os.callback = callback || F;
-                if ( doc.exitFullscreen ) {
-                    doc.exitFullscreen();
-                }
-                else if ( doc.mozCancelFullScreen ) {
-                    doc.mozCancelFullScreen();
-                }
-                else if ( doc.webkitCancelFullScreen ) {
-                    doc.webkitCancelFullScreen();
-                }
-            },
-
-            listen: function() {
-                if ( !fullscreen.os.support ) {
-                    return;
-                }
-                var handler = function() {
-                    if ( doc.fullscreen || doc.mozFullScreen || doc.webkitIsFullScreen ) {
-                        fullscreen._enter( fullscreen.os.callback );
-                    } else {
-                        fullscreen._exit( fullscreen.os.callback );
-                    }
-                };
-                doc.addEventListener( 'fullscreenchange', handler, false );
-                doc.addEventListener( 'mozfullscreenchange', handler, false );
-                doc.addEventListener( 'webkitfullscreenchange', handler, false );
-            }
-        },
-
         enter: function( callback ) {
-            if ( self._options.trueFullscreen && fullscreen.os.support ) {
-                fullscreen.os.enter( callback );
+
+            if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
+                _nativeFullscreen.enter( self, callback );
             } else {
                 fullscreen._enter( callback );
             }
@@ -1714,8 +1733,8 @@ Galleria = function() {
         },
 
         exit: function( callback ) {
-            if ( self._options.trueFullscreen && fullscreen.os.support ) {
-                fullscreen.os.exit( callback );
+            if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
+                _nativeFullscreen.exit( callback );
             } else {
                 fullscreen._exit( callback );
             }
@@ -1777,9 +1796,6 @@ Galleria = function() {
             $win.unbind('resize', fullscreen.scale);
         }
     };
-
-    // invoke the native listeners
-    fullscreen.os.listen();
 
     // the internal idle object for controlling idle states
     var idle = this._idle = {

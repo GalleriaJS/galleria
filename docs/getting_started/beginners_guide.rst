@@ -126,17 +126,16 @@ A theme is included using a javascript function called ``Galleria.loadTheme``. I
         Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
 
 
-Set dimensions and fire up the gallery
-======================================
+Activate the gallery
+====================
 
-All we need to do now is set dimensions and apply Galleria.
+All we need to do now is to activate Galleria.
 Add the following script after the loadTheme function we just inserted::
 
         Galleria.run('#galleria');
     </script>
 
-As you can see, we just applied galleria to the '#gallery' container where the images are, and set dimensions to 500x500 pixels.
-You can change the width & height to any dimensions you see fit for your design.
+As you can see, we just applied galleria to the '#gallery' container where the images are. That’s it!
 
 .. _complete_code:
 
@@ -164,4 +163,4 @@ The complete code example:
         </body>
     </html>
 
-Reload the page. Ta-da! You should see the very basic version of Galleria up and running.
+Reload the page and you should see the very basic version of Galleria up and running.
