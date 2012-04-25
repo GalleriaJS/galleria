@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8a 2012-04-11
+ * Galleria v 1.2.8a 2012-04-25
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -3219,8 +3219,6 @@ Galleria.prototype = {
         // trigger the DATA event and return
         if ( this.getDataLength() ) {
             this._parseData().trigger( Galleria.DATA );
-        } else {
-            Galleria.raise('Load failed: no data found.');
         }
         return this;
 

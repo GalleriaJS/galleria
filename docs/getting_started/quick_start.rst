@@ -87,7 +87,7 @@ Use the Galleria.loadTheme and then the galleria() function on the selected jQue
 Adding options
 ===============
 
-Use the Galleria.confirgure function to apply options. You can define an object to apply
+Use the Galleria.configure function to apply options. You can define an object to apply
 multiple options, or two arguments (key/value) to apply a single option.
 Please visit :doc:`/options/index` for a complete list.
 
