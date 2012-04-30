@@ -11,8 +11,8 @@ Options
 
 .. highlight:: javascript
 
-The Galleria options covers most of the gallery customizations you will need for each implementation.
-Below you will find a summary of all options available. Click on a option title for more explanations and examples.
+The Galleria options cover most of the gallery customizations you will need for each implementation.
+Below you will find a summary of all options available. Click on an option title for more explanations and examples.
 
 These options are the standard options that you can use for all themes. However, themes can add new options and set/modify default values on their own. Please check each theme documentation for full coverage. Custom options for each theme starts with an underscore.
 
@@ -103,7 +103,7 @@ List of options
 
 - :doc:`layerFollow` Boolean for controlling if the layer will follow the image size or not.
 
-- :doc:`lightbox` Helper for attaching a lightbox when the user clicks on an image.
+- :doc:`lightbox` Helper for attaching a `lightbox <http://en.wikipedia.org/wiki/Lightbox_(JavaScript)>`_ (to zoom in) when the user clicks on an image.
 
 - :doc:`lightboxFadeSpeed` Defines how fast the lightbox should fade.
 
