@@ -59,7 +59,7 @@ Captions & meta data
 
 If you want to extract meta data from the HTML source such as title & description, you can provide this as ``<img>`` attributes::
 
-    <img src="image.jpg" data-title="My image title" data-description="My <strong>description</strong>" data-link="http://my.destination.com">
+    <img src="image.jpg" data-title="My title" data-description="My <strong>description</strong>" data-link="http://my.destination.com">
 
 Now you’ll get the following data::
 
