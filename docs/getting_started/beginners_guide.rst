@@ -11,7 +11,7 @@ This tutorial takes you through the very basics of setting up Galleria. If you'r
 A basic HTML template
 =====================
 
-If you haven't got a HTML template yet, here's a good one to start with::
+If you don't have an HTML template yet, here's a good one to start with::
 
     <!doctype html>
     <html>
@@ -64,7 +64,7 @@ If it does work, you can remove the ``<script>`` tag inside the body and move al
 Installing Galleria
 ===================
 
-Now that we have a HTML template and jQuery in place, it's time to install Galleria itself!
+Now that we have an HTML template and jQuery in place, it's time to install Galleria itself!
 
 1. Download the latest version from the Galleria website.
 2. Extract the galleria.zip file and place the "galleria" directory where you have your HTML files.
@@ -72,7 +72,7 @@ Now that we have a HTML template and jQuery in place, it's time to install Galle
 
     <script src="galleria/galleria-1.2.7.min.js"></script>
 
-To make sure Gallery works properly add the following code inside the ``<body>`` tag::
+To make sure Galleria works properly add the following code inside the ``<body>`` tag::
 
     <script>
         if (Galleria) { $("body").text('Galleria works') }
@@ -94,9 +94,9 @@ The HTML file should look something like::
         </body>
     </html>
 
-If you don’t see any text after reloading the page: the path to the Galleria file is probably wrong.
+If you don’t see any text after reloading the page, the path to the Galleria file is probably wrong.
 
-If it does work, you can remove ``<script>`` tag inside the body and move along.
+If it does work, you can remove the ``<script>`` tag inside the body and move along.
 
 
 Adding images
