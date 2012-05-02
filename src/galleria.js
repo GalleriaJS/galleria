@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8a 2012-04-25
+ * Galleria v 1.2.8a 2012-05-02
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -1176,6 +1176,9 @@ Galleria = function() {
 
     // target holder
     this._target = undef;
+
+    // bind hashes
+    this._binds = [];
 
     // instance id
     this._id = parseInt(Math.random()*10000, 10);
@@ -2713,7 +2716,10 @@ Galleria.prototype = {
 
         // bind the ons
         $.each( Galleria.on.binds, function(i, bind) {
-            self.bind( bind.type, bind.callback );
+            // check if already bound
+            if ( $.inArray( bind.hash, self._binds ) == -1 ) {
+                self.bind( bind.type, bind.callback );
+            }
         });
 
         return this;
@@ -4979,13 +4985,25 @@ Galleria.on = function( type, callback ) {
     if ( !type ) {
         return;
     }
-    Galleria.on.binds.push({
-        type: type,
-        callback: callback || F
-    });
+
+    callback = callback || F;
+
+    // hash the bind
+    var hash = type + callback.toString().replace(/\s/g,'') + Utils.timestamp();
+
+    // for existing instances
     $.each( Galleria.get(), function(i, instance) {
+        instance._binds.push( hash );
         instance.bind( type, callback );
     });
+
+    // for future instances
+    Galleria.on.binds.push({
+        type: type,
+        callback: callback,
+        hash: hash
+    });
+
     return Galleria;
 };
 
