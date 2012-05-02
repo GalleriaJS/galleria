@@ -113,8 +113,8 @@ Could not extract a stage height from the CSS. Traced height: ...
 After the gallery has initialized, it will make sure that the stage has sufficient height to continue the program.
 It targets the stage, because this is a good way of making sure that the CSS is loaded and has applied.
 
-It doesn’t really matter if you set width/height as options, because Galleria need to extract *computed* measures.
-That means that the gallery and it’s parents must be visible in some way, otherwise it will fail.
+It doesn’t really matter if you set width/height as options, because Galleria needs to extract *computed* measures.
+That means that the gallery and its parents must be visible in some way, otherwise it will fail.
 
 This message will appear if these requirements aren’t met within 5 seconds.
 
