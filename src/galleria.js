@@ -5061,15 +5061,20 @@ Galleria.utils = Utils;
     @example Galleria.log("hello", document.body, [1,2,3]);
 */
 
-Galleria.log = (function() {
+Galleria.log = function() {
+    var args = Utils.array( arguments );
     if( 'console' in window && 'log' in window.console ) {
-        return window.console.log;
+        try {
+            return window.console.log.apply( window.console, args );
+        } catch( e ) {
+            $.each( args, function() {
+                window.console.log(this);
+            });
+        }
     } else {
-        return function() {
-            window.alert( Utils.array( arguments ).join(', ') );
-        };
+        return window.alert( args.join('<br>') );
     }
-}());
+};
 
 /**
     A ready method for adding callbacks when a gallery is ready
