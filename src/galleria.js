@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8a 2012-05-02
+ * Galleria v 1.2.8a 2012-06-27
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -1451,8 +1451,11 @@ Galleria = function() {
 
             Utils.insertStyleTag(css);
 
-            self.$( 'tooltip' ).css('opacity', 0.8);
-            Utils.hide( self.get('tooltip') );
+            self.$( 'tooltip' ).css({
+                opacity: 0.8,
+                visibility: 'visible',
+                display: 'none'
+            });
 
         },
 
