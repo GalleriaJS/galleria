@@ -4,6 +4,7 @@ Changelog
 
 1.2.8
 -----
+* Fixed a dummy image bug
 * Responsive is now default true, and it will also keep the original aspect ratio per default. You can still set your own ratio if you configure a height less than two.
 * Fixed Galleria.log
 * Fixed a bug with multiple galleries and true fullscreen

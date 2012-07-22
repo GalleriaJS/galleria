@@ -5339,6 +5339,25 @@ Galleria.Picture.prototype = {
             $container = $( this.container ),
             $image = $( this.image ),
 
+            onerror = function() {
+                if ( !reload ) {
+                    reload = true;
+                    // reload the image with a timestamp
+                    window.setTimeout((function(image, src) {
+                        return function() {
+                            image.attr('src', src + '?' + Utils.timestamp() );
+                        };
+                    }( $(this), src )), 50);
+                } else {
+                    // apply the dummy image if it exists
+                    if ( DUMMY ) {
+                        $( this ).load( onload ).attr( 'src', DUMMY );
+                    } else {
+                        Galleria.raise('Image not found: ' + src);
+                    }
+                }
+            },
+
             // the onload method
             onload = (function( self, callback, src ) {
 
@@ -5404,33 +5423,8 @@ Galleria.Picture.prototype = {
             $image.css(prop, (/min/.test(prop) ? '0' : 'none'));
         });
 
-        if ( this.cache[ src ] ) {
-
-            // quick load on cache
-            $image.load( onload ).attr( 'src', src );
-
-            return this.container;
-        }
-
         // begin load and insert in cache when done
-        $image.load( onload ).error( function() {
-            if ( !reload ) {
-                reload = true;
-                // reload the image with a timestamp
-                window.setTimeout((function(image, src) {
-                    return function() {
-                        image.attr('src', src + '?' + Utils.timestamp() );
-                    };
-                }( $(this), src )), 50);
-            } else {
-                // apply the dummy image if it exists
-                if ( DUMMY ) {
-                    $( this ).attr( 'src', DUMMY );
-                } else {
-                    Galleria.raise('Image not found: ' + src);
-                }
-            }
-        }).attr( 'src', src );
+        $image.load( onload ).error( onerror ).attr( 'src', src );
 
         // return the container
         return this.container;
