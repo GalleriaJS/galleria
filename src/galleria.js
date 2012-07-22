@@ -1155,9 +1155,6 @@ Galleria = function() {
     // the internal data array
     this._data = [];
 
-    // cached data
-    this._dataCache = [];
-
     // the internal dom collection
     this._dom = {};
 
@@ -2776,11 +2773,6 @@ Galleria.prototype = {
 
         // allow setting a height ratio instead of exact value
         // useful when doing responsive galleries
-        /*
-        if ( self._options.height && self._options.height < 2 ) {
-            num.height = num.width * self._options.height;
-        }
-        */
 
         if ( self._ratio ) {
             num.height = num.width * self._ratio;
@@ -2858,8 +2850,6 @@ Galleria.prototype = {
             },
 
             onThumbLoad = function( thumb ) {
-
-                console.log(thumb)
 
                 // scale when ready
                 thumb.scale({
@@ -3963,7 +3953,6 @@ this.prependChild( 'info', 'myElement' );
     */
 
     updateCarousel : function() {
-        console.log('update')
         this._carousel.update();
         return this;
     },
