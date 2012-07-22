@@ -5351,7 +5351,7 @@ Galleria.Picture.prototype = {
                 } else {
                     // apply the dummy image if it exists
                     if ( DUMMY ) {
-                        $( this ).load( onload ).attr( 'src', DUMMY );
+                        $( this ).attr( 'src', DUMMY );
                     } else {
                         Galleria.raise('Image not found: ' + src);
                     }
