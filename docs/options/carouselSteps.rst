@@ -13,7 +13,7 @@ You can control the animation speed using the carouselSpeed option.
 .. highlight:: javascript
 
 Example::
-    
-    $("#galleria").galleria({
-        carouselSteps: 2 
-    })
+
+    Galleria.run('#galleria', {
+        carouselSteps: 2
+    });

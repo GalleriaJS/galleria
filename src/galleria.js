@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8a 2012-06-27
+ * Galleria v 1.2.8b 2012-07-22
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -1155,6 +1155,9 @@ Galleria = function() {
     // the internal data array
     this._data = [];
 
+    // cached data
+    this._dataCache = [];
+
     // the internal dom collection
     this._dom = {};
 
@@ -1446,7 +1449,7 @@ Galleria = function() {
 
             tooltip.initialized = true;
 
-            var css = '.galleria-tooltip{padding:3px 8px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:11px;line-height:1.3' +
+            var css = '.galleria-tooltip{padding:3px 8px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:11px;line-height:1.3;' +
                       'opacity:0;box-shadow:0 0 2px rgba(0,0,0,.4);-moz-box-shadow:0 0 2px rgba(0,0,0,.4);-webkit-box-shadow:0 0 2px rgba(0,0,0,.4);}';
 
             Utils.insertStyleTag(css);
@@ -2310,7 +2313,7 @@ Galleria.prototype = {
             popupLinks: false,
             preload: 2,
             queue: true,
-            responsive: false,
+            responsive: true,
             show: 0,
             showInfo: true,
             showCounter: true,
@@ -2435,6 +2438,11 @@ Galleria.prototype = {
             // cache the container
             var $container = this.$( 'container' );
 
+            // set ratio if height is < 2
+            if ( self._options.height < 2 ) {
+                self._ratio = self._options.height;
+            }
+
             // the gallery is ready, let's just wait for the css
             var num = { width: 0, height: 0 };
             var testHeight = function() {
@@ -2455,6 +2463,7 @@ Galleria.prototype = {
 
                     self._width = num.width;
                     self._height = num.height;
+                    self._ratio = self._ratio || num.height/num.width;
 
                     // for some strange reason, webkit needs a single setTimeout to play ball
                     if ( Galleria.WEBKIT ) {
@@ -2767,8 +2776,14 @@ Galleria.prototype = {
 
         // allow setting a height ratio instead of exact value
         // useful when doing responsive galleries
+        /*
         if ( self._options.height && self._options.height < 2 ) {
             num.height = num.width * self._options.height;
+        }
+        */
+
+        if ( self._ratio ) {
+            num.height = num.width * self._ratio;
         }
 
         return num;
@@ -2776,8 +2791,9 @@ Galleria.prototype = {
 
     // Creates the thumbnails and carousel
     // can be used at any time, f.ex when the data object is manipulated
+    // all is an optional argument with additional data if push
 
-    _createThumbnails : function() {
+    _createThumbnails : function( push ) {
 
         this.get( 'total' ).innerHTML = this.getDataLength();
 
@@ -2843,6 +2859,8 @@ Galleria.prototype = {
 
             onThumbLoad = function( thumb ) {
 
+                console.log(thumb)
+
                 // scale when ready
                 thumb.scale({
                     width:    thumb.data.width,
@@ -2902,12 +2920,16 @@ Galleria.prototype = {
                 });
             };
 
-        this._thumbnails = [];
-
-        this.$( 'thumbnails' ).empty();
+        if ( !push ) {
+            this._thumbnails = [];
+            this.$( 'thumbnails' ).empty();
+            i = 0;
+        } else {
+            i = this._data.length - push.length;
+        }
 
         // loop through data and create thumbnails
-        for( i = 0; this._data[ i ]; i++ ) {
+        for( ; this._data[ i ]; i++ ) {
 
             data = this._data[ i ];
 
@@ -3292,7 +3314,7 @@ Galleria.prototype = {
         @returns Instance
     */
 
-    destroy: function() {
+    destroy : function() {
         this.get('target').innerHTML = this._original.html;
         return this;
     },
@@ -3307,7 +3329,7 @@ Galleria.prototype = {
         @returns Instance
     */
 
-    splice: function() {
+    splice : function() {
         var self = this,
             args = Utils.array( arguments );
         window.setTimeout(function() {
@@ -3327,12 +3349,17 @@ Galleria.prototype = {
         @returns Instance
     */
 
-    push: function() {
+    push : function() {
         var self = this,
             args = Utils.array( arguments );
+
+        if ( args.length == 1 && args[0].constructor == Array ) {
+            args = args[0];
+        }
+
         window.setTimeout(function() {
             protoArray.push.apply( self._data, args );
-            self._parseData()._createThumbnails();
+            self._parseData()._createThumbnails( args );
         },2);
         return self;
     },
@@ -3936,6 +3963,7 @@ this.prependChild( 'info', 'myElement' );
     */
 
     updateCarousel : function() {
+        console.log('update')
         this._carousel.update();
         return this;
     },
@@ -3959,9 +3987,7 @@ this.prependChild( 'info', 'myElement' );
         measures = $.extend( { width:0, height:0 }, measures );
 
         var self = this,
-            $container = this.$( 'container' ),
-            aspect = this._options.responsive == 'aspect' && ( !measures.width || !measures.height ),
-            ratio;
+            $container = this.$( 'container' );
 
         $.each( measures, function( m, val ) {
             if ( !val ) {
@@ -3970,13 +3996,8 @@ this.prependChild( 'info', 'myElement' );
             }
         });
 
-        // experimental aspect option, not documented yet. Use ratio-based height instead!
-        if ( aspect ) {
-            ratio = Math.min( measures.width/this._width, measures.height/this._height );
-        }
-
         $.each( measures, function( m, val ) {
-            $container[ m ]( ratio ? ratio * self[ '_' + m ] : val );
+            $container[ m ]( val );
         });
 
         return this.rescale( complete );
@@ -5517,12 +5538,12 @@ Galleria.Picture.prototype = {
                     ratio = cropMap[ options.crop.toString() ],
                     canvasKey = '';
 
-                // allow max_scale_ratio
+                // allow maxScaleRatio
                 if ( options.max ) {
                     ratio = Math.min( options.max, ratio );
                 }
 
-                // allow min_scale_ratio
+                // allow minScaleRatio
                 if ( options.min ) {
                     ratio = Math.max( options.min, ratio );
                 }

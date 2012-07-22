@@ -99,6 +99,19 @@ If you don’t see any text after reloading the page, the path to the Galleria f
 If it does work, you can remove the ``<script>`` tag inside the body and move along.
 
 
+Setting dimensions
+==================
+
+We need to set some dimensions for the gallery. This can be done in many ways, but the simplest is to add some basic CSS rules.
+Add the following markup inside the ``<head>`` tag to apply dimensions and a default black background:
+
+    <style>
+        #galleria{ width: 700px; height: 400px; background: #000 }
+    </style>
+
+Galleria will then extract these measures and apply to the gallery.
+
+
 Adding images
 =============
 

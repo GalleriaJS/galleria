@@ -2,6 +2,15 @@
 Changelog
 *********
 
+1.2.8
+-----
+* Responsive is now default true, and it will also keep the original aspect ratio per default. You can still set your own ratio if you configure a height less than two.
+* Fixed Galleria.log
+* Fixed a bug with multiple galleries and true fullscreen
+* Fixed a Galleria.on bug
+* Fixed tooltip bug in some IE versions
+* .push() now silently adds new thumbnails without reloading the thumbnail bar
+
 1.2.7
 -----
 * Fixed an issue with double events when using clicknext and layer.

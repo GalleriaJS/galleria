@@ -31,12 +31,21 @@ no interval is given, default (5000 = 5 seconds) is used.
 
 Stops the slideshow and resets the interval.
 
+
 .playToggle()
 -------------
 
     | returns **Galleria**
 
 Stops the slideshow if currently playing, otherwise it start the slideshow.
+
+
+.setPlaytime( milliseconds )
+-------------
+
+    | returns **Galleria**
+
+Sets the interval of the autoplay slideshow at run-time.
 
 
 .next()
@@ -397,6 +406,11 @@ Returns the current index.
 Helper method for getting the right ``x`` and ``y`` values from a mouse event,
 relative to the galleria position. ``event`` is a jQuery mouseevent object.
 
+$(document).bind('mousemove', this.proxy(function(e) {
+    var pos = this.mousePosition(e);
+    Galleria.log(pos.x, pos.y);
+}));
+
 
 .hasInfo( [index] )
 -------------------
@@ -406,10 +420,6 @@ relative to the galleria position. ``event`` is a jQuery mouseevent object.
 Helper method for finding out if a gallery image has info (captions). You can
 specify index or it will assume the currently active image. Example::
 
-    $(document).bind('mousemove', this.proxy(function(e) {
-        var pos = this.mousePosition(e);
-        Galleria.log(pos.x, pos.y);
-    }));
 
 
 Miscellaneous
@@ -423,12 +433,12 @@ Miscellaneous
 Binds a callback function to a Galleria event. The callback function contains
 the event object as the only argument. Example::
 
-    this.bind(Galleria.IMAGE, function(e) {
+    this.bind('image', function(e) {
         Galleria.log(this) // the galleria instance
         Galleria.log(e.imageTarget); // the displayed Image element
     });
 
-    this.bind(Galleria.FULLSCREEN_ENTER, function(e) {
+    this.bind('fullscreen_enter', function(e) {
         Galleria.log('Fullscreen mode!');
     });
 
