@@ -41,7 +41,7 @@ Example on how to print out the current image index::
 
     // now call galleria on all containers with the className 'galleria'
     // the method above will be called on all galleries when initialized
-    Galleria.run('#galleria');
+    Galleria.run('.galleria');
 
 
 Fetching the Galleria instance
