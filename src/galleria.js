@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8b 2012-07-22
+ * Galleria v 1.2.8b 2012-08-01
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -1793,11 +1793,11 @@ Galleria = function() {
     // the internal idle object for controlling idle states
     var idle = this._idle = {
 
-        timer: 'idle' + self._id,
-
         trunk: [],
 
         bound: false,
+
+        active: false,
 
         add: function(elem, to) {
             if (!elem) {
@@ -1845,16 +1845,25 @@ Galleria = function() {
 
         addEvent : function() {
             idle.bound = true;
-            self.$('container').bind('mousemove click', idle.showAll );
+            self.$('container').bind( 'mousemove click', idle.showAll );
+            if ( self._options.idleMode == 'hover' ) {
+                self.$('container').bind( 'mouseleave', idle.hide );
+            }
         },
 
         removeEvent : function() {
             idle.bound = false;
-            self.$('container').unbind('mousemove click', idle.showAll );
+            self.$('container').bind( 'mousemove click', idle.showAll );
+            if ( self._options.idleMode == 'hover' ) {
+                self.$('container').unbind( 'mouseleave', idle.hide );
+            }
         },
 
         addTimer : function() {
-            self.addTimer( idle.timer, function() {
+            if( self._options.idleMode == 'hover' ) {
+                return;
+            }
+            self.addTimer( 'idle', function() {
                 idle.hide();
             }, self._options.idleTime );
         },
@@ -1867,6 +1876,8 @@ Galleria = function() {
 
             self.trigger( Galleria.IDLE_ENTER );
 
+            var len = idle.trunk.length;
+
             $.each( idle.trunk, function(i, elem) {
 
                 var data = elem.data('idle');
@@ -1878,14 +1889,19 @@ Galleria = function() {
                 elem.data('idle').complete = false;
 
                 Utils.animate( elem, data.to, {
-                    duration: self._options.idleSpeed
+                    duration: self._options.idleSpeed,
+                    complete: function() {
+                        if ( i == len-1 ) {
+                            idle.active = false;
+                        }
+                    }
                 });
             });
         },
 
         showAll : function() {
 
-            self.clearTimer( idle.timer );
+            self.clearTimer( 'idle' );
 
             $.each( idle.trunk, function( i, elem ) {
                 idle.show( elem );
@@ -1896,19 +1912,20 @@ Galleria = function() {
 
             var data = elem.data('idle');
 
-            if (!data.busy && !data.complete) {
+            if ( !idle.active || ( !data.busy && !data.complete ) ) {
 
                 data.busy = true;
 
                 self.trigger( Galleria.IDLE_EXIT );
 
-                self.clearTimer( idle.timer );
+                self.clearTimer( 'idle' );
 
                 Utils.animate( elem, data.from, {
                     duration: self._options.idleSpeed/2,
                     complete: function() {
-                        $(this).data('idle').busy = false;
-                        $(this).data('idle').complete = true;
+                        idle.active = true;
+                        $(elem).data('idle').busy = false;
+                        $(elem).data('idle').complete = true;
                     }
                 });
 
@@ -2292,7 +2309,7 @@ Galleria.prototype = {
         this._options = {
             autoplay: false,
             carousel: true,
-            carouselFollow: true,
+            carouselFollow: true, // legacy, remove at 1.2.9
             carouselSpeed: 400,
             carouselSteps: 'auto',
             clicknext: false,
