@@ -280,6 +280,20 @@ var undef,
 
         return {
 
+            // legacy support for clearTimer
+            clearTimer: function( id ) {
+                $.each( Galleria.get(), function() {
+                    this.clearTimer( id );
+                });
+            },
+
+            // legacy support for addTimer
+            addTimer: function( id ) {
+                $.each( Galleria.get(), function() {
+                    this.addTimer( id );
+                });
+            },
+
             array : function( obj ) {
                 return protoArray.slice.call(obj, 0);
             },
