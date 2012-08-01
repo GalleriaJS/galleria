@@ -248,46 +248,6 @@ var undef,
         }
     },
 
-    // the internal timeouts object
-    // provides helper methods for controlling timeouts
-    _timeouts = {
-
-        trunk: {},
-
-        add: function( id, fn, delay, loop ) {
-            id = id || new Date().getTime();
-            loop = loop || false;
-            this.clear( id );
-            if ( loop ) {
-                var old = fn;
-                fn = function() {
-                    old();
-                    _timeouts.add( id, fn, delay );
-                };
-            }
-            this.trunk[ id ] = window.setTimeout( fn, delay );
-        },
-
-        clear: function( id ) {
-
-            var del = function( i ) {
-                window.clearTimeout( this.trunk[ i ] );
-                delete this.trunk[ i ];
-            }, i;
-
-            if ( !!id && id in this.trunk ) {
-                del.call( _timeouts, id );
-
-            } else if ( typeof id === 'undefined' ) {
-                for ( i in this.trunk ) {
-                    if ( this.trunk.hasOwnProperty( i ) ) {
-                        del.call( _timeouts, i );
-                    }
-                }
-            }
-        }
-    },
-
     // the internal gallery holder
     _galleries = [],
 
@@ -740,16 +700,6 @@ var undef,
                 };
             }()),
 
-            addTimer : function() {
-                _timeouts.add.apply( _timeouts, Utils.array( arguments ) );
-                return this;
-            },
-
-            clearTimer : function() {
-                _timeouts.clear.apply( _timeouts, Utils.array( arguments ) );
-                return this;
-            },
-
             wait : function(options) {
                 options = $.extend({
                     until : FALSE,
@@ -1037,82 +987,87 @@ var undef,
 
         return {
 
-            fade: function(params, complete) {
-                $(params.next).css({
-                    opacity: 0,
-                    left: 0
-                }).show();
-                Utils.animate(params.next, {
-                    opacity: 1
-                },{
-                    duration: params.speed,
-                    complete: complete
-                });
-                if (params.prev) {
-                    $(params.prev).css('opacity',1).show();
-                    Utils.animate(params.prev, {
-                        opacity: 0
-                    },{
-                        duration: params.speed
-                    });
-                }
-            },
+            active: false,
 
-            flash: function(params, complete) {
-                $(params.next).css({
-                    opacity: 0,
-                    left: 0
-                });
-                if (params.prev) {
-                    Utils.animate( params.prev, {
-                        opacity: 0
-                    },{
-                        duration: params.speed/2,
-                        complete: function() {
-                            Utils.animate( params.next, {
-                                opacity:1
-                            },{
-                                duration: params.speed,
-                                complete: complete
-                            });
-                        }
-                    });
-                } else {
-                    Utils.animate( params.next, {
+            effects: {
+
+                fade: function(params, complete) {
+                    $(params.next).css({
+                        opacity: 0,
+                        left: 0
+                    }).show();
+                    Utils.animate(params.next, {
                         opacity: 1
                     },{
                         duration: params.speed,
                         complete: complete
                     });
+                    if (params.prev) {
+                        $(params.prev).css('opacity',1).show();
+                        Utils.animate(params.prev, {
+                            opacity: 0
+                        },{
+                            duration: params.speed
+                        });
+                    }
+                },
+
+                flash: function(params, complete) {
+                    $(params.next).css({
+                        opacity: 0,
+                        left: 0
+                    });
+                    if (params.prev) {
+                        Utils.animate( params.prev, {
+                            opacity: 0
+                        },{
+                            duration: params.speed/2,
+                            complete: function() {
+                                Utils.animate( params.next, {
+                                    opacity:1
+                                },{
+                                    duration: params.speed,
+                                    complete: complete
+                                });
+                            }
+                        });
+                    } else {
+                        Utils.animate( params.next, {
+                            opacity: 1
+                        },{
+                            duration: params.speed,
+                            complete: complete
+                        });
+                    }
+                },
+
+                pulse: function(params, complete) {
+                    if (params.prev) {
+                        $(params.prev).hide();
+                    }
+                    $(params.next).css({
+                        opacity: 0,
+                        left: 0
+                    }).show();
+                    Utils.animate(params.next, {
+                        opacity:1
+                    },{
+                        duration: params.speed,
+                        complete: complete
+                    });
+                },
+
+                slide: function(params, complete) {
+                    _slide.apply( this, Utils.array( arguments ) );
+                },
+
+                fadeslide: function(params, complete) {
+                    _slide.apply( this, Utils.array( arguments ).concat( [true] ) );
+                },
+
+                doorslide: function(params, complete) {
+                    _slide.apply( this, Utils.array( arguments ).concat( [false, true] ) );
                 }
-            },
-
-            pulse: function(params, complete) {
-                if (params.prev) {
-                    $(params.prev).hide();
-                }
-                $(params.next).css({
-                    opacity: 0,
-                    left: 0
-                }).show();
-                Utils.animate(params.next, {
-                    opacity:1
-                },{
-                    duration: params.speed,
-                    complete: complete
-                });
-            },
-
-            slide: function(params, complete) {
-                _slide.apply( this, Utils.array( arguments ) );
-            },
-
-            fadeslide: function(params, complete) {
-                _slide.apply( this, Utils.array( arguments ).concat( [true] ) );
-            },
-
-            doorslide: function(params, complete) {
-                _slide.apply( this, Utils.array( arguments ).concat( [false, true] ) );
             }
         };
     }());
@@ -1509,11 +1464,11 @@ Galleria = function() {
 
                 $( elem ).hover(function() {
 
-                    Utils.clearTimer( tooltip.swapTimer );
+                    self.clearTimer( tooltip.swapTimer );
                     self.$('container').unbind( 'mousemove', tooltip.move ).bind( 'mousemove', tooltip.move ).trigger( 'mousemove' );
                     tooltip.show( elem );
 
-                    Utils.addTimer( tooltip.timer, function() {
+                    self.addTimer( tooltip.timer, function() {
                         self.$( 'tooltip' ).stop().show().animate({
                             opacity:1
                         });
@@ -1524,7 +1479,7 @@ Galleria = function() {
                 }, function() {
 
                     self.$( 'container' ).unbind( 'mousemove', tooltip.move );
-                    Utils.clearTimer( tooltip.timer );
+                    self.clearTimer( tooltip.timer );
 
                     self.$( 'tooltip' ).stop().animate({
                         opacity: 0
@@ -1532,7 +1487,7 @@ Galleria = function() {
 
                         self.$( 'tooltip' ).hide();
 
-                        Utils.addTimer( tooltip.swapTimer, function() {
+                        self.addTimer( tooltip.swapTimer, function() {
                             tooltip.open = false;
                         }, 1000);
                     });
@@ -1611,7 +1566,22 @@ Galleria = function() {
 
         keymap: self._keyboard.map,
 
+        parseCallback: function( callback ) {
+
+            return _transitions.active ? function() {
+                if ( typeof callback == 'function' ) {
+                    callback();
+                }
+                self._scaleImage( self._controls.getNext() );
+                self._scaleImage( self._controls.getActive() );
+                $( self._controls.getActive().container ).css( 'opacity', 0 );
+            } : callback;
+
+        },
+
         enter: function( callback ) {
+
+            callback = fullscreen.parseCallback( callback );
 
             if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
                 _nativeFullscreen.enter( self, callback );
@@ -1715,7 +1685,7 @@ Galleria = function() {
             // init the first rescale and attach callbacks
             self.rescale(function() {
 
-                Utils.addTimer(false, function() {
+                self.addTimer(false, function() {
                     // show the image after 50 ms
                     Utils.show( self.getActiveImage() );
 
@@ -1739,6 +1709,9 @@ Galleria = function() {
         },
 
         exit: function( callback ) {
+
+            callback = fullscreen.parseCallback( callback );
+
             if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
                 _nativeFullscreen.exit( callback );
             } else {
@@ -1783,7 +1756,7 @@ Galleria = function() {
             }
 
             self.rescale(function() {
-                Utils.addTimer(false, function() {
+                self.addTimer(false, function() {
 
                     // show the image after 50 ms
                     Utils.show( self.getActiveImage() );
@@ -1852,7 +1825,7 @@ Galleria = function() {
 
             if (!idle.trunk.length) {
                 idle.removeEvent();
-                Utils.clearTimer( idle.timer );
+                self.clearTimer( idle.timer );
             }
         },
 
@@ -1867,7 +1840,7 @@ Galleria = function() {
         },
 
         addTimer : function() {
-            Utils.addTimer( idle.timer, function() {
+            self.addTimer( idle.timer, function() {
                 idle.hide();
             }, self._options.idleTime );
         },
@@ -1898,7 +1871,7 @@ Galleria = function() {
 
         showAll : function() {
 
-            Utils.clearTimer( idle.timer );
+            self.clearTimer( idle.timer );
 
             $.each( idle.trunk, function( i, elem ) {
                 idle.show( elem );
@@ -1915,7 +1888,7 @@ Galleria = function() {
 
                 self.trigger( Galleria.IDLE_EXIT );
 
-                Utils.clearTimer( idle.timer );
+                self.clearTimer( idle.timer );
 
                 Utils.animate( elem, data.from, {
                     duration: self._options.idleSpeed/2,
@@ -2208,6 +2181,47 @@ Galleria = function() {
 
             $( lightbox.elems.overlay ).show().css( 'visibility', 'visible' );
             $( lightbox.elems.box ).show();
+        }
+    };
+
+    // the internal timeouts object
+    // provides helper methods for controlling timeouts
+
+    var _timer = this._timer = {
+
+        trunk: {},
+
+        add: function( id, fn, delay, loop ) {
+            id = id || new Date().getTime();
+            loop = loop || false;
+            this.clear( id );
+            if ( loop ) {
+                var old = fn;
+                fn = function() {
+                    old();
+                    _timer.add( id, fn, delay );
+                };
+            }
+            this.trunk[ id ] = window.setTimeout( fn, delay );
+        },
+
+        clear: function( id ) {
+
+            var del = function( i ) {
+                window.clearTimeout( this.trunk[ i ] );
+                delete this.trunk[ i ];
+            }, i;
+
+            if ( !!id && id in this.trunk ) {
+                del.call( this, id );
+
+            } else if ( typeof id === 'undefined' ) {
+                for ( i in this.trunk ) {
+                    if ( this.trunk.hasOwnProperty( i ) ) {
+                        del.call( this, i );
+                    }
+                }
+            }
         }
     };
 
@@ -2731,6 +2745,16 @@ Galleria.prototype = {
             }
         });
 
+        return this;
+    },
+
+    addTimer : function() {
+        this._timer.add.apply( this._timer, Utils.array( arguments ) );
+        return this;
+    },
+
+    clearTimer : function() {
+        this._timer.clear.apply( this._timer, Utils.array( arguments ) );
         return this;
     },
 
@@ -3306,6 +3330,7 @@ Galleria.prototype = {
 
     destroy : function() {
         this.get('target').innerHTML = this._original.html;
+        this.clearTimer();
         return this;
     },
 
@@ -3720,7 +3745,7 @@ $(document).mousemove(function(e) {
         this.$( 'stage' ).unbind( 'mousemove', calculate ).bind( 'mousemove', calculate );
 
         // loop the loop
-        Utils.addTimer( 'pan' + self._id, loop, 50, true);
+        this.addTimer( 'pan' + self._id, loop, 50, true);
 
         return this;
     },
@@ -3758,7 +3783,7 @@ $(document).mousemove(function(e) {
 
         this.$( 'stage' ).unbind( 'mousemove' );
 
-        Utils.clearTimer( 'pan' + this._id );
+        this.clearTimer( 'pan' + this._id );
 
         return this;
     },
@@ -4035,7 +4060,7 @@ this.prependChild( 'info', 'myElement' );
 
 
         if ( Galleria.WEBKIT && !Galleria.TOUCH && !width && !height ) {
-            Utils.addTimer( false, scale, 10 );// webkit is too fast
+            self.addTimer( false, scale, 10 );// webkit is too fast
         } else {
             scale.call( self );
         }
@@ -4100,7 +4125,7 @@ this.prependChild( 'info', 'myElement' );
     },
 
     // the internal _show method does the actual showing
-    _show : function() {
+    _show : function( transition ) {
 
         // shortcuts
         var self = this,
@@ -4126,6 +4151,8 @@ this.prependChild( 'info', 'myElement' );
             return function() {
 
                 var win;
+
+                _transitions.active = false;
 
                 // remove stalled
                 self._queue.stalled = false;
@@ -4308,7 +4335,7 @@ this.prependChild( 'info', 'myElement' );
                         galleriaData: self.getData( queue.index )
                     });
 
-                    var transition = self._options.transition;
+                    transition = typeof transition == 'undefined' ? self._options.transition : transition;
 
                     // can JavaScript loop through objects in order? yes.
                     $.each({
@@ -4323,7 +4350,7 @@ this.prependChild( 'info', 'myElement' );
                     });
 
                     // validate the transition
-                    if ( transition in _transitions === false ) {
+                    if ( transition in _transitions.effects === false ) {
                         complete();
                     } else {
                         var params = {
@@ -4333,8 +4360,10 @@ this.prependChild( 'info', 'myElement' );
                             speed: self._options.transitionSpeed || 400
                         };
 
+                        _transitions.active = true;
+
                         // call the transition function and send some stuff
-                        _transitions[ transition ].call(self, params, complete );
+                        _transitions.effects[ transition ].call( self, params, complete );
 
                     }
                 }
@@ -4571,13 +4600,13 @@ this.prependChild( 'info', 'myElement' );
 
         if ( this._playing ) {
 
-            Utils.clearTimer( timer_id );
+            this.clearTimer( timer_id );
 
             var fn = function() {
 
                 played = Utils.timestamp() - now;
                 if ( played >= self._playtime && self._playing ) {
-                    Utils.clearTimer( timer_id );
+                    self.clearTimer( timer_id );
                     self.next();
                     return;
                 }
@@ -4591,10 +4620,10 @@ this.prependChild( 'info', 'myElement' );
                         milliseconds: played
                     });
 
-                    Utils.addTimer( timer_id, fn, interval );
+                    self.addTimer( timer_id, fn, interval );
                 }
             };
-            Utils.addTimer( timer_id, fn, interval );
+            self.addTimer( timer_id, fn, interval );
         }
     },
 
@@ -4837,7 +4866,7 @@ Galleria.addTheme = function( theme ) {
                     // we have a match
                     css = script.src.replace(/[^\/]*$/, '') + theme.css;
 
-                    Utils.addTimer( "css", function() {
+                    window.setTimeout(function() {
                         Utils.loadCSS( css, 'galleria-theme', function() {
 
                             // the themeload trigger
@@ -5054,7 +5083,7 @@ Galleria.run = function( selector, options ) {
 */
 
 Galleria.addTransition = function( name, fn ) {
-    _transitions[name] = fn;
+    _transitions.effects[name] = fn;
     return Galleria;
 };
 
