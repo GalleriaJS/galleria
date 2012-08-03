@@ -11,6 +11,10 @@ Changelog
 * Fixed a Galleria.on bug
 * Fixed tooltip bug in some IE versions
 * .push() now silently adds new thumbnails without reloading the thumbnail bar
+* Fixed a enterFullscreen bug in FF if fullscreen was entered during transition
+* Added a thumbDisplayOrder option (defaults true) that will make the thumbnails appear in order (but still load async)
+* Added a 'lazy' option for thumbnails, making them lazy so you can control the loading later
+* Added two more API calls - 'lazyLoad()' and 'lazyLoadChunks()' that controls how the lazy thumbnails should be loaded
 
 1.2.7
 -----

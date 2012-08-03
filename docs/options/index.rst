@@ -42,8 +42,6 @@ List of options
 
 - :doc:`carousel` Toggle the creation of a carousel.
 
-- :doc:`carouselFollow` Defines if the carousel should follow the image.
-
 - :doc:`carouselSpeed` Carousel animation speed in milliseconds.
 
 - :doc:`carouselSteps` Defines how many "steps" the carousel should take on
@@ -140,7 +138,7 @@ List of options
 
 - :doc:`thumbCrop` Same as image_crop for thumbnails.
 
-- :doc:`thumbFit` Lets you fit thumbnails according to width.
+- :doc:`thumbDisplayOrder` Defines if the gallery should display the loaded thumbnails in order
 
 - :doc:`thumbMargin` Same as :doc:`imageMargin` for thumbnails.
 

@@ -2328,7 +2328,7 @@ Galleria.prototype = {
         this._options = {
             autoplay: false,
             carousel: true,
-            carouselFollow: true, // legacy, remove at 1.2.9
+            carouselFollow: true, // legacy, deprecate at 1.3
             carouselSpeed: 400,
             carouselSteps: 'auto',
             clicknext: false,
@@ -2382,9 +2382,10 @@ Galleria.prototype = {
             swipe: true, // 1.2.4
             thumbCrop: true,
             thumbEventType: 'click',
-            thumbFit: true,
+            thumbFit: true, // legacy, deprecate at 1.3
             thumbMargin: 0,
             thumbQuality: 'auto',
+            thumbDisplayOrder: true, // 1.2.8
             thumbnails: true,
             touchTransition: undef, // 1.2.6
             transition: 'fade',
@@ -2857,14 +2858,13 @@ Galleria.prototype = {
 
     // Creates the thumbnails and carousel
     // can be used at any time, f.ex when the data object is manipulated
-    // all is an optional argument with additional data if push
+    // push is an optional argument with pushed images
 
     _createThumbnails : function( push ) {
 
         this.get( 'total' ).innerHTML = this.getDataLength();
 
-        var i,
-            src,
+        var src,
             thumb,
             data,
             special,
@@ -2873,6 +2873,14 @@ Galleria.prototype = {
 
             self = this,
             o = this._options,
+
+            i = push ? this._data.length - push.length : 0,
+            chunk = i,
+
+            thumbchunk = [],
+            loadindex = 0,
+
+            gif = 'data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D',
 
             // get previously active thumbnail, if exists
             active = (function() {
@@ -2923,7 +2931,22 @@ Galleria.prototype = {
                 e.preventDefault();
             },
 
-            onThumbLoad = function( thumb ) {
+            thumbComplete = function( thumb, callback ) {
+
+                $( thumb.container ).css( 'visibility', 'visible' );
+                self.trigger({
+                    type: Galleria.THUMBNAIL,
+                    thumbTarget: thumb.image,
+                    index: thumb.data.order,
+                    galleriaData: self.getData( thumb.data.order )
+                });
+
+                if ( typeof callback == 'function' ) {
+                    callback.call( self, thumb );
+                }
+            };
+
+        self._onThumbLoad = function( thumb, callback ) {
 
                 // scale when ready
                 thumb.scale({
@@ -2973,13 +2996,21 @@ Galleria.prototype = {
                             }( thumb.image ) ));
                         }
 
-                        // trigger the THUMBNAIL event
-                        self.trigger({
-                            type: Galleria.THUMBNAIL,
-                            thumbTarget: thumb.image,
-                            index: thumb.data.order,
-                            galleriaData: self.getData( thumb.data.order )
-                        });
+                        if ( o.thumbDisplayOrder && !thumb.lazy ) {
+
+                            $.each( thumbchunk, function( i, th ) {
+                                if ( i === loadindex && th.ready && !th.displayed ) {
+
+                                    loadindex++;
+                                    th.displayed = true;
+
+                                    thumbComplete( th, callback );
+                                }
+                            });
+                        } else {
+
+                            thumbComplete( thumb, callback );
+                        }
                     }
                 });
             };
@@ -2987,9 +3018,6 @@ Galleria.prototype = {
         if ( !push ) {
             this._thumbnails = [];
             this.$( 'thumbnails' ).empty();
-            i = 0;
-        } else {
-            i = this._data.length - push.length;
         }
 
         // loop through data and create thumbnails
@@ -2997,7 +3025,10 @@ Galleria.prototype = {
 
             data = this._data[ i ];
 
-            if ( o.thumbnails === true && (data.thumb || data.image) ) {
+            // get source from thumb or image
+            src = data.thumb || data.image;
+
+            if ( ( o.thumbnails === true || optval == 'lazy' ) && ( data.thumb || data.image ) ) {
 
                 // add a new Picture instance
                 thumb = new Galleria.Picture(i);
@@ -3005,8 +3036,11 @@ Galleria.prototype = {
                 // save the index
                 thumb.index = i;
 
-                // get source from thumb or image
-                src = data.thumb || data.image;
+                // flag displayed
+                thumb.displayed = false;
+
+                // flag lazy
+                thumb.lazy = false;
 
                 // append the thumbnail
                 this.$( 'thumbnails' ).append( thumb.container );
@@ -3014,10 +3048,14 @@ Galleria.prototype = {
                 // cache the container
                 $container = $( thumb.container );
 
+                // hide it
+                $container.css( 'visibility', 'hidden' );
+
                 thumb.data = {
                     width  : Utils.parseValue( getStyle( 'width' ) ),
                     height : Utils.parseValue( getStyle( 'height' ) ),
-                    order  : i
+                    order  : i,
+                    src    : src
                 };
 
                 // grab & reset size for smoother thumbnail loads
@@ -3029,13 +3067,27 @@ Galleria.prototype = {
 
                 // load the thumbnail
                 special = src.split(':');
+
                 if ( special.length == 2 && special[0] in _video ) {
-                    thumb.load('data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D', {
+
+                    thumb.load( gif, {
                         height: thumb.data.height,
                         width: thumb.data.height*1.25
-                    }, onThumbLoad);
+                    }, self._onThumbLoad);
+
+                } else if ( optval == 'lazy' ) {
+
+                    $container.addClass( 'lazy' );
+
+                    thumb.lazy = true;
+
+                    thumb.load( gif, {
+                        height: thumb.data.height,
+                        width: thumb.data.width
+                    });
+
                 } else {
-                    thumb.load( src, onThumbLoad );
+                    thumb.load( src, self._onThumbLoad );
                 }
 
                 // preload all images here
@@ -3052,14 +3104,13 @@ Galleria.prototype = {
                     ready: true
                 };
 
-
                 // create numbered thumbnails
                 if ( optval === 'numbers' ) {
                     $( thumb.image ).text( i + 1 );
                 }
 
-                if( data.iframe ) {
-                    $( thumb.image ).addClass('iframe');
+                if ( data.iframe ) {
+                    $( thumb.image ).addClass( 'iframe' );
                 }
 
                 this.$( 'thumbnails' ).append( thumb.container );
@@ -3090,6 +3141,98 @@ Galleria.prototype = {
 
             this._thumbnails.push( thumb );
         }
+
+        thumbchunk = this._thumbnails.slice( chunk );
+
+        return this;
+    },
+
+    /**
+        Lazy-loads thumbnails.
+        You can call this method to load lazy thumbnails at run time
+
+        @param {Array|Number} index Index or array of indexes of thumbnails to be loaded
+        @param {Function} complete Callback that is called when all lazy thumbnails have been loaded
+
+        @returns Instance
+    */
+
+    lazyLoad: function( index, complete ) {
+
+        var arr = index.constructor == Array ? index : [ index ],
+            self = this,
+            thumbnails = this.$( 'thumbnails' ).children().filter(function() {
+                return $(this).data('lazy-src');
+            }),
+            loaded = 0;
+
+        $.each( arr, function(i, ind) {
+
+            if ( ind > self._thumbnails.length - 1 ) {
+                return;
+            }
+
+            var thumb = self._thumbnails[ ind ],
+                data = thumb.data;
+
+            thumb.load( data.src , function( thumb ) {
+                self._onThumbLoad.call( self, thumb, function() {
+                    if ( ++loaded == arr.length && typeof complete == 'function' ) {
+                        complete.call( self );
+                    }
+                });
+            });
+        });
+
+        return this;
+
+    },
+
+    /**
+        Lazy-loads thumbnails in chunks.
+        This method automatcally chops up the loading process of many thumbnails into chunks
+
+        @param {Number} size Size of each chunk to be loaded
+        @param {Number} [delay] Delay between each loads
+
+        @returns Instance
+    */
+
+    lazyLoadChunks: function( size, delay ) {
+
+        var len = this.getDataLength(),
+            i = 0,
+            n = 0,
+            arr = [],
+            temp = [],
+            self = this;
+
+        delay = delay || 0;
+
+        for( ; i<len; i++ ) {
+            temp.push(i);
+            if ( ++n == size || i == len-1 ) {
+                arr.push( temp );
+                n = 0;
+                temp = [];
+            }
+        }
+
+        var init = function( wait ) {
+            var a = arr.shift();
+            if ( a ) {
+                window.setTimeout(function() {
+                    self.lazyLoad(a, function() {
+                        init( true );
+                    });
+                }, ( delay && wait ) ? delay : 0 );
+            }
+        };
+
+        init( false );
+
+        return this;
+
     },
 
     // the internal _run method should be called after loading data into galleria
@@ -3181,8 +3324,10 @@ Galleria.prototype = {
                 Galleria.theme.init.call( self, self._options );
 
                 // Trigger Galleria.ready
-                $.each( Galleria.ready.callbacks, function() {
-                    this.call( self, self._options );
+                $.each( Galleria.ready.callbacks, function(i ,fn) {
+                    if ( typeof fn == 'function' ) {
+                        fn.call( self, self._options );
+                    }
                 });
 
                 // call the extend option
