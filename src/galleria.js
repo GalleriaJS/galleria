@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8b 2012-08-01
+ * Galleria v 1.2.8b 2012-08-03
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -452,6 +452,7 @@ var undef,
                             // attach the end event
                             elem.one(endEvent, (function( elem ) {
                                 return function() {
+
                                     // clear the animation
                                     clearStyle(elem);
 
@@ -1002,6 +1003,12 @@ var undef,
         return {
 
             active: false,
+
+            init: function( effect, params, complete ) {
+                if ( _transitions.effects.hasOwnProperty( effect ) ) {
+                    _transitions.effects[ effect ].call( this, params, complete );
+                }
+            },
 
             effects: {
 
@@ -1580,22 +1587,30 @@ Galleria = function() {
 
         keymap: self._keyboard.map,
 
-        parseCallback: function( callback ) {
+        parseCallback: function( callback, enter ) {
 
             return _transitions.active ? function() {
                 if ( typeof callback == 'function' ) {
                     callback();
                 }
-                self._scaleImage( self._controls.getNext() );
-                self._scaleImage( self._controls.getActive() );
-                $( self._controls.getActive().container ).css( 'opacity', 0 );
+                var active = self._controls.getActive(),
+                    next = self._controls.getNext();
+
+                self._scaleImage( next );
+                self._scaleImage( active );
+
+                if ( enter ) {
+                    // Firefox bug, revise later
+                    $( active.container ).add( next.container ).trigger( 'transitionend' );
+                }
+
             } : callback;
 
         },
 
         enter: function( callback ) {
 
-            callback = fullscreen.parseCallback( callback );
+            callback = fullscreen.parseCallback( callback, true );
 
             if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
                 _nativeFullscreen.enter( self, callback );
@@ -1799,7 +1814,7 @@ Galleria = function() {
 
         active: false,
 
-        add: function(elem, to) {
+        add: function(elem, to, init) {
             if (!elem) {
                 return;
             }
@@ -1822,7 +1837,11 @@ Galleria = function() {
                 complete: true,
                 busy: false
             });
-            idle.addTimer();
+            if ( !init ) {
+                idle.addTimer();
+            } else {
+                elem.css( to );
+            }
             idle.trunk.push(elem);
         },
 
@@ -4156,7 +4175,7 @@ this.prependChild( 'info', 'myElement' );
     },
 
     // the internal _show method does the actual showing
-    _show : function( transition ) {
+    _show : function() {
 
         // shortcuts
         var self = this,
@@ -4366,7 +4385,7 @@ this.prependChild( 'info', 'myElement' );
                         galleriaData: self.getData( queue.index )
                     });
 
-                    transition = typeof transition == 'undefined' ? self._options.transition : transition;
+                    var transition = self._options.transition;
 
                     // can JavaScript loop through objects in order? yes.
                     $.each({
@@ -4394,7 +4413,7 @@ this.prependChild( 'info', 'myElement' );
                         _transitions.active = true;
 
                         // call the transition function and send some stuff
-                        _transitions.effects[ transition ].call( self, params, complete );
+                        _transitions.init.call( self, transition, params, complete );
 
                     }
                 }

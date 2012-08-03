@@ -94,7 +94,7 @@ Separate fullscreen image
 
 You can also specify a separate larger image for fullscreen & lightbox using the data-big attribute on the IMG tag::
 
-   <a href="thumb.jpg"><img data-big="big.jpg" src="image.jpg"></a>
+   <a href="image.jpg"><img data-big="big.jpg" src="thumb.jpg"></a>
 
 This will give you::
 
