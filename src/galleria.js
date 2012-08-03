@@ -1599,7 +1599,7 @@ Galleria = function() {
                 self._scaleImage( next );
                 self._scaleImage( active );
 
-                if ( enter && this._options.trueFullscreen ) {
+                if ( enter && self._options.trueFullscreen ) {
                     // Firefox bug, revise later
                     $( active.container ).add( next.container ).trigger( 'transitionend' );
                 }
