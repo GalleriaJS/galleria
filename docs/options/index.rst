@@ -57,6 +57,8 @@ List of options
 - :doc:`dataSelector` Defines the selector Galleria should look for in the
   source.
 
+- :doc:`dataSort` Function to sort the data before using it.
+
 - :doc:`dataSource` Defines the Galleria data, or the HTML source where the
   data is found.
 

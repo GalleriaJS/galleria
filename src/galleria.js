@@ -2341,6 +2341,7 @@ Galleria.prototype = {
             },
             dataConfig : function( elem ) { return {}; },
             dataSelector: 'img',
+            dataSort: false,
             dataSource: this._target,
             debug: undef,
             dummy: undef, // 1.2.5
@@ -3368,7 +3369,8 @@ Galleria.prototype = {
 
     load : function( source, selector, config ) {
 
-        var self = this;
+        var self = this,
+            o = this._options;
 
         // empty the data array
         this._data = [];
@@ -3384,13 +3386,13 @@ Galleria.prototype = {
         }
 
         // use the source set by target
-        source = source || this._options.dataSource;
+        source = source || o.dataSource;
 
         // use selector set by option
-        selector = selector || this._options.dataSelector;
+        selector = selector || o.dataSelector;
 
         // use the dataConfig set by option
-        config = config || this._options.dataConfig;
+        config = config || o.dataConfig;
 
         // if source is a true object, make it into an array
         if( /^function Object/.test( source.constructor ) ) {
@@ -3400,62 +3402,68 @@ Galleria.prototype = {
         // check if the data is an array already
         if ( source.constructor === Array ) {
             if ( this.validate( source ) ) {
-
                 this._data = source;
-                this._parseData().trigger( Galleria.DATA );
-
             } else {
                 Galleria.raise( 'Load failed: JSON Array not valid.' );
             }
-            return this;
+        } else {
+
+            // add .video and .iframe to the selector (1.2.7)
+            selector += ',.video,.iframe';
+
+            // loop through images and set data
+            $( source ).find( selector ).each( function( i, elem ) {
+
+                elem = $( elem );
+                var data = {},
+                    parent = elem.parent(),
+                    href = parent.attr( 'href' ),
+                    rel  = parent.attr( 'rel' );
+
+                if( href && ( elem[0].nodeName == 'IMG' || elem.hasClass('video') ) && _videoTest( href ) ) {
+                    data.video = href;
+                } else if( href && elem.hasClass('iframe') ) {
+                    data.iframe = href;
+                } else {
+                    data.image = data.big = href;
+                }
+
+                if ( rel ) {
+                    data.big = rel;
+                }
+
+                // alternative extraction from HTML5 data attribute, added in 1.2.7
+                $.each( 'big title description link layer'.split(' '), function( i, val ) {
+                    if ( elem.data(val) ) {
+                        data[ val ] = elem.data(val);
+                    }
+                });
+
+                // mix default extractions with the hrefs and config
+                // and push it into the data array
+                self._data.push( $.extend({
+
+                    title:       elem.attr('title') || '',
+                    thumb:       elem.attr('src'),
+                    image:       elem.attr('src'),
+                    big:         elem.attr('src'),
+                    description: elem.attr('alt') || '',
+                    link:        elem.attr('longdesc'),
+                    original:    elem.get(0) // saved as a reference
+
+                }, data, config( elem ) ) );
+
+            });
         }
 
-        // add .video and .iframe to the selector (1.2.7)
-        selector += ',.video,.iframe';
-
-        // loop through images and set data
-        $( source ).find( selector ).each( function( i, elem ) {
-
-            elem = $( elem );
-            var data = {},
-                parent = elem.parent(),
-                href = parent.attr( 'href' ),
-                rel  = parent.attr( 'rel' );
-
-            if( href && ( elem[0].nodeName == 'IMG' || elem.hasClass('video') ) && _videoTest( href ) ) {
-                data.video = href;
-            } else if( href && elem.hasClass('iframe') ) {
-                data.iframe = href;
-            } else {
-                data.image = data.big = href;
-            }
-
-            if ( rel ) {
-                data.big = rel;
-            }
-
-            // alternative extraction from HTML5 data attribute, added in 1.2.7
-            $.each( 'big title description link layer'.split(' '), function( i, val ) {
-                if ( elem.data(val) ) {
-                    data[ val ] = elem.data(val);
-                }
+        if ( typeof o.dataSort == 'function' ) {
+            protoArray.sort.call( this._data, o.dataSort );
+        } else if ( o.dataSort == 'random' ) {
+            this._data.sort( function() {
+                return Math.round(Math.random())-0.5;
             });
+        }
 
-            // mix default extractions with the hrefs and config
-            // and push it into the data array
-            self._data.push( $.extend({
-
-                title:       elem.attr('title') || '',
-                thumb:       elem.attr('src'),
-                image:       elem.attr('src'),
-                big:         elem.attr('src'),
-                description: elem.attr('alt') || '',
-                link:        elem.attr('longdesc'),
-                original:    elem.get(0) // saved as a reference
-
-            }, data, config( elem ) ) );
-
-        });
         // trigger the DATA event and return
         if ( this.getDataLength() ) {
             this._parseData().trigger( Galleria.DATA );
