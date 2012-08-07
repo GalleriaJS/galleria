@@ -46,3 +46,10 @@ Example on how to load the theme in the head instad of using loadTheme::
 This can also be a small speed-booster, but can also be negative from a progressive enhancement point of view. If you use JSON, make sure you serve a reasonable fallback for users without JavaScript turned on. Read more in the Quick Guide for more examples.
 
 
+6. Lazy load thumbnails
+-----------------------
+
+If you are using a lot of images, JSON data and version 1.2.8+ you can optimize your loading order by utilizing a so called "lazy load" techniques for thumbnails.
+You do this by simply passing ``thumbnails: 'lazy'`` as an option.
+When you do this, thumbnails will not be loaded at once, intead you can control when the thumbnails should be loaded by calling `lazyLoad()` or `lazyLoadChunks()`.
+Please see the API for more info about lazy loading thumbnails.

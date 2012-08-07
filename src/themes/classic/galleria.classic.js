@@ -24,7 +24,7 @@ Galleria.addTheme({
     },
     init: function(options) {
 
-        Galleria.requires(1.25, 'This version of Classic theme requires Galleria 1.2.5 or later');
+        Galleria.requires(1.28, 'This version of Classic theme requires Galleria 1.2.8 or later');
 
         // add some elements
         this.addElement('info-link','info-close');

@@ -15,6 +15,9 @@ Changelog
 * Added a thumbDisplayOrder option (defaults true) that will make the thumbnails appear in order (but still load async)
 * Added a 'lazy' option for thumbnails, making them lazy so you can control the loading later
 * Added two more API calls - 'lazyLoad()' and 'lazyLoadChunks()' that controls how the lazy thumbnails should be loaded
+* Galleria now uses a test element to know when the CSS is loaded for better Android compatibility. If you are getting errors after upgrading you should also download the latest theme files.
+* Fixed some performance issues in Folio, it should now work more stable across all browsers
+* Added a dataSort option that you can use to sort the images before showing them
 
 1.2.7
 -----

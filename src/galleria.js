@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8b 2012-08-03
+ * Galleria v 1.2.8b 2012-08-07
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -814,22 +814,10 @@ var undef,
                 return new Date().getTime();
             },
 
-            // this is pretty crap, but works for now
-            // it will add a callback, but it can't guarantee that the styles can be fetched
-            // using getComputedStyle further checking needed, possibly a dummy element
             loadCSS : function( href, id, callback ) {
 
                 var link,
-                    ready = false,
-                    length,
-                    lastChance = function() {
-                        var fake = new Image();
-                        fake.onload = fake.onerror = function(e) {
-                            fake = null;
-                            ready = true;
-                        };
-                        fake.src = href;
-                    };
+                    length;
 
                 // look for manual css
                 $('link[rel=stylesheet]').each(function() {
@@ -856,10 +844,11 @@ var undef,
                 length = doc.styleSheets.length;
 
                 // check for existing id
-                if( $('#'+id).length ) {
-                    $('#'+id).attr('href', href);
+                if( $( '#' + id ).length ) {
+
+                    $( '#' + id ).attr( 'href', href );
                     length--;
-                    ready = true;
+
                 } else {
                     link = $( '<link>' ).attr({
                         rel: 'stylesheet',
@@ -867,71 +856,42 @@ var undef,
                         id: id
                     }).get(0);
 
-                    window.setTimeout(function() {
-                        var styles = $('link[rel="stylesheet"], style');
-                        if ( styles.length ) {
-                            styles.get(0).parentNode.insertBefore( link, styles[0] );
-                        } else {
-                            DOM().head.appendChild( link );
+                    var styles = $('link[rel="stylesheet"], style');
+                    if ( styles.length ) {
+                        styles.get(0).parentNode.insertBefore( link, styles[0] );
+                    } else {
+                        DOM().head.appendChild( link );
+                    }
+
+                    if ( IE ) {
+
+                        // IE has a limit of 31 stylesheets in one document
+                        if( length >= 31 ) {
+                            Galleria.raise( 'You have reached the browser stylesheet limit (31)', true );
+                            return;
                         }
-
-                        if ( IE ) {
-
-                            // IE has a limit of 31 stylesheets in one document
-                            if( length >= 31 ) {
-                                Galleria.raise( 'You have reached the browser stylesheet limit (31)', true );
-                                return;
-                            }
-
-                            link.onreadystatechange = function(e) {
-                                if ( !ready && (!this.readyState ||
-                                    this.readyState === 'loaded' || this.readyState === 'complete') ) {
-                                    ready = true;
-                                }
-                            };
-
-                        } else {
-
-                            // final test via ajax
-                            var dum = doc.createElement('a'),
-                                loc = window.location;
-
-                            dum.href = href;
-
-                            if ( !( /file/.test( loc.protocol ) ) &&
-                                 loc.hostname == dum.hostname &&
-                                 loc.port == dum.port &&
-                                 loc.protocol == dum.protocol ) {
-
-                                // Same origin policy should apply
-                                $.ajax({
-                                    url: href,
-                                    success: function() {
-                                        ready = true;
-                                    },
-                                    error: lastChance
-                                });
-
-                            } else {
-                                lastChance();
-                            }
-                        }
-                    }, 10);
+                    }
                 }
 
                 if ( typeof callback === 'function' ) {
 
+                    // First check for dummy element (new in 1.2.8)
+                    var $loader = $('<s>').attr( 'id', 'galleria-loader' ).hide().appendTo( DOM().body );
+
                     Utils.wait({
                         until: function() {
-                            return ready && doc.styleSheets.length > length;
+                            return $loader.height() == 1;
                         },
                         success: function() {
-                            window.setTimeout( function() {
-                                callback.call( link, link );
-                            }, 100);
+                            $loader.remove();
+                            callback.call( link, link );
                         },
                         error: function() {
-                            Galleria.raise( 'Theme CSS could not load', true );
+                            $loader.remove();
+
+                            // If failed, tell the dev to download the latest theme
+                            Galleria.raise( 'Theme CSS could not load. Please download the latest theme at http://galleria.io/customer/', true );
+
                         },
                         timeout: 10000
                     });
@@ -2997,7 +2957,7 @@ Galleria.prototype = {
                             }( thumb.image ) ));
                         }
 
-                        if ( o.thumbDisplayOrder && !thumb.lazy ) {
+                        if ( o.thumbDisplayOrder && !thumb.lazy && !thumb.video ) {
 
                             $.each( thumbchunk, function( i, th ) {
                                 if ( i === loadindex && th.ready && !th.displayed ) {
@@ -3009,7 +2969,6 @@ Galleria.prototype = {
                                 }
                             });
                         } else {
-
                             thumbComplete( thumb, callback );
                         }
                     }
@@ -3043,6 +3002,9 @@ Galleria.prototype = {
                 // flag lazy
                 thumb.lazy = false;
 
+                // flag video
+                thumb.video = false;
+
                 // append the thumbnail
                 this.$( 'thumbnails' ).append( thumb.container );
 
@@ -3070,6 +3032,8 @@ Galleria.prototype = {
                 special = src.split(':');
 
                 if ( special.length == 2 && special[0] in _video ) {
+
+                    thumb.video = true;
 
                     thumb.load( gif, {
                         height: thumb.data.height,
@@ -3174,15 +3138,21 @@ Galleria.prototype = {
             }
 
             var thumb = self._thumbnails[ ind ],
-                data = thumb.data;
-
-            thumb.load( data.src , function( thumb ) {
-                self._onThumbLoad.call( self, thumb, function() {
+                data = thumb.data,
+                special = data.src.split(':'),
+                callback = function() {
                     if ( ++loaded == arr.length && typeof complete == 'function' ) {
                         complete.call( self );
                     }
+                };
+
+            if ( thumb.video ) {
+                self._onThumbLoad.call( self, thumb, callback );
+            } else {
+                thumb.load( data.src , function( thumb ) {
+                    self._onThumbLoad.call( self, thumb, callback );
                 });
-            });
+            }
         });
 
         return this;
@@ -3463,6 +3433,8 @@ Galleria.prototype = {
                 return Math.round(Math.random())-0.5;
             });
         }
+
+
 
         // trigger the DATA event and return
         if ( this.getDataLength() ) {
@@ -4261,12 +4233,7 @@ this.prependChild( 'info', 'myElement' );
             }
         };
 
-
-        if ( Galleria.WEBKIT && !Galleria.TOUCH && !width && !height ) {
-            self.addTimer( false, scale, 10 );// webkit is too fast
-        } else {
-            scale.call( self );
-        }
+        scale.call( self );
 
         return this;
     },
@@ -5328,6 +5295,9 @@ Galleria.log = function() {
 */
 
 Galleria.ready = function( fn ) {
+    if ( typeof fn != 'function' ) {
+        return Galleria;
+    }
     $.each( _galleries, function( i, gallery ) {
         fn.call( gallery, gallery._options );
     });

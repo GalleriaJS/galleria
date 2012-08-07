@@ -1,8 +1,6 @@
-/*
- * Galleria Classic Theme
- * Copyright (c) 2010, Aino
- * Licensed under the MIT license.
- */
+/* Galleria Classic Theme 2012-08-07 | https://raw.github.com/aino/galleria/master/LICENSE | (c) Aino */
+
+#galleria-loader{height:1px!important}
 
 .galleria-container {
     position: relative;
