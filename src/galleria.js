@@ -2849,7 +2849,8 @@ Galleria.prototype = {
             thumbchunk = [],
             loadindex = 0,
 
-            gif = 'data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D',
+            gif = IE < 8 ? 'http://upload.wikimedia.org/wikipedia/commons/c/c0/Blank.gif' :
+                           'data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D',
 
             // get previously active thumbnail, if exists
             active = (function() {
