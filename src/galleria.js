@@ -2958,14 +2958,15 @@ Galleria.prototype = {
 
                         // get "special" thumbs from provider
                         if( data.iframe && special.length == 2 && special[0] in _video ) {
+
                             _video[ special[0] ].getThumb( special[1], (function(img) {
                                 return function(src) {
                                     img.src = src;
+                                    thumbComplete( thumb, callback );
                                 };
                             }( thumb.image ) ));
-                        }
 
-                        if ( o.thumbDisplayOrder && !thumb.lazy && !thumb.video ) {
+                        } else if ( o.thumbDisplayOrder && !thumb.lazy ) {
 
                             $.each( thumbchunk, function( i, th ) {
                                 if ( i === loadindex && th.ready && !th.displayed ) {
@@ -2978,7 +2979,6 @@ Galleria.prototype = {
                             });
                         } else {
                             thumbComplete( thumb, callback );
-                            loadindex++;
                         }
                     }
                 });
