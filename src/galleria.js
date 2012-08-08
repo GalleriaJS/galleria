@@ -3117,6 +3117,12 @@ Galleria.prototype = {
 
         thumbchunk = this._thumbnails.slice( chunk );
 
+        $.each( thumbchunk, function( i, th ) {
+            if ( th.video ) {
+                thumbchunk.splice(i, 1);
+            }
+        });
+
         return this;
     },
 
