@@ -1,5 +1,5 @@
 /**
- * Galleria Classic Theme 2012-04-04
+ * Galleria Classic Theme 2012-08-08
  * http://galleria.io
  *
  * Licensed under the MIT license

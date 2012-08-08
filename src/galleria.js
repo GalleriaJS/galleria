@@ -1439,6 +1439,22 @@ Galleria = function() {
                 tooltip.init();
             }
 
+            var mouseout = function() {
+                self.$( 'container' ).unbind( 'mousemove', tooltip.move );
+                self.clearTimer( tooltip.timer );
+
+                self.$( 'tooltip' ).stop().animate({
+                    opacity: 0
+                }, 200, function() {
+
+                    self.$( 'tooltip' ).hide();
+
+                    self.addTimer( tooltip.swapTimer, function() {
+                        tooltip.open = false;
+                    }, 1000);
+                });
+            };
+
             var hover = function( elem, value) {
 
                 tooltip.define( elem, value );
@@ -1451,30 +1467,13 @@ Galleria = function() {
 
                     self.addTimer( tooltip.timer, function() {
                         self.$( 'tooltip' ).stop().show().animate({
-                            opacity:1
+                            opacity: 1
                         });
                         tooltip.open = true;
 
                     }, tooltip.open ? 0 : 500);
 
-                }, function() {
-
-                    self.$( 'container' ).unbind( 'mousemove', tooltip.move );
-                    self.clearTimer( tooltip.timer );
-
-                    self.$( 'tooltip' ).stop().animate({
-                        opacity: 0
-                    }, 200, function() {
-
-                        self.$( 'tooltip' ).hide();
-
-                        self.addTimer( tooltip.swapTimer, function() {
-                            tooltip.open = false;
-                        }, 1000);
-                    });
-                }).click(function() {
-                    $( this ).trigger( 'mouseout' );
-                });
+                }, mouseout).click(mouseout);
             };
 
             if ( typeof value === 'string' ) {
@@ -1805,6 +1804,7 @@ Galleria = function() {
                 complete: true,
                 busy: false
             });
+
             if ( !hide ) {
                 idle.addTimer();
             } else {
@@ -3266,11 +3266,15 @@ Galleria.prototype = {
                         self._playtime = self._options.autoplay;
                     }
 
-                    self.trigger( Galleria.PLAY );
                     self._playing = true;
                 }
                 // if second load, just do the show and return
                 if ( self._firstrun ) {
+
+                    if ( self._options.autoplay ) {
+                        self.trigger( Galleria.PLAY );
+                    }
+
                     if ( typeof self._options.show === 'number' ) {
                         self.show( self._options.show );
                     }
@@ -3319,6 +3323,11 @@ Galleria.prototype = {
 
                 } else if( self._data[ self._options.show ] ) {
                     self.show( self._options.show );
+                }
+
+                // play trigger
+                if ( self._options.autoplay ) {
+                    self.trigger( Galleria.PLAY );
                 }
             },
 
