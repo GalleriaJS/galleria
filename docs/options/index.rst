@@ -27,7 +27,7 @@ Galleria options are configured at anytime using the ``Galleria.configure`` func
         imageCrop: true
     });
 
-Or when calling ``Galleria.run``:
+Or when calling ``Galleria.run``::
 
     Galleria.run('#galleria', {
         transition: 'fade',
@@ -103,7 +103,7 @@ List of options
 
 - :doc:`layerFollow` Boolean for controlling if the layer will follow the image size or not.
 
-- :doc:`lightbox` Helper for attaching a `lightbox <http://en.wikipedia.org/wiki/Lightbox_(JavaScript)>`_ (to zoom in) when the user clicks on an image.
+- :doc:`lightbox` Helper for attaching a **lightbox** (to zoom in) when the user clicks on an image.
 
 - :doc:`lightboxFadeSpeed` Defines how fast the lightbox should fade.
 
