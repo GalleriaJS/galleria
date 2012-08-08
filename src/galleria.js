@@ -2975,6 +2975,8 @@ Galleria.prototype = {
                                     th.displayed = true;
 
                                     thumbComplete( th, callback );
+
+                                    return false;
                                 }
                             });
                         } else {
@@ -3043,6 +3045,7 @@ Galleria.prototype = {
                 if ( special.length == 2 && special[0] in _video ) {
 
                     thumb.video = true;
+                    thumb.ready = true;
 
                     thumb.load( gif, {
                         height: thumb.data.height,
