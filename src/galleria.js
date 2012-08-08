@@ -2965,10 +2965,10 @@ Galleria.prototype = {
                             }( thumb.image ) ));
                         }
 
-                        if ( o.thumbDisplayOrder && !thumb.lazy && !thumb.video ) {
+                        if ( o.thumbDisplayOrder && !thumb.lazy ) {
 
                             $.each( thumbchunk, function( i, th ) {
-                                if ( i === loadindex && th.ready && !th.displayed ) {
+                                if ( th.video || ( i === loadindex && th.ready && !th.displayed ) ) {
 
                                     loadindex++;
                                     th.displayed = true;
