@@ -6,9 +6,11 @@ dataSort
     | default: **false**
 
 Function to sort the data before using it.
-You can use it the same way you would use `Array.sort() <https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/sort>`_ ::
+You can use it the same way you would use `Array.sort() <https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/sort>`_.
 
 .. highlight:: javascript
+
+::
 
     Galleria.configure({
         dataSort: function(a, b) {
