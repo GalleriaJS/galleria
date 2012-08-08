@@ -103,7 +103,7 @@ Setting dimensions
 ==================
 
 We need to set some dimensions for the gallery. This can be done in many ways, but the simplest is to add some basic CSS rules.
-Add the following markup inside the ``<head>`` tag to apply dimensions and a default black background:
+Add the following markup inside the ``<head>`` tag to apply dimensions and a default black background::
 
     <style>
         #galleria{ width: 700px; height: 400px; background: #000 }
