@@ -2965,7 +2965,7 @@ Galleria.prototype = {
                             }( thumb.image ) ));
                         }
 
-                        if ( o.thumbDisplayOrder && !thumb.lazy ) {
+                        if ( o.thumbDisplayOrder && !thumb.lazy && !thumb.video ) {
 
                             $.each( thumbchunk, function( i, th ) {
                                 if ( i === loadindex && th.ready && !th.displayed ) {
@@ -2978,6 +2978,7 @@ Galleria.prototype = {
                             });
                         } else {
                             thumbComplete( thumb, callback );
+                            loadindex++;
                         }
                     }
                 });
@@ -3116,12 +3117,6 @@ Galleria.prototype = {
         }
 
         thumbchunk = this._thumbnails.slice( chunk );
-
-        $.each( thumbchunk, function( i, th ) {
-            if ( th.video ) {
-                thumbchunk.splice(i, 1);
-            }
-        });
 
         return this;
     },
