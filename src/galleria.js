@@ -2968,7 +2968,7 @@ Galleria.prototype = {
                         if ( o.thumbDisplayOrder && !thumb.lazy ) {
 
                             $.each( thumbchunk, function( i, th ) {
-                                if ( th.video || ( i === loadindex && th.ready && !th.displayed ) ) {
+                                if ( i === loadindex && th.ready && !th.displayed ) {
 
                                     loadindex++;
                                     th.displayed = true;
