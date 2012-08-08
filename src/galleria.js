@@ -1774,7 +1774,7 @@ Galleria = function() {
 
         active: false,
 
-        add: function(elem, to, init) {
+        add: function(elem, to, from, hide) {
             if (!elem) {
                 return;
             }
@@ -1783,21 +1783,29 @@ Galleria = function() {
             }
             elem = $(elem);
 
-            var from = {},
+            if ( typeof from == 'boolean' ) {
+                hide = from;
+                from = {};
+            }
+
+            from = from || {};
+
+            var extract = {},
                 style;
 
             for ( style in to ) {
                 if ( to.hasOwnProperty( style ) ) {
-                    from[ style ] = elem.css( style );
+                    extract[ style ] = elem.css( style );
                 }
             }
+
             elem.data('idle', {
-                from: from,
+                from: $.extend( extract, from ),
                 to: to,
                 complete: true,
                 busy: false
             });
-            if ( !init ) {
+            if ( !hide ) {
                 idle.addTimer();
             } else {
                 elem.css( to );
@@ -1807,12 +1815,12 @@ Galleria = function() {
 
         remove: function(elem) {
 
-            elem = jQuery(elem);
+            elem = $(elem);
 
             $.each(idle.trunk, function(i, el) {
                 if ( el && el.length && !el.not(elem).length ) {
-                    self._idle.show(elem);
-                    self._idle.trunk.splice(i, 1);
+                    elem.css( elem.data( 'idle' ).from );
+                    idle.trunk.splice(i, 1);
                 }
             });
 
@@ -3624,15 +3632,17 @@ Galleria.prototype = {
         Useful to hide f.ex navigation when the gallery is inactive
 
         @param {HTMLElement|string} elem The Dom node or selector to apply the idle state to
-        @param {Object} styles the CSS styles to apply
+        @param {Object} styles the CSS styles to apply when in idle mode
+        @param {Object} [from] the CSS styles to apply when in normal
+        @param {Boolean} [hide] set to true if you want to hide it first
 
         @example addIdleState( this.get('image-nav'), { opacity: 0 });
-        @example addIdleState( '.galleria-image-nav', { top: -200 });
+        @example addIdleState( '.galleria-image-nav', { top: -200 }, true);
 
         @returns Instance
     */
 
-    addIdleState: function( elem, styles ) {
+    addIdleState: function( elem, styles, from, hide ) {
         this._idle.add.apply( this._idle, Utils.array( arguments ) );
         return this;
     },
