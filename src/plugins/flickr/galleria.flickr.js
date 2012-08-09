@@ -64,7 +64,7 @@ Galleria.Flickr.prototype = {
     */
 
     search: function( phrase, callback ) {
-        if(this.options.username) {
+            if(this.options.username) {
 	        return this._call({
 	            method: 'flickr.urls.lookupUser',
 	            url: 'flickr.com/photos/' + this.options.username
@@ -108,14 +108,22 @@ Galleria.Flickr.prototype = {
 
     user: function( username, callback ) {
         return this._call({
-            method: 'flickr.urls.lookupUser',
-            url: 'flickr.com/photos/' + username
+                method: 'flickr.urls.lookupUser',
+                url: 'flickr.com/photos/' + username
         }, function( data ) {
-            this._find({
-                user_id: data.user.id,
-                method: 'flickr.people.getPublicPhotos'
-            }, callback);
-        });
+                if(this.options.sort.match(/interestingness-(desc|asc)/)) {
+                    this._find({
+                        text: '',
+                        user_id: data.user.id
+                    }, callback);
+                }
+                else {
+                    this._find({
+                        user_id: data.user.id,
+                        method: 'flickr.people.getPublicPhotos'
+                    }, callback);
+                }
+            })
     },
 
     /**
