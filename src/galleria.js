@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8 2012-08-08
+ * Galleria v 1.2.8 2012-08-09
  * http://galleria.io
  *
  * Licensed under the MIT license
