@@ -2914,9 +2914,9 @@ Galleria.prototype = {
                 if ( typeof callback == 'function' ) {
                     callback.call( self, thumb );
                 }
-            };
+            },
 
-        self._onThumbLoad = function( thumb, callback ) {
+            onThumbLoad = function( thumb, callback ) {
 
                 // scale when ready
                 thumb.scale({
@@ -2977,7 +2977,7 @@ Galleria.prototype = {
 
                                     thumbComplete( th, callback );
 
-                                    return false;
+                                    return;
                                 }
                             });
                         } else {
@@ -3051,7 +3051,7 @@ Galleria.prototype = {
                     thumb.load( gif, {
                         height: thumb.data.height,
                         width: thumb.data.height*1.25
-                    }, self._onThumbLoad);
+                    }, onThumbLoad);
 
                 } else if ( optval == 'lazy' ) {
 
@@ -3065,7 +3065,7 @@ Galleria.prototype = {
                     });
 
                 } else {
-                    thumb.load( src, self._onThumbLoad );
+                    thumb.load( src, onThumbLoad );
                 }
 
                 // preload all images here
@@ -3111,7 +3111,8 @@ Galleria.prototype = {
             // we'll add the same event to the source if it's kept
 
             $( thumb.container ).add( o.keepSource && o.linkSourceImages ? data.original : null )
-                .data('index', i).bind( o.thumbEventType, onThumbEvent );
+                .data('index', i).bind( o.thumbEventType, onThumbEvent )
+                .data('thumbload', onThumbLoad);
 
             if (active === src) {
                 $( thumb.container ).addClass( 'active' );
@@ -3157,13 +3158,13 @@ Galleria.prototype = {
                     if ( ++loaded == arr.length && typeof complete == 'function' ) {
                         complete.call( self );
                     }
-                };
-
+                },
+                thumbload = $( thumb.container ).data( 'thumbload' );
             if ( thumb.video ) {
-                self._onThumbLoad.call( self, thumb, callback );
+                thumbload.call( self, thumb, callback );
             } else {
                 thumb.load( data.src , function( thumb ) {
-                    self._onThumbLoad.call( self, thumb, callback );
+                    thumbload.call( self, thumb, callback );
                 });
             }
         });
