@@ -33,6 +33,9 @@ Theme-specific options
         // Toggles tooltip
         _showTooltip: true,
 
+        // Sets this to false if you don’t want to show the captions initially
+        _showCaption: true,
+
         // Localized strings, modify these if you want tooltips in your language
         _locale: {
             show_captions: 'Show captions',

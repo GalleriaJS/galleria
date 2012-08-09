@@ -890,10 +890,10 @@ var undef,
                             $loader.remove();
 
                             // If failed, tell the dev to download the latest theme
-                            Galleria.raise( 'Theme CSS could not load. Please download the latest theme at http://galleria.io/customer/', true );
+                            Galleria.raise( 'Theme CSS could not load after 20 sec. Please download the latest theme at http://galleria.io/customer/', true );
 
                         },
-                        timeout: 10000
+                        timeout: 20000
                     });
                 }
                 return link;
