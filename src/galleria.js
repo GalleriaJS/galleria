@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8b 2012-08-13
+ * Galleria v 1.2.9b 2012-08-13
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -51,6 +51,7 @@ var undef,
             title: doc.title
         };
     },
+    IFRAME = window.parent !== window.self,
 
     // list of Galleria events
     _eventlist = 'data ready thumbnail loadstart loadfinish image play pause progress ' +
@@ -183,7 +184,7 @@ var undef,
 
         support: (function() {
             var html = DOM().html;
-            return html.requestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen;
+            return !IFRAME && ( html.requestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen );
         }()),
 
         callback: F,
@@ -1587,11 +1588,47 @@ Galleria = function() {
 
             fullscreen.active = true;
 
+            if ( IFRAME ) {
+
+                fullscreen.iframe = (function() {
+
+                    var elem,
+                        refer = doc.referrer,
+                        test = doc.createElement('a'),
+                        loc = window.location;
+
+                    test.href = refer;
+
+                    if( test.protocol != loc.protocol ||
+                        test.hostname != loc.hostname ||
+                        test.port != loc.port ) {
+                            Galleria.raise('Parent fullscreen not available. Iframe protocol, domains and ports must match.');
+                            return false;
+                        }
+
+                    fullscreen.pd = window.parent.document;
+
+                    $( fullscreen.pd ).find('iframe').each(function() {
+                        var idoc = this.contentDocument || this.contentWindow.document;
+                        if ( idoc === doc ) {
+                            elem = this;
+                            return false;
+                        }
+                    });
+
+                    return elem;
+                }());
+
+            }
+
             // hide the image until rescale is complete
             Utils.hide( self.getActiveImage() );
 
             self.$( 'container' ).addClass( 'fullscreen' );
 
+            if ( IFRAME && fullscreen.iframe ) {
+                fullscreen.iframe.scrolled = $( window.parent ).scrollTop();
+            }
             // begin styleforce
             Utils.forceStyles(self.get('container'), {
                 position: 'fixed',
@@ -1615,6 +1652,20 @@ Galleria = function() {
 
             Utils.forceStyles( DOM().html, htmlbody );
             Utils.forceStyles( DOM().body, htmlbody );
+
+            if ( IFRAME && fullscreen.iframe ) {
+                Utils.forceStyles( fullscreen.pd.documentElement, htmlbody );
+                Utils.forceStyles( fullscreen.pd.body, htmlbody );
+                Utils.forceStyles( fullscreen.iframe, $.extend( htmlbody, {
+                    width: '100%',
+                    height: '100%',
+                    top: 0,
+                    left: 0,
+                    position: 'fixed',
+                    zIndex: 10000,
+                    border: 'none'
+                }));
+            }
 
             // temporarily attach some keys
             // save the old ones first in a cloned object
@@ -1721,8 +1772,15 @@ Galleria = function() {
             // revert all styles
             Utils.revertStyles( self.get('container'), DOM().html, DOM().body );
 
+            if ( IFRAME && fullscreen.iframe ) {
+                Utils.revertStyles( fullscreen.pd.documentElement, fullscreen.pd.body, fullscreen.iframe );
+            }
+
             // scroll back
             window.scrollTo(0, fullscreen.scrolled);
+            if ( IFRAME && fullscreen.iframe && fullscreen.iframe.scrolled ) {
+                window.parent.scrollTo(0, fullscreen.iframe.scrolled );
+            }
 
             // detach all keyboard events and apply the old keymap
             self.detachKeyboard();

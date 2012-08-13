@@ -2,6 +2,10 @@
 Changelog
 *********
 
+1.2.9
+-----
+* Added fullscreen functionality from within an iframe gallery, assuming that the iframe and parent window protocol, host and ports match.
+
 1.2.8
 -----
 * Fixed a dummy image bug
