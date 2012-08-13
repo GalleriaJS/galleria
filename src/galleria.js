@@ -1583,12 +1583,11 @@ Galleria = function() {
                 }
             };
 
+            var version = NAV.match(/version\/([0-9.]{3,5})/);
+
             // Safari 6 work around
-            if ( Galleria.SAFARI ) {
-                var version = NAV.match(/version\/([0-9.]{3,5})/);
-                if ( version.length && version[1] && parseFloat( version[1] ) >= 6 ) {
-                    window.setTimeout( enter, 1 );
-                }
+            if ( Galleria.SAFARI && version && version.length && version[1] && parseFloat( version[1] ) >= 6 ) {
+                window.setTimeout( enter, 1 );
             } else {
                 enter();
             }
