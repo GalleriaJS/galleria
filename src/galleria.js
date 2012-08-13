@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8 2012-08-09
+ * Galleria v 1.2.8b 2012-08-13
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -1574,7 +1574,12 @@ Galleria = function() {
             if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
                 _nativeFullscreen.enter( self, callback );
             } else {
-                fullscreen._enter( callback );
+                // Safari Mountain Lion work around
+                fullscreen.scrolled = $win.scrollTop();
+                window.scrollTo(0, 1);
+                window.setTimeout(function() {
+                    fullscreen._enter( callback );
+                }, 1);
             }
         },
 
@@ -1586,8 +1591,6 @@ Galleria = function() {
             Utils.hide( self.getActiveImage() );
 
             self.$( 'container' ).addClass( 'fullscreen' );
-
-            fullscreen.scrolled = $win.scrollTop();
 
             // begin styleforce
             Utils.forceStyles(self.get('container'), {
