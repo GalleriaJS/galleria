@@ -1572,16 +1572,27 @@ Galleria = function() {
 
             callback = fullscreen.parseCallback( callback, true );
 
-            if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
-                _nativeFullscreen.enter( self, callback );
-            } else {
-                // Safari Mountain Lion work around
-                fullscreen.scrolled = $win.scrollTop();
-                window.scrollTo(0, 1);
-                window.setTimeout(function() {
+            fullscreen.scrolled = $win.scrollTop();
+            window.scrollTo(0, 0);
+
+            var enter = function() {
+                if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
+                    _nativeFullscreen.enter( self, callback );
+                } else {
                     fullscreen._enter( callback );
-                }, 1);
+                }
+            };
+
+            // Safari 6 work around
+            if ( Galleria.SAFARI ) {
+                var version = NAV.match(/version\/([0-9.]{3,5})/);
+                if ( version.length && version[1] && parseFloat( version[1] ) >= 6 ) {
+                    window.setTimeout( enter, 1 );
+                }
+            } else {
+                enter();
             }
+
         },
 
         _enter: function( callback ) {
