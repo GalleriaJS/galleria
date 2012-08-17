@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.9b 2012-08-13
+ * Galleria v 1.2.9b 2012-08-17
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -978,7 +978,7 @@ var undef,
                     $(params.next).css({
                         opacity: 0,
                         left: 0
-                    }).show();
+                    });
                     Utils.animate(params.next, {
                         opacity: 1
                     },{
@@ -5630,6 +5630,11 @@ Galleria.Picture.prototype = {
         }
 
         this.image = new Image();
+
+        // IE8 opacity inherit bug
+        if ( Galleria.IE8 ) {
+            $( this.image ).css( 'filter', 'inherit' );
+        }
 
         var i = 0,
             reload = false,

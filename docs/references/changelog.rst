@@ -4,6 +4,7 @@ Changelog
 
 1.2.9
 -----
+* Fixed an IE8 bug with initial inherited opacity for images
 * Added fullscreen functionality from within an iframe gallery, assuming that the iframe and parent window protocol, host and ports match.
 
 1.2.8
