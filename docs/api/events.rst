@@ -4,8 +4,7 @@ Events
 
 You can bind functions to the Galleria events to build custom themes. All
 callbacks contains an event object as a function argument. The event object is
-similar to jQuery's event model, except that it adds event.scope that refers to
-the current gallery scope of each event. Some events will add even further
+similar to the one that jQuery uses in their event model, except that it adds even further
 properties to the event object, specified here.
 
 In the callback, the ``this`` keyword inside the callback always refers to the gallery scope.
@@ -52,6 +51,8 @@ Triggers when a thumbnail is loaded and displayed in Galleria.
 Event properties:
 -----------------
 
+- **galleriaData** (Object) The currently active data object
+
 - **thumbTarget** (HTML element) The thumbnail IMG element
 
 - **index** (int) the index of the thumbnail, starting at 0
@@ -63,6 +64,8 @@ Triggers every time Galleria begins loading an image.
 
 Event properties:
 -----------------
+
+- **galleriaData** (Object) The currently active data object
 
 - **cached** (boolean) is true if the image is cached (no loading required).
 
@@ -81,6 +84,8 @@ Triggers every time Galleria has finished loading an image.
 Event properties:
 -----------------
 
+- **galleriaData** (Object) The currently active data object
+
 - **cached** (boolean) is true if the image is cached (no loading required).
 
 - **imageTarget** (HTML element) The ``IMG`` element of the now loaded image
@@ -98,6 +103,8 @@ Triggers when the gallery image is displayed after loading and transition.
 
 Event properties:
 -----------------
+
+- **galleriaData** (Object) The currently active data object
 
 - **imageTarget** (HTML element) The ``IMG`` element of the now active
   displayed image after transition.

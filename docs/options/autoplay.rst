@@ -12,6 +12,6 @@ If you set this to any number, f.ex 4000, it will start playing with that interv
 
 Example::
 
-    $("#gallery").galleria({
+    Galleria.run('#galleria, {
         autoplay: 7000 // will move forward every 7 seconds
     });

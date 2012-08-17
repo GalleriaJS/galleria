@@ -2,6 +2,28 @@
 Changelog
 *********
 
+1.2.9
+-----
+* Fixed an IE8 bug with initial inherited opacity for images
+* Added fullscreen functionality from within an iframe gallery, assuming that the iframe and parent window protocol, host and ports match.
+
+1.2.8
+-----
+* Fixed a dummy image bug
+* Responsive is now default true, and it will also keep the original aspect ratio per default. You can still set your own ratio if you configure a height less than two.
+* Fixed Galleria.log
+* Fixed a bug with multiple galleries and true fullscreen
+* Fixed a Galleria.on bug
+* Fixed tooltip bug in some IE versions
+* .push() now silently adds new thumbnails without reloading the thumbnail bar
+* Fixed a enterFullscreen bug in FF if fullscreen was entered during transition
+* Added a thumbDisplayOrder option (defaults true) that will make the thumbnails appear in order (but still load async)
+* Added a 'lazy' option for thumbnails, making them lazy so you can control the loading later
+* Added two more API calls - 'lazyLoad()' and 'lazyLoadChunks()' that controls how the lazy thumbnails should be loaded
+* Galleria now uses a test element to know when the CSS is loaded for better Android compatibility. If you are getting errors after upgrading you should also download the latest theme files.
+* Fixed some performance issues in Folio, it should now work more stable across all browsers
+* Added a dataSort option that you can use to sort the images before showing them
+
 1.2.7
 -----
 * Fixed an issue with double events when using clicknext and layer.

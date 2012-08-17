@@ -63,12 +63,6 @@ We do not currently develop specific themes for mobile devices since we have not
 This direction might change very soon since there is a lot of things happening on the mobile web in a fast pace.
 
 
-Can I use HTML captions?
-------------------------
-
-Yes you can, just use the data-title and data-description attributes on the IMG tag. Read more at :doc:`/references/data` for much more information about how to pass data to Galleria.
-
-
 Do you have multi-license options for Premium themes?
 -----------------------------------------------------
 

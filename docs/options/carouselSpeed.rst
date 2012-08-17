@@ -12,6 +12,6 @@ It globally affects the carousel animation, both when following and sliding.
 
 Example::
 
-    $("#galleria").galleria({
+    Galleria.run('#galleria', {
         carouselSpeed: 1200 // sets the carosuel animation speed to 1.2 seconds (slow)
-    })
+    });

@@ -70,7 +70,7 @@ Now that we have an HTML template and jQuery in place, it's time to install Gall
 2. Extract the galleria.zip file and place the "galleria" directory where you have your HTML files.
 3. Add the following code beneath the jQuery script tag we added earlier::
 
-    <script src="galleria/galleria-1.2.7.min.js"></script>
+    <script src="galleria/galleria-1.2.8.min.js"></script>
 
 To make sure Galleria works properly add the following code inside the ``<body>`` tag::
 
@@ -85,7 +85,7 @@ The HTML file should look something like::
     <html>
         <head>
             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-            <script src="galleria/galleria-1.2.7.min.js"></script>
+            <script src="galleria/galleria-1.2.8.min.js"></script>
         </head>
         <body>
             <script>
@@ -97,6 +97,19 @@ The HTML file should look something like::
 If you don’t see any text after reloading the page, the path to the Galleria file is probably wrong.
 
 If it does work, you can remove the ``<script>`` tag inside the body and move along.
+
+
+Setting dimensions
+==================
+
+We need to set some dimensions for the gallery. This can be done in many ways, but the simplest is to add some basic CSS rules.
+Add the following markup inside the ``<head>`` tag to apply dimensions and a default black background::
+
+    <style>
+        #galleria{ width: 700px; height: 400px; background: #000 }
+    </style>
+
+Galleria will then extract these measures and apply to the gallery.
 
 
 Adding images
@@ -148,7 +161,7 @@ The complete code example:
     <html>
         <head>
             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-            <script src="galleria/galleria-1.2.7.min.js"></script>
+            <script src="galleria/galleria-1.2.8.min.js"></script>
         </head>
         <body>
             <div id="galleria">

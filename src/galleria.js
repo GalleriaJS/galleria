@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.8a 2012-05-02
+ * Galleria v 1.2.9b 2012-08-17
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -51,6 +51,7 @@ var undef,
             title: doc.title
         };
     },
+    IFRAME = window.parent !== window.self,
 
     // list of Galleria events
     _eventlist = 'data ready thumbnail loadstart loadfinish image play pause progress ' +
@@ -183,7 +184,7 @@ var undef,
 
         support: (function() {
             var html = DOM().html;
-            return html.requestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen;
+            return !IFRAME && ( html.requestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen );
         }()),
 
         callback: F,
@@ -248,46 +249,6 @@ var undef,
         }
     },
 
-    // the internal timeouts object
-    // provides helper methods for controlling timeouts
-    _timeouts = {
-
-        trunk: {},
-
-        add: function( id, fn, delay, loop ) {
-            id = id || new Date().getTime();
-            loop = loop || false;
-            this.clear( id );
-            if ( loop ) {
-                var old = fn;
-                fn = function() {
-                    old();
-                    _timeouts.add( id, fn, delay );
-                };
-            }
-            this.trunk[ id ] = window.setTimeout( fn, delay );
-        },
-
-        clear: function( id ) {
-
-            var del = function( i ) {
-                window.clearTimeout( this.trunk[ i ] );
-                delete this.trunk[ i ];
-            }, i;
-
-            if ( !!id && id in this.trunk ) {
-                del.call( _timeouts, id );
-
-            } else if ( typeof id === 'undefined' ) {
-                for ( i in this.trunk ) {
-                    if ( this.trunk.hasOwnProperty( i ) ) {
-                        del.call( _timeouts, i );
-                    }
-                }
-            }
-        }
-    },
-
     // the internal gallery holder
     _galleries = [],
 
@@ -319,6 +280,20 @@ var undef,
     Utils = (function() {
 
         return {
+
+            // legacy support for clearTimer
+            clearTimer: function( id ) {
+                $.each( Galleria.get(), function() {
+                    this.clearTimer( id );
+                });
+            },
+
+            // legacy support for addTimer
+            addTimer: function( id ) {
+                $.each( Galleria.get(), function() {
+                    this.addTimer( id );
+                });
+            },
 
             array : function( obj ) {
                 return protoArray.slice.call(obj, 0);
@@ -478,6 +453,7 @@ var undef,
                             // attach the end event
                             elem.one(endEvent, (function( elem ) {
                                 return function() {
+
                                     // clear the animation
                                     clearStyle(elem);
 
@@ -740,16 +716,6 @@ var undef,
                 };
             }()),
 
-            addTimer : function() {
-                _timeouts.add.apply( _timeouts, Utils.array( arguments ) );
-                return this;
-            },
-
-            clearTimer : function() {
-                _timeouts.clear.apply( _timeouts, Utils.array( arguments ) );
-                return this;
-            },
-
             wait : function(options) {
                 options = $.extend({
                     until : FALSE,
@@ -849,22 +815,10 @@ var undef,
                 return new Date().getTime();
             },
 
-            // this is pretty crap, but works for now
-            // it will add a callback, but it can't guarantee that the styles can be fetched
-            // using getComputedStyle further checking needed, possibly a dummy element
             loadCSS : function( href, id, callback ) {
 
                 var link,
-                    ready = false,
-                    length,
-                    lastChance = function() {
-                        var fake = new Image();
-                        fake.onload = fake.onerror = function(e) {
-                            fake = null;
-                            ready = true;
-                        };
-                        fake.src = href;
-                    };
+                    length;
 
                 // look for manual css
                 $('link[rel=stylesheet]').each(function() {
@@ -891,10 +845,11 @@ var undef,
                 length = doc.styleSheets.length;
 
                 // check for existing id
-                if( $('#'+id).length ) {
-                    $('#'+id).attr('href', href);
+                if( $( '#' + id ).length ) {
+
+                    $( '#' + id ).attr( 'href', href );
                     length--;
-                    ready = true;
+
                 } else {
                     link = $( '<link>' ).attr({
                         rel: 'stylesheet',
@@ -902,73 +857,45 @@ var undef,
                         id: id
                     }).get(0);
 
-                    window.setTimeout(function() {
-                        var styles = $('link[rel="stylesheet"], style');
-                        if ( styles.length ) {
-                            styles.get(0).parentNode.insertBefore( link, styles[0] );
-                        } else {
-                            DOM().head.appendChild( link );
+                    var styles = $('link[rel="stylesheet"], style');
+                    if ( styles.length ) {
+                        styles.get(0).parentNode.insertBefore( link, styles[0] );
+                    } else {
+                        DOM().head.appendChild( link );
+                    }
+
+                    if ( IE ) {
+
+                        // IE has a limit of 31 stylesheets in one document
+                        if( length >= 31 ) {
+                            Galleria.raise( 'You have reached the browser stylesheet limit (31)', true );
+                            return;
                         }
-
-                        if ( IE ) {
-
-                            // IE has a limit of 31 stylesheets in one document
-                            if( length >= 31 ) {
-                                Galleria.raise( 'You have reached the browser stylesheet limit (31)', true );
-                                return;
-                            }
-
-                            link.onreadystatechange = function(e) {
-                                if ( !ready && (!this.readyState ||
-                                    this.readyState === 'loaded' || this.readyState === 'complete') ) {
-                                    ready = true;
-                                }
-                            };
-
-                        } else {
-
-                            // final test via ajax
-                            var dum = doc.createElement('a'),
-                                loc = window.location;
-
-                            dum.href = href;
-
-                            if ( !( /file/.test( loc.protocol ) ) &&
-                                 loc.hostname == dum.hostname &&
-                                 loc.port == dum.port &&
-                                 loc.protocol == dum.protocol ) {
-
-                                // Same origin policy should apply
-                                $.ajax({
-                                    url: href,
-                                    success: function() {
-                                        ready = true;
-                                    },
-                                    error: lastChance
-                                });
-
-                            } else {
-                                lastChance();
-                            }
-                        }
-                    }, 10);
+                    }
                 }
 
                 if ( typeof callback === 'function' ) {
 
+                    // First check for dummy element (new in 1.2.8)
+                    var $loader = $('<s>').attr( 'id', 'galleria-loader' ).hide().appendTo( DOM().body );
+
                     Utils.wait({
                         until: function() {
-                            return ready && doc.styleSheets.length > length;
+                            return $loader.height() == 1;
                         },
                         success: function() {
-                            window.setTimeout( function() {
-                                callback.call( link, link );
-                            }, 100);
+                            $loader.remove();
+                            callback.call( link, link );
                         },
                         error: function() {
-                            Galleria.raise( 'Theme CSS could not load', true );
+                            $loader.remove();
+
+                            // If failed, tell the dev to download the latest theme
+                            Galleria.raise( 'Theme CSS could not load after 20 sec. ' + Galleria.QUIRK ?
+                                'Your browser is in Quirks Mode, please add a correct doctype.' :
+                                'Please download the latest theme at http://galleria.io/customer/.', true );
                         },
-                        timeout: 10000
+                        timeout: 20000
                     });
                 }
                 return link;
@@ -1037,82 +964,93 @@ var undef,
 
         return {
 
-            fade: function(params, complete) {
-                $(params.next).css({
-                    opacity: 0,
-                    left: 0
-                }).show();
-                Utils.animate(params.next, {
-                    opacity: 1
-                },{
-                    duration: params.speed,
-                    complete: complete
-                });
-                if (params.prev) {
-                    $(params.prev).css('opacity',1).show();
-                    Utils.animate(params.prev, {
-                        opacity: 0
-                    },{
-                        duration: params.speed
-                    });
+            active: false,
+
+            init: function( effect, params, complete ) {
+                if ( _transitions.effects.hasOwnProperty( effect ) ) {
+                    _transitions.effects[ effect ].call( this, params, complete );
                 }
             },
 
-            flash: function(params, complete) {
-                $(params.next).css({
-                    opacity: 0,
-                    left: 0
-                });
-                if (params.prev) {
-                    Utils.animate( params.prev, {
-                        opacity: 0
-                    },{
-                        duration: params.speed/2,
-                        complete: function() {
-                            Utils.animate( params.next, {
-                                opacity:1
-                            },{
-                                duration: params.speed,
-                                complete: complete
-                            });
-                        }
+            effects: {
+
+                fade: function(params, complete) {
+                    $(params.next).css({
+                        opacity: 0,
+                        left: 0
                     });
-                } else {
-                    Utils.animate( params.next, {
+                    Utils.animate(params.next, {
                         opacity: 1
                     },{
                         duration: params.speed,
                         complete: complete
                     });
+                    if (params.prev) {
+                        $(params.prev).css('opacity',1).show();
+                        Utils.animate(params.prev, {
+                            opacity: 0
+                        },{
+                            duration: params.speed
+                        });
+                    }
+                },
+
+                flash: function(params, complete) {
+                    $(params.next).css({
+                        opacity: 0,
+                        left: 0
+                    });
+                    if (params.prev) {
+                        Utils.animate( params.prev, {
+                            opacity: 0
+                        },{
+                            duration: params.speed/2,
+                            complete: function() {
+                                Utils.animate( params.next, {
+                                    opacity:1
+                                },{
+                                    duration: params.speed,
+                                    complete: complete
+                                });
+                            }
+                        });
+                    } else {
+                        Utils.animate( params.next, {
+                            opacity: 1
+                        },{
+                            duration: params.speed,
+                            complete: complete
+                        });
+                    }
+                },
+
+                pulse: function(params, complete) {
+                    if (params.prev) {
+                        $(params.prev).hide();
+                    }
+                    $(params.next).css({
+                        opacity: 0,
+                        left: 0
+                    }).show();
+                    Utils.animate(params.next, {
+                        opacity:1
+                    },{
+                        duration: params.speed,
+                        complete: complete
+                    });
+                },
+
+                slide: function(params, complete) {
+                    _slide.apply( this, Utils.array( arguments ) );
+                },
+
+                fadeslide: function(params, complete) {
+                    _slide.apply( this, Utils.array( arguments ).concat( [true] ) );
+                },
+
+                doorslide: function(params, complete) {
+                    _slide.apply( this, Utils.array( arguments ).concat( [false, true] ) );
                 }
-            },
-
-            pulse: function(params, complete) {
-                if (params.prev) {
-                    $(params.prev).hide();
-                }
-                $(params.next).css({
-                    opacity: 0,
-                    left: 0
-                }).show();
-                Utils.animate(params.next, {
-                    opacity:1
-                },{
-                    duration: params.speed,
-                    complete: complete
-                });
-            },
-
-            slide: function(params, complete) {
-                _slide.apply( this, Utils.array( arguments ) );
-            },
-
-            fadeslide: function(params, complete) {
-                _slide.apply( this, Utils.array( arguments ).concat( [true] ) );
-            },
-
-            doorslide: function(params, complete) {
-                _slide.apply( this, Utils.array( arguments ).concat( [false, true] ) );
             }
         };
     }());
@@ -1446,13 +1384,16 @@ Galleria = function() {
 
             tooltip.initialized = true;
 
-            var css = '.galleria-tooltip{padding:3px 8px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:11px;line-height:1.3' +
+            var css = '.galleria-tooltip{padding:3px 8px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:11px;line-height:1.3;' +
                       'opacity:0;box-shadow:0 0 2px rgba(0,0,0,.4);-moz-box-shadow:0 0 2px rgba(0,0,0,.4);-webkit-box-shadow:0 0 2px rgba(0,0,0,.4);}';
 
             Utils.insertStyleTag(css);
 
-            self.$( 'tooltip' ).css('opacity', 0.8);
-            Utils.hide( self.get('tooltip') );
+            self.$( 'tooltip' ).css({
+                opacity: 0.8,
+                visibility: 'visible',
+                display: 'none'
+            });
 
         },
 
@@ -1500,42 +1441,41 @@ Galleria = function() {
                 tooltip.init();
             }
 
+            var mouseout = function() {
+                self.$( 'container' ).unbind( 'mousemove', tooltip.move );
+                self.clearTimer( tooltip.timer );
+
+                self.$( 'tooltip' ).stop().animate({
+                    opacity: 0
+                }, 200, function() {
+
+                    self.$( 'tooltip' ).hide();
+
+                    self.addTimer( tooltip.swapTimer, function() {
+                        tooltip.open = false;
+                    }, 1000);
+                });
+            };
+
             var hover = function( elem, value) {
 
                 tooltip.define( elem, value );
 
                 $( elem ).hover(function() {
 
-                    Utils.clearTimer( tooltip.swapTimer );
+                    self.clearTimer( tooltip.swapTimer );
                     self.$('container').unbind( 'mousemove', tooltip.move ).bind( 'mousemove', tooltip.move ).trigger( 'mousemove' );
                     tooltip.show( elem );
 
-                    Utils.addTimer( tooltip.timer, function() {
+                    self.addTimer( tooltip.timer, function() {
                         self.$( 'tooltip' ).stop().show().animate({
-                            opacity:1
+                            opacity: 1
                         });
                         tooltip.open = true;
 
                     }, tooltip.open ? 0 : 500);
 
-                }, function() {
-
-                    self.$( 'container' ).unbind( 'mousemove', tooltip.move );
-                    Utils.clearTimer( tooltip.timer );
-
-                    self.$( 'tooltip' ).stop().animate({
-                        opacity: 0
-                    }, 200, function() {
-
-                        self.$( 'tooltip' ).hide();
-
-                        Utils.addTimer( tooltip.swapTimer, function() {
-                            tooltip.open = false;
-                        }, 1000);
-                    });
-                }).click(function() {
-                    $( this ).trigger( 'mouseout' );
-                });
+                }, mouseout).click(mouseout);
             };
 
             if ( typeof value === 'string' ) {
@@ -1608,25 +1548,98 @@ Galleria = function() {
 
         keymap: self._keyboard.map,
 
+        parseCallback: function( callback, enter ) {
+
+            return _transitions.active ? function() {
+                if ( typeof callback == 'function' ) {
+                    callback();
+                }
+                var active = self._controls.getActive(),
+                    next = self._controls.getNext();
+
+                self._scaleImage( next );
+                self._scaleImage( active );
+
+                if ( enter && self._options.trueFullscreen ) {
+                    // Firefox bug, revise later
+                    $( active.container ).add( next.container ).trigger( 'transitionend' );
+                }
+
+            } : callback;
+
+        },
+
         enter: function( callback ) {
 
-            if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
-                _nativeFullscreen.enter( self, callback );
+            callback = fullscreen.parseCallback( callback, true );
+
+            fullscreen.scrolled = $win.scrollTop();
+            window.scrollTo(0, 0);
+
+            var version = NAV.match( /version\/([0-9.]{3,5})/ ),
+                enter = function() {
+                    if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
+                        _nativeFullscreen.enter( self, callback );
+                    } else {
+                        fullscreen._enter( callback );
+                    }
+                };
+
+            // Safari 6 work around
+            if ( Galleria.SAFARI && version && parseFloat( version[1] ) >= 6 ) {
+                window.setTimeout( enter, 1 );
             } else {
-                fullscreen._enter( callback );
+                enter();
             }
+
         },
 
         _enter: function( callback ) {
 
             fullscreen.active = true;
 
+            if ( IFRAME ) {
+
+                fullscreen.iframe = (function() {
+
+                    var elem,
+                        refer = doc.referrer,
+                        test = doc.createElement('a'),
+                        loc = window.location;
+
+                    test.href = refer;
+
+                    if( test.protocol != loc.protocol ||
+                        test.hostname != loc.hostname ||
+                        test.port != loc.port ) {
+                            Galleria.raise('Parent fullscreen not available. Iframe protocol, domains and ports must match.');
+                            return false;
+                        }
+
+                    fullscreen.pd = window.parent.document;
+
+                    $( fullscreen.pd ).find('iframe').each(function() {
+                        var idoc = this.contentDocument || this.contentWindow.document;
+                        if ( idoc === doc ) {
+                            elem = this;
+                            return false;
+                        }
+                    });
+
+                    return elem;
+                }());
+
+            }
+
             // hide the image until rescale is complete
             Utils.hide( self.getActiveImage() );
 
             self.$( 'container' ).addClass( 'fullscreen' );
 
-            fullscreen.scrolled = $win.scrollTop();
+            if ( IFRAME && fullscreen.iframe ) {
+                fullscreen.iframe.scrolled = $( window.parent ).scrollTop();
+                window.parent.scrollTo(0, 0);
+            }
 
             // begin styleforce
             Utils.forceStyles(self.get('container'), {
@@ -1651,6 +1664,20 @@ Galleria = function() {
 
             Utils.forceStyles( DOM().html, htmlbody );
             Utils.forceStyles( DOM().body, htmlbody );
+
+            if ( IFRAME && fullscreen.iframe ) {
+                Utils.forceStyles( fullscreen.pd.documentElement, htmlbody );
+                Utils.forceStyles( fullscreen.pd.body, htmlbody );
+                Utils.forceStyles( fullscreen.iframe, $.extend( htmlbody, {
+                    width: '100%',
+                    height: '100%',
+                    top: 0,
+                    left: 0,
+                    position: 'fixed',
+                    zIndex: 10000,
+                    border: 'none'
+                }));
+            }
 
             // temporarily attach some keys
             // save the old ones first in a cloned object
@@ -1712,7 +1739,7 @@ Galleria = function() {
             // init the first rescale and attach callbacks
             self.rescale(function() {
 
-                Utils.addTimer(false, function() {
+                self.addTimer(false, function() {
                     // show the image after 50 ms
                     Utils.show( self.getActiveImage() );
 
@@ -1736,6 +1763,9 @@ Galleria = function() {
         },
 
         exit: function( callback ) {
+
+            callback = fullscreen.parseCallback( callback );
+
             if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
                 _nativeFullscreen.exit( callback );
             } else {
@@ -1754,8 +1784,15 @@ Galleria = function() {
             // revert all styles
             Utils.revertStyles( self.get('container'), DOM().html, DOM().body );
 
+            if ( IFRAME && fullscreen.iframe ) {
+                Utils.revertStyles( fullscreen.pd.documentElement, fullscreen.pd.body, fullscreen.iframe );
+            }
+
             // scroll back
             window.scrollTo(0, fullscreen.scrolled);
+            if ( IFRAME && fullscreen.iframe && fullscreen.iframe.scrolled ) {
+                window.parent.scrollTo(0, fullscreen.iframe.scrolled );
+            }
 
             // detach all keyboard events and apply the old keymap
             self.detachKeyboard();
@@ -1780,7 +1817,7 @@ Galleria = function() {
             }
 
             self.rescale(function() {
-                Utils.addTimer(false, function() {
+                self.addTimer(false, function() {
 
                     // show the image after 50 ms
                     Utils.show( self.getActiveImage() );
@@ -1803,13 +1840,13 @@ Galleria = function() {
     // the internal idle object for controlling idle states
     var idle = this._idle = {
 
-        timer: 'idle' + self._id,
-
         trunk: [],
 
         bound: false,
 
-        add: function(elem, to) {
+        active: false,
+
+        add: function(elem, to, from, hide) {
             if (!elem) {
                 return;
             }
@@ -1818,53 +1855,75 @@ Galleria = function() {
             }
             elem = $(elem);
 
-            var from = {},
+            if ( typeof from == 'boolean' ) {
+                hide = from;
+                from = {};
+            }
+
+            from = from || {};
+
+            var extract = {},
                 style;
 
             for ( style in to ) {
                 if ( to.hasOwnProperty( style ) ) {
-                    from[ style ] = elem.css( style );
+                    extract[ style ] = elem.css( style );
                 }
             }
+
             elem.data('idle', {
-                from: from,
+                from: $.extend( extract, from ),
                 to: to,
                 complete: true,
                 busy: false
             });
-            idle.addTimer();
+
+            if ( !hide ) {
+                idle.addTimer();
+            } else {
+                elem.css( to );
+            }
             idle.trunk.push(elem);
         },
 
         remove: function(elem) {
 
-            elem = jQuery(elem);
+            elem = $(elem);
 
             $.each(idle.trunk, function(i, el) {
                 if ( el && el.length && !el.not(elem).length ) {
-                    self._idle.show(elem);
-                    self._idle.trunk.splice(i, 1);
+                    elem.css( elem.data( 'idle' ).from );
+                    idle.trunk.splice(i, 1);
                 }
             });
 
             if (!idle.trunk.length) {
                 idle.removeEvent();
-                Utils.clearTimer( idle.timer );
+                self.clearTimer( idle.timer );
             }
         },
 
         addEvent : function() {
             idle.bound = true;
-            self.$('container').bind('mousemove click', idle.showAll );
+            self.$('container').bind( 'mousemove click', idle.showAll );
+            if ( self._options.idleMode == 'hover' ) {
+                self.$('container').bind( 'mouseleave', idle.hide );
+            }
         },
 
         removeEvent : function() {
             idle.bound = false;
-            self.$('container').unbind('mousemove click', idle.showAll );
+            self.$('container').bind( 'mousemove click', idle.showAll );
+            if ( self._options.idleMode == 'hover' ) {
+                self.$('container').unbind( 'mouseleave', idle.hide );
+            }
         },
 
         addTimer : function() {
-            Utils.addTimer( idle.timer, function() {
+            if( self._options.idleMode == 'hover' ) {
+                return;
+            }
+            self.addTimer( 'idle', function() {
                 idle.hide();
             }, self._options.idleTime );
         },
@@ -1877,6 +1936,8 @@ Galleria = function() {
 
             self.trigger( Galleria.IDLE_ENTER );
 
+            var len = idle.trunk.length;
+
             $.each( idle.trunk, function(i, elem) {
 
                 var data = elem.data('idle');
@@ -1888,14 +1949,19 @@ Galleria = function() {
                 elem.data('idle').complete = false;
 
                 Utils.animate( elem, data.to, {
-                    duration: self._options.idleSpeed
+                    duration: self._options.idleSpeed,
+                    complete: function() {
+                        if ( i == len-1 ) {
+                            idle.active = false;
+                        }
+                    }
                 });
             });
         },
 
         showAll : function() {
 
-            Utils.clearTimer( idle.timer );
+            self.clearTimer( 'idle' );
 
             $.each( idle.trunk, function( i, elem ) {
                 idle.show( elem );
@@ -1906,19 +1972,20 @@ Galleria = function() {
 
             var data = elem.data('idle');
 
-            if (!data.busy && !data.complete) {
+            if ( !idle.active || ( !data.busy && !data.complete ) ) {
 
                 data.busy = true;
 
                 self.trigger( Galleria.IDLE_EXIT );
 
-                Utils.clearTimer( idle.timer );
+                self.clearTimer( 'idle' );
 
                 Utils.animate( elem, data.from, {
                     duration: self._options.idleSpeed/2,
                     complete: function() {
-                        $(this).data('idle').busy = false;
-                        $(this).data('idle').complete = true;
+                        idle.active = true;
+                        $(elem).data('idle').busy = false;
+                        $(elem).data('idle').complete = true;
                     }
                 });
 
@@ -2208,6 +2275,47 @@ Galleria = function() {
         }
     };
 
+    // the internal timeouts object
+    // provides helper methods for controlling timeouts
+
+    var _timer = this._timer = {
+
+        trunk: {},
+
+        add: function( id, fn, delay, loop ) {
+            id = id || new Date().getTime();
+            loop = loop || false;
+            this.clear( id );
+            if ( loop ) {
+                var old = fn;
+                fn = function() {
+                    old();
+                    _timer.add( id, fn, delay );
+                };
+            }
+            this.trunk[ id ] = window.setTimeout( fn, delay );
+        },
+
+        clear: function( id ) {
+
+            var del = function( i ) {
+                window.clearTimeout( this.trunk[ i ] );
+                delete this.trunk[ i ];
+            }, i;
+
+            if ( !!id && id in this.trunk ) {
+                del.call( this, id );
+
+            } else if ( typeof id === 'undefined' ) {
+                for ( i in this.trunk ) {
+                    if ( this.trunk.hasOwnProperty( i ) ) {
+                        del.call( this, i );
+                    }
+                }
+            }
+        }
+    };
+
     return this;
 };
 
@@ -2261,7 +2369,7 @@ Galleria.prototype = {
         this._options = {
             autoplay: false,
             carousel: true,
-            carouselFollow: true,
+            carouselFollow: true, // legacy, deprecate at 1.3
             carouselSpeed: 400,
             carouselSteps: 'auto',
             clicknext: false,
@@ -2274,6 +2382,7 @@ Galleria.prototype = {
             },
             dataConfig : function( elem ) { return {}; },
             dataSelector: 'img',
+            dataSort: false,
             dataSource: this._target,
             debug: undef,
             dummy: undef, // 1.2.5
@@ -2307,7 +2416,7 @@ Galleria.prototype = {
             popupLinks: false,
             preload: 2,
             queue: true,
-            responsive: false,
+            responsive: true,
             show: 0,
             showInfo: true,
             showCounter: true,
@@ -2315,9 +2424,10 @@ Galleria.prototype = {
             swipe: true, // 1.2.4
             thumbCrop: true,
             thumbEventType: 'click',
-            thumbFit: true,
+            thumbFit: true, // legacy, deprecate at 1.3
             thumbMargin: 0,
             thumbQuality: 'auto',
+            thumbDisplayOrder: true, // 1.2.8
             thumbnails: true,
             touchTransition: undef, // 1.2.6
             transition: 'fade',
@@ -2363,6 +2473,11 @@ Galleria.prototype = {
 
         // hide all content
         $( this._target ).children().hide();
+
+        // Warn for quirks mode
+        if ( Galleria.QUIRK ) {
+            Galleria.raise('Your page is in Quirks mode, Galleria may not render correctly. Please validate your HTML and add a correct doctype.');
+        }
 
         // now we just have to wait for the theme...
         if ( typeof Galleria.theme === 'object' ) {
@@ -2418,11 +2533,6 @@ Galleria.prototype = {
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
 
-            // Warn for quirks mode
-            if ( Galleria.QUIRK ) {
-                Galleria.raise('Your page is in Quirks mode, Galleria may not render correctly. Please validate your HTML.');
-            }
-
             // save the new data
             this._original.data = this._data;
 
@@ -2431,6 +2541,11 @@ Galleria.prototype = {
 
             // cache the container
             var $container = this.$( 'container' );
+
+            // set ratio if height is < 2
+            if ( self._options.height < 2 ) {
+                self._ratio = self._options.height;
+            }
 
             // the gallery is ready, let's just wait for the css
             var num = { width: 0, height: 0 };
@@ -2452,6 +2567,7 @@ Galleria.prototype = {
 
                     self._width = num.width;
                     self._height = num.height;
+                    self._ratio = self._ratio || num.height/num.width;
 
                     // for some strange reason, webkit needs a single setTimeout to play ball
                     if ( Galleria.WEBKIT ) {
@@ -2725,6 +2841,16 @@ Galleria.prototype = {
         return this;
     },
 
+    addTimer : function() {
+        this._timer.add.apply( this._timer, Utils.array( arguments ) );
+        return this;
+    },
+
+    clearTimer : function() {
+        this._timer.clear.apply( this._timer, Utils.array( arguments ) );
+        return this;
+    },
+
     // parse width & height from CSS or options
 
     _getWH : function() {
@@ -2764,8 +2890,9 @@ Galleria.prototype = {
 
         // allow setting a height ratio instead of exact value
         // useful when doing responsive galleries
-        if ( self._options.height && self._options.height < 2 ) {
-            num.height = num.width * self._options.height;
+
+        if ( self._ratio ) {
+            num.height = num.width * self._ratio;
         }
 
         return num;
@@ -2773,13 +2900,13 @@ Galleria.prototype = {
 
     // Creates the thumbnails and carousel
     // can be used at any time, f.ex when the data object is manipulated
+    // push is an optional argument with pushed images
 
-    _createThumbnails : function() {
+    _createThumbnails : function( push ) {
 
         this.get( 'total' ).innerHTML = this.getDataLength();
 
-        var i,
-            src,
+        var src,
             thumb,
             data,
             special,
@@ -2788,6 +2915,15 @@ Galleria.prototype = {
 
             self = this,
             o = this._options,
+
+            i = push ? this._data.length - push.length : 0,
+            chunk = i,
+
+            thumbchunk = [],
+            loadindex = 0,
+
+            gif = IE < 8 ? 'http://upload.wikimedia.org/wikipedia/commons/c/c0/Blank.gif' :
+                           'data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D',
 
             // get previously active thumbnail, if exists
             active = (function() {
@@ -2838,7 +2974,22 @@ Galleria.prototype = {
                 e.preventDefault();
             },
 
-            onThumbLoad = function( thumb ) {
+            thumbComplete = function( thumb, callback ) {
+
+                $( thumb.container ).css( 'visibility', 'visible' );
+                self.trigger({
+                    type: Galleria.THUMBNAIL,
+                    thumbTarget: thumb.image,
+                    index: thumb.data.order,
+                    galleriaData: self.getData( thumb.data.order )
+                });
+
+                if ( typeof callback == 'function' ) {
+                    callback.call( self, thumb );
+                }
+            },
+
+            onThumbLoad = function( thumb, callback ) {
 
                 // scale when ready
                 thumb.scale({
@@ -2881,34 +3032,48 @@ Galleria.prototype = {
 
                         // get "special" thumbs from provider
                         if( data.iframe && special.length == 2 && special[0] in _video ) {
+
                             _video[ special[0] ].getThumb( special[1], (function(img) {
                                 return function(src) {
                                     img.src = src;
+                                    thumbComplete( thumb, callback );
                                 };
                             }( thumb.image ) ));
-                        }
 
-                        // trigger the THUMBNAIL event
-                        self.trigger({
-                            type: Galleria.THUMBNAIL,
-                            thumbTarget: thumb.image,
-                            index: thumb.data.order,
-                            galleriaData: self.getData( thumb.data.order )
-                        });
+                        } else if ( o.thumbDisplayOrder && !thumb.lazy ) {
+
+                            $.each( thumbchunk, function( i, th ) {
+                                if ( i === loadindex && th.ready && !th.displayed ) {
+
+                                    loadindex++;
+                                    th.displayed = true;
+
+                                    thumbComplete( th, callback );
+
+                                    return;
+                                }
+                            });
+                        } else {
+                            thumbComplete( thumb, callback );
+                        }
                     }
                 });
             };
 
-        this._thumbnails = [];
-
-        this.$( 'thumbnails' ).empty();
+        if ( !push ) {
+            this._thumbnails = [];
+            this.$( 'thumbnails' ).empty();
+        }
 
         // loop through data and create thumbnails
-        for( i = 0; this._data[ i ]; i++ ) {
+        for( ; this._data[ i ]; i++ ) {
 
             data = this._data[ i ];
 
-            if ( o.thumbnails === true && (data.thumb || data.image) ) {
+            // get source from thumb or image
+            src = data.thumb || data.image;
+
+            if ( ( o.thumbnails === true || optval == 'lazy' ) && ( data.thumb || data.image ) ) {
 
                 // add a new Picture instance
                 thumb = new Galleria.Picture(i);
@@ -2916,8 +3081,14 @@ Galleria.prototype = {
                 // save the index
                 thumb.index = i;
 
-                // get source from thumb or image
-                src = data.thumb || data.image;
+                // flag displayed
+                thumb.displayed = false;
+
+                // flag lazy
+                thumb.lazy = false;
+
+                // flag video
+                thumb.video = false;
 
                 // append the thumbnail
                 this.$( 'thumbnails' ).append( thumb.container );
@@ -2925,10 +3096,14 @@ Galleria.prototype = {
                 // cache the container
                 $container = $( thumb.container );
 
+                // hide it
+                $container.css( 'visibility', 'hidden' );
+
                 thumb.data = {
                     width  : Utils.parseValue( getStyle( 'width' ) ),
                     height : Utils.parseValue( getStyle( 'height' ) ),
-                    order  : i
+                    order  : i,
+                    src    : src
                 };
 
                 // grab & reset size for smoother thumbnail loads
@@ -2940,11 +3115,28 @@ Galleria.prototype = {
 
                 // load the thumbnail
                 special = src.split(':');
+
                 if ( special.length == 2 && special[0] in _video ) {
-                    thumb.load('data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw%3D%3D', {
+
+                    thumb.video = true;
+                    thumb.ready = true;
+
+                    thumb.load( gif, {
                         height: thumb.data.height,
                         width: thumb.data.height*1.25
                     }, onThumbLoad);
+
+                } else if ( optval == 'lazy' ) {
+
+                    $container.addClass( 'lazy' );
+
+                    thumb.lazy = true;
+
+                    thumb.load( gif, {
+                        height: thumb.data.height,
+                        width: thumb.data.width
+                    });
+
                 } else {
                     thumb.load( src, onThumbLoad );
                 }
@@ -2963,14 +3155,13 @@ Galleria.prototype = {
                     ready: true
                 };
 
-
                 // create numbered thumbnails
                 if ( optval === 'numbers' ) {
                     $( thumb.image ).text( i + 1 );
                 }
 
-                if( data.iframe ) {
-                    $( thumb.image ).addClass('iframe');
+                if ( data.iframe ) {
+                    $( thumb.image ).addClass( 'iframe' );
                 }
 
                 this.$( 'thumbnails' ).append( thumb.container );
@@ -2993,7 +3184,8 @@ Galleria.prototype = {
             // we'll add the same event to the source if it's kept
 
             $( thumb.container ).add( o.keepSource && o.linkSourceImages ? data.original : null )
-                .data('index', i).bind( o.thumbEventType, onThumbEvent );
+                .data('index', i).bind( o.thumbEventType, onThumbEvent )
+                .data('thumbload', onThumbLoad);
 
             if (active === src) {
                 $( thumb.container ).addClass( 'active' );
@@ -3001,6 +3193,104 @@ Galleria.prototype = {
 
             this._thumbnails.push( thumb );
         }
+
+        thumbchunk = this._thumbnails.slice( chunk );
+
+        return this;
+    },
+
+    /**
+        Lazy-loads thumbnails.
+        You can call this method to load lazy thumbnails at run time
+
+        @param {Array|Number} index Index or array of indexes of thumbnails to be loaded
+        @param {Function} complete Callback that is called when all lazy thumbnails have been loaded
+
+        @returns Instance
+    */
+
+    lazyLoad: function( index, complete ) {
+
+        var arr = index.constructor == Array ? index : [ index ],
+            self = this,
+            thumbnails = this.$( 'thumbnails' ).children().filter(function() {
+                return $(this).data('lazy-src');
+            }),
+            loaded = 0;
+
+        $.each( arr, function(i, ind) {
+
+            if ( ind > self._thumbnails.length - 1 ) {
+                return;
+            }
+
+            var thumb = self._thumbnails[ ind ],
+                data = thumb.data,
+                special = data.src.split(':'),
+                callback = function() {
+                    if ( ++loaded == arr.length && typeof complete == 'function' ) {
+                        complete.call( self );
+                    }
+                },
+                thumbload = $( thumb.container ).data( 'thumbload' );
+            if ( thumb.video ) {
+                thumbload.call( self, thumb, callback );
+            } else {
+                thumb.load( data.src , function( thumb ) {
+                    thumbload.call( self, thumb, callback );
+                });
+            }
+        });
+
+        return this;
+
+    },
+
+    /**
+        Lazy-loads thumbnails in chunks.
+        This method automatcally chops up the loading process of many thumbnails into chunks
+
+        @param {Number} size Size of each chunk to be loaded
+        @param {Number} [delay] Delay between each loads
+
+        @returns Instance
+    */
+
+    lazyLoadChunks: function( size, delay ) {
+
+        var len = this.getDataLength(),
+            i = 0,
+            n = 0,
+            arr = [],
+            temp = [],
+            self = this;
+
+        delay = delay || 0;
+
+        for( ; i<len; i++ ) {
+            temp.push(i);
+            if ( ++n == size || i == len-1 ) {
+                arr.push( temp );
+                n = 0;
+                temp = [];
+            }
+        }
+
+        var init = function( wait ) {
+            var a = arr.shift();
+            if ( a ) {
+                window.setTimeout(function() {
+                    self.lazyLoad(a, function() {
+                        init( true );
+                    });
+                }, ( delay && wait ) ? delay : 0 );
+            }
+        };
+
+        init( false );
+
+        return this;
+
     },
 
     // the internal _run method should be called after loading data into galleria
@@ -3055,11 +3345,15 @@ Galleria.prototype = {
                         self._playtime = self._options.autoplay;
                     }
 
-                    self.trigger( Galleria.PLAY );
                     self._playing = true;
                 }
                 // if second load, just do the show and return
                 if ( self._firstrun ) {
+
+                    if ( self._options.autoplay ) {
+                        self.trigger( Galleria.PLAY );
+                    }
+
                     if ( typeof self._options.show === 'number' ) {
                         self.show( self._options.show );
                     }
@@ -3092,8 +3386,10 @@ Galleria.prototype = {
                 Galleria.theme.init.call( self, self._options );
 
                 // Trigger Galleria.ready
-                $.each( Galleria.ready.callbacks, function() {
-                    this.call( self, self._options );
+                $.each( Galleria.ready.callbacks, function(i ,fn) {
+                    if ( typeof fn == 'function' ) {
+                        fn.call( self, self._options );
+                    }
                 });
 
                 // call the extend option
@@ -3106,6 +3402,11 @@ Galleria.prototype = {
 
                 } else if( self._data[ self._options.show ] ) {
                     self.show( self._options.show );
+                }
+
+                // play trigger
+                if ( self._options.autoplay ) {
+                    self.trigger( Galleria.PLAY );
                 }
             },
 
@@ -3134,7 +3435,8 @@ Galleria.prototype = {
 
     load : function( source, selector, config ) {
 
-        var self = this;
+        var self = this,
+            o = this._options;
 
         // empty the data array
         this._data = [];
@@ -3150,13 +3452,13 @@ Galleria.prototype = {
         }
 
         // use the source set by target
-        source = source || this._options.dataSource;
+        source = source || o.dataSource;
 
         // use selector set by option
-        selector = selector || this._options.dataSelector;
+        selector = selector || o.dataSelector;
 
         // use the dataConfig set by option
-        config = config || this._options.dataConfig;
+        config = config || o.dataConfig;
 
         // if source is a true object, make it into an array
         if( /^function Object/.test( source.constructor ) ) {
@@ -3166,62 +3468,70 @@ Galleria.prototype = {
         // check if the data is an array already
         if ( source.constructor === Array ) {
             if ( this.validate( source ) ) {
-
                 this._data = source;
-                this._parseData().trigger( Galleria.DATA );
-
             } else {
                 Galleria.raise( 'Load failed: JSON Array not valid.' );
             }
-            return this;
+        } else {
+
+            // add .video and .iframe to the selector (1.2.7)
+            selector += ',.video,.iframe';
+
+            // loop through images and set data
+            $( source ).find( selector ).each( function( i, elem ) {
+
+                elem = $( elem );
+                var data = {},
+                    parent = elem.parent(),
+                    href = parent.attr( 'href' ),
+                    rel  = parent.attr( 'rel' );
+
+                if( href && ( elem[0].nodeName == 'IMG' || elem.hasClass('video') ) && _videoTest( href ) ) {
+                    data.video = href;
+                } else if( href && elem.hasClass('iframe') ) {
+                    data.iframe = href;
+                } else {
+                    data.image = data.big = href;
+                }
+
+                if ( rel ) {
+                    data.big = rel;
+                }
+
+                // alternative extraction from HTML5 data attribute, added in 1.2.7
+                $.each( 'big title description link layer'.split(' '), function( i, val ) {
+                    if ( elem.data(val) ) {
+                        data[ val ] = elem.data(val);
+                    }
+                });
+
+                // mix default extractions with the hrefs and config
+                // and push it into the data array
+                self._data.push( $.extend({
+
+                    title:       elem.attr('title') || '',
+                    thumb:       elem.attr('src'),
+                    image:       elem.attr('src'),
+                    big:         elem.attr('src'),
+                    description: elem.attr('alt') || '',
+                    link:        elem.attr('longdesc'),
+                    original:    elem.get(0) // saved as a reference
+
+                }, data, config( elem ) ) );
+
+            });
         }
 
-        // add .video and .iframe to the selector (1.2.7)
-        selector += ',.video,.iframe';
-
-        // loop through images and set data
-        $( source ).find( selector ).each( function( i, elem ) {
-
-            elem = $( elem );
-            var data = {},
-                parent = elem.parent(),
-                href = parent.attr( 'href' ),
-                rel  = parent.attr( 'rel' );
-
-            if( href && ( elem[0].nodeName == 'IMG' || elem.hasClass('video') ) && _videoTest( href ) ) {
-                data.video = href;
-            } else if( href && elem.hasClass('iframe') ) {
-                data.iframe = href;
-            } else {
-                data.image = data.big = href;
-            }
-
-            if ( rel ) {
-                data.big = rel;
-            }
-
-            // alternative extraction from HTML5 data attribute, added in 1.2.7
-            $.each( 'big title description link layer'.split(' '), function( i, val ) {
-                if ( elem.data(val) ) {
-                    data[ val ] = elem.data(val);
-                }
+        if ( typeof o.dataSort == 'function' ) {
+            protoArray.sort.call( this._data, o.dataSort );
+        } else if ( o.dataSort == 'random' ) {
+            this._data.sort( function() {
+                return Math.round(Math.random())-0.5;
             });
+        }
 
-            // mix default extractions with the hrefs and config
-            // and push it into the data array
-            self._data.push( $.extend({
 
-                title:       elem.attr('title') || '',
-                thumb:       elem.attr('src'),
-                image:       elem.attr('src'),
-                big:         elem.attr('src'),
-                description: elem.attr('alt') || '',
-                link:        elem.attr('longdesc'),
-                original:    elem.get(0) // saved as a reference
 
-            }, data, config( elem ) ) );
-
-        });
         // trigger the DATA event and return
         if ( this.getDataLength() ) {
             this._parseData().trigger( Galleria.DATA );
@@ -3289,8 +3599,9 @@ Galleria.prototype = {
         @returns Instance
     */
 
-    destroy: function() {
+    destroy : function() {
         this.get('target').innerHTML = this._original.html;
+        this.clearTimer();
         return this;
     },
 
@@ -3304,7 +3615,7 @@ Galleria.prototype = {
         @returns Instance
     */
 
-    splice: function() {
+    splice : function() {
         var self = this,
             args = Utils.array( arguments );
         window.setTimeout(function() {
@@ -3324,12 +3635,17 @@ Galleria.prototype = {
         @returns Instance
     */
 
-    push: function() {
+    push : function() {
         var self = this,
             args = Utils.array( arguments );
+
+        if ( args.length == 1 && args[0].constructor == Array ) {
+            args = args[0];
+        }
+
         window.setTimeout(function() {
             protoArray.push.apply( self._data, args );
-            self._parseData()._createThumbnails();
+            self._parseData()._createThumbnails( args );
         },2);
         return self;
     },
@@ -3404,15 +3720,17 @@ Galleria.prototype = {
         Useful to hide f.ex navigation when the gallery is inactive
 
         @param {HTMLElement|string} elem The Dom node or selector to apply the idle state to
-        @param {Object} styles the CSS styles to apply
+        @param {Object} styles the CSS styles to apply when in idle mode
+        @param {Object} [from] the CSS styles to apply when in normal
+        @param {Boolean} [hide] set to true if you want to hide it first
 
         @example addIdleState( this.get('image-nav'), { opacity: 0 });
-        @example addIdleState( '.galleria-image-nav', { top: -200 });
+        @example addIdleState( '.galleria-image-nav', { top: -200 }, true);
 
         @returns Instance
     */
 
-    addIdleState: function( elem, styles ) {
+    addIdleState: function( elem, styles, from, hide ) {
         this._idle.add.apply( this._idle, Utils.array( arguments ) );
         return this;
     },
@@ -3700,7 +4018,7 @@ $(document).mousemove(function(e) {
         this.$( 'stage' ).unbind( 'mousemove', calculate ).bind( 'mousemove', calculate );
 
         // loop the loop
-        Utils.addTimer( 'pan' + self._id, loop, 50, true);
+        this.addTimer( 'pan' + self._id, loop, 50, true);
 
         return this;
     },
@@ -3738,7 +4056,7 @@ $(document).mousemove(function(e) {
 
         this.$( 'stage' ).unbind( 'mousemove' );
 
-        Utils.clearTimer( 'pan' + this._id );
+        this.clearTimer( 'pan' + this._id );
 
         return this;
     },
@@ -3956,9 +4274,7 @@ this.prependChild( 'info', 'myElement' );
         measures = $.extend( { width:0, height:0 }, measures );
 
         var self = this,
-            $container = this.$( 'container' ),
-            aspect = this._options.responsive == 'aspect' && ( !measures.width || !measures.height ),
-            ratio;
+            $container = this.$( 'container' );
 
         $.each( measures, function( m, val ) {
             if ( !val ) {
@@ -3967,13 +4283,8 @@ this.prependChild( 'info', 'myElement' );
             }
         });
 
-        // experimental aspect option, not documented yet. Use ratio-based height instead!
-        if ( aspect ) {
-            ratio = Math.min( measures.width/this._width, measures.height/this._height );
-        }
-
         $.each( measures, function( m, val ) {
-            $container[ m ]( ratio ? ratio * self[ '_' + m ] : val );
+            $container[ m ]( val );
         });
 
         return this.rescale( complete );
@@ -4020,12 +4331,7 @@ this.prependChild( 'info', 'myElement' );
             }
         };
 
-
-        if ( Galleria.WEBKIT && !Galleria.TOUCH && !width && !height ) {
-            Utils.addTimer( false, scale, 10 );// webkit is too fast
-        } else {
-            scale.call( self );
-        }
+        scale.call( self );
 
         return this;
     },
@@ -4113,6 +4419,8 @@ this.prependChild( 'info', 'myElement' );
             return function() {
 
                 var win;
+
+                _transitions.active = false;
 
                 // remove stalled
                 self._queue.stalled = false;
@@ -4310,7 +4618,7 @@ this.prependChild( 'info', 'myElement' );
                     });
 
                     // validate the transition
-                    if ( transition in _transitions === false ) {
+                    if ( transition in _transitions.effects === false ) {
                         complete();
                     } else {
                         var params = {
@@ -4320,8 +4628,10 @@ this.prependChild( 'info', 'myElement' );
                             speed: self._options.transitionSpeed || 400
                         };
 
+                        _transitions.active = true;
+
                         // call the transition function and send some stuff
-                        _transitions[ transition ].call(self, params, complete );
+                        _transitions.init.call( self, transition, params, complete );
 
                     }
                 }
@@ -4558,13 +4868,13 @@ this.prependChild( 'info', 'myElement' );
 
         if ( this._playing ) {
 
-            Utils.clearTimer( timer_id );
+            this.clearTimer( timer_id );
 
             var fn = function() {
 
                 played = Utils.timestamp() - now;
                 if ( played >= self._playtime && self._playing ) {
-                    Utils.clearTimer( timer_id );
+                    self.clearTimer( timer_id );
                     self.next();
                     return;
                 }
@@ -4578,10 +4888,10 @@ this.prependChild( 'info', 'myElement' );
                         milliseconds: played
                     });
 
-                    Utils.addTimer( timer_id, fn, interval );
+                    self.addTimer( timer_id, fn, interval );
                 }
             };
-            Utils.addTimer( timer_id, fn, interval );
+            self.addTimer( timer_id, fn, interval );
         }
     },
 
@@ -4824,7 +5134,7 @@ Galleria.addTheme = function( theme ) {
                     // we have a match
                     css = script.src.replace(/[^\/]*$/, '') + theme.css;
 
-                    Utils.addTimer( "css", function() {
+                    window.setTimeout(function() {
                         Utils.loadCSS( css, 'galleria-theme', function() {
 
                             // the themeload trigger
@@ -5041,7 +5351,7 @@ Galleria.run = function( selector, options ) {
 */
 
 Galleria.addTransition = function( name, fn ) {
-    _transitions[name] = fn;
+    _transitions.effects[name] = fn;
     return Galleria;
 };
 
@@ -5058,15 +5368,20 @@ Galleria.utils = Utils;
     @example Galleria.log("hello", document.body, [1,2,3]);
 */
 
-Galleria.log = (function() {
-    if( 'console' in window && 'log' in window.console ) { 
-        return window.console.log.apply(window.console, arguments);
+Galleria.log = function() {
+    var args = Utils.array( arguments );
+    if( 'console' in window && 'log' in window.console ) {
+        try {
+            return window.console.log.apply( window.console, args );
+        } catch( e ) {
+            $.each( args, function() {
+                window.console.log(this);
+            });
+        }
     } else {
-        return function() {
-            window.alert( Utils.array( arguments ).join(', ') );
-        };
+        return window.alert( args.join('<br>') );
     }
-});
+};
 
 /**
     A ready method for adding callbacks when a gallery is ready
@@ -5078,6 +5393,9 @@ Galleria.log = (function() {
 */
 
 Galleria.ready = function( fn ) {
+    if ( typeof fn != 'function' ) {
+        return Galleria;
+    }
     $.each( _galleries, function( i, gallery ) {
         fn.call( gallery, gallery._options );
     });
@@ -5313,6 +5631,11 @@ Galleria.Picture.prototype = {
 
         this.image = new Image();
 
+        // IE8 opacity inherit bug
+        if ( Galleria.IE8 ) {
+            $( this.image ).css( 'filter', 'inherit' );
+        }
+
         var i = 0,
             reload = false,
             resort = false,
@@ -5320,6 +5643,25 @@ Galleria.Picture.prototype = {
             // some jquery cache
             $container = $( this.container ),
             $image = $( this.image ),
+
+            onerror = function() {
+                if ( !reload ) {
+                    reload = true;
+                    // reload the image with a timestamp
+                    window.setTimeout((function(image, src) {
+                        return function() {
+                            image.attr('src', src + '?' + Utils.timestamp() );
+                        };
+                    }( $(this), src )), 50);
+                } else {
+                    // apply the dummy image if it exists
+                    if ( DUMMY ) {
+                        $( this ).attr( 'src', DUMMY );
+                    } else {
+                        Galleria.raise('Image not found: ' + src);
+                    }
+                }
+            },
 
             // the onload method
             onload = (function( self, callback, src ) {
@@ -5386,33 +5728,8 @@ Galleria.Picture.prototype = {
             $image.css(prop, (/min/.test(prop) ? '0' : 'none'));
         });
 
-        if ( this.cache[ src ] ) {
-
-            // quick load on cache
-            $image.load( onload ).attr( 'src', src );
-
-            return this.container;
-        }
-
         // begin load and insert in cache when done
-        $image.load( onload ).error( function() {
-            if ( !reload ) {
-                reload = true;
-                // reload the image with a timestamp
-                window.setTimeout((function(image, src) {
-                    return function() {
-                        image.attr('src', src + '?' + Utils.timestamp() );
-                    };
-                }( $(this), src )), 50);
-            } else {
-                // apply the dummy image if it exists
-                if ( DUMMY ) {
-                    $( this ).attr( 'src', DUMMY );
-                } else {
-                    Galleria.raise('Image not found: ' + src);
-                }
-            }
-        }).attr( 'src', src );
+        $image.load( onload ).error( onerror ).attr( 'src', src );
 
         // return the container
         return this.container;
@@ -5509,12 +5826,12 @@ Galleria.Picture.prototype = {
                     ratio = cropMap[ options.crop.toString() ],
                     canvasKey = '';
 
-                // allow max_scale_ratio
+                // allow maxScaleRatio
                 if ( options.max ) {
                     ratio = Math.min( options.max, ratio );
                 }
 
-                // allow min_scale_ratio
+                // allow minScaleRatio
                 if ( options.min ) {
                     ratio = Math.max( options.min, ratio );
                 }

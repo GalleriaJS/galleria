@@ -27,7 +27,7 @@ Galleria options are configured at anytime using the ``Galleria.configure`` func
         imageCrop: true
     });
 
-Or when calling ``Galleria.run``:
+Or when calling ``Galleria.run``::
 
     Galleria.run('#galleria', {
         transition: 'fade',
@@ -41,8 +41,6 @@ List of options
 - :doc:`autoplay` Sets Galleria to play slidehow when initialized.
 
 - :doc:`carousel` Toggle the creation of a carousel.
-
-- :doc:`carouselFollow` Defines if the carousel should follow the image.
 
 - :doc:`carouselSpeed` Carousel animation speed in milliseconds.
 
@@ -58,6 +56,8 @@ List of options
 
 - :doc:`dataSelector` Defines the selector Galleria should look for in the
   source.
+
+- :doc:`dataSort` Function to sort the data before using it.
 
 - :doc:`dataSource` Defines the Galleria data, or the HTML source where the
   data is found.
@@ -103,7 +103,7 @@ List of options
 
 - :doc:`layerFollow` Boolean for controlling if the layer will follow the image size or not.
 
-- :doc:`lightbox` Helper for attaching a `lightbox <http://en.wikipedia.org/wiki/Lightbox_(JavaScript)>`_ (to zoom in) when the user clicks on an image.
+- :doc:`lightbox` Helper for attaching a **lightbox** (to zoom in) when the user clicks on an image.
 
 - :doc:`lightboxFadeSpeed` Defines how fast the lightbox should fade.
 
@@ -140,7 +140,7 @@ List of options
 
 - :doc:`thumbCrop` Same as image_crop for thumbnails.
 
-- :doc:`thumbFit` Lets you fit thumbnails according to width.
+- :doc:`thumbDisplayOrder` Defines if the gallery should display the loaded thumbnails in order
 
 - :doc:`thumbMargin` Same as :doc:`imageMargin` for thumbnails.
 

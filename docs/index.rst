@@ -27,6 +27,7 @@ Themes
     themes/twelve.rst
     themes/folio.rst
     themes/fullscreen.rst
+    themes/azur.rst
 
 Plugins
 =======
