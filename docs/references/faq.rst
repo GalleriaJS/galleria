@@ -24,6 +24,8 @@ I get a "Fatal Error" when I run Galleria
 Galleria throws errors when something is not right. Some errors are considered critical for Galleria to run properly, and when they occur Galleria stops and throws a "Fatal Error".
 The most common error is that the path to the themes, images or scripts are wrong so please double check those and make sure you have the right permissions set.
 
+If you get the message ``Could not extract a stage height from the CSS. Traced height: 0px.``, most likely the DOM element on which you want to run Galleria doesn't have a height set. Use a CSS rule to set a height for the element.
+
 Another common issue is that the gallery is hidden when it tries to initialize,
 then it will fail to extract correct measurements. Make sure the gallery is visible or try the :doc:`/options/wait` option.
 
