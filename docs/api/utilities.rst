@@ -5,8 +5,6 @@ Utilities
 Static methods
 ==============
 
-Static methods are exposed using ``Galleria.fn()``.
-
 .. highlight:: javascript
 
 Galleria.run( selector, options )
@@ -18,7 +16,7 @@ This function initializes the gallery. The first argument is the jQuery selector
 element(s) you want to load the gallery to. The second argument (optional) is an object
 of configuration options::
 
-    // with defaukt options
+    // with default options
     Galleria.run('#galleria');
 
     // with custom options
@@ -85,7 +83,7 @@ Galleria.log( msg [,msg,...] )
 
     | returns Galleria
 
-A helper metod for cross-browser logging. It uses the console log if available
+A helper method for cross-browser logging. It uses the console log if available
 otherwise it falls back to the opera debugger and finally ``alert()``
 
 
