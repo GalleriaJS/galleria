@@ -911,8 +911,9 @@ var undef,
                             $loader.remove();
 
                             // If failed, tell the dev to download the latest theme
-                            Galleria.raise( 'Theme CSS could not load after 20 sec. Please download the latest theme at http://galleria.io/customer/', true );
-
+                            Galleria.raise( 'Theme CSS could not load after 20 sec. ' + Galleria.QUIRK ?
+                                'Your browser is in Quirks Mode, please add a correct doctype.' :
+                                'Please download the latest theme at http://galleria.io/customer/.', true );
                         },
                         timeout: 20000
                     });
@@ -997,7 +998,7 @@ var undef,
                     $(params.next).css({
                         opacity: 0,
                         left: 0
-                    }).show();
+                    });
                     Utils.animate(params.next, {
                         opacity: 1
                     },{
@@ -1595,18 +1596,17 @@ Galleria = function() {
             fullscreen.scrolled = $win.scrollTop();
             window.scrollTo(0, 0);
 
-            var enter = function() {
-                if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
-                    _nativeFullscreen.enter( self, callback );
-                } else {
-                    fullscreen._enter( callback );
-                }
-            };
-
-            var version = NAV.match(/version\/([0-9.]{3,5})/);
+            var version = NAV.match( /version\/([0-9.]{3,5})/ ),
+                enter = function() {
+                    if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
+                        _nativeFullscreen.enter( self, callback );
+                    } else {
+                        fullscreen._enter( callback );
+                    }
+                };
 
             // Safari 6 work around
-            if ( Galleria.SAFARI && version && version.length && version[1] && parseFloat( version[1] ) >= 6 ) {
+            if ( Galleria.SAFARI && version && parseFloat( version[1] ) >= 6 ) {
                 window.setTimeout( enter, 1 );
             } else {
                 enter();
@@ -1658,7 +1658,9 @@ Galleria = function() {
 
             if ( IFRAME && fullscreen.iframe ) {
                 fullscreen.iframe.scrolled = $( window.parent ).scrollTop();
+                window.parent.scrollTo(0, 0);
             }
+
             // begin styleforce
             Utils.forceStyles(self.get('container'), {
                 position: 'fixed',
@@ -2492,6 +2494,11 @@ Galleria.prototype = {
         // hide all content
         $( this._target ).children().hide();
 
+        // Warn for quirks mode
+        if ( Galleria.QUIRK ) {
+            Galleria.raise('Your page is in Quirks mode, Galleria may not render correctly. Please validate your HTML and add a correct doctype.');
+        }
+
         // now we just have to wait for the theme...
         if ( typeof Galleria.theme === 'object' ) {
             this._init();
@@ -2545,11 +2552,6 @@ Galleria.prototype = {
 
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
-
-            // Warn for quirks mode
-            if ( Galleria.QUIRK ) {
-                Galleria.raise('Your page is in Quirks mode, Galleria may not render correctly. Please validate your HTML.');
-            }
 
             // save the new data
             this._original.data = this._data;
@@ -5642,6 +5644,11 @@ Galleria.Picture.prototype = {
         }
 
         this.image = new Image();
+
+        // IE8 opacity inherit bug
+        if ( Galleria.IE8 ) {
+            $( this.image ).css( 'filter', 'inherit' );
+        }
 
         var i = 0,
             reload = false,
