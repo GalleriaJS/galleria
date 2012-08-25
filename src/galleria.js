@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.9b 2012-08-13
+ * Galleria v 1.2.9b 2012-08-25
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -266,6 +266,7 @@ var undef,
 
     // themeLoad trigger
     _themeLoad = function( theme ) {
+
         Galleria.theme = theme;
 
         // run the instances we have in the pool
@@ -304,6 +305,16 @@ var undef,
                 var elem = doc.createElement( nodeName );
                 elem.className = className;
                 return elem;
+            },
+
+            removeFromArray : function( arr, elem ) {
+                $.each(arr, function(i, el) {
+                    if ( el == elem ) {
+                        arr.splice(i, 1);
+                        return false;
+                    }
+                });
+                return arr;
             },
 
             getScriptPath : function( src ) {
@@ -758,8 +769,17 @@ var undef,
                 img.style.msInterpolationMode = force ? 'bicubic' : 'nearest-neighbor';
             },
 
-            insertStyleTag : function( styles ) {
+            insertStyleTag : function( styles, id ) {
+
+                if ( id && $( '#'+id ).length ) {
+                    return;
+                }
+
                 var style = doc.createElement( 'style' );
+                if ( id ) {
+                    style.id = id;
+                }
+
                 DOM().head.appendChild( style );
 
                 if ( style.styleSheet ) { // IE
@@ -1386,7 +1406,7 @@ Galleria = function() {
             var css = '.galleria-tooltip{padding:3px 8px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:11px;line-height:1.3;' +
                       'opacity:0;box-shadow:0 0 2px rgba(0,0,0,.4);-moz-box-shadow:0 0 2px rgba(0,0,0,.4);-webkit-box-shadow:0 0 2px rgba(0,0,0,.4);}';
 
-            Utils.insertStyleTag(css);
+            Utils.insertStyleTag( css, 'galleria-tooltip' );
 
             self.$( 'tooltip' ).css({
                 opacity: 0.8,
@@ -2066,7 +2086,7 @@ Galleria = function() {
                    '.galleria-'+prefix+'box.iframe .galleria-'+prefix+'nextholder{'+
                    'width:100px;height:100px;top:50%;margin-top:-70px}';
 
-            Utils.insertStyleTag( css );
+            Utils.insertStyleTag( css, 'galleria-lightbox' );
 
             // create the elements
             $.each(elems.split(' '), function( i, elemId ) {
@@ -3598,8 +3618,12 @@ Galleria.prototype = {
     */
 
     destroy : function() {
-        this.get('target').innerHTML = this._original.html;
+        this.$( 'target' ).data( 'galleria', null );
+        this.$( 'container' ).unbind( 'galleria' );
+        this.get( 'target' ).innerHTML = this._original.html;
         this.clearTimer();
+        Utils.removeFromArray( _instances, this );
+        Utils.removeFromArray( _galleries, this );
         return this;
     },
 
@@ -5168,57 +5192,47 @@ Galleria.addTheme = function( theme ) {
 
 Galleria.loadTheme = function( src, options ) {
 
+    // Don't load if theme is already loaded
+    if( $('script').filter(function() { return $(this).attr('src') == src; }).length ) {
+        return;
+    }
+
     var loaded = false,
         length = _galleries.length,
         err = window.setTimeout( function() {
             Galleria.raise( "Theme at " + src + " could not load, check theme path.", true );
-        }, 5000 );
+        }, 10000 );
 
     // first clear the current theme, if exists
-    Galleria.theme = undef;
+    Galleria.unloadTheme();
 
     // load the theme
     Utils.loadScript( src, function() {
-
         window.clearTimeout( err );
-
-        // check for existing galleries and reload them with the new theme
-        if ( length ) {
-
-            // temporary save the new galleries
-            var refreshed = [];
-
-            // refresh all instances
-            // when adding a new theme to an existing gallery, all options will be resetted but the data will be kept
-            // you can apply new options as a second argument
-            $.each( Galleria.get(), function(i, instance) {
-
-                // mix the old data and options into the new instance
-                var op = $.extend( instance._original.options, {
-                    data_source: instance._data
-                }, options);
-
-                // remove the old container
-                instance.$('container').remove();
-
-                // create a new instance
-                var g = new Galleria();
-
-                // move the id
-                g._id = instance._id;
-
-                // initialize the new instance
-                g.init( instance._original.target, op );
-
-                // push the new instance
-                refreshed.push( g );
-            });
-
-            // now overwrite the old holder with the new instances
-            _galleries = refreshed;
-        }
-
     });
+
+    return Galleria;
+};
+
+/**
+    unloadTheme unloads the Galleria theme and prepares for a new theme
+
+    @returns Galleria
+*/
+
+Galleria.unloadTheme = function() {
+
+    if ( typeof Galleria.theme == 'object' ) {
+
+        $('script').each(function( i, script ) {
+
+            if( new RegExp( 'galleria\\.' + Galleria.theme.name + '\\.' ).test( script.src ) ) {
+                $( script ).remove();
+            }
+        });
+
+        Galleria.theme = undef;
+    }
 
     return Galleria;
 };
@@ -5984,10 +5998,14 @@ $.fn.galleria = function( options ) {
 
     return this.each(function() {
 
-        // fail silent if already run
-        if ( !$.data(this, 'galleria') ) {
-            $.data( this, 'galleria', new Galleria().init( this, options ) );
+        // destroy previous instance and prepare for new load
+        if ( $.data(this, 'galleria') ) {
+            $.data( this, 'galleria' ).destroy();
+            $( this ).find( '*' ).hide();
         }
+
+        // load the new gallery
+        $.data( this, 'galleria', new Galleria().init( this, options ) );
     });
 
 };

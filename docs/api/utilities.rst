@@ -18,7 +18,10 @@ This function initializes the gallery. The first argument is the jQuery selector
 element(s) you want to load the gallery to. The second argument (optional) is an object
 of configuration options::
 
+    // with defaukt options
     Galleria.run('#galleria');
+
+    // with custom options
     Galleria.run('#galleria', {
         imageCrop: true,
         transition: 'fade'
@@ -63,6 +66,20 @@ when the gallery is loaded. Example::
     });
 
 
+Galleria.on( event, fn )
+------------------------
+
+    | returns Galleria
+
+Convenient global event listener for all instances. You can use this instead of `bind()`
+as a static function. Example on how to listen to when an image is shown
+and log the current image source path::
+
+    Galleria.on('image', function(e) {
+        Galleria.log( e.imageTarget.src ); // e is the event object
+    });
+
+
 Galleria.log( msg [,msg,...] )
 ------------------------------
 
@@ -101,8 +118,8 @@ return an array with all galleries initiated. Example::
 
 .. _loadTheme:
 
-Galleria.loadTheme( url[, options] )
-------------------------------------
+Galleria.loadTheme( url )
+-------------------------
 
     | returns Galleria
 
@@ -120,7 +137,14 @@ absolute path to the theme .js file. Example::
 
     // when the theme is fully loaded, galleria will run.
 
-The second argument, options, can be used when loading a new theme into an existing gallery. Galleria will then reset the options and then apply any new options you add as a second argument.
+
+Galleria.unloadTheme()
+----------------------
+
+    | returns Galleria
+
+Unloads the theme at source, but still keeps the current theme in memory.
+Use this before you load a new theme into the same gallery.
 
 
 Galleria.addTransition( name, function )
