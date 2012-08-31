@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.9b 2012-08-25
+ * Galleria v 1.2.9b 2012-08-31
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -275,6 +275,8 @@ var undef,
                 instance._init.call( instance );
             }
         });
+
+        _pool = [];
     },
 
     // the Utils singleton
@@ -4386,8 +4388,8 @@ this.prependChild( 'info', 'myElement' );
 
     show : function( index, rewind, _history ) {
 
-        // do nothing if index is false or queue is false and transition is in progress
-        if ( index === false || ( !this._options.queue && this._queue.stalled ) ) {
+        // do nothing queue is long || index is false || queue is false and transition is in progress
+        if ( this._queue.length > 3 || index === false || ( !this._options.queue && this._queue.stalled ) ) {
             return;
         }
 
@@ -4445,9 +4447,6 @@ this.prependChild( 'info', 'myElement' );
                 var win;
 
                 _transitions.active = false;
-
-                // remove stalled
-                self._queue.stalled = false;
 
                 // optimize quality
                 Utils.toggleQuality( next.image, self._options.imageQuality );
@@ -4514,14 +4513,6 @@ this.prependChild( 'info', 'myElement' );
                     });
                 }
 
-                // remove the queued image
-                protoArray.shift.call( self._queue );
-
-                // if we still have images in the queue, show it
-                if ( self._queue.length ) {
-                    self._show();
-                }
-
                 // check if we are playing
                 self._playCheck();
 
@@ -4533,6 +4524,18 @@ this.prependChild( 'info', 'myElement' );
                     thumbTarget: thumb.image,
                     galleriaData: data
                 });
+
+                // remove the queued image
+                protoArray.shift.call( self._queue );
+
+                // remove stalled
+                self._queue.stalled = false;
+
+                // if we still have images in the queue, show it
+                if ( self._queue.length ) {
+                    self._show();
+                }
+
             };
         }( data, next, active, queue, thumb ));
 
@@ -4580,6 +4583,9 @@ this.prependChild( 'info', 'myElement' );
             galleriaData: data
         });
 
+        // stall the queue
+        self._queue.stalled = true;
+
         // begin loading the next image
         next.load( src, function( next ) {
 
@@ -4595,9 +4601,6 @@ this.prependChild( 'info', 'myElement' );
                         Utils.toggleQuality( active.image, false );
                     }
                     Utils.toggleQuality( next.image, false );
-
-                    // stall the queue
-                    self._queue.stalled = true;
 
                     // remove the image panning, if applied
                     // TODO: rethink if this is necessary
