@@ -4485,7 +4485,12 @@ this.prependChild( 'info', 'myElement' );
 
                     $( next.image ).css({
                         cursor: 'pointer'
-                    }).bind( 'mouseup', function() {
+                    }).bind( 'mouseup', function( e ) {
+
+                        // non-left click
+                        if ( typeof e.which == 'number' && e.which > 1 ) {
+                            return;
+                        }
 
                         // clicknext
                         if ( self._options.clicknext && !Galleria.TOUCH ) {
