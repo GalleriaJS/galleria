@@ -59,19 +59,25 @@ Howver, this is not necessary as the script will automatically load the CSS for 
 Switching themes
 ================
 
-You can switch themes at runtime, just fire another ``Galleria.loadTheme()`` function. The following example loads the classic theme, then adds a link with a click event that triggers a theme load (fullscreen)::
+You can switch themes at runtime. First you need to call `unloadTheme` to completely unload the previous theme,
+then load the new theme and run Galleria again:
 
     <script>
-        Galleria.loadTheme('galleria/classic/galleria.classic.js');
+        Galleria.loadTheme('themes/classic/galleria.classic.min.js');
         Galleria.run('#galleria');
 
         $('<a>').click(function(e) {
 
             e.preventDefault();
-            Galleria.loadTheme('galleria/fullscreen/galleria.fullscreen.js');
+
+            // unload the current theme
+            Galleria.unloadTheme();
+
+            // load a new theme
+            Galleria.loadTheme('thems/fullscreen/galleria.fullscreen.min.js');
+
+            // run Galleria again with the new theme
+            Galleria.run('#galleria');
 
         }).text('Switch to fullscreen').appendTo('body');
     </script>
-
-The ``loadTheme()`` method will automatically convert all your Galleria instances into the new theme. All options will then be resetted, but the data will be kept. You can apply additional options you wish to apply to the new theme in a second argument. Please refer to the :ref:`loadTheme` documentation for more information.
-

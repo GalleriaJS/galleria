@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.9b 2012-08-17
+ * Galleria v 1.2.9b 2012-09-11
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -266,6 +266,7 @@ var undef,
 
     // themeLoad trigger
     _themeLoad = function( theme ) {
+
         Galleria.theme = theme;
 
         // run the instances we have in the pool
@@ -274,6 +275,8 @@ var undef,
                 instance._init.call( instance );
             }
         });
+
+        _pool = [];
     },
 
     // the Utils singleton
@@ -304,6 +307,16 @@ var undef,
                 var elem = doc.createElement( nodeName );
                 elem.className = className;
                 return elem;
+            },
+
+            removeFromArray : function( arr, elem ) {
+                $.each(arr, function(i, el) {
+                    if ( el == elem ) {
+                        arr.splice(i, 1);
+                        return false;
+                    }
+                });
+                return arr;
             },
 
             getScriptPath : function( src ) {
@@ -758,8 +771,17 @@ var undef,
                 img.style.msInterpolationMode = force ? 'bicubic' : 'nearest-neighbor';
             },
 
-            insertStyleTag : function( styles ) {
+            insertStyleTag : function( styles, id ) {
+
+                if ( id && $( '#'+id ).length ) {
+                    return;
+                }
+
                 var style = doc.createElement( 'style' );
+                if ( id ) {
+                    style.id = id;
+                }
+
                 DOM().head.appendChild( style );
 
                 if ( style.styleSheet ) { // IE
@@ -1387,7 +1409,7 @@ Galleria = function() {
             var css = '.galleria-tooltip{padding:3px 8px;max-width:50%;background:#ffe;color:#000;z-index:3;position:absolute;font-size:11px;line-height:1.3;' +
                       'opacity:0;box-shadow:0 0 2px rgba(0,0,0,.4);-moz-box-shadow:0 0 2px rgba(0,0,0,.4);-webkit-box-shadow:0 0 2px rgba(0,0,0,.4);}';
 
-            Utils.insertStyleTag(css);
+            Utils.insertStyleTag( css, 'galleria-tooltip' );
 
             self.$( 'tooltip' ).css({
                 opacity: 0.8,
@@ -2068,7 +2090,7 @@ Galleria = function() {
                    '.galleria-'+prefix+'box.iframe .galleria-'+prefix+'nextholder{'+
                    'width:100px;height:100px;top:50%;margin-top:-70px}';
 
-            Utils.insertStyleTag( css );
+            Utils.insertStyleTag( css, 'galleria-lightbox' );
 
             // create the elements
             $.each(elems.split(' '), function( i, elemId ) {
@@ -2544,7 +2566,7 @@ Galleria.prototype = {
 
             // set ratio if height is < 2
             if ( self._options.height < 2 ) {
-                self._ratio = self._options.height;
+                self._userRatio = self._ratio = self._options.height;
             }
 
             // the gallery is ready, let's just wait for the css
@@ -2891,8 +2913,8 @@ Galleria.prototype = {
         // allow setting a height ratio instead of exact value
         // useful when doing responsive galleries
 
-        if ( self._ratio ) {
-            num.height = num.width * self._ratio;
+        if ( self._userRatio ) {
+            num.height = num.width * self._userRatio;
         }
 
         return num;
@@ -3600,8 +3622,12 @@ Galleria.prototype = {
     */
 
     destroy : function() {
-        this.get('target').innerHTML = this._original.html;
+        this.$( 'target' ).data( 'galleria', null );
+        this.$( 'container' ).unbind( 'galleria' );
+        this.get( 'target' ).innerHTML = this._original.html;
         this.clearTimer();
+        Utils.removeFromArray( _instances, this );
+        Utils.removeFromArray( _galleries, this );
         return this;
     },
 
@@ -4362,8 +4388,8 @@ this.prependChild( 'info', 'myElement' );
 
     show : function( index, rewind, _history ) {
 
-        // do nothing if index is false or queue is false and transition is in progress
-        if ( index === false || ( !this._options.queue && this._queue.stalled ) ) {
+        // do nothing queue is long || index is false || queue is false and transition is in progress
+        if ( this._queue.length > 3 || index === false || ( !this._options.queue && this._queue.stalled ) ) {
             return;
         }
 
@@ -4422,9 +4448,6 @@ this.prependChild( 'info', 'myElement' );
 
                 _transitions.active = false;
 
-                // remove stalled
-                self._queue.stalled = false;
-
                 // optimize quality
                 Utils.toggleQuality( next.image, self._options.imageQuality );
 
@@ -4462,7 +4485,12 @@ this.prependChild( 'info', 'myElement' );
 
                     $( next.image ).css({
                         cursor: 'pointer'
-                    }).bind( 'mouseup', function() {
+                    }).bind( 'mouseup', function( e ) {
+
+                        // non-left click
+                        if ( typeof e.which == 'number' && e.which > 1 ) {
+                            return;
+                        }
 
                         // clicknext
                         if ( self._options.clicknext && !Galleria.TOUCH ) {
@@ -4490,14 +4518,6 @@ this.prependChild( 'info', 'myElement' );
                     });
                 }
 
-                // remove the queued image
-                protoArray.shift.call( self._queue );
-
-                // if we still have images in the queue, show it
-                if ( self._queue.length ) {
-                    self._show();
-                }
-
                 // check if we are playing
                 self._playCheck();
 
@@ -4509,6 +4529,18 @@ this.prependChild( 'info', 'myElement' );
                     thumbTarget: thumb.image,
                     galleriaData: data
                 });
+
+                // remove the queued image
+                protoArray.shift.call( self._queue );
+
+                // remove stalled
+                self._queue.stalled = false;
+
+                // if we still have images in the queue, show it
+                if ( self._queue.length ) {
+                    self._show();
+                }
+
             };
         }( data, next, active, queue, thumb ));
 
@@ -4556,6 +4588,9 @@ this.prependChild( 'info', 'myElement' );
             galleriaData: data
         });
 
+        // stall the queue
+        self._queue.stalled = true;
+
         // begin loading the next image
         next.load( src, function( next ) {
 
@@ -4571,9 +4606,6 @@ this.prependChild( 'info', 'myElement' );
                         Utils.toggleQuality( active.image, false );
                     }
                     Utils.toggleQuality( next.image, false );
-
-                    // stall the queue
-                    self._queue.stalled = true;
 
                     // remove the image panning, if applied
                     // TODO: rethink if this is necessary
@@ -5170,57 +5202,57 @@ Galleria.addTheme = function( theme ) {
 
 Galleria.loadTheme = function( src, options ) {
 
+    // Don't load if theme is already loaded
+    if( $('script').filter(function() { return $(this).attr('src') == src; }).length ) {
+        return;
+    }
+
     var loaded = false,
-        length = _galleries.length,
-        err = window.setTimeout( function() {
-            Galleria.raise( "Theme at " + src + " could not load, check theme path.", true );
-        }, 5000 );
+        err;
+
+    // start listening for the timeout onload
+    $( window ).load( function() {
+        if ( !loaded ) {
+            // give it another 20 seconds
+            err = window.setTimeout(function() {
+                if ( !loaded && !Galleria.theme ) {
+                    Galleria.raise( "Galleria had problems loading theme at " + src + ". Please check theme path or load manually.", true );
+                }
+            }, 20000);
+        }
+    });
 
     // first clear the current theme, if exists
-    Galleria.theme = undef;
+    Galleria.unloadTheme();
 
     // load the theme
     Utils.loadScript( src, function() {
-
+        loaded = true;
         window.clearTimeout( err );
-
-        // check for existing galleries and reload them with the new theme
-        if ( length ) {
-
-            // temporary save the new galleries
-            var refreshed = [];
-
-            // refresh all instances
-            // when adding a new theme to an existing gallery, all options will be resetted but the data will be kept
-            // you can apply new options as a second argument
-            $.each( Galleria.get(), function(i, instance) {
-
-                // mix the old data and options into the new instance
-                var op = $.extend( instance._original.options, {
-                    data_source: instance._data
-                }, options);
-
-                // remove the old container
-                instance.$('container').remove();
-
-                // create a new instance
-                var g = new Galleria();
-
-                // move the id
-                g._id = instance._id;
-
-                // initialize the new instance
-                g.init( instance._original.target, op );
-
-                // push the new instance
-                refreshed.push( g );
-            });
-
-            // now overwrite the old holder with the new instances
-            _galleries = refreshed;
-        }
-
     });
+
+    return Galleria;
+};
+
+/**
+    unloadTheme unloads the Galleria theme and prepares for a new theme
+
+    @returns Galleria
+*/
+
+Galleria.unloadTheme = function() {
+
+    if ( typeof Galleria.theme == 'object' ) {
+
+        $('script').each(function( i, script ) {
+
+            if( new RegExp( 'galleria\\.' + Galleria.theme.name + '\\.' ).test( script.src ) ) {
+                $( script ).remove();
+            }
+        });
+
+        Galleria.theme = undef;
+    }
 
     return Galleria;
 };
@@ -5991,10 +6023,14 @@ $.fn.galleria = function( options ) {
 
     return this.each(function() {
 
-        // fail silent if already run
-        if ( !$.data(this, 'galleria') ) {
-            $.data( this, 'galleria', new Galleria().init( this, options ) );
+        // destroy previous instance and prepare for new load
+        if ( $.data(this, 'galleria') ) {
+            $.data( this, 'galleria' ).destroy();
+            $( this ).find( '*' ).hide();
         }
+
+        // load the new gallery
+        $.data( this, 'galleria', new Galleria().init( this, options ) );
     });
 
 };

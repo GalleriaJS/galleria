@@ -4,6 +4,10 @@ Changelog
 
 1.2.9
 -----
+* Improved the .destroy() method so it destroys all events and data as well
+* Added an automatic .destroy() trigger if a gallery was initialized on an element that already contained a gallery
+* Removed automatic gallery updates when using .loadTheme()
+* Added a static Galleria.unloadTheme() that unloads the existing theme and prepares for a new one
 * Fixed an IE8 bug with initial inherited opacity for images
 * Added fullscreen functionality from within an iframe gallery, assuming that the iframe and parent window protocol, host and ports match.
 

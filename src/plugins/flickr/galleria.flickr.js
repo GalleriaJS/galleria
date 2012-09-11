@@ -1,5 +1,5 @@
 /**
- * Galleria Flickr Plugin 2012-04-04
+ * Galleria Flickr Plugin 2012-09-04
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -271,14 +271,15 @@ Galleria.Flickr.prototype = {
         params = $.extend({
             method: 'flickr.photos.search',
             extras: 'url_t,url_m,url_o,url_s,url_l,url_z,description',
-            sort: this.options.sort
+            sort: this.options.sort,
+            per_page: Math.min( this.options.max, 500 )
         }, params );
 
         return this._call( params, function(data) {
 
             var gallery = [],
                 photos = data.photos ? data.photos.photo : data.photoset.photo,
-                len = Math.min( this.options.max, photos.length ),
+                len = photos.length,
                 photo,
                 i;
 
