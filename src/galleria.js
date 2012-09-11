@@ -5207,13 +5207,14 @@ Galleria.loadTheme = function( src, options ) {
         return;
     }
 
-    var loaded = false;
+    var loaded = false,
+        err;
 
     // start listening for the timeout onload
     $( window ).load( function() {
         if ( !loaded ) {
             // give it another 20 seconds
-            window.setTimeout(function() {
+            err = window.setTimeout(function() {
                 if ( !loaded && !Galleria.theme ) {
                     Galleria.raise( "Galleria had problems loading theme at " + src + ". Please check theme path or load manually.", true );
                 }
@@ -5227,6 +5228,7 @@ Galleria.loadTheme = function( src, options ) {
     // load the theme
     Utils.loadScript( src, function() {
         loaded = true;
+        window.clearTimeout( err );
     });
 
     return Galleria;
