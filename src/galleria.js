@@ -1257,7 +1257,8 @@ Galleria = function() {
         update: function() {
             var w = 0,
                 h = 0,
-                hooks = [0];
+                hooks = [0],
+                cntWidth = self.$( 'thumbnails-container' );
 
             $.each( self._thumbnails, function( i, thumb ) {
                 if ( thumb.ready ) {
@@ -1277,12 +1278,10 @@ Galleria = function() {
             carousel.width = self.$( 'thumbnails-list' ).width();
             carousel.setClasses();
 
-            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > carousel.width );
+            cntWidth.toggleClass( 'galleria-carousel', w > carousel.width );
 
             // one extra calculation
-            carousel.width = self.$( 'thumbnails-list' ).width();
-
-            // todo: fix so the carousel moves to the left
+            carousel.width = cntWidth.width();
         },
 
         bindControls: function() {
