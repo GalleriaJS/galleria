@@ -2566,7 +2566,7 @@ Galleria.prototype = {
 
             // set ratio if height is < 2
             if ( self._options.height < 2 ) {
-                self._ratio = self._options.height;
+                self._userRatio = self._ratio = self._options.height;
             }
 
             // the gallery is ready, let's just wait for the css
@@ -2913,8 +2913,8 @@ Galleria.prototype = {
         // allow setting a height ratio instead of exact value
         // useful when doing responsive galleries
 
-        if ( self._ratio ) {
-            num.height = num.width * self._ratio;
+        if ( self._userRatio ) {
+            num.height = num.width * self._userRatio;
         }
 
         return num;
