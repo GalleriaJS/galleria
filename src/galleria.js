@@ -1574,7 +1574,7 @@ Galleria = function() {
 
             return _transitions.active ? function() {
                 if ( typeof callback == 'function' ) {
-                    callback();
+                    callback.call(self);
                 }
                 var active = self._controls.getActive(),
                     next = self._controls.getNext();
@@ -4591,6 +4591,38 @@ this.prependChild( 'info', 'myElement' );
         // stall the queue
         self._queue.stalled = true;
 
+        var transition = self._options.transition;
+
+        // can JavaScript loop through objects in order? yes.
+        $.each({
+            initial: active.image === null,
+            touch: Galleria.TOUCH,
+            fullscreen: self.isFullscreen()
+        }, function( type, arg ) {
+            if ( arg && self._options[ type + 'Transition' ] !== undef ) {
+                transition = self._options[ type + 'Transition' ];
+                return false;
+            }
+        });
+
+        // validate the transition
+        if ( transition in _transitions.effects === false ) {
+            complete();
+        } else {
+            var params = {
+                prev: active.container,
+                next: next.container,
+                rewind: queue.rewind,
+                speed: self._options.transitionSpeed || 400
+            };
+
+            _transitions.active = true;
+
+            // call the transition function and send some stuff
+            _transitions.init.call( self, transition, params, complete );
+
+        }
+
         // begin loading the next image
         next.load( src, function( next ) {
 
@@ -4635,37 +4667,7 @@ this.prependChild( 'info', 'myElement' );
                         galleriaData: self.getData( queue.index )
                     });
 
-                    var transition = self._options.transition;
 
-                    // can JavaScript loop through objects in order? yes.
-                    $.each({
-                        initial: active.image === null,
-                        touch: Galleria.TOUCH,
-                        fullscreen: self.isFullscreen()
-                    }, function( type, arg ) {
-                        if ( arg && self._options[ type + 'Transition' ] !== undef ) {
-                            transition = self._options[ type + 'Transition' ];
-                            return false;
-                        }
-                    });
-
-                    // validate the transition
-                    if ( transition in _transitions.effects === false ) {
-                        complete();
-                    } else {
-                        var params = {
-                            prev: active.container,
-                            next: next.container,
-                            rewind: queue.rewind,
-                            speed: self._options.transitionSpeed || 400
-                        };
-
-                        _transitions.active = true;
-
-                        // call the transition function and send some stuff
-                        _transitions.init.call( self, transition, params, complete );
-
-                    }
                 }
             });
         });
