@@ -5464,7 +5464,7 @@ Galleria.raise = function( msg, fatal ) {
         echo = function( msg ) {
 
             var html = '<div style="padding:4px;margin:0 0 2px;background:#' +
-                ( fatal ? '811' : '222' ) + '";>' +
+                ( fatal ? '811' : '222' ) + ';">' +
                 ( fatal ? '<strong>' + type + ': </strong>' : '' ) +
                 msg + '</div>';
 
