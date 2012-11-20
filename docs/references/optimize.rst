@@ -25,7 +25,9 @@ You can define separate thumbnails by linking a thumbnail to the big image in th
 3. Don’t add too many images at once
 ------------------------------------
 
-There are no limits to how many images you can add, but after 30 it can clog the pipes on load, especially in IE. Use a reasonable amount of images at first, then try the ``.load()``, ``.splice()`` and ``.push()`` methods to add/remove image data on the fly.
+There are no limits to how many images you can add, but after 30 it can clog the pipes on load, especially in IE.
+Use a reasonable amount of images at first. If you need a lot of images (100+), use JSON and lazyload the thumbnails.
+You can also try the ``.push()`` API method to add more images on the fly.
 
 
 4. Include your theme in the head
@@ -43,7 +45,8 @@ Example on how to load the theme in the head instad of using loadTheme::
 5. Use JSON as data
 -------------------
 
-This can also be a small speed-booster, but can also be negative from a progressive enhancement point of view. If you use JSON, make sure you serve a reasonable fallback for users without JavaScript turned on. Read more in the Quick Guide for more examples.
+This can be a speed-booster, especially for large galleries. Just make sure you serve a reasonable fallback for users without JavaScript turned on.
+Read more in the Quick Guide and Galleria Data reference for examples.
 
 
 6. Lazy load thumbnails

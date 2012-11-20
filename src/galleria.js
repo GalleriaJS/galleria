@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.9b 2012-09-11
+ * Galleria v 1.2.9b 2012-11-20
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -189,21 +189,21 @@ var undef,
 
         callback: F,
 
-        enter: function( instance, callback ) {
+        enter: function( instance, callback, elem ) {
 
             this.instance = instance;
 
             this.callback = callback || F;
 
-            var html = DOM().html;
-            if ( html.requestFullscreen ) {
-                html.requestFullscreen();
+            elem = elem || DOM().html;
+            if ( elem.requestFullscreen ) {
+                elem.requestFullscreen();
             }
-            else if ( html.mozRequestFullScreen ) {
-                html.mozRequestFullScreen();
+            else if ( elem.mozRequestFullScreen ) {
+                elem.mozRequestFullScreen();
             }
-            else if ( html.webkitRequestFullScreen ) {
-                html.webkitRequestFullScreen();
+            else if ( elem.webkitRequestFullScreen ) {
+                elem.webkitRequestFullScreen();
             }
         },
 
@@ -1564,8 +1564,6 @@ Galleria = function() {
 
         crop: undef,
 
-        transition: undef,
-
         active: false,
 
         keymap: self._keyboard.map,
@@ -1574,7 +1572,7 @@ Galleria = function() {
 
             return _transitions.active ? function() {
                 if ( typeof callback == 'function' ) {
-                    callback();
+                    callback.call(self);
                 }
                 var active = self._controls.getActive(),
                     next = self._controls.getNext();
@@ -1595,23 +1593,43 @@ Galleria = function() {
 
             callback = fullscreen.parseCallback( callback, true );
 
-            fullscreen.scrolled = $win.scrollTop();
-            window.scrollTo(0, 0);
+            if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
 
-            var version = NAV.match( /version\/([0-9.]{3,5})/ ),
-                enter = function() {
-                    if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
-                        _nativeFullscreen.enter( self, callback );
-                    } else {
-                        fullscreen._enter( callback );
-                    }
-                };
+                // do some stuff prior animation for wmoother transitions
 
-            // Safari 6 work around
-            if ( Galleria.SAFARI && version && parseFloat( version[1] ) >= 6 ) {
-                window.setTimeout( enter, 1 );
+                fullscreen.active = true;
+
+                Utils.forceStyles( self.get('container'), {
+                    width: '100%',
+                    height: '100%'
+                });
+
+                self.rescale();
+
+                if ( Galleria.WEBKIT ) {
+                    self.$('container').css('opacity', 0).addClass('fullscreen');
+                    window.setTimeout(function() {
+                        fullscreen.scale();
+                        self.$('container').css('opacity', 1);
+                    }, 50);
+                } else {
+                    self.$('stage').css('opacity', 0);
+                    window.setTimeout(function() {
+                        fullscreen.scale();
+                        self.$('stage').css('opacity', 1);
+                    },4);
+                }
+
+                $win.resize( fullscreen.scale );
+
+                _nativeFullscreen.enter( self, callback, self.get('container') );
+
             } else {
-                enter();
+
+                fullscreen.scrolled = $win.scrollTop();
+                window.scrollTo(0, 0);
+
+                fullscreen._enter( callback );
             }
 
         },
@@ -1656,49 +1674,54 @@ Galleria = function() {
             // hide the image until rescale is complete
             Utils.hide( self.getActiveImage() );
 
-            self.$( 'container' ).addClass( 'fullscreen' );
+            //self.$( 'container' ).addClass( 'fullscreen' )
 
             if ( IFRAME && fullscreen.iframe ) {
                 fullscreen.iframe.scrolled = $( window.parent ).scrollTop();
                 window.parent.scrollTo(0, 0);
             }
 
-            // begin styleforce
-            Utils.forceStyles(self.get('container'), {
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 10000
-            });
+            var data = self.getData(),
+                options = self._options,
+                inBrowser = !self._options.trueFullscreen || !_nativeFullscreen.support;
 
-            var htmlbody = {
+            if (inBrowser) {
+
+                self.$('container').addClass('fullscreen');
+
+                // begin styleforce
+
+                var htmlbody = {
                     height: '100%',
                     overflow: 'hidden',
                     margin:0,
                     padding:0
-                },
+                };
 
-                data = self.getData(),
-
-                options = self._options;
-
-            Utils.forceStyles( DOM().html, htmlbody );
-            Utils.forceStyles( DOM().body, htmlbody );
-
-            if ( IFRAME && fullscreen.iframe ) {
-                Utils.forceStyles( fullscreen.pd.documentElement, htmlbody );
-                Utils.forceStyles( fullscreen.pd.body, htmlbody );
-                Utils.forceStyles( fullscreen.iframe, $.extend( htmlbody, {
-                    width: '100%',
-                    height: '100%',
+                Utils.forceStyles(self.get('container'), {
+                    position: 'fixed',
                     top: 0,
                     left: 0,
-                    position: 'fixed',
-                    zIndex: 10000,
-                    border: 'none'
-                }));
+                    width: '100%',
+                    height: '100%',
+                    zIndex: 10000
+                });
+                Utils.forceStyles( DOM().html, htmlbody );
+                Utils.forceStyles( DOM().body, htmlbody );
+
+                if ( IFRAME && fullscreen.iframe ) {
+                    Utils.forceStyles( fullscreen.pd.documentElement, htmlbody );
+                    Utils.forceStyles( fullscreen.pd.body, htmlbody );
+                    Utils.forceStyles( fullscreen.iframe, $.extend( htmlbody, {
+                        width: '100%',
+                        height: '100%',
+                        top: 0,
+                        left: 0,
+                        position: 'fixed',
+                        zIndex: 10000,
+                        border: 'none'
+                    }));
+                }
             }
 
             // temporarily attach some keys
@@ -1759,11 +1782,14 @@ Galleria = function() {
             }
 
             // init the first rescale and attach callbacks
+
             self.rescale(function() {
 
                 self.addTimer(false, function() {
                     // show the image after 50 ms
-                    Utils.show( self.getActiveImage() );
+                    if ( inBrowser ) {
+                        Utils.show( self.getActiveImage() );
+                    }
 
                     if (typeof callback === 'function') {
                         callback.call( self );
@@ -1774,10 +1800,12 @@ Galleria = function() {
                 self.trigger( Galleria.FULLSCREEN_ENTER );
             });
 
-            // bind the scaling to the resize event
-            $win.resize( function() {
-                fullscreen.scale();
-            } );
+            if ( !inBrowser ) {
+                Utils.show( self.getActiveImage() );
+            } else {
+                $win.resize( fullscreen.scale );
+            }
+
         },
 
         scale : function() {
@@ -1799,21 +1827,25 @@ Galleria = function() {
 
             fullscreen.active = false;
 
-            Utils.hide( self.getActiveImage() );
+            var inBrowser = !self._options.trueFullscreen || !_nativeFullscreen.support;
 
             self.$('container').removeClass( 'fullscreen' );
 
-            // revert all styles
-            Utils.revertStyles( self.get('container'), DOM().html, DOM().body );
+            if ( inBrowser ) {
+                Utils.hide( self.getActiveImage() );
 
-            if ( IFRAME && fullscreen.iframe ) {
-                Utils.revertStyles( fullscreen.pd.documentElement, fullscreen.pd.body, fullscreen.iframe );
-            }
+                // revert all styles
+                Utils.revertStyles( self.get('container'), DOM().html, DOM().body );
 
-            // scroll back
-            window.scrollTo(0, fullscreen.scrolled);
-            if ( IFRAME && fullscreen.iframe && fullscreen.iframe.scrolled ) {
-                window.parent.scrollTo(0, fullscreen.iframe.scrolled );
+                if ( IFRAME && fullscreen.iframe ) {
+                    Utils.revertStyles( fullscreen.pd.documentElement, fullscreen.pd.body, fullscreen.iframe );
+                }
+
+                // scroll back
+                window.scrollTo(0, fullscreen.scrolled);
+                if ( IFRAME && fullscreen.iframe && fullscreen.iframe.scrolled ) {
+                    window.parent.scrollTo(0, fullscreen.iframe.scrolled );
+                }
             }
 
             // detach all keyboard events and apply the old keymap
@@ -1822,7 +1854,6 @@ Galleria = function() {
 
             // bring back cached options
             self._options.imageCrop = fullscreen.crop;
-            //self._options.transition = fullscreen.transition;
 
             // return to original image
             var big = self.getData().big,
@@ -1842,7 +1873,9 @@ Galleria = function() {
                 self.addTimer(false, function() {
 
                     // show the image after 50 ms
-                    Utils.show( self.getActiveImage() );
+                    if ( inBrowser ) {
+                        Utils.show( self.getActiveImage() );
+                    }
 
                     if ( typeof callback === 'function' ) {
                         callback.call( self );
@@ -1853,7 +1886,6 @@ Galleria = function() {
                 }, 50);
                 self.trigger( Galleria.FULLSCREEN_EXIT );
             });
-
 
             $win.unbind('resize', fullscreen.scale);
         }
@@ -4624,17 +4656,6 @@ this.prependChild( 'info', 'myElement' );
                         }
                     }
 
-                    // trigger the LOADFINISH event
-                    self.trigger({
-                        type: Galleria.LOADFINISH,
-                        cached: cached,
-                        index: queue.index,
-                        rewind: queue.rewind,
-                        imageTarget: next.image,
-                        thumbTarget: self._thumbnails[ queue.index ].image,
-                        galleriaData: self.getData( queue.index )
-                    });
-
                     var transition = self._options.transition;
 
                     // can JavaScript loop through objects in order? yes.
@@ -4666,6 +4687,19 @@ this.prependChild( 'info', 'myElement' );
                         _transitions.init.call( self, transition, params, complete );
 
                     }
+
+                    // trigger the LOADFINISH event
+                    self.trigger({
+                        type: Galleria.LOADFINISH,
+                        cached: cached,
+                        index: queue.index,
+                        rewind: queue.rewind,
+                        imageTarget: next.image,
+                        thumbTarget: self._thumbnails[ queue.index ].image,
+                        galleriaData: self.getData( queue.index )
+                    });
+
+
                 }
             });
         });

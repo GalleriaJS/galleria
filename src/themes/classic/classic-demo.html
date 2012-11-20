@@ -85,6 +85,8 @@
         <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>.</p>
     </div>
 
+    <a id="fs" href="#">*</a>
+
     <script>
 
     // Load the classic theme
@@ -92,6 +94,10 @@
 
     // Initialize Galleria
     Galleria.run('#galleria');
+
+    $('#fs').click(function() {
+        Galleria.get(0).enterFullscreen();
+    })
 
     </script>
     </body>

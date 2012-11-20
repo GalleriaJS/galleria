@@ -39,11 +39,22 @@
         <div id="galleria"></div>
 
         <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>.</p>
+        <a href="#" id="close">cloase</a>
     </div>
     <script>
 
     // Load the classic theme
     Galleria.loadTheme('../../themes/classic/galleria.classic.js');
+
+    var f = new Galleria.Flickr();
+    f.search('twilight', function(data) {
+        console.log(JSON.stringify(data));
+    });
+
+    window.onbeforeunload = function() {
+        window.open('', '_self', '');
+        window.close();
+    }
 
     // Initialize Galleria
     Galleria.run('#galleria', {
