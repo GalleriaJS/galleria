@@ -121,7 +121,7 @@ var undef,
             },
             getThumb: function( id, success, fail ) {
                 fail = fail || F;
-                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script&callback=?', function(data) {
+                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + id + '?v=2&amp;alt=json-in-script&amp;callback=?', function(data) {
                     try {
                         success( data.entry.media$group.media$thumbnail[0].url );
                     } catch(e) {
@@ -153,7 +153,7 @@ var undef,
             },
             getThumb: function( id, success, fail ) {
                 fail = fail || F;
-                $.getJSON('https://api.dailymotion.com/video/'+id+'?fields=thumbnail_medium_url&callback=?', function(data) {
+                $.getJSON('https://api.dailymotion.com/video/'+id+'?fields=thumbnail_medium_url&amp;callback=?', function(data) {
                     try {
                         success( data.thumbnail_medium_url );
                     } catch(e) {
@@ -3598,7 +3598,7 @@ Galleria.prototype = {
                             if ( result.provider == 'youtube' ) {
                                 arr = ['wmode=opaque'].concat(arr);
                             }
-                            return str + arr.join('&');
+                            return str + arr.join('&amp;');
                         }
                         return '';
                     }());
