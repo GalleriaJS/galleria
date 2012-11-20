@@ -1606,18 +1606,22 @@ Galleria = function() {
 
                 self.rescale();
 
-                if ( Galleria.WEBKIT ) {
-                    self.$('container').css('opacity', 0).addClass('fullscreen');
-                    window.setTimeout(function() {
-                        fullscreen.scale();
-                        self.$('container').css('opacity', 1);
-                    }, 50);
+                if ( Galleria.MAC ) {
+                    if ( Galleria.WEBKIT ) {
+                        self.$('container').css('opacity', 0).addClass('fullscreen');
+                        window.setTimeout(function() {
+                            fullscreen.scale();
+                            self.$('container').css('opacity', 1);
+                        }, 50);
+                    } else {
+                        self.$('stage').css('opacity', 0);
+                        window.setTimeout(function() {
+                            fullscreen.scale();
+                            self.$('stage').css('opacity', 1);
+                        },4);
+                    }
                 } else {
-                    self.$('stage').css('opacity', 0);
-                    window.setTimeout(function() {
-                        fullscreen.scale();
-                        self.$('stage').css('opacity', 1);
-                    },4);
+                    self.$('container').addClass('fullscreen');
                 }
 
                 $win.resize( fullscreen.scale );
@@ -1674,8 +1678,6 @@ Galleria = function() {
             // hide the image until rescale is complete
             Utils.hide( self.getActiveImage() );
 
-            //self.$( 'container' ).addClass( 'fullscreen' )
-
             if ( IFRAME && fullscreen.iframe ) {
                 fullscreen.iframe.scrolled = $( window.parent ).scrollTop();
                 window.parent.scrollTo(0, 0);
@@ -1683,20 +1685,19 @@ Galleria = function() {
 
             var data = self.getData(),
                 options = self._options,
-                inBrowser = !self._options.trueFullscreen || !_nativeFullscreen.support;
+                inBrowser = !self._options.trueFullscreen || !_nativeFullscreen.support,
+                htmlbody = {
+                    height: '100%',
+                    overflow: 'hidden',
+                    margin:0,
+                    padding:0
+                };
 
             if (inBrowser) {
 
                 self.$('container').addClass('fullscreen');
 
                 // begin styleforce
-
-                var htmlbody = {
-                    height: '100%',
-                    overflow: 'hidden',
-                    margin:0,
-                    padding:0
-                };
 
                 Utils.forceStyles(self.get('container'), {
                     position: 'fixed',
@@ -1708,20 +1709,20 @@ Galleria = function() {
                 });
                 Utils.forceStyles( DOM().html, htmlbody );
                 Utils.forceStyles( DOM().body, htmlbody );
+            }
 
-                if ( IFRAME && fullscreen.iframe ) {
-                    Utils.forceStyles( fullscreen.pd.documentElement, htmlbody );
-                    Utils.forceStyles( fullscreen.pd.body, htmlbody );
-                    Utils.forceStyles( fullscreen.iframe, $.extend( htmlbody, {
-                        width: '100%',
-                        height: '100%',
-                        top: 0,
-                        left: 0,
-                        position: 'fixed',
-                        zIndex: 10000,
-                        border: 'none'
-                    }));
-                }
+            if ( IFRAME && fullscreen.iframe ) {
+                Utils.forceStyles( fullscreen.pd.documentElement, htmlbody );
+                Utils.forceStyles( fullscreen.pd.body, htmlbody );
+                Utils.forceStyles( fullscreen.iframe, $.extend( htmlbody, {
+                    width: '100%',
+                    height: '100%',
+                    top: 0,
+                    left: 0,
+                    position: 'fixed',
+                    zIndex: 10000,
+                    border: 'none'
+                }));
             }
 
             // temporarily attach some keys
@@ -1837,13 +1838,13 @@ Galleria = function() {
                 // revert all styles
                 Utils.revertStyles( self.get('container'), DOM().html, DOM().body );
 
-                if ( IFRAME && fullscreen.iframe ) {
-                    Utils.revertStyles( fullscreen.pd.documentElement, fullscreen.pd.body, fullscreen.iframe );
-                }
-
                 // scroll back
                 window.scrollTo(0, fullscreen.scrolled);
-                if ( IFRAME && fullscreen.iframe && fullscreen.iframe.scrolled ) {
+            }
+
+            if ( IFRAME && fullscreen.iframe ) {
+                Utils.revertStyles( fullscreen.pd.documentElement, fullscreen.pd.body, fullscreen.iframe );
+                if ( fullscreen.iframe.scrolled ) {
                     window.parent.scrollTo(0, fullscreen.iframe.scrolled );
                 }
             }
