@@ -20,7 +20,7 @@ These options are the standard options that you can use for all themes. However,
 Using options
 =============
 
-Galleria options are configured at anytime using the ``Galleria.configure`` function. You can add this code anywhere in your scripts, but we recommend you to put it before the ``Galleria.run`` command::
+Galleria options can be configured at anytime using the ``Galleria.configure`` function. You can add this code anywhere in your scripts, but we recommend you to put it before the ``Galleria.run`` command::
 
     <script>
     Galleria.loadTheme("themes/classic/galleria.classic.min.js");
