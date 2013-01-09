@@ -12,6 +12,7 @@ Changelog
 * Added a static Galleria.unloadTheme() that unloads the existing theme and prepares for a new one
 * Fixed an IE8 bug with initial inherited opacity for images
 * Added fullscreen functionality from within an iframe gallery, assuming that the iframe and parent window protocol, host and ports match
+* Added a maxVideoSize option that limits the iframe/video size
 
 1.2.8
 -----

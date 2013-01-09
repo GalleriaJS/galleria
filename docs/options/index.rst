@@ -109,9 +109,9 @@ List of options
 
 - :doc:`lightboxTransitionSpeed` Defines how fast the lightbox should animate.
 
-- :doc:`maxScaleRatio` Defines how much Galleria is allowed to scale.
+- :doc:`maxScaleRatio` Defines how much Galleria is allowed to upscale images.
 
-- :doc:`minScaleRatio` Defines how much Galleria must scale.
+- :doc:`maxVideoSize` Defines how much Galleria is allowed to upscale videos.
 
 - :doc:`overlayBackground` Defines the background color of the overlay.
 

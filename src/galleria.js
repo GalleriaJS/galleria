@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.9b 2012-11-20
+ * Galleria v 1.2.9b 2013-01-09
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -22,7 +22,7 @@ var undef,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.28,
+    VERSION = 1.29,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -121,7 +121,7 @@ var undef,
             },
             getThumb: function( id, success, fail ) {
                 fail = fail || F;
-                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script&callback=?', function(data) {
+                $.getJSON(window.location.protocol+'//gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script&callback=?', function(data) {
                     try {
                         success( data.entry.media$group.media$thumbnail[0].url );
                     } catch(e) {
@@ -1430,13 +1430,13 @@ Galleria = function() {
                 width = $elem.outerWidth( true ),
                 limitY = height + 15;
 
-            var maxX = self.$( 'container').width() - width - 2,
-                maxY = self.$( 'container').height() - height - 2;
+            var maxX = self.$( 'container' ).width() - width - 2,
+                maxY = self.$( 'container' ).height() - height - 2;
 
             if ( !isNaN(x) && !isNaN(y) ) {
 
                 x += 10;
-                y -= 30;
+                y -= ( height+8 );
 
                 x = Math.max( 0, Math.min( maxX, x ) );
                 y = Math.max( 0, Math.min( maxY, y ) );
@@ -2307,8 +2307,25 @@ Galleria = function() {
 
             lightbox.image.load( data.iframe || data.big || data.image, function( image ) {
 
-                lightbox.width = image.isIframe ? $(window).width() : image.original.width;
-                lightbox.height = image.isIframe ? $(window).height() : image.original.height;
+                if ( image.isIframe ) {
+
+                    var cw = $(window).width(),
+                        ch = $(window).height();
+
+                    if ( self._options.maxVideoSize ) {
+                        var r = Math.min( self._options.maxVideoSize/cw, self._options.maxVideoSize/ch );
+                        if ( r < 1 ) {
+                            cw *= r;
+                            ch *= r;
+                        }
+                    }
+                    lightbox.width = cw;
+                    lightbox.height = ch;
+
+                } else {
+                    lightbox.width = image.original.width;
+                    lightbox.height = image.original.height;
+                }
 
                 $( image.image ).css({
                     width: image.isIframe ? '100%' : '100.1%',
@@ -2464,7 +2481,8 @@ Galleria.prototype = {
             lightboxTransitionSpeed: 200,
             linkSourceImages: true,
             maxScaleRatio: undef,
-            minScaleRatio: undef,
+            maxVideoSize: undef, // 1.2.9
+            minScaleRatio: undef, // deprecated in 1.2.9
             overlayOpacity: 0.85,
             overlayBackground: '#0b0b0b',
             pauseOnInteraction: true,
@@ -4273,13 +4291,14 @@ this.prependChild( 'info', 'myElement' );
             };
 
         options = $.extend({
-            width:    this._stageWidth,
-            height:   this._stageHeight,
-            crop:     this._options.imageCrop,
-            max:      this._options.maxScaleRatio,
-            min:      this._options.minScaleRatio,
-            margin:   this._options.imageMargin,
-            position: this._options.imagePosition
+            width:       this._stageWidth,
+            height:      this._stageHeight,
+            crop:        this._options.imageCrop,
+            max:         this._options.maxScaleRatio,
+            min:         this._options.minScaleRatio,
+            margin:      this._options.imageMargin,
+            position:    this._options.imagePosition,
+            iframelimit: this._options.maxVideoSize
         }, options );
 
         if ( this._options.layerFollow && this._options.imageCrop !== true ) {
@@ -5400,6 +5419,9 @@ Galleria.on.binds = [];
 */
 
 Galleria.run = function( selector, options ) {
+    if ( $.isFunction( options ) ) {
+        options = { extend: options };
+    }
     $( selector || '#galleria' ).galleria( options );
     return Galleria;
 };
@@ -5836,12 +5858,35 @@ Galleria.Picture.prototype = {
             complete: F,
             position: 'center',
             crop: false,
-            canvas: false
+            canvas: false,
+            iframelimit: undef
         }, options);
 
         if( this.isIframe ) {
-            $( this.image ).width( options.width ).height( options.height ).removeAttr( 'width' ).removeAttr( 'height' );
-            $( this.container ).width( options.width ).height( options.height) ;
+
+            var cw = options.width, 
+                ch = options.height,
+                nw, nh;
+            if ( options.iframelimit ) {
+                var r = Math.min( options.iframelimit/cw, options.iframelimit/ch );
+                if ( r < 1 ) {
+                    nw = cw * r;
+                    nh = ch * r;
+
+                    $( this.image ).css({
+                        top: ch/2-nh/2,
+                        left: cw/2-nw/2,
+                        position: 'absolute'
+                    });
+                } else {
+                    $( this.image ).css({
+                        top: 0,
+                        left: 0
+                    });
+                }
+            }
+            $( this.image ).width( nw || cw ).height( nh || ch ).removeAttr( 'width' ).removeAttr( 'height' );
+            $( this.container ).width( cw ).height( ch );
             options.complete.call(self, self);
             try {
                 if( this.image.contentWindow ) {
@@ -5849,6 +5894,7 @@ Galleria.Picture.prototype = {
                 }
             } catch(e) {}
             return this.container;
+
         }
 
         // return the element if no image found
