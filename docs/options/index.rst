@@ -20,14 +20,18 @@ These options are the standard options that you can use for all themes. However,
 Using options
 =============
 
-Galleria options are configured at anytime using the ``Galleria.configure`` function::
+Galleria options can be configured at anytime using the ``Galleria.configure`` function. You can add this code anywhere in your scripts, but we recommend you to put it before the ``Galleria.run`` command::
 
+    <script>
+    Galleria.loadTheme("themes/classic/galleria.classic.min.js");
     Galleria.configure({
         transition: 'fade',
         imageCrop: true
     });
+    Galleria.run();
+    </script>
 
-Or when calling ``Galleria.run``::
+You can also add options as a second argument when calling ``Galleria.run``::
 
     Galleria.run('#galleria', {
         transition: 'fade',
