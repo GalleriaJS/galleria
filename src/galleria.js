@@ -1534,7 +1534,7 @@ Galleria = function() {
                 return;
             }
 
-            self.$( 'tooltip' ).html( text.replace(/\s/, '&nbsp;') );
+            self.$( 'tooltip' ).html( text.replace(/\s/, '&#160;') );
 
             // trigger mousemove on mouseup in case of click
             elem.bind( 'mouseup', mouseup );
@@ -2163,7 +2163,7 @@ Galleria = function() {
 
             $.each( ['Prev','Next'], function(i, dir) {
 
-                var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&nbsp;' : '&nbsp;&#8250;' ),
+                var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&#160;' : '&#160;&#8250;' ),
                     $e = $( el[ dir.toLowerCase()+'holder'] );
 
                 $e.bind( 'click', function() {
@@ -5519,7 +5519,7 @@ Galleria.raise = function( msg, fatal ) {
         echo = function( msg ) {
 
             var html = '<div style="padding:4px;margin:0 0 2px;background:#' +
-                ( fatal ? '811' : '222' ) + '";>' +
+                ( fatal ? '811' : '222' ) + ';">' +
                 ( fatal ? '<strong>' + type + ': </strong>' : '' ) +
                 msg + '</div>';
 
