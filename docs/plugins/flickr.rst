@@ -19,7 +19,7 @@ Examples
 **Example on how to search flickr for "galleria" and display the first 30 results**
 
 ::
-
+    
     Galleria.run('#galleria', {
         flickr: 'search:galleria'
     });
