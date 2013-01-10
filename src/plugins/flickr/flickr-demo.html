@@ -48,8 +48,12 @@
 
     // Initialize Galleria
     Galleria.run('#galleria', {
-        flickr: 'search:cityscape',
+
+        // search flickr for "galleria"
+        flickr: 'search:galleria',
+        
         flickrOptions: {
+            // sort by interestingness
             sort: 'interestingness-desc'
         }
     });
