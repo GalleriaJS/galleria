@@ -53,14 +53,14 @@ You can put this script anywhere in your document, before initializing Galleria.
 
     <link rel="stylesheet" href="galleria/themes/galleria.classic.css">
 
-Howver, this is not necessary as the script will automatically load the CSS for you.
+However, this is not necessary as the script will automatically load the CSS for you.
 
 
 Switching themes
 ================
 
 You can switch themes at runtime. First you need to call `unloadTheme` to completely unload the previous theme,
-then load the new theme and run Galleria again:
+then load the new theme and run Galleria again::
 
     <script>
         Galleria.loadTheme('themes/classic/galleria.classic.min.js');
