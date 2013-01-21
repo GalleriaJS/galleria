@@ -7,15 +7,17 @@ What browsers can I run Galleria in?
 
 **The short answer:** IE7+, FF3+, Opera 11+, Chrome 9+, Safar 4+ and Mobile Safari.
 
-**The long answer:** The Galleria core is not very browser dependent. We use regular, linted JavaScript for most of our API and jQuery to even out browser differences in the DOM. However, themes might have different support tables, and sometimes they use progressive enhancement for visual details. All themes made by Galleria supports IE7+, Opera 11, Firefox 3+, Chrome 9+, Safari 4+ and Mobile Safari (iPad, iPhone, Android etc). IE6 is not supported by any theme at this point, but Galleria itself supports it so you can patch a theme yourself if you need IE6 compliance (we don’t really see the point though).
+**The long answer:** The Galleria core is not very browser dependent. We use regular, linted JavaScript for most of our API and jQuery to even out browser differences in the DOM. However, themes might have different support tables, and sometimes they use progressive enhancement for visual details. All themes made by Galleria supports IE7+, Opera 11, Firefox 3+, Chrome 9+, Safari 4+ and Mobile Safari (iPad, iPhone, Android etc). 
+
+IE6 is not supported by any theme at this point, but Galleria itself supports it so you can patch a theme yourself if you need IE6 compliance (we don’t really see the point though).
 
 
-Wait a minute, what’s up with all the ”Buy now” stuff? I thought Galleria was free?
------------------------------------------------------------------------------------
+Wait a minute, I thought Galleria was free?
+-------------------------------------------
 
-The Galleria core and one bundled theme (Classic) is released under the MIT license and is completely free to use and abuse. We like to keep it that way. However, nobody wants to see Galleria become yet another JavaScript component that drops out after the first beta, like so many jQuery-related products do. But in order to establish continuous growth and progress, we need fundings. Donations are always welcome, but unfortunately not enough to keep things running for us.
+The Galleria core and one bundled theme (Classic) is released under the MIT license and is completely free to use and abuse. We like to keep it that way. But in order to establish continuous growth and progress, we need fundings. Donations are always welcome, but unfortunately not enough to keep things running for us.
 
-So the business model we decided to take was to keep Galleria 100% free but also develop Premium Themes and add-ons that we release under a commercial license. These themes are available for purchase on our site and they probably cost less than half of your hourly consulting fee rate. Purchasing themes is a great way to support the project and at the same time increase your portfolio of web design components.
+So the business model is to keep Galleria 100% free but also develop Premium Themes and add-ons that we release under a commercial license. These themes are available for purchase on our site and they probably cost less than half of your hourly consulting fee rate. Purchasing themes is a great way to support the project and at the same time increase your portfolio of web design components.
 
 
 I get a "Fatal Error" when I run Galleria
@@ -58,9 +60,7 @@ Being JavaScript based, the user experience can vary depending on browser and OS
 What mobile strategy does Galleria have?
 ----------------------------------------
 
-We do not currently develop specific themes for mobile devices since we have not yet seen a good web app for flicking through images that comes anywhere near the native experience. Instead, we focus on mobile compatibility in a web site context, meaning that the Galleria gallery works on mobile devices much the same way as they do on the desktop web. We also optimize our themes so the interaction is more precise when displayed on touch devices.
-
-This direction might change very soon since there is a lot of things happening on the mobile web in a fast pace.
+Ge focus on mobile compatibility in a responsive context, meaning that the Galleria gallery works on mobile devices much the same way as they do on the desktop web. We also optimize our themes so the interaction is more precise when displayed on touch devices.
 
 
 Do you have multi-license options for Premium themes?

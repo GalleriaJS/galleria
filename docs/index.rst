@@ -2,7 +2,7 @@
 Galleria Documentation
 **********************
 
-.. rubric:: Everything you need to know about Galleria.
+.. rubric:: The complete Galleria documentation.
 
 Getting started
 ===============
