@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.9 2013-01-18
+ * Galleria v 1.3 2013-XX-XX
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -22,7 +22,7 @@ var undef,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.29,
+    VERSION = 1.3,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -659,76 +659,6 @@ var undef,
                 }
             },
 
-
-            // enhanced click for mobile devices
-            // we bind a touchend and hijack any click event in the bubble
-            // then we execute the click directly and save it in a separate data object for later
-            optimizeTouch: (function() {
-
-                var node,
-                    evs,
-                    fakes,
-                    travel,
-                    evt = {},
-                    handler = function( e ) {
-                        e.preventDefault();
-                        evt = $.extend({}, e, true);
-                    },
-                    attach = function() {
-                        this.evt = evt;
-                    },
-                    fake = function() {
-                        this.handler.call(node, this.evt);
-                    };
-
-                return function( elem ) {
-
-                    $(elem).bind('touchend', function( e ) {
-
-                        node = e.target;
-                        travel = true;
-
-                        while( node.parentNode && node != e.currentTarget && travel ) {
-
-                            evs =   $(node).data('events');
-                            fakes = $(node).data('fakes');
-
-                            if (evs && 'click' in evs) {
-
-                                travel = false;
-                                e.preventDefault();
-
-                                // fake the click and save the event object
-                                $(node).click(handler).click();
-
-                                // remove the faked click
-                                evs.click.pop();
-
-                                // attach the faked event
-                                $.each( evs.click, attach);
-
-                                // save the faked clicks in a new data object
-                                $(node).data('fakes', evs.click);
-
-                                // remove all clicks
-                                delete evs.click;
-
-                            } else if ( fakes ) {
-
-                                travel = false;
-                                e.preventDefault();
-
-                                // fake all clicks
-                                $.each( fakes, fake );
-                            }
-
-                            // bubble
-                            node = node.parentNode;
-                        }
-                    });
-                };
-            }()),
-
             wait : function(options) {
                 options = $.extend({
                     until : FALSE,
@@ -1230,7 +1160,9 @@ Galleria = function() {
 
         getNext : function() {
             return controls[ 1 - controls.active ];
-        }
+        },
+
+        slides : []
     };
 
     // internal carousel object
@@ -2155,8 +2087,6 @@ Galleria = function() {
 
             $( DOM().body ).append( el.overlay, el.box );
 
-            Utils.optimizeTouch( el.box );
-
             // add the prev/next nav and bind some controls
 
             hover( $( el.close ).bind( 'click', lightbox.hide ).html('&#215;') );
@@ -2503,6 +2433,7 @@ Galleria.prototype = {
             thumbDisplayOrder: true, // 1.2.8
             thumbnails: true,
             touchTransition: undef, // 1.2.6
+            touchSlide: true, // 1.3
             transition: 'fade',
             transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
@@ -2542,6 +2473,11 @@ Galleria.prototype = {
         // set dummy
         if ( options && typeof options.dummy === 'string' ) {
             DUMMY = options.dummy;
+        }
+
+        // disable touchSlide if no touch
+        if ( !Galleria.TOUCH ) {
+            this._options.touchSlide = false;
         }
 
         // hide all content
@@ -2585,6 +2521,12 @@ Galleria.prototype = {
 
         // merge the theme & caller options
         $.extend( true, options, Galleria.theme.defaults, this._original.options, Galleria.configure.options );
+
+        // disable options that arent compatible with touchSlide
+        if ( options.touchSlide ) {
+            options.swipe = false;
+            options.clicknext = false;
+        }
 
         // check for canvas support
         (function( can ) {
@@ -2697,29 +2639,31 @@ Galleria.prototype = {
         this.$( 'container' ).addClass( Galleria.TOUCH ? 'touch' : 'notouch' );
 
         // add images to the controls
-        $.each( new Array(2), function( i ) {
+        if ( !this._options.touchSlide ) {
+            $.each( new Array(2), function( i ) {
 
-            // create a new Picture instance
-            var image = new Galleria.Picture();
+                // create a new Picture instance
+                var image = new Galleria.Picture();
 
-            // apply some styles, create & prepend overlay
-            $( image.container ).css({
-                position: 'absolute',
-                top: 0,
-                left: 0
-            }).prepend( self._layers[i] = $( Utils.create('galleria-layer') ).css({
-                position: 'absolute',
-                top:0, left:0, right:0, bottom:0,
-                zIndex:2
-            })[0] );
+                // apply some styles, create & prepend overlay
+                $( image.container ).css({
+                    position: 'absolute',
+                    top: 0,
+                    left: 0
+                }).prepend( self._layers[i] = $( Utils.create('galleria-layer') ).css({
+                    position: 'absolute',
+                    top:0, left:0, right:0, bottom:0,
+                    zIndex:2
+                })[0] );
 
-            // append the image
-            self.$( 'images' ).append( image.container );
+                // append the image
+                self.$( 'images' ).append( image.container );
 
-            // reload the controls
-            self._controls[i] = image;
+                // reload the controls
+                self._controls[i] = image;
 
-        });
+            });
+        }
 
         // some forced generic styling
         this.$( 'images' ).css({
@@ -2729,6 +2673,16 @@ Galleria.prototype = {
             width: '100%',
             height: '100%'
         });
+
+        if ( options.touchSlide ) {
+            this.$( 'images' ).css({
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: 0,
+                height: '100%'
+            });
+        }
 
         this.$( 'thumbnails, thumbnails-list' ).css({
             overflow: 'hidden',
@@ -2897,11 +2851,7 @@ Galleria.prototype = {
                     };
                 }()));
             }
-
         }
-
-        // optimize touch for container
-        Utils.optimizeTouch( this.get( 'container' ) );
 
         // bind the ons
         $.each( Galleria.on.binds, function(i, bind) {
@@ -3400,6 +3350,32 @@ Galleria.prototype = {
                 _galleries.push( self );
 
                 // postrun some stuff after the gallery is ready
+
+                // create the touch slider
+                if ( self._options.touchSlide ) {
+                    self.$('stage').finger({
+                        onchange: function(page) {
+                            self.show(page)
+                        }
+                    });
+                    var $images = self.$( 'images' ).width( self.getDataLength() * self._stageWidth );
+                    $.each( new Array( self.getDataLength() ), function(i) {
+
+                        var image = new Galleria.Picture();
+
+                        $( image.container ).css({
+                            position: 'absolute',
+                            top: 0,
+                            left: self._stageWidth*i
+                        }).prepend( self._layers[i] = $( Utils.create('galleria-layer') ).css({
+                            position: 'absolute',
+                            top:0, left:0, right:0, bottom:0,
+                            zIndex:2
+                        })[0] ).appendTo( $images );
+
+                        self._controls.slides.push(image)
+                    });
+                }
 
                 // show counter
                 Utils.show( self.get('counter') );
@@ -4395,6 +4371,12 @@ this.prependChild( 'info', 'myElement' );
             self._stageWidth = width || self.$( 'stage' ).width();
             self._stageHeight = height || self.$( 'stage' ).height();
 
+            if ( self._options.touchSlide ) {
+                $.each( self._controls.slides, function(i, img) {
+                    self._rescale( img );
+                });
+            }
+
             // scale the active image
             self._scaleImage();
 
@@ -4440,8 +4422,11 @@ this.prependChild( 'info', 'myElement' );
 
     show : function( index, rewind, _history ) {
 
+        var touchSlide = this._options.touchSlide;
+
         // do nothing queue is long || index is false || queue is false and transition is in progress
-        if ( this._queue.length > 3 || index === false || ( !this._options.queue && this._queue.stalled ) ) {
+        if ( !touchSlide && 
+            ( this._queue.length > 3 || index === false || ( !this._options.queue && this._queue.stalled ) ) ) {
             return;
         }
 
@@ -4459,12 +4444,68 @@ this.prependChild( 'info', 'myElement' );
 
         this._active = index;
 
-        protoArray.push.call( this._queue, {
-            index : index,
-            rewind : rewind
-        });
-        if ( !this._queue.stalled ) {
-            this._show();
+        // we do things a bit simpler in touchSlide:
+        if ( touchSlide ) {
+
+            var data = this.getData(index),
+                self = this;
+            if ( !data ) { 
+                return;
+            }
+
+            var src = data.iframe || ( this.isFullscreen() && 'big' in data ? data.big : data.image ), 
+                image = this._controls.slides[index],
+                cached = image.isCached( src ),
+                thumb = this._thumbnails[ index ];
+
+            var evObj = {
+                cached: cached,
+                index: index,
+                rewind: rewind,
+                imageTarget: image.image,
+                thumbTarget: thumb.image,
+                galleriaData: data
+            };
+
+            this.trigger($.extend(evObj, {
+                type: Galleria.LOADSTART,
+            }));
+
+            var complete = function(image) {
+                self.trigger($.extend(evObj, {
+                    type: Galleria.LOADFINISH,
+                }));
+            }
+
+            // load this if not ready
+            if ( !image.ready ) {
+                image.load(src, function(image) {
+                    self._scaleImage(image, complete);
+                })
+            }
+
+            // preload the surroundings
+            $.each([self.getNext(), self.getPrev()], function(i, loadme) {
+                var d = self.getData(loadme),
+                    img = self._controls.slides[loadme],
+                    src = d.iframe || ( self.isFullscreen() && 'big' in f ? d.big : d.image );
+
+                if ( !img.ready ) {
+                    self._controls.slides[loadme].load(src, function(img) {
+                        img.image.style.webkitTransform = 'translate3d(0,0,0)'
+                        self._scaleImage(img);
+                    });
+                }
+            });
+
+        } else {
+            protoArray.push.call( this._queue, {
+                index : index,
+                rewind : rewind
+            });
+            if ( !this._queue.stalled ) {
+                this._show();
+            }
         }
 
         return this;
