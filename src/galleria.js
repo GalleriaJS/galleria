@@ -1155,11 +1155,11 @@ Galleria = function() {
         },
 
         getActive : function() {
-            return self._options.touchSlide ? controls.slides[ self._active ] : controls[ controls.active ];
+            return self._options.swipe ? controls.slides[ self._active ] : controls[ controls.active ];
         },
 
         getNext : function() {
-            return self._options.touchSlide ? controls.slides[ self.getNext( self._active ) ] : controls[ 1 - controls.active ];
+            return self._options.swipe ? controls.slides[ self.getNext( self._active ) ] : controls[ 1 - controls.active ];
         },
 
         slides : []
@@ -1563,7 +1563,9 @@ Galleria = function() {
             } else {
 
                 fullscreen.scrolled = $win.scrollTop();
-                window.scrollTo(0, 0);
+                if( !Galleria.TOUCH ) {
+                    window.scrollTo(0, 0);
+                }
 
                 fullscreen._enter( callback );
             }
@@ -1771,7 +1773,9 @@ Galleria = function() {
                 Utils.revertStyles( self.get('container'), DOM().html, DOM().body );
 
                 // scroll back
-                window.scrollTo(0, fullscreen.scrolled);
+                if( !Galleria.TOUCH ) {
+                    window.scrollTo(0, fullscreen.scrolled);
+                }
             }
 
             if ( IFRAME && fullscreen.iframe ) {
@@ -2341,8 +2345,6 @@ Galleria.prototype = {
 
     init: function( target, options ) {
 
-        var self = this;
-
         options = _legacyOptions( options );
 
         // save the original ingredients
@@ -2424,7 +2426,7 @@ Galleria.prototype = {
             showInfo: true,
             showCounter: true,
             showImagenav: true,
-            swipe: true, // 1.2.4
+            swipe: true, // 1.2.4 -> revised in 1.3
             thumbCrop: true,
             thumbEventType: 'click',
             thumbFit: true, // legacy, deprecate at 1.3
@@ -2433,7 +2435,6 @@ Galleria.prototype = {
             thumbDisplayOrder: true, // 1.2.8
             thumbnails: true,
             touchTransition: undef, // 1.2.6
-            touchSlide: true, // 1.3
             transition: 'fade',
             transitionInitial: undef, // legacy, deprecate in 1.3. Use initialTransition instead.
             transitionSpeed: 400,
@@ -2475,9 +2476,9 @@ Galleria.prototype = {
             DUMMY = options.dummy;
         }
 
-        // disable touchSlide if no touch
+        // disable swipe if no touch
         if ( !Galleria.TOUCH ) {
-           this._options.touchSlide = false;
+           this._options.swipe = false;
         }
 
         // hide all content
@@ -2522,9 +2523,8 @@ Galleria.prototype = {
         // merge the theme & caller options
         $.extend( true, options, Galleria.theme.defaults, this._original.options, Galleria.configure.options );
 
-        // disable options that arent compatible with touchSlide
-        if ( options.touchSlide ) {
-            options.swipe = false;
+        // disable options that arent compatible with swipe
+        if ( options.swipe ) {
             options.clicknext = false;
             options.imagePan = false;
         }
@@ -2640,7 +2640,7 @@ Galleria.prototype = {
         this.$( 'container' ).addClass( Galleria.TOUCH ? 'touch' : 'notouch' );
 
         // add images to the controls
-        if ( !this._options.touchSlide ) {
+        if ( !this._options.swipe ) {
             $.each( new Array(2), function( i ) {
 
                 // create a new Picture instance
@@ -2675,7 +2675,7 @@ Galleria.prototype = {
             height: '100%'
         });
 
-        if ( options.touchSlide ) {
+        if ( options.swipe ) {
             this.$( 'images' ).css({
                 position: 'absolute',
                 top: 0,
@@ -2683,7 +2683,7 @@ Galleria.prototype = {
                 width: 0,
                 height: '100%'
             });
-            this.$('stage').finger({
+            this.finger = new Galleria.Finger(this.get('stage'), {
                 onchange: function(page) {
                     self.setCounter( page );
                     self.pause();
@@ -2714,7 +2714,7 @@ Galleria.prototype = {
                 }
             });
             this.bind( Galleria.RESCALE, function() {
-                this.$('stage').data('finger').setup();
+                this.finger.setup();
             });
             this.bind( Galleria.IMAGE, function(e) {
 
@@ -2804,104 +2804,33 @@ Galleria.prototype = {
             });
         }
 
-        // bind swipe gesture
-        if ( options.swipe ) {
+        // double-tap/click fullscreen toggle
 
-            (function( images ) {
+        if ( options.fullscreenDoubleTap ) {
 
-                var swipeStart = [0,0],
-                    swipeStop = [0,0],
-                    limitX = 30,
-                    limitY = 100,
-                    multi = false,
-                    tid = 0,
-                    data,
-                    ev = {
-                        start: 'touchstart',
-                        move: 'touchmove',
-                        stop: 'touchend'
-                    },
+            this.$( 'stage' ).bind( 'touchstart', (function() {
+                var last, cx, cy, lx, ly, now,
                     getData = function(e) {
                         return e.originalEvent.touches ? e.originalEvent.touches[0] : e;
-                    },
-                    moveHandler = function( e ) {
-
-                        if ( e.originalEvent.touches && e.originalEvent.touches.length > 1 ) {
-                            return;
-                        }
-
-                        data = getData( e );
-                        swipeStop = [ data.pageX, data.pageY ];
-
-                        if ( !swipeStart[0] ) {
-                            swipeStart = swipeStop;
-                        }
-
-                        if ( Math.abs( swipeStart[0] - swipeStop[0] ) > 10 ) {
-                            e.preventDefault();
-                        }
-                    },
-                    upHandler = function( e ) {
-
-                        images.unbind( ev.move, moveHandler );
-
-                        // if multitouch (possibly zooming), abort
-                        if ( ( e.originalEvent.touches && e.originalEvent.touches.length ) || multi ) {
-                            multi = !multi;
-                            return;
-                        }
-
-                        if ( Utils.timestamp() - tid < 1000 &&
-                             Math.abs( swipeStart[0] - swipeStop[0] ) > limitX &&
-                             Math.abs( swipeStart[1] - swipeStop[1] ) < limitY ) {
-
-                            e.preventDefault();
-                            self[ swipeStart[0] > swipeStop[0] ? 'next' : 'prev' ]();
-                        }
-
-                        swipeStart = swipeStop = [0,0];
                     };
-
-                images.bind(ev.start, function(e) {
-
-                    if ( e.originalEvent.touches && e.originalEvent.touches.length > 1 ) {
+                self.$( 'stage' ).bind('touchmove', function() {
+                    last = 0;
+                });
+                return function(e) {
+                    now = Galleria.utils.timestamp();
+                    cx = getData(e).pageX;
+                    cy = getData(e).pageY;
+                    if ( ( now - last < 500 ) && ( cx - lx < 20) && ( cy - ly < 20) ) {
+                        self.toggleFullscreen();
+                        e.preventDefault();
+                        //self.$( 'images' ).unbind( 'touchstart', arguments.callee );
                         return;
                     }
-
-                    data = getData(e);
-                    tid = Utils.timestamp();
-                    swipeStart = swipeStop = [ data.pageX, data.pageY ];
-                    images.bind(ev.move, moveHandler ).one(ev.stop, upHandler);
-
-                });
-
-            }( self.$( 'images' ) ));
-
-            // double-tap/click fullscreen toggle
-
-            if ( options.fullscreenDoubleTap ) {
-
-                this.$( 'images' ).bind( 'touchstart', (function() {
-                    var last, cx, cy, lx, ly, now,
-                        getData = function(e) {
-                            return e.originalEvent.touches ? e.originalEvent.touches[0] : e;
-                        };
-                    return function(e) {
-                        now = Galleria.utils.timestamp();
-                        cx = getData(e).pageX;
-                        cy = getData(e).pageY;
-                        if ( ( now - last < 500 ) && ( cx - lx < 20) && ( cy - ly < 20) ) {
-                            self.toggleFullscreen();
-                            e.preventDefault();
-                            self.$( 'stage' ).unbind( 'touchstart', arguments.callee );
-                            return;
-                        }
-                        last = now;
-                        lx = cx;
-                        ly = cy;
-                    };
-                }()));
-            }
+                    last = now;
+                    lx = cx;
+                    ly = cy;
+                };
+            }()));
         }
 
         // bind the ons
@@ -3287,9 +3216,6 @@ Galleria.prototype = {
 
         var arr = index.constructor == Array ? index : [ index ],
             self = this,
-            thumbnails = this.$( 'thumbnails' ).children().filter(function() {
-                return $(this).data('lazy-src');
-            }),
             loaded = 0;
 
         $.each( arr, function(i, ind) {
@@ -3300,7 +3226,6 @@ Galleria.prototype = {
 
             var thumb = self._thumbnails[ ind ],
                 data = thumb.data,
-                special = data.src.split(':'),
                 callback = function() {
                     if ( ++loaded == arr.length && typeof complete == 'function' ) {
                         complete.call( self );
@@ -3403,7 +3328,7 @@ Galleria.prototype = {
                 // postrun some stuff after the gallery is ready
 
                 // create the touch slider
-                if ( self._options.touchSlide ) {
+                if ( self._options.swipe ) {
 
                     var $images = self.$( 'images' ).width( self.getDataLength() * self._stageWidth );
                     $.each( new Array( self.getDataLength() ), function(i) {
@@ -3423,7 +3348,7 @@ Galleria.prototype = {
                         self._controls.slides.push(image);
                     });
 
-                    self.$('stage').data('finger').setup();
+                    self.finger.setup();
                 }
 
                 // show counter
@@ -4303,9 +4228,7 @@ this.prependChild( 'info', 'myElement' );
             return;
         }
 
-        var self = this,
-
-            complete,
+        var complete,
 
             scaleLayer = function( img ) {
                 $( img.container ).children(':first').css({
@@ -4421,7 +4344,7 @@ this.prependChild( 'info', 'myElement' );
             self._stageWidth = width || self.$( 'stage' ).width();
             self._stageHeight = height || self.$( 'stage' ).height();
 
-            if ( self._options.touchSlide ) {
+            if ( self._options.swipe ) {
                 $.each( self._controls.slides, function(i, img) {
                     self._scaleImage( img );
                     $( img.container ).css('left', self._stageWidth * i);
@@ -4476,10 +4399,10 @@ this.prependChild( 'info', 'myElement' );
 
     show : function( index, rewind, _history ) {
 
-        var touchSlide = this._options.touchSlide;
+        var swipe = this._options.swipe;
 
         // do nothing queue is long || index is false || queue is false and transition is in progress
-        if ( !touchSlide &&
+        if ( !swipe &&
             ( this._queue.length > 3 || index === false || ( !this._options.queue && this._queue.stalled ) ) ) {
             return;
         }
@@ -4496,16 +4419,15 @@ this.prependChild( 'info', 'myElement' );
             return;
         }
 
-        if ( touchSlide && index !== this._active ) {
-            var finger = this.$('stage').data('finger');
-            finger.to = -( index*finger.width );
-            finger.index = index;
+        if ( swipe && index !== this._active ) {
+            this.finger.to = -( index*this.finger.width );
+            this.finger.index = index;
         }
 
         this._active = index;
 
-        // we do things a bit simpler in touchSlide:
-        if ( touchSlide ) {
+        // we do things a bit simpler in swipe:
+        if ( swipe ) {
 
             var data = this.getData(index),
                 self = this;
@@ -5602,8 +5524,6 @@ Galleria.raise = function( msg, fatal ) {
 
     var type = fatal ? 'Fatal error' : 'Error',
 
-        self = this,
-
         css = {
             color: '#fff',
             position: 'absolute',
@@ -5821,8 +5741,7 @@ Galleria.Picture.prototype = {
             $( this.image ).css( 'filter', 'inherit' );
         }
 
-        var i = 0,
-            reload = false,
+        var reload = false,
             resort = false,
 
             // some jquery cache
@@ -6162,6 +6081,242 @@ $.extend( $.easing, {
     }
 
 });
+
+// Forked version of Ainos Finger.js for native-style touch
+
+Galleria.Finger = (function() {
+
+    var abs = Math.abs;
+
+    // test for translate3d support
+    var has3d = (function() {
+
+        var el = document.createElement('p'),
+            has3d,
+            t = ['webkit','O','ms','Moz',''], s, i=0, a = 'transform';
+
+        DOM().html.insertBefore(el, null);
+
+        for (; t[i]; i++) {
+            s = t[i] ? t[i]+'Transform' : a;
+            if (el.style[s] !== undefined) {
+                el.style[s] = "translate3d(1px,1px,1px)";
+                has3d = $(el).css(t[i] ? '-'+t[i].toLowerCase()+'-'+a : a);
+            }
+        }
+
+        DOM().html.removeChild(el);
+        return (has3d !== undefined && has3d.length > 0 && has3d !== "none");
+    }());
+
+    // request animation shim
+    var requestFrame = (function(){
+        var r = 'RequestAnimationFrame';
+        return window.requestAnimationFrame ||
+               window['webkit'+r] ||
+               window['moz'+r] ||
+               window['o'+r] ||
+               window['ms'+r] ||
+               function( callback ) {
+                   window.setTimeout(callback, 1000 / 60);
+               };
+    }());
+
+  ///
+
+    var Finger = function(elem, options) {
+
+        // default options
+        this.config = {
+            start: 0,
+            duration: 240,
+            onchange: function() {},
+            oncomplete: function() {},
+            easing: function(x,t,b,c,d) {
+                return -c * ((t=t/d-1)*t*t*t - 1) + b; // easeOutQuart
+            }
+        };
+
+        if ( !elem.children.length ) {
+            return;
+        }
+
+        var self = this;
+
+        // extend options
+        $.extend(this.config, options);
+
+        this.elem = elem;
+        this.child = elem.children[0];
+        this.to = this.pos = 0;
+        this.touching = false;
+        this.start = {};
+        this.index = this.config.start;
+        this.anim = 0;
+
+        if ( !has3d ) {
+          this.child.style.position = 'absolute';
+          this.elem.style.position = 'relative';
+        }
+
+        // Bind event handlers to context
+        $.each(['ontouchstart','ontouchmove','ontouchend','setup'], function(i, fn) {
+            self[fn] = (function(caller) {
+                return function() {
+                    caller.apply( self, arguments );
+                };
+            }(self[fn]));
+        });
+
+        // the physical animator
+        this.setX = function() {
+
+            var style = self.child.style;
+
+            if (!has3d) {
+                // this is actually faster than CSS3 translate
+                style.left = self.pos+'px';
+                return;
+            }
+            style.MozTransform = style.webkitTransform = 'translate3d(' + self.pos + 'px,0,0)';
+            return;
+        };
+
+        // bind events
+        $(elem).bind('touchstart', this.ontouchstart);
+        $(window).bind('resize', this.setup);
+        $(window).bind('orientationchange', this.setup);
+
+        // set up width
+        this.setup();
+
+        // start the animations
+        (function animloop(){
+          requestFrame(animloop);
+          self.loop.call( self );
+        }());
+
+    };
+
+    Finger.prototype = {
+
+        constructor: Finger,
+
+        setup: function() {
+            this.width = $( this.elem ).width();
+            this.length = Math.ceil( $(this.child).width() / this.width );
+            if ( this.index !== 0 ) {
+                this.index = Math.max(0, Math.min( this.index, this.length-1 ) );
+                this.pos = this.to = -this.width*this.index;
+            }
+        },
+
+        ontouchstart: function(e) {
+
+            var touch = e.originalEvent.touches;
+
+            this.start = {
+                pageX: touch[0].pageX,
+                pageY: touch[0].pageY,
+                time:  +new Date()
+            };
+
+            this.isScrolling = null;
+            this.touching = true;
+            this.deltaX = 0;
+
+            $doc.bind('touchmove', this.ontouchmove);
+            $doc.bind('touchend', this.ontouchend);
+        },
+
+        ontouchmove: function(e) {
+
+            var touch = e.originalEvent.touches;
+
+            // ensure swiping with one touch and not pinching
+            if( touch && touch.length > 1 || e.scale && e.scale !== 1 ) {
+                return;
+            }
+
+            this.deltaX = touch[0].pageX - this.start.pageX;
+
+            // determine if scrolling test has run - one time test
+            if ( this.isScrolling === null ) {
+                this.isScrolling = !!(
+                    this.isScrolling ||
+                    abs(this.deltaX) < abs(touch[0].pageY - this.start.pageY)
+                );
+            }
+
+            // if user is not trying to scroll vertically
+            if (!this.isScrolling) {
+
+                // prevent native scrolling
+                e.preventDefault();
+
+                // increase resistance if first or last slide
+                this.deltaX /= ( (!this.index && this.deltaX > 0 || this.index == this.length - 1 && this.deltaX < 0 ) ?
+                    ( abs(this.deltaX) / this.width + 1.8 )  : 1 );
+                this.to = this.deltaX - this.index * this.width;
+            }
+            e.stopPropagation();
+        },
+
+        ontouchend: function(e) {
+
+            this.touching = false;
+
+            // determine if slide attempt triggers next/prev slide
+            var isValidSlide = +new Date() - this.start.time < 250 &&
+                abs(this.deltaX) > 40 ||
+                abs(this.deltaX) > this.width/2,
+
+                isPastBounds = !this.index && this.deltaX > 0 ||
+                    this.index == this.length - 1 && this.deltaX < 0;
+
+            // if not scrolling vertically
+            if ( !this.isScrolling ) {
+                this.show( this.index + ( isValidSlide && !isPastBounds ? (this.deltaX < 0 ? 1 : -1) : 0 ) );
+            }
+
+            $doc.unbind('touchmove', this.ontouchmove);
+            $doc.unbind('touchend', this.ontouchend);
+        },
+
+        show: function( index ) {
+            if ( index != this.index ) {
+                this.config.onchange.call(this, index);
+            } else {
+                this.to = -( index*this.width );
+            }
+        },
+
+        loop: function() {
+
+            var distance = this.to - this.pos;
+
+            // if distance is short or the user is touching, do a 1-1 animation
+            if ( this.touching || abs(distance) <= 1 ) {
+                this.pos = this.to;
+                if ( this.anim ) {
+                    this.config.oncomplete( this.index );
+                }
+                this.anim = 0;
+            } else {
+                if ( !this.anim ) {
+                    // save animation parameters
+                    this.anim = { v: this.pos, c: distance, t: 0 };
+                }
+                // apply easing
+                this.pos = this.config.easing(null, this.anim.t++, this.anim.v, this.anim.c, (this.config.duration/10));
+            }
+            this.setX();
+        }
+    };
+
+    return Finger;
+
+}());
 
 // the plugin initializer
 $.fn.galleria = function( options ) {
