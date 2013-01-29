@@ -6512,7 +6512,7 @@ Galleria.Finger = (function() {
             var touch = e.originalEvent.touches;
 
             // ensure swiping with one touch and not pinching
-            if( touch && touch.length > 1 || e.scale && e.scale !== 1 ) {
+            if( touch && touch.length > 1 || e.scale && e.scale !== 1 || doc.documentElement.clientWidth !== window.innerWidth ) {
                 return;
             }
 
