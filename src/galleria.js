@@ -1498,6 +1498,11 @@ Galleria = function() {
 
         active: false,
 
+        prev: $(),
+
+        beforeEnter: function(fn){ fn(); },
+        beforeExit:  function(fn){ fn(); },
+
         keymap: self._keyboard.map,
 
         parseCallback: function( callback, enter ) {
@@ -1523,52 +1528,55 @@ Galleria = function() {
 
         enter: function( callback ) {
 
-            callback = fullscreen.parseCallback( callback, true );
+            fullscreen.beforeEnter(function() {
 
-            if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
+                callback = fullscreen.parseCallback( callback, true );
 
-                // do some stuff prior animation for wmoother transitions
+                if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
 
-                fullscreen.active = true;
+                    // do some stuff prior animation for wmoother transitions
 
-                Utils.forceStyles( self.get('container'), {
-                    width: '100%',
-                    height: '100%'
-                });
+                    fullscreen.active = true;
 
-                self.rescale();
+                    Utils.forceStyles( self.get('container'), {
+                        width: '100%',
+                        height: '100%'
+                    });
 
-                if ( Galleria.MAC ) {
-                    if ( Galleria.WEBKIT ) {
-                        self.$('container').css('opacity', 0).addClass('fullscreen');
-                        window.setTimeout(function() {
-                            fullscreen.scale();
-                            self.$('container').css('opacity', 1);
-                        }, 50);
+                    self.rescale();
+
+                    if ( Galleria.MAC ) {
+                        if ( Galleria.WEBKIT ) {
+                            self.$('container').css('opacity', 0).addClass('fullscreen');
+                            window.setTimeout(function() {
+                                fullscreen.scale();
+                                self.$('container').css('opacity', 1);
+                            }, 50);
+                        } else {
+                            self.$('stage').css('opacity', 0);
+                            window.setTimeout(function() {
+                                fullscreen.scale();
+                                self.$('stage').css('opacity', 1);
+                            },4);
+                        }
                     } else {
-                        self.$('stage').css('opacity', 0);
-                        window.setTimeout(function() {
-                            fullscreen.scale();
-                            self.$('stage').css('opacity', 1);
-                        },4);
+                        self.$('container').addClass('fullscreen');
                     }
+
+                    $win.resize( fullscreen.scale );
+
+                    _nativeFullscreen.enter( self, callback, self.get('container') );
+
                 } else {
-                    self.$('container').addClass('fullscreen');
+
+                    fullscreen.scrolled = $win.scrollTop();
+                    if( !Galleria.TOUCH ) {
+                        window.scrollTo(0, 0);
+                    }
+
+                    fullscreen._enter( callback );
                 }
-
-                $win.resize( fullscreen.scale );
-
-                _nativeFullscreen.enter( self, callback, self.get('container') );
-
-            } else {
-
-                fullscreen.scrolled = $win.scrollTop();
-                if( !Galleria.TOUCH ) {
-                    window.scrollTo(0, 0);
-                }
-
-                fullscreen._enter( callback );
-            }
+            });
 
         },
 
@@ -1630,6 +1638,14 @@ Galleria = function() {
             if (inBrowser) {
 
                 self.$('container').addClass('fullscreen');
+                fullscreen.prev = self.$('container').prev();
+
+                if ( !fullscreen.prev.length ) {
+                    fullscreen.parent = self.$( 'container' ).parent();
+                }
+
+                // move
+                self.$('container').appendTo('body');
 
                 // begin styleforce
 
@@ -1749,22 +1765,31 @@ Galleria = function() {
 
         exit: function( callback ) {
 
-            callback = fullscreen.parseCallback( callback );
+            fullscreen.beforeExit(function() {
 
-            if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
-                _nativeFullscreen.exit( callback );
-            } else {
-                fullscreen._exit( callback );
-            }
+                callback = fullscreen.parseCallback( callback );
+
+                if ( self._options.trueFullscreen && _nativeFullscreen.support ) {
+                    _nativeFullscreen.exit( callback );
+                } else {
+                    fullscreen._exit( callback );
+                }
+            });
         },
 
         _exit: function( callback ) {
 
             fullscreen.active = false;
 
-            var inBrowser = !self._options.trueFullscreen || !_nativeFullscreen.support;
+            var inBrowser = !self._options.trueFullscreen || !_nativeFullscreen.support,
+                $container = self.$( 'container' ).removeClass( 'fullscreen' );
 
-            self.$('container').removeClass( 'fullscreen' );
+            // move back
+            if ( fullscreen.parent ) {
+                fullscreen.parent.prepend( $container );
+            } else {
+                $container.insertAfter( fullscreen.prev );
+            }
 
             if ( inBrowser ) {
                 Utils.hide( self.getActiveImage() );
@@ -2552,6 +2577,20 @@ Galleria.prototype = {
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
 
+            // remove big if total pixels are less than 1024 (most phones)
+            if ( window.screen && window.screen.width && Array.prototype.forEach ) {
+
+                this._data.forEach(function(data) {
+
+                    var density = 'devicePixelRatio' in window ? window.devicePixelRatio : 1,
+                        m = Math.max( window.screen.width, window.screen.height );
+
+                    if ( m*density < 1024 ) {
+                        data.big = data.image;
+                    }
+                });
+            }
+
             // save the new data
             this._original.data = this._data;
 
@@ -2827,10 +2866,10 @@ Galleria.prototype = {
                     if( /(-left|-right)/.test(e.target.className) ) {
                         return;
                     }
-                    now = Galleria.utils.timestamp();
+                    now = Utils.timestamp();
                     cx = getData(e).pageX;
                     cy = getData(e).pageY;
-                    if ( ( now - last < 500 ) && ( cx - lx < 20) && ( cy - ly < 20) ) {
+                    if ( e.originalEvent.touches.length < 2 && ( now - last < 300 ) && ( cx - lx < 20) && ( cy - ly < 20) ) {
                         self.toggleFullscreen();
                         e.preventDefault();
                         return;
@@ -3561,8 +3600,6 @@ Galleria.prototype = {
                 return Math.round(Math.random())-0.5;
             });
         }
-
-
 
         // trigger the DATA event and return
         if ( this.getDataLength() ) {
@@ -5791,6 +5828,11 @@ Galleria.Picture.prototype = {
                             width: this.width
                         };
 
+                        // translate3d if needed
+                        if ( Galleria.HAS3D ) {
+                            this.style.MozTransform = this.style.webkitTransform = 'translate3d(0,0,0)';
+                        }
+
                         self.container.appendChild( this );
 
                         self.cache[ src ] = src; // will override old cache
@@ -6130,9 +6172,9 @@ Galleria.Fastclick = (function() {
             layer.addEventListener('touchend', this.onTouchEnd, false);
             layer.addEventListener('touchcancel', this.onTouchCancel, false);
 
-            if (!Event.prototype.stopImmediatePropagation) {
+            if (!window.Event.prototype.stopImmediatePropagation) {
                 layer.removeEventListener = function(type, callback, capture) {
-                    var rmv = Node.prototype.removeEventListener;
+                    var rmv = window.Node.prototype.removeEventListener;
                     if (type === 'click') {
                         rmv.call(layer, type, callback.hijacked || callback, capture);
                     } else {
@@ -6140,7 +6182,7 @@ Galleria.Fastclick = (function() {
                     }
                 };
                 layer.addEventListener = function(type, callback, capture) {
-                    var adv = Node.prototype.addEventListener;
+                    var adv = window.Node.prototype.addEventListener;
                     if (type === 'click') {
                         adv.call(layer, type, callback.hijacked || (callback.hijacked = function(event) {
                             if (!event.propagationStopped) {
@@ -6256,7 +6298,7 @@ Galleria.Fastclick = (function() {
             if (deviceIsIOSWithBadTarget) {
                 touch = event.changedTouches[0];
                 targetElement = event.target;
-                targetElement = document.elementFromPoint(touch.pageX - window.pageXOffset, touch.pageY - window.pageYOffset);
+                targetElement = doc.elementFromPoint(touch.pageX - window.pageXOffset, touch.pageY - window.pageYOffset);
             }
 
             targetTagName = targetElement.tagName.toLowerCase();
@@ -6325,9 +6367,9 @@ Galleria.Finger = (function() {
     var abs = Math.abs;
 
     // test for translate3d support
-    var has3d = (function() {
+    var has3d = Galleria.HAS3D = (function() {
 
-        var el = document.createElement('p'),
+        var el = doc.createElement('p'),
             has3d,
             t = ['webkit','O','ms','Moz',''], s, i=0, a = 'transform';
 
