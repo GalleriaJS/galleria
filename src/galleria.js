@@ -2546,6 +2546,9 @@ Galleria.prototype = {
 
         }( doc.createElement( 'canvas' ) ) );
 
+
+        Galleria.Fastclick.init( this.get('target' ));
+
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
 
@@ -2711,6 +2714,10 @@ Galleria.prototype = {
                         thumbTarget: thumb.image,
                         galleriaData: data
                     });
+
+                    if ( self._options.carousel && self._options.carouselFollow ) {
+                        self._carousel.follow( index );
+                    }
                 }
             });
             this.bind( Galleria.RESCALE, function() {
@@ -2817,13 +2824,15 @@ Galleria.prototype = {
                     last = 0;
                 });
                 return function(e) {
+                    if( /(-left|-right)/.test(e.target.className) ) {
+                        return;
+                    }
                     now = Galleria.utils.timestamp();
                     cx = getData(e).pageX;
                     cy = getData(e).pageY;
                     if ( ( now - last < 500 ) && ( cx - lx < 20) && ( cy - ly < 20) ) {
                         self.toggleFullscreen();
                         e.preventDefault();
-                        //self.$( 'images' ).unbind( 'touchstart', arguments.callee );
                         return;
                     }
                     last = now;
@@ -6082,6 +6091,233 @@ $.extend( $.easing, {
 
 });
 
+// fastclick, for faster touch interactions
+// loosely based on FastClick by FTLabs (Financial Times)
+
+Galleria.Fastclick = (function() {
+
+    var deviceIsIOS = /iP(ad|hone|od)/.test(navigator.userAgent),
+        deviceIsIOS4 = deviceIsIOS && (/OS 4_\d(_\d)?/).test(navigator.userAgent),
+        deviceIsIOSWithBadTarget = deviceIsIOS && (/OS ([6-9]|\d{2})_\d/).test(navigator.userAgent);
+
+    return {
+        init: function(layer) {
+            var oldOnClick, self = this;
+            this.trackingClick = false;
+            this.trackingClickStart = 0;
+            this.targetElement = null;
+            this.touchStartX = 0;
+            this.touchStartY = 0;
+            this.lastTouchIdentifier = 0;
+            this.layer = layer;
+
+            $.each(['Click', 'TouchStart', 'TouchMove', 'TouchEnd', 'TouchCancel'], function(i, fn) {
+                self['on'+fn] = (function(caller) {
+                    return function() {
+                        caller.apply( self, arguments );
+                    };
+                }(self['on'+fn]));
+            });
+
+            if (!Galleria.TOUCH) {
+                return;
+            }
+
+            // Set up event handlers as required
+            layer.addEventListener('click', this.onClick, true);
+            layer.addEventListener('touchstart', this.onTouchStart, false);
+            layer.addEventListener('touchmove', this.onTouchMove, false);
+            layer.addEventListener('touchend', this.onTouchEnd, false);
+            layer.addEventListener('touchcancel', this.onTouchCancel, false);
+
+            if (!Event.prototype.stopImmediatePropagation) {
+                layer.removeEventListener = function(type, callback, capture) {
+                    var rmv = Node.prototype.removeEventListener;
+                    if (type === 'click') {
+                        rmv.call(layer, type, callback.hijacked || callback, capture);
+                    } else {
+                        rmv.call(layer, type, callback, capture);
+                    }
+                };
+                layer.addEventListener = function(type, callback, capture) {
+                    var adv = Node.prototype.addEventListener;
+                    if (type === 'click') {
+                        adv.call(layer, type, callback.hijacked || (callback.hijacked = function(event) {
+                            if (!event.propagationStopped) {
+                                callback(event);
+                            }
+                        }), capture);
+                    } else {
+                        adv.call(layer, type, callback, capture);
+                    }
+                };
+            }
+            if (typeof layer.onclick === 'function') {
+                oldOnClick = layer.onclick;
+                layer.addEventListener('click', function(event) {
+                    oldOnClick(event);
+                }, false);
+                layer.onclick = null;
+            }
+
+        },
+        sendClick: function(targetElement, event) {
+            var clickEvent, touch;
+
+            if (doc.activeElement && doc.activeElement !== targetElement) {
+                doc.activeElement.blur();
+            }
+
+            touch = event.changedTouches[0];
+
+            // Synthesise a click event, with an extra attribute so it can be tracked
+            clickEvent = doc.createEvent('MouseEvents');
+            clickEvent.initMouseEvent('click', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+            clickEvent.forwardedTouchEvent = true;
+            targetElement.dispatchEvent(clickEvent);
+        },
+        onTouchStart: function(event) {
+            var targetElement, touch, selection;
+
+            targetElement = event.target;
+            touch = event.targetTouches[0];
+
+            if (deviceIsIOS) {
+
+                selection = window.getSelection();
+                if (selection.rangeCount && !selection.isCollapsed) {
+                    return true;
+                }
+
+                if (!deviceIsIOS4) {
+                    if (touch.identifier === this.lastTouchIdentifier) {
+                        event.preventDefault();
+                        return false;
+                    }
+
+                    this.lastTouchIdentifier = touch.identifier;
+                }
+            }
+
+            this.trackingClick = true;
+            this.trackingClickStart = event.timeStamp;
+            this.targetElement = targetElement;
+
+            this.touchStartX = touch.pageX;
+            this.touchStartY = touch.pageY;
+
+            if ((event.timeStamp - this.lastClickTime) < 200) {
+                event.preventDefault();
+            }
+
+            return true;
+        },
+        touchHasMoved: function(event) {
+            var touch = event.targetTouches[0];
+
+            if (Math.abs(touch.pageX - this.touchStartX) > 10 || Math.abs(touch.pageY - this.touchStartY) > 10) {
+                return true;
+            }
+
+            return false;
+        },
+        onTouchMove: function(event) {
+            if (!this.trackingClick) {
+                return true;
+            }
+
+            // If the touch has moved, cancel the click tracking
+            if (this.targetElement !== event.target || this.touchHasMoved(event)) {
+                this.trackingClick = false;
+                this.targetElement = null;
+            }
+
+            return true;
+        },
+        onTouchEnd: function(event) {
+            var trackingClickStart, targetTagName, scrollParent, touch, targetElement = this.targetElement;
+
+            if (!this.trackingClick) {
+                return true;
+            }
+
+            // Prevent phantom clicks on fast double-tap (issue #36)
+            if ((event.timeStamp - this.lastClickTime) < 200) {
+                this.cancelNextClick = true;
+                return true;
+            }
+
+            this.lastClickTime = event.timeStamp;
+
+            trackingClickStart = this.trackingClickStart;
+            this.trackingClick = false;
+            this.trackingClickStart = 0;
+
+            if (deviceIsIOSWithBadTarget) {
+                touch = event.changedTouches[0];
+                targetElement = event.target;
+                targetElement = document.elementFromPoint(touch.pageX - window.pageXOffset, touch.pageY - window.pageYOffset);
+            }
+
+            targetTagName = targetElement.tagName.toLowerCase();
+
+            event.preventDefault();
+            this.sendClick(targetElement, event);
+
+            return false;
+        },
+        onTouchCancel: function() {
+            this.trackingClick = false;
+            this.targetElement = null;
+        },
+        onClick: function(event) {
+            var oldTargetElement;
+
+            // If a target element was never set (because a touch event was never fired) allow the click
+            if (!this.targetElement) {
+                return true;
+            }
+
+            if (event.forwardedTouchEvent) {
+                return true;
+            }
+
+            oldTargetElement = this.targetElement;
+            this.targetElement = null;
+
+            if (this.trackingClick) {
+                this.trackingClick = false;
+                return true;
+            }
+
+            // Programmatically generated events targeting a specific element should be permitted
+            if (!event.cancelable) {
+                return true;
+            }
+
+            if (this.cancelNextClick) {
+                this.cancelNextClick = false;
+
+                // Prevent any user-added listeners declared on FastClick element from being fired.
+                if (event.stopImmediatePropagation) {
+                    event.stopImmediatePropagation();
+                } else {
+
+                    // Part of the hack for browsers that don't support Event#stopImmediatePropagation (e.g. Android 2)
+                    event.propagationStopped = true;
+                }
+
+                // Cancel the event
+                event.stopPropagation();
+                event.preventDefault();
+
+                return false;
+            }
+            return true;
+        }
+    };
+}());
+
 // Forked version of Ainos Finger.js for native-style touch
 
 Galleria.Finger = (function() {
@@ -6122,7 +6358,7 @@ Galleria.Finger = (function() {
                };
     }());
 
-  ///
+
 
     var Finger = function(elem, options) {
 
