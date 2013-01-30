@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3 2013-01-22
+ * Galleria v 1.3 2013-01-31
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -9,7 +9,7 @@
 
 (function( $ ) {
 
-/*global jQuery, navigator, Galleria:true, Image */
+/*global jQuery, navigator, Image */
 
 // some references
 var undef,
@@ -17,6 +17,8 @@ var undef,
     doc    = window.document,
     $doc   = $( doc ),
     $win   = $( window ),
+
+    Galleria,
 
 // native prototypes
     protoArray = Array.prototype,
@@ -127,7 +129,7 @@ var undef,
                     } catch(e) {
                         fail();
                     }
-                }).error(fail);
+                });
             }
         },
         vimeo: {
@@ -143,7 +145,7 @@ var undef,
                     } catch(e) {
                         fail();
                     }
-                }).error(fail);
+                });
             }
         },
         dailymotion: {
@@ -159,7 +161,7 @@ var undef,
                     } catch(e) {
                         fail();
                     }
-                }).error(fail);
+                });
             }
         }
     },
@@ -517,6 +519,9 @@ var undef,
             }()),
 
             removeAlpha : function( elem ) {
+                if ( elem instanceof jQuery ) {
+                    elem = elem[0];
+                }
                 if ( IE < 9 && elem ) {
 
                     var style = elem.style,
@@ -562,28 +567,12 @@ var undef,
                 Utils.revertStyles.apply( Utils, Utils.array( arguments ) );
             },
 
-            elem : function( elem ) {
-                if (elem instanceof $) {
-                    return {
-                        $: elem,
-                        dom: elem[0]
-                    };
-                } else {
-                    return {
-                        $: $(elem),
-                        dom: elem
-                    };
-                }
-            },
-
             hide : function( elem, speed, callback ) {
 
                 callback = callback || F;
 
-                var el = Utils.elem( elem ),
-                    $elem = el.$;
-
-                elem = el.dom;
+                var $elem = $(elem);
+                elem = $elem[0];
 
                 // save the value if not exist
                 if (! $elem.data('opacity') ) {
@@ -620,10 +609,8 @@ var undef,
 
                 callback = callback || F;
 
-                var el = Utils.elem( elem ),
-                    $elem = el.$;
-
-                elem = el.dom;
+                var $elem = $(elem);
+                elem = $elem[0];
 
                 // bring back saved opacity
                 var saved = parseFloat( $elem.data('opacity') ) || 1,
@@ -816,13 +803,9 @@ var undef,
                         DOM().head.appendChild( link );
                     }
 
-                    if ( IE ) {
-
-                        // IE has a limit of 31 stylesheets in one document
-                        if( length >= 31 ) {
-                            Galleria.raise( 'You have reached the browser stylesheet limit (31)', true );
-                            return;
-                        }
+                    if ( IE && length >= 31 ) {
+                        Galleria.raise( 'You have reached the browser stylesheet limit (31)', true );
+                        return;
                     }
                 }
 
@@ -1023,7 +1006,7 @@ _nativeFullscreen.listen();
 
 */
 
-Galleria = function() {
+Galleria = window.Galleria = function() {
 
     var self = this;
 
@@ -5884,7 +5867,7 @@ Galleria.Picture.prototype = {
         });
 
         // begin load and insert in cache when done
-        $image.load( onload ).error( onerror ).attr( 'src', src );
+        $image.load( onload ).bind( 'error', onerror ).attr( 'src', src );
 
         // return the container
         return this.container;
@@ -6277,7 +6260,7 @@ Galleria.Fastclick = (function() {
             return true;
         },
         onTouchEnd: function(event) {
-            var trackingClickStart, targetTagName, scrollParent, touch, targetElement = this.targetElement;
+            var trackingClickStart, targetTagName, touch, targetElement = this.targetElement;
 
             if (!this.trackingClick) {
                 return true;
@@ -6399,8 +6382,6 @@ Galleria.Finger = (function() {
                    window.setTimeout(callback, 1000 / 60);
                };
     }());
-
-
 
     var Finger = function(elem, options) {
 
