@@ -11,6 +11,8 @@ Info, demos, docs and everything else: http://galleria.io
 
 Updates via twitter: http://twitter.com/galleriajs
 
+Non-code related issues and support: http://support.galleria.io
+
 Documentation
 =============
 
