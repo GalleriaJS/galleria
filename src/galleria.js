@@ -7,18 +7,15 @@
  *
  */
 
-(function( $ ) {
+(function( $, Galleria, undef ) {
 
 /*global jQuery, navigator, Image */
 
 // some references
-var undef,
-    window = this,
+var window = this,
     doc    = window.document,
     $doc   = $( doc ),
     $win   = $( window ),
-
-    Galleria,
 
 // native prototypes
     protoArray = Array.prototype,
