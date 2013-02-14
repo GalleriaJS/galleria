@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.2.9 2013-01-18
+ * Galleria v 1.2.9 2013-02-14
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -1607,7 +1607,7 @@ Galleria = function() {
                 self.rescale();
 
                 if ( Galleria.MAC ) {
-                    if ( Galleria.WEBKIT ) {
+                    if ( Galleria.WEBKIT && !( Galleria.SAFARI && /version\/[1-5]/.test(NAV)) ) {
                         self.$('container').css('opacity', 0).addClass('fullscreen');
                         window.setTimeout(function() {
                             fullscreen.scale();
