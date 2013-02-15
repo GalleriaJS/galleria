@@ -44,7 +44,8 @@ Galleria.Flickr = function( api_key ) {
         sort: 'interestingness-desc',  // sort option ( date-posted-asc, date-posted-desc, date-taken-asc, date-taken-desc, interestingness-desc, interestingness-asc, relevance )
         description: false,            // set this to true to get description as caption
         complete: function(){},        // callback to be called inside the Galleria.prototype.load
-        backlink: false                // set this to true if you want to pass a link back to the original image
+        backlink: false,               // set this to true if you want to pass a link back to the original image
+        username: ''                   // flickr username to search within
     };
 };
 
@@ -64,9 +65,22 @@ Galleria.Flickr.prototype = {
     */
 
     search: function( phrase, callback ) {
-        return this._find({
-            text: phrase
-        }, callback );
+            if(this.options.username) {
+	        return this._call({
+	            method: 'flickr.urls.lookupUser',
+	            url: 'flickr.com/photos/' + this.options.username
+	        }, function( data ) {
+	            this._find({
+	                text: phrase,
+	                user_id: data.user.id
+	            }, callback);
+	        })
+	    }
+	    else {
+	        return this._find({
+	        	text: phrase
+	        }, callback);
+	    }
     },
 
     /**
@@ -95,14 +109,22 @@ Galleria.Flickr.prototype = {
 
     user: function( username, callback ) {
         return this._call({
-            method: 'flickr.urls.lookupUser',
-            url: 'flickr.com/photos/' + username
+                method: 'flickr.urls.lookupUser',
+                url: 'flickr.com/photos/' + username
         }, function( data ) {
-            this._find({
-                user_id: data.user.id,
-                method: 'flickr.people.getPublicPhotos'
-            }, callback);
-        });
+                if(this.options.sort.match(/interestingness-(desc|asc)/)) {
+                    this._find({
+                        text: '',
+                        user_id: data.user.id
+                    }, callback);
+                }
+                else {
+                    this._find({
+                        user_id: data.user.id,
+                        method: 'flickr.people.getPublicPhotos'
+                    }, callback);
+                }
+            })
     },
 
     /**

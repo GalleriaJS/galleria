@@ -177,4 +177,12 @@ description
 
 The plugin fetches the title per default. If you also wish to fetch the description, set this option to true.
 
+username
+--------
+
+    | type: **String**
+    | default: ''
+
+The flickr username to search within. Applicable only for .search() method.
+
 
