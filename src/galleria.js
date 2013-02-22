@@ -1526,7 +1526,7 @@ Galleria = window.Galleria = function() {
                     self.rescale();
 
                     if ( Galleria.MAC ) {
-                        if ( Galleria.WEBKIT ) {
+                        if ( Galleria.WEBKIT && !( Galleria.SAFARI && /version\/[1-5]/.test(NAV)) ) {
                             self.$('container').css('opacity', 0).addClass('fullscreen');
                             window.setTimeout(function() {
                                 fullscreen.scale();
