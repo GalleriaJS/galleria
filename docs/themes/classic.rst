@@ -1,7 +1,7 @@
 .. highlight:: javascript
 
 *******
-Classic
+Vertical
 *******
 
 The free open sourced theme that comes bundled with the Galleria core.
