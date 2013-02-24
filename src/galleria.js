@@ -1152,8 +1152,8 @@ Galleria = window.Galleria = function() {
         next: self.$('thumb-nav-right'),
         prev: self.$('thumb-nav-left'),
 
-        // cache the width
-        width: 0,
+        // cache the size (width or height, depends on vertical option)
+        size: 0,
 
         // track the current position
         current: 0,
@@ -1169,30 +1169,33 @@ Galleria = window.Galleria = function() {
         update: function() {
             var w = 0,
                 h = 0,
+                wh = 0,
                 hooks = [0];
+                vertical = ( self._options.carousel === "vertical" );
 
             $.each( self._thumbnails, function( i, thumb ) {
                 if ( thumb.ready ) {
-                    w += thumb.outerWidth || $( thumb.container ).outerWidth( true );
-                    hooks[ i+1 ] = w;
+                    wh += vertical ? ( thumb.outerHeight || $( thumb.container ).outerHeight( true ) ) : ( thumb.outerWidth || $( thumb.container ).outerWidth( true ) );
+                    hooks[ i+1 ] = wh;
                     h = Math.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
+                    w = Math.max( w, thumb.outerWidth || $( thumb.container).outerWidth( true ) );
                 }
             });
 
             self.$( 'thumbnails' ).css({
-                width: w,
-                height: h
+                width: vertical ? w : wh, 
+                height: vertical ? wh : h
             });
 
-            carousel.max = w;
+            carousel.max = wh;
             carousel.hooks = hooks;
-            carousel.width = self.$( 'thumbnails-list' ).width();
+            carousel.size = vertical ? self.$( 'thumbnails-list' ).height() : self.$( 'thumbnails-list' ).width();
             carousel.setClasses();
 
-            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > carousel.width );
+            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', wh > carousel.size );
 
             // one extra calculation
-            carousel.width = self.$( 'thumbnails-list' ).width();
+            carousel.size = vertical ? self.$( 'thumbnails-list' ).height() : self.$( 'thumbnails-list' ).width();
 
             // todo: fix so the carousel moves to the left
         },
@@ -1207,7 +1210,7 @@ Galleria = window.Galleria = function() {
                 if ( self._options.carouselSteps === 'auto' ) {
 
                     for ( i = carousel.current; i < carousel.hooks.length; i++ ) {
-                        if ( carousel.hooks[i] - carousel.hooks[ carousel.current ] > carousel.width ) {
+                        if ( carousel.hooks[i] - carousel.hooks[ carousel.current ] > carousel.size ) {
                             carousel.set(i - 2);
                             break;
                         }
@@ -1224,7 +1227,7 @@ Galleria = window.Galleria = function() {
                 if ( self._options.carouselSteps === 'auto' ) {
 
                     for ( i = carousel.current; i >= 0; i-- ) {
-                        if ( carousel.hooks[ carousel.current ] - carousel.hooks[i] > carousel.width ) {
+                        if ( carousel.hooks[ carousel.current ] - carousel.hooks[i] > carousel.size ) {
                             carousel.set( i + 2 );
                             break;
                         } else if ( i === 0 ) {
@@ -1241,7 +1244,7 @@ Galleria = window.Galleria = function() {
         // calculate and set positions
         set: function( i ) {
             i = Math.max( i, 0 );
-            while ( carousel.hooks[i - 1] + carousel.width >= carousel.max && i >= 0 ) {
+            while ( carousel.hooks[i - 1] + carousel.size >= carousel.max && i >= 0 ) {
                 i--;
             }
             carousel.current = i;
@@ -1265,7 +1268,7 @@ Galleria = window.Galleria = function() {
             // calculate last position
             var last = carousel.current;
             while( carousel.hooks[last] - carousel.hooks[ carousel.current ] <
-                   carousel.width && last <= carousel.hooks.length ) {
+                   carousel.size && last <= carousel.hooks.length ) {
                 last ++;
             }
 
@@ -1280,7 +1283,7 @@ Galleria = window.Galleria = function() {
         // helper for setting disabled classes
         setClasses: function() {
             carousel.prev.toggleClass( 'disabled', !carousel.current );
-            carousel.next.toggleClass( 'disabled', carousel.hooks[ carousel.current ] + carousel.width >= carousel.max );
+            carousel.next.toggleClass( 'disabled', carousel.hooks[ carousel.current ] + carousel.size >= carousel.max );
         },
 
         // the animation method
@@ -1292,9 +1295,12 @@ Galleria = window.Galleria = function() {
                 return;
             }
 
-            Utils.animate(self.get( 'thumbnails' ), {
-                left: num
-            },{
+            Utils.animate(self.get( 'thumbnails' ), (self._options.carousel === "vertical" ) ? {
+				top: num
+				} :
+				{
+				left: num
+			},{
                 duration: self._options.carouselSpeed,
                 easing: self._options.easing,
                 queue: false
@@ -2660,7 +2666,12 @@ Galleria.prototype = {
 
         // add a notouch class on the container to prevent unwanted :hovers on touch devices
         this.$( 'container' ).addClass( Galleria.TOUCH ? 'touch' : 'notouch' );
-
+        
+        // add a vertical class on the container if option carousel: "vertical"
+        if ( options.carousel ) {
+            this.$( 'container' ).addClass( (options.carousel === "vertical") ? 'vertical' : 'horizontal' );
+        }
+        
         // add images to the controls
         if ( !this._options.swipe ) {
             $.each( new Array(2), function( i ) {
@@ -2765,6 +2776,14 @@ Galleria.prototype = {
             overflow: 'hidden',
             position: 'relative'
         });
+        
+        if (options.carousel === "vertical") {
+            this.$( 'thumbnails-list' ).css({
+                position: 'absolute',
+                top: 0,
+                bottom: 0
+            });
+        }
 
         // bind image navigation arrows
         this.$( 'image-nav-right, image-nav-left' ).bind( 'click', function(e) {
