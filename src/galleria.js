@@ -1296,11 +1296,11 @@ Galleria = window.Galleria = function() {
             }
 
             Utils.animate(self.get( 'thumbnails' ), (self._options.carousel === "vertical" ) ? {
-				top: num
-				} :
-				{
-				left: num
-			},{
+                top: num
+                } :
+                {
+                left: num
+            },{
                 duration: self._options.carouselSpeed,
                 easing: self._options.easing,
                 queue: false
