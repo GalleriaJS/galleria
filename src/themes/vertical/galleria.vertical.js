@@ -19,14 +19,14 @@ Galleria.addTheme({
     defaults: {
         transition: 'slide',
         thumbCrop:  'width',
-        vertical: true,
+        carousel: 'vertical',
 
         // set this to false if you want to show the caption all the time:
         _toggleInfo: true
     },
     init: function(options) {
 
-        Galleria.requires(1.28, 'This version of Classic theme requires Galleria 1.2.8 or later');
+        Galleria.requires(1.3, 'This version of Classic theme requires Galleria 1.3 or later');
 
         // add some elements
         this.addElement('info-link','info-close');
