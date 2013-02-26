@@ -74,7 +74,7 @@ then load the new theme and run Galleria again::
             Galleria.unloadTheme();
 
             // load a new theme
-            Galleria.loadTheme('thems/fullscreen/galleria.fullscreen.min.js');
+            Galleria.loadTheme('themes/fullscreen/galleria.fullscreen.min.js');
 
             // run Galleria again with the new theme
             Galleria.run('#galleria');
