@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3 2013-01-31
+ * Galleria v 1.3 2013-05-22
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -2434,10 +2434,10 @@ Galleria.prototype = {
             swipe: true, // 1.2.4 -> revised in 1.3
             thumbCrop: true,
             thumbEventType: 'click',
-            thumbFit: true, // legacy, deprecate at 1.3
             thumbMargin: 0,
             thumbQuality: 'auto',
             thumbDisplayOrder: true, // 1.2.8
+            thumbPosition: '50%', // 1.3
             thumbnails: true,
             touchTransition: undef, // 1.2.6
             transition: 'fade',
@@ -3029,6 +3029,7 @@ Galleria.prototype = {
                     crop:     o.thumbCrop,
                     margin:   o.thumbMargin,
                     canvas:   o.useCanvas,
+                    position: o.thumbPosition,
                     complete: function( thumb ) {
 
                         // shrink thumbnails to fit
@@ -3042,7 +3043,7 @@ Galleria.prototype = {
                         // calculate shrinked positions
                         $.each(arr, function( i, measure ) {
                             m = measure.toLowerCase();
-                            if ( (o.thumbCrop !== true || o.thumbCrop === m ) && o.thumbFit ) {
+                            if ( (o.thumbCrop !== true || o.thumbCrop === m ) ) {
                                 css = {};
                                 css[ m ] = thumb[ m ];
                                 $( thumb.container ).css( css );
@@ -3138,7 +3139,7 @@ Galleria.prototype = {
                 };
 
                 // grab & reset size for smoother thumbnail loads
-                if ( o.thumbFit && o.thumbCrop !== true ) {
+                if ( o.thumbCrop !== true ) {
                     $container.css( { width: 'auto', height: 'auto' } );
                 } else {
                     $container.css( { width: thumb.data.width, height: thumb.data.height } );
@@ -3552,7 +3553,7 @@ Galleria.prototype = {
                 // alternative extraction from HTML5 data attribute, added in 1.2.7
                 $.each( 'big title description link layer'.split(' '), function( i, val ) {
                     if ( elem.data(val) ) {
-                        data[ val ] = elem.data(val);
+                        data[ val ] = elem.data(val).toString();
                     }
                 });
 
@@ -4480,6 +4481,9 @@ this.prependChild( 'info', 'myElement' );
             }));
 
             var complete = function(image) {
+
+                self._layers[index].innerHTML = self.getData().layer;
+
                 self.trigger($.extend(evObj, {
                     type: Galleria.LOADFINISH
                 }));
@@ -5255,25 +5259,26 @@ Galleria.addTheme = function( theme ) {
         // else look for the absolute path and load the CSS dynamic
         if ( !css ) {
 
-            $('script').each(function( i, script ) {
+            $(function() {
 
-                // look for the theme script
-                reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
-                if( reg.test( script.src )) {
+                $('script').each(function( i, script ) {
+                    // look for the theme script
+                    reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
+                    if( reg.test( script.src )) {
 
-                    // we have a match
-                    css = script.src.replace(/[^\/]*$/, '') + theme.css;
+                        // we have a match
+                        css = script.src.replace(/[^\/]*$/, '') + theme.css;
 
-                    window.setTimeout(function() {
-                        Utils.loadCSS( css, 'galleria-theme', function() {
+                        window.setTimeout(function() {
+                            Utils.loadCSS( css, 'galleria-theme', function() {
 
-                            // the themeload trigger
-                            _themeLoad( theme );
+                                // the themeload trigger
+                                _themeLoad( theme );
 
-                        });
-                    }, 1);
-
-                }
+                            });
+                        }, 1);
+                    }
+                });
             });
         }
 

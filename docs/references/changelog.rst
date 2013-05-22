@@ -2,6 +2,14 @@
 Changelog
 *********
 
+1.3
+---
+* Added a much improved touch/slide experience, close to native.
+* Added a fastclick variant for better overall touch experience
+* Handle a random ready issue when loading dynamic CSS in IE
+* Fixed html5 data to strict typing (string)
+* Added thumbPosition option, same as imagePosition but for thumbnails
+
 1.2.9
 -----
 * Clicknext/lightbox is now only triggered on left-click
