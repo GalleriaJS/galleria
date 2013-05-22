@@ -4482,7 +4482,7 @@ this.prependChild( 'info', 'myElement' );
 
             var complete = function(image) {
 
-                self._layers[index].innerHTML = self.getData().layer;
+                self._layers[index].innerHTML = self.getData().layer || '';
 
                 self.trigger($.extend(evObj, {
                     type: Galleria.LOADFINISH
