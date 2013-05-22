@@ -5,7 +5,7 @@ imagePan
     | type: **Boolean**
     | default: **false**
 
-Galleri comes with a built-in panning effect.
+Galleria comes with a built-in panning effect.
 The effect is sometimes useful if you have cropped images and want to let the users pan across the stage to see the entire image.
 
 Set ``imagePan`` to ``true`` to apply a mouse-controlled movement of the image to reveal the cropped parts.
