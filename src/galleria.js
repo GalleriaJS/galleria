@@ -2010,9 +2010,6 @@ Galleria = window.Galleria = function() {
 
         init : function() {
 
-            // trigger the event
-            self.trigger( Galleria.LIGHTBOX_OPEN );
-
             if ( lightbox.initialized ) {
                 return;
             }
@@ -2208,6 +2205,9 @@ Galleria = window.Galleria = function() {
             if ( !lightbox.initialized ) {
                 lightbox.init();
             }
+
+            // trigger the event
+            self.trigger( Galleria.LIGHTBOX_OPEN );
 
             // temporarily attach some keys
             // save the old ones first in a cloned object
