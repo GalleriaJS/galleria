@@ -4905,14 +4905,6 @@ this.prependChild( 'info', 'myElement' );
     },
 
     /**
-        Retrieve the format to display
-
-    */
-    getFormat : function(){
-        return this.getOptions('format');
-    },
-
-    /**
         Retrieve the option
 
         @param {string} key The option key to retrieve. If no key specified it will return all options in an object.
