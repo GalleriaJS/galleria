@@ -2397,6 +2397,7 @@ Galleria.prototype = {
             dummy: undef, // 1.2.5
             easing: 'galleria',
             extend: function(options) {},
+            format: 'image',
             fullscreenCrop: undef, // 1.2.5
             fullscreenDoubleTap: true, // 1.2.4 toggles fullscreen on double-tap for touch devices
             fullscreenTransition: undef, // 1.2.6
@@ -4529,8 +4530,8 @@ this.prependChild( 'info', 'myElement' );
         if ( !data ) {
             return;
         }
-
-        var src = data.iframe || ( this.isFullscreen() && 'big' in data ? data.big : data.image ), // use big image if fullscreen mode
+        
+        var src = data.iframe || ( this.isFullscreen() && 'big' in data ? data.big : data[this.getOptions('format')] ), // use big image if fullscreen mode
             active = this._controls.getActive(),
             next = this._controls.getNext(),
             cached = next.isCached( src ),
@@ -4891,13 +4892,33 @@ this.prependChild( 'info', 'myElement' );
     },
 
     /**
+        Specify source format to diplay. Data must contains the specified format
+
+        @param {string} format Format to use
+
+    */
+    setFormat : function(format){
+        format = format == undefined ? "image" : format;
+        this.setOptions('format', format);
+        //this._options.format = format;
+        this.show(this._active);
+    },
+
+    /**
+        Retrieve the format to display
+
+    */
+    getFormat : function(){
+        return this.getOptions('format');
+    },
+
+    /**
         Retrieve the option
 
         @param {string} key The option key to retrieve. If no key specified it will return all options in an object.
 
         @returns option or options
     */
-
     getOptions : function( key ) {
         return typeof key === 'undefined' ? this._options : this._options[ key ];
     },
