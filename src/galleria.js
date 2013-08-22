@@ -4514,6 +4514,11 @@ this.prependChild( 'info', 'myElement' );
                 type: Galleria.LOADSTART
             }));
 
+            $( this._thumbnails[ index ].container )
+                .addClass( 'active' )
+                .siblings( '.active' )
+                .removeClass( 'active' );
+
             var complete = function(image) {
 
                 self._layers[index].innerHTML = self.getData().layer || '';
@@ -4800,8 +4805,6 @@ this.prependChild( 'info', 'myElement' );
                         thumbTarget: self._thumbnails[ queue.index ].image,
                         galleriaData: self.getData( queue.index )
                     });
-
-
                 }
             });
         });
