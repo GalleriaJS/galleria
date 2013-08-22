@@ -2744,7 +2744,7 @@ Galleria.prototype = {
             });
             this.$('stage').bind('click', function(e) {
                 var data = self.getData();
-                if ( data.link ) {
+                if ( data && data.link ) {
                     if ( self._options.popupLinks ) {
                         win = window.open( data.link, '_blank' );
                     } else {
@@ -6424,7 +6424,7 @@ Galleria.Finger = (function() {
         // default options
         this.config = {
             start: 0,
-            duration: 240,
+            duration: 300,
             onchange: function() {},
             oncomplete: function() {},
             easing: function(x,t,b,c,d) {
@@ -6607,10 +6607,10 @@ Galleria.Finger = (function() {
             } else {
                 if ( !this.anim ) {
                     // save animation parameters
-                    this.anim = { v: this.pos, c: distance, t: 0 };
+                    this.anim = { v: this.pos, c: distance, t: +new Date() };
                 }
                 // apply easing
-                this.pos = this.config.easing(null, this.anim.t++, this.anim.v, this.anim.c, (this.config.duration/10));
+                this.pos = this.config.easing(null, +new Date() - this.anim.t, this.anim.v, this.anim.c, this.config.duration);
             }
             this.setX();
         }
