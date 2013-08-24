@@ -59,20 +59,18 @@ Galleria.addTheme({
 
         // bind some stuff
         this.bind('thumbnail', function(e) {
+            // reduce opacity of all non-active thumbnails
+            if (e.index != this.getIndex()) {
+                $(e.thumbTarget).css('opacity', 0.6);
+            }
 
             if (! touch ) {
                 // fade thumbnails
-                $(e.thumbTarget).css('opacity', 0.6).parent().hover(function() {
+                $(e.thumbTarget).parent().hover(function() {
                     $(this).not('.active').children().stop().fadeTo(100, 1);
                 }, function() {
                     $(this).not('.active').children().stop().fadeTo(400, 0.6);
                 });
-
-                if ( e.index === this.getIndex() ) {
-                    $(e.thumbTarget).css('opacity',1);
-                }
-            } else {
-                $(e.thumbTarget).css('opacity', this.getIndex() ? 1 : 0.6);
             }
         });
 
