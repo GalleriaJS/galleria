@@ -195,7 +195,7 @@ Manipulation
 
     | returns **Galleria**
 
-Loads new data into the gallery. The data should be structured the same way as JSON would be when first initialized
+Loads new data into the gallery. The data should be structured as an Array and follow the same data patterns as the original JSON data
 
 .splice( index, howMany[, element1[, ...[, elementN]]] )
 --------------------------------------------------------

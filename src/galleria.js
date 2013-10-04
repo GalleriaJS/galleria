@@ -388,13 +388,6 @@ var window = this,
                 // clear styles
                 var clearStyle = function( elem ) {
                     setStyle( elem, 'none', 'transition' );
-                    if ( Galleria.WEBKIT && Galleria.TOUCH ) {
-                        setStyle( elem, 'translate3d(0,0,0)', 'transform' );
-                        if ( elem.data('revert') ) {
-                            elem.css( elem.data('revert') );
-                            elem.data('revert', null);
-                        }
-                    }
                 };
 
                 // various variables
@@ -3513,12 +3506,12 @@ Galleria.prototype = {
         config = config || o.dataConfig;
 
         // if source is a true object, make it into an array
-        if( /^function Object/.test( source.constructor ) ) {
+        if( $.isPlainObject( source ) ) {
             source = [source];
         }
 
         // check if the data is an array already
-        if ( source.constructor === Array ) {
+        if ( $.isArray( source ) ) {
             if ( this.validate( source ) ) {
                 this._data = source;
             } else {
@@ -5818,7 +5811,7 @@ Galleria.Picture.prototype = {
                             this.style.MozTransform = this.style.webkitTransform = 'translate3d(0,0,0)';
                         }
 
-                        self.container.appendChild( this );
+                        $container.append( this );
 
                         self.cache[ src ] = src; // will override old cache
 
@@ -6390,7 +6383,7 @@ Galleria.Finger = (function() {
         // default options
         this.config = {
             start: 0,
-            duration: 240,
+            duration: 400,
             onchange: function() {},
             oncomplete: function() {},
             easing: function(x,t,b,c,d) {
@@ -6470,6 +6463,11 @@ Galleria.Finger = (function() {
                 this.index = Math.max(0, Math.min( this.index, this.length-1 ) );
                 this.pos = this.to = -this.width*this.index;
             }
+        },
+
+        setPosition: function(pos) {
+            this.pos = pos;
+            this.to = pos;
         },
 
         ontouchstart: function(e) {
@@ -6558,18 +6556,18 @@ Galleria.Finger = (function() {
 
             // if distance is short or the user is touching, do a 1-1 animation
             if ( this.touching || abs(distance) <= 1 ) {
-                this.pos = this.to;
-                if ( this.anim ) {
-                    this.config.oncomplete( this.index );
-                }
-                this.anim = 0;
+              this.pos = this.to;
+              if ( this.anim ) {
+                this.config.oncomplete( this.index );
+              }
+              this.anim = 0;
             } else {
-                if ( !this.anim ) {
-                    // save animation parameters
-                    this.anim = { v: this.pos, c: distance, t: 0 };
-                }
-                // apply easing
-                this.pos = this.config.easing(null, this.anim.t++, this.anim.v, this.anim.c, (this.config.duration/10));
+              if ( !this.anim ) {
+                // save animation parameters
+                this.anim = { v: this.pos, c: distance, t: +new Date() };
+              }
+              // apply easing
+              this.pos = this.config.easing(null, +new Date() - this.anim.t, this.anim.v, this.anim.c, this.config.duration);
             }
             this.setX();
         }

@@ -2,6 +2,8 @@
 thumbFit
 ========
 
+**Note: this has been deprecated in 1.3**
+
     | type: **Boolean**
     | default: **true**
 

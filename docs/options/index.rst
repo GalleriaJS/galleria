@@ -150,6 +150,8 @@ List of options
 
 - :doc:`thumbnails` Sets how and if thumbnails should be created.
 
+- :doc:`thumbPosition` Same as :doc:`imagePosition` for thumbnails.
+
 - :doc:`thumbQuality` Defines if and how IE should use bicubic image rendering
   for thumbnails
 
