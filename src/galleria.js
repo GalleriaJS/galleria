@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3 2013-05-22
+ * Galleria v 1.3 2013-11-04
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -2735,19 +2735,53 @@ Galleria.prototype = {
             this.bind( Galleria.RESCALE, function() {
                 this.finger.setup();
             });
+            this.$('stage').bind('click', function(e) {
+                var data = self.getData();
+                if ( data && data.link ) {
+                    if ( self._options.popupLinks ) {
+                        win = window.open( data.link, '_blank' );
+                    } else {
+                        window.location.href = data.link;
+                    }
+                }
+            });
             this.bind( Galleria.IMAGE, function(e) {
 
                 self.setCounter( e.index );
                 self.setInfo( e.index );
 
-                $.each([this.getNext(), this.getPrev()], function(i, loadme) {
+                var next = this.getNext(),
+                    prev = this.getPrev();
+
+                var preloads = [prev,next];
+                preloads.push(this.getNext(next), this.getPrev(prev), self._controls.slides.length-1);
+
+                var filtered = [];
+
+                $.each(preloads, function(i, val) {
+                    if ( $.inArray(val, filtered) == -1 ) {
+                        filtered.push(val);
+                    }
+                });
+
+                $.each(filtered, function(i, loadme) {
                     var d = self.getData(loadme),
                         img = self._controls.slides[loadme],
                         src = d.iframe || ( self.isFullscreen() && 'big' in d ? d.big : d.image );
 
                     if ( !img.ready ) {
                         self._controls.slides[loadme].load(src, function(img) {
-                            self._scaleImage(img);
+                            $(img.image).css('visibility', 'hidden');
+                            self._scaleImage(img, {
+                                complete: function(img) {
+                                    $(img.image).css({
+                                        opacity: 0,
+                                        visibility: 'visible'
+                                    }).animate({
+                                        opacity: 1
+                                    }, 200);
+                                }
+                            });
                         });
                     }
                 });
@@ -4439,7 +4473,7 @@ this.prependChild( 'info', 'myElement' );
             return;
         }
 
-        if ( swipe && index !== this._active ) {
+        if ( this.finger && index !== this._active ) {
             this.finger.to = -( index*this.finger.width );
             this.finger.index = index;
         }
@@ -4473,6 +4507,11 @@ this.prependChild( 'info', 'myElement' );
                 type: Galleria.LOADSTART
             }));
 
+            $( this._thumbnails[ index ].container )
+                .addClass( 'active' )
+                .siblings( '.active' )
+                .removeClass( 'active' );
+
             var complete = function(image) {
 
                 self._layers[index].innerHTML = self.getData().layer || '';
@@ -4493,7 +4532,7 @@ this.prependChild( 'info', 'myElement' );
                 });
             } else {
                 self.trigger($.extend(evObj, {
-                    type: Galleria.LOADFINISH
+                    type: Galleria.IMAGE
                 }));
                 complete();
             }
@@ -4759,8 +4798,6 @@ this.prependChild( 'info', 'myElement' );
                         thumbTarget: self._thumbnails[ queue.index ].image,
                         galleriaData: self.getData( queue.index )
                     });
-
-
                 }
             });
         });
@@ -6383,7 +6420,7 @@ Galleria.Finger = (function() {
         // default options
         this.config = {
             start: 0,
-            duration: 400,
+            duration: 300,
             onchange: function() {},
             oncomplete: function() {},
             easing: function(x,t,b,c,d) {
@@ -6550,6 +6587,13 @@ Galleria.Finger = (function() {
             }
         },
 
+        moveTo: function( index ) {
+            if ( index != this.index ) {
+                this.pos = this.to = -( index*this.width );
+                this.index = index;
+            }
+        },
+
         loop: function() {
 
             var distance = this.to - this.pos;
@@ -6562,12 +6606,12 @@ Galleria.Finger = (function() {
               }
               this.anim = 0;
             } else {
-              if ( !this.anim ) {
-                // save animation parameters
-                this.anim = { v: this.pos, c: distance, t: +new Date() };
-              }
-              // apply easing
-              this.pos = this.config.easing(null, +new Date() - this.anim.t, this.anim.v, this.anim.c, this.config.duration);
+                if ( !this.anim ) {
+                    // save animation parameters
+                    this.anim = { v: this.pos, c: distance, t: +new Date() };
+                }
+                // apply easing
+                this.pos = this.config.easing(null, +new Date() - this.anim.t, this.anim.v, this.anim.c, this.config.duration);
             }
             this.setX();
         }
