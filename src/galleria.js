@@ -1285,6 +1285,8 @@ Galleria = window.Galleria = function() {
                 return;
             }
 
+            self.$( 'thumbnails' ).css('left', 0); // FF 24 bug
+
             Utils.animate(self.get( 'thumbnails' ), {
                 left: num
             },{
@@ -1519,7 +1521,7 @@ Galleria = window.Galleria = function() {
                     self.rescale();
 
                     if ( Galleria.MAC ) {
-                        if ( Galleria.WEBKIT && !( Galleria.SAFARI && /version\/[1-5]/.test(NAV)) ) {
+                        if ( !( Galleria.SAFARI && /version\/[1-5]/.test(NAV)) ) {
                             self.$('container').css('opacity', 0).addClass('fullscreen');
                             window.setTimeout(function() {
                                 fullscreen.scale();
@@ -5309,12 +5311,12 @@ Galleria.addTheme = function( theme ) {
                         }, 1);
                     }
                 });
+                if ( !css ) {
+                    Galleria.raise('No theme CSS loaded');
+                }
             });
         }
 
-        if ( !css ) {
-            Galleria.raise('No theme CSS loaded');
-        }
     } else {
 
         // pass
