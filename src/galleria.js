@@ -3478,6 +3478,7 @@ Galleria.prototype = {
                         fn.call( self, self._options );
                     }
                 });
+                Galleria.ready.callbacks = [];
 
                 // call the extend option
                 self._options.extend.call( self, self._options );
