@@ -1288,7 +1288,10 @@ Galleria = window.Galleria = function() {
                 return;
             }
 
-            self.$( 'thumbnails' ).css('left', 0); // FF 24 bug
+            // FF 24 bug
+            self.$( 'thumbnails' ).css('left', function() {
+                return $(this).css('left');
+            });
 
             Utils.animate(self.get( 'thumbnails' ), {
                 left: num
