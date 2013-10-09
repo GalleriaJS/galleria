@@ -9,6 +9,8 @@ Changelog
 * Handle a random ready issue when loading dynamic CSS in IE
 * Fixed html5 data to strict typing (string)
 * Added thumbPosition option, same as imagePosition but for thumbnails
+* Fixed FF fullscreen class bug
+* Fixed FF carousel animation bug
 
 1.2.9
 -----

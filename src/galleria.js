@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3 2013-11-04
+ * Galleria v 1.3 2013-11-09
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -637,6 +637,9 @@ var window = this,
             },
 
             wait : function(options) {
+
+                Galleria._waiters = Galleria._waiters || [];
+
                 options = $.extend({
                     until : FALSE,
                     success : F,
@@ -647,22 +650,22 @@ var window = this,
                 var start = Utils.timestamp(),
                     elapsed,
                     now,
+                    tid,
                     fn = function() {
                         now = Utils.timestamp();
                         elapsed = now - start;
+                        Utils.removeFromArray( Galleria._waiters, tid );
                         if ( options.until( elapsed ) ) {
                             options.success();
                             return false;
                         }
-
                         if (typeof options.timeout == 'number' && now >= start + options.timeout) {
                             options.error();
                             return false;
                         }
-                        window.setTimeout(fn, 10);
+                        Galleria._waiters.push( tid = window.setTimeout(fn, 10) );
                     };
-
-                window.setTimeout(fn, 10);
+                Galleria._waiters.push( tid = window.setTimeout(fn, 10) );
             },
 
             toggleQuality : function( img, force ) {
@@ -2741,7 +2744,7 @@ Galleria.prototype = {
                 var data = self.getData();
                 if ( data && data.link ) {
                     if ( self._options.popupLinks ) {
-                        win = window.open( data.link, '_blank' );
+                        var win = window.open( data.link, '_blank' );
                     } else {
                         window.location.href = data.link;
                     }
@@ -3685,6 +3688,11 @@ Galleria.prototype = {
         this.clearTimer();
         Utils.removeFromArray( _instances, this );
         Utils.removeFromArray( _galleries, this );
+        if ( Galleria._waiters.length ) {
+            $.each( Galleria._waiters, function( i, w ) {
+                if ( w ) window.clearTimeout( w );
+            });
+        }
         return this;
     },
 
