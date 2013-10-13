@@ -2406,6 +2406,7 @@ Galleria.prototype = {
             fullscreenCrop: undef, // 1.2.5
             fullscreenDoubleTap: true, // 1.2.4 toggles fullscreen on double-tap for touch devices
             fullscreenTransition: undef, // 1.2.6
+    		fullscreen: false,
             height: 0,
             idleMode: true, // 1.2.4 toggles idleMode
             idleTime: 3000,
@@ -3879,7 +3880,9 @@ Galleria.prototype = {
     */
 
     enterFullscreen: function( callback ) {
-        this._fullscreen.enter.apply( this, Utils.array( arguments ) );
+		if (!this._fullscreen.active) {
+			this._fullscreen.enter.apply( this, Utils.array( arguments ) );
+		}
         return this;
     },
 
@@ -4632,7 +4635,7 @@ this.prependChild( 'info', 'myElement' );
 
                 // make the image link or add lightbox
                 // link takes precedence over lightbox if both are detected
-                if ( data.link || self._options.lightbox || self._options.clicknext ) {
+                if ( data.link || self._options.lightbox || self._options.clicknext || self._options.fullscreen ) {
 
                     $( next.image ).css({
                         cursor: 'pointer'
@@ -4664,6 +4667,10 @@ this.prependChild( 'info', 'myElement' );
 
                         if ( self._options.lightbox ) {
                             self.openLightbox();
+                        }
+						
+						if (self._options.fullscreen) {
+                            self.enterFullscreen();
                         }
 
                     });
