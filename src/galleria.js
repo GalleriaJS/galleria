@@ -983,7 +983,13 @@ var window = this,
         };
     }());
 
+// listen to fullscreen
 _nativeFullscreen.listen();
+
+// trigger resize on orientationchange (IOS7)
+$win.bind( 'orientationchange', function() { 
+    $(this).resize();
+});
 
 /**
     The main Galleria class
