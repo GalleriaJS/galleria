@@ -118,17 +118,59 @@ var window = this,
             embed: function(id) {
                 return 'http://www.youtube.com/embed/'+id;
             },
-            getThumb: function( id, success, fail ) {
-                fail = fail || F;
-                $.getJSON(window.location.protocol+'//gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script&callback=?', function(data) {
-                    try {
-                        success( data.entry.media$group.media$thumbnail[0].url );
-                    } catch(e) {
-                        fail();
-                    }
-                });
+            getUrl: function(id) {
+                return window.location.protocol+'//gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script&callback=?';
+            },
+            get_thumb: function(data) {
+                return data.entry.media$group.media$thumbnail[0].url;
+            },
+            get_image: function(data) {
+                return data.entry.media$group.media$thumbnail[0].url;
+            },
+            cache: {}
+        }
+    },
+    Video = function( type, id ) {
+        var readys = [],
+            self = this,
+            onload = function( data ) {
+                
+            };
+
+        self.type = type;
+
+        $.extend( this, _video[type] );
+
+        this.data = _video[ type ].cache[ id ] || null;
+
+        if ( !this.data ) {
+
+            $.getJSON( this.getUrl( id ), function(data) {
+                self.data = data;
+                _video[ self.type ].cache[ id ] = data;
+                $.each( readys, function( i, fn ) {
+                    fn( self.data );
+                })
+            });
+        }
+
+        this.getMedia = function( type, callback, fail ) {
+            fail = fail || F;
+            var self = this;
+            var success = function( data ) {
+                callback( self['get_'+type]( data ) );
+            };
+            try {
+                if ( self.data ) {
+                    success( self.data );
+                } else {
+                    readys.push( success );
+                }
+            } catch(e) {
+                fail();
             }
-        },
+        }
+    /*,
         vimeo: {
             reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
             embed: function(id) {
@@ -160,7 +202,7 @@ var window = this,
                     }
                 });
             }
-        }
+        }*/
     },
 
     // utility for testing the video URL and getting the video ID
@@ -2732,7 +2774,7 @@ Galleria.prototype = {
                        return;
                     }
 
-                    var src = data.iframe || ( self.isFullscreen() && 'big' in data ? data.big : data.image ),
+                    var src = self.isFullscreen() && 'big' in data ? data.big : ( data.image || data.iframe ),
                         image = self._controls.slides[index],
                         cached = image.isCached( src ),
                         thumb = self._thumbnails[ index ];
@@ -2786,7 +2828,7 @@ Galleria.prototype = {
                 $.each(filtered, function(i, loadme) {
                     var d = self.getData(loadme),
                         img = self._controls.slides[loadme],
-                        src = d.iframe || ( self.isFullscreen() && 'big' in d ? d.big : d.image );
+                        src = self.isFullscreen() && 'big' in d ? d.big : ( d.image || d.iframe );
 
                     if ( !img.ready ) {
                         self._controls.slides[loadme].load(src, function(img) {
@@ -2986,7 +3028,6 @@ Galleria.prototype = {
         var src,
             thumb,
             data,
-            special,
 
             $container,
 
@@ -3083,8 +3124,7 @@ Galleria.prototype = {
                             arr = ['Width', 'Height'],
                             m,
                             css,
-                            data = self.getData( thumb.index ),
-                            special = data.thumb.split(':');
+                            data = self.getData( thumb.index );
 
                         // calculate shrinked positions
                         $.each(arr, function( i, measure ) {
@@ -3108,17 +3148,7 @@ Galleria.prototype = {
                             ( o.thumbQuality === 'auto' && thumb.original.width < thumb.width * 3 )
                         );
 
-                        // get "special" thumbs from provider
-                        if( data.iframe && special.length == 2 && special[0] in _video ) {
-
-                            _video[ special[0] ].getThumb( special[1], (function(img) {
-                                return function(src) {
-                                    img.src = src;
-                                    thumbComplete( thumb, callback );
-                                };
-                            }( thumb.image ) ));
-
-                        } else if ( o.thumbDisplayOrder && !thumb.lazy ) {
+                        if ( o.thumbDisplayOrder && !thumb.lazy ) {
 
                             $.each( thumbchunk, function( i, th ) {
                                 if ( i === loadindex && th.ready && !th.displayed ) {
@@ -3192,19 +3222,7 @@ Galleria.prototype = {
                 }
 
                 // load the thumbnail
-                special = src.split(':');
-
-                if ( special.length == 2 && special[0] in _video ) {
-
-                    thumb.video = true;
-                    thumb.ready = true;
-
-                    thumb.load( gif, {
-                        height: thumb.data.height,
-                        width: thumb.data.height*1.25
-                    }, onThumbLoad);
-
-                } else if ( optval == 'lazy' ) {
+                if ( optval == 'lazy' ) {
 
                     $container.addClass( 'lazy' );
 
@@ -3631,17 +3649,35 @@ Galleria.prototype = {
 
         // trigger the DATA event and return
         if ( this.getDataLength() ) {
-            this._parseData().trigger( Galleria.DATA );
+            this._parseData( function() {
+                this.trigger( Galleria.DATA );
+            } );
         }
         return this;
 
     },
 
     // make sure the data works properly
-    _parseData : function() {
+    _parseData : function( callback ) {
+
+        console.log('_parse')
 
         var self = this,
-            current;
+            current,
+            ready = false;
+            onload = function() {
+                var complete = true;
+                $.each( self._data, function( i, data ) {
+                    if ( data.loading ) {
+                        complete = false;
+                        return false;
+                    }
+                });
+                if ( complete && !ready ) {
+                    ready = true;
+                    callback.call( self );
+                }
+            };
 
         $.each( this._data, function( i, data ) {
 
@@ -3657,7 +3693,7 @@ Galleria.prototype = {
             }
             // parse video
             if ( 'video' in data ) {
-                var result = _videoTest( data.video );
+                var result = _videoTest( data.video )
 
                 if ( result ) {
                     current.iframe = _video[ result.provider ].embed( result.id ) + (function() {
@@ -3677,13 +3713,31 @@ Galleria.prototype = {
                         }
                         return '';
                     }());
+                    
                     delete current.video;
-                    if( !('thumb' in current) || !current.thumb ) {
-                        current.thumb = result.provider+':'+result.id;
+
+                    // pre-fetch video providers media
+
+                    if( !current.thumb || !current.image ) {
+                        $.each( ['thumb', 'image'], function( i, type ) {
+                            var video = new Video( result.provider, result.id );
+                            if ( !current[ type ] ) {
+                                current.loading = true;
+                                video.getMedia( type, (function(current, type) {
+                                    return function(src) {
+                                        current[ type ] = src;
+                                        delete current.loading;
+                                        onload();
+                                    }
+                                }( current, type )));
+                            }
+                        });
                     }
                 }
             }
         });
+
+        onload();
 
         return this;
     },
@@ -4514,7 +4568,7 @@ this.prependChild( 'info', 'myElement' );
                 return;
             }
 
-            var src = data.iframe || ( this.isFullscreen() && 'big' in data ? data.big : data.image ),
+            var src = this.isFullscreen() && 'big' in data ? data.big : ( data.image || data.iframe ),
                 image = this._controls.slides[index],
                 cached = image.isCached( src ),
                 thumb = this._thumbnails[ index ];
@@ -4587,7 +4641,7 @@ this.prependChild( 'info', 'myElement' );
             return;
         }
 
-        var src = data.iframe || ( this.isFullscreen() && 'big' in data ? data.big : data.image ), // use big image if fullscreen mode
+        var src = this.isFullscreen() && 'big' in data ? data.big : ( data.image || data.iframe ),
             active = this._controls.getActive(),
             next = this._controls.getNext(),
             cached = next.isCached( src ),
@@ -4726,7 +4780,7 @@ this.prependChild( 'info', 'myElement' );
         // show the next image, just in case
         Utils.show( next.container );
 
-        next.isIframe = !!data.iframe;
+        //next.isIframe = !!data.iframe;
 
         // add active classes
         $( self._thumbnails[ queue.index ].container )
