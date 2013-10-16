@@ -131,15 +131,31 @@ var window = this,
                 return data.entry.media$group.media$thumbnail[3].url;
             }
         },
+        vimeo: {
+            reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
+            embed: function(id) {
+                return 'http://player.vimeo.com/video/' + this.id;
+            },
+            getUrl: function() {
+                return window.location.protocol+'//vimeo.com/api/v2/video/' + this.id + '.json?callback=?'
+            },
+            get_thumb: function( data ) {
+                return data[0].thumbnail_medium;
+            },
+            get_image: function( data ) {
+                console.log(data)
+                return data[0].thumbnail_large;
+            }
+        },
         _inst: [],
         appendIcon: function( container ) {
 
-            var css = '.galleria-videoplay{font-size:24px;width:60px;height:60px;position:absolute;top:50%;left:50%;' +
+            var css = '.galleria-videoicon{font-size:24px;width:60px;height:60px;position:absolute;top:50%;left:50%;' +
                       'margin:-30px 0 0 -30px;color:#fff;cursor:pointer;background:rgba(0,0,0,.7);border-radius:3px;text-align:center;line-height:63px}';
 
-            Utils.insertStyleTag( css, 'galleria-videoplay' );
+            Utils.insertStyleTag( css, 'galleria-videoicon' );
 
-            return $( Utils.create( 'galleria-videoplay' ) ).html( '&#9654;' ).appendTo( container )
+            return $( Utils.create( 'galleria-videoicon' ) ).html( '&#9654;' ).appendTo( container )
                 .click( function() { $( this ).siblings( 'img' ).mouseup(); });
         }
     },
@@ -1203,7 +1219,9 @@ Galleria = window.Galleria = function() {
 
         slides : [],
 
-        videos: []
+        frames: [],
+
+        layers: []
     };
 
     // internal carousel object
@@ -2246,7 +2264,7 @@ Galleria = window.Galleria = function() {
 
             $win.unbind('resize', lightbox.rescale);
 
-            $( lightbox.elems.box ).hide();
+            $( lightbox.elems.box ).hide().find( 'iframe' ).remove();
 
             Utils.hide( lightbox.elems.info );
 
@@ -2315,7 +2333,7 @@ Galleria = window.Galleria = function() {
 
             $(lightbox.elems.box).toggleClass( 'iframe', lightbox.image.isIframe );
 
-            $( lightbox.image.container ).find( '.galleria-videoplay' ).remove()
+            $( lightbox.image.container ).find( '.galleria-videoicon' ).remove()
 
             lightbox.image.load( data.big || data.image || data.iframe, function( image ) {
 
@@ -2324,7 +2342,7 @@ Galleria = window.Galleria = function() {
                     var cw = $(window).width(),
                         ch = $(window).height();
 
-                    if ( self._options.maxVideoSize ) {
+                    if ( image.video && self._options.maxVideoSize ) {
                         var r = Math.min( self._options.maxVideoSize/cw, self._options.maxVideoSize/ch );
                         if ( r < 1 ) {
                             cw *= r;
@@ -2354,18 +2372,22 @@ Galleria = window.Galleria = function() {
                 lightbox.rescale();
 
                 if( data.image && data.iframe ) {
+
                     $( lightbox.elems.box ).addClass('iframe');
-                    var $icon = _video.appendIcon( image.container ).hide();
-                    setTimeout(function() {
-                        $icon.fadeIn(200);
-                    }, 200);
+
+                    if ( data.video ) {
+                        var $icon = _video.appendIcon( image.container ).hide();
+                        setTimeout(function() {
+                            $icon.fadeIn(200);
+                        }, 200);
+                    }
 
                     $( image.image ).css( 'cursor', 'pointer' ).mouseup((function(data, image) {
                         return function(e) {
-                            $( lightbox.image.container ).find( '.galleria-videoplay' ).remove();
+                            $( lightbox.image.container ).find( '.galleria-videoicon' ).remove();
                             e.preventDefault();
                             image.isIframe = true;
-                            image.load(data.iframe+'&autoplay=1', function(image) {
+                            image.load( data.iframe + ( data.video ? '&autoplay=1' : '' ), function(image) {
                                 image.scale({
                                     width: '100%',
                                     height: '100%'
@@ -2781,10 +2803,11 @@ Galleria.prototype = {
                 // reload the controls
                 self._controls[i] = image;
 
-                var video = new Galleria.Picture();
-                video.isIframe = true;
+                // build a frame
+                var frame = new Galleria.Picture();
+                frame.isIframe = true;
 
-                $( video.container ).attr('class', 'galleria-video').css({
+                $( frame.container ).attr('class', 'galleria-frame').css({
                     position: 'absolute',
                     top: 0,
                     left: 0,
@@ -2793,11 +2816,9 @@ Galleria.prototype = {
                     display: 'none'
                 }).appendTo( image.container );
 
-                self._controls.videos[i] = video;
+                self._controls.frames[i] = frame;
 
             });
-            // greate a video frame
-            
         }
 
         // some forced generic styling
@@ -4560,7 +4581,7 @@ this.prependChild( 'info', 'myElement' );
                 self.updateCarousel();
             }
 
-            self._controls.videos[ self._controls.active ].scale({
+            self._controls.frames[ self._controls.active ].scale({
                 width: self._stageWidth,
                 height: self._stageHeight,
                 iframelimit: self._options.maxVideoSize
@@ -4722,7 +4743,7 @@ this.prependChild( 'info', 'myElement' );
                 $( next.image ).trigger( 'mouseup' );
             };
 
-        self.$('container').toggleClass('iframe', !!data.isIframe);
+        self.$('container').toggleClass('iframe', !!data.isIframe).removeClass( 'videoplay' );
 
         // to be fired when loading & transition is complete:
         var complete = (function( data, next, active, queue, thumb ) {
@@ -4745,8 +4766,8 @@ this.prependChild( 'info', 'myElement' );
                     opacity: 0
                 }).show();
 
-                $( active.container ).find( 'iframe, .galleria-videoplay' ).remove();
-                $( self._controls.videos[ self._controls.active ].container ).hide();
+                $( active.container ).find( 'iframe, .galleria-videoicon' ).remove();
+                $( self._controls.frames[ self._controls.active ].container ).hide();
 
                 $( next.container ).css({
                     zIndex: 1,
@@ -4781,22 +4802,28 @@ this.prependChild( 'info', 'myElement' );
                                 self.pause();
                             }
 
-                            var video = self._controls.videos[ self._controls.active ];
+                            var frame = self._controls.frames[ self._controls.active ],
+                                w = self._stageWidth,
+                                h = self._stageHeight;
 
-                            $( video.container ).css({
-                                width: self._stageWidth,
-                                height: self._stageHeight,
+                            $( frame.container ).css({
+                                width: w,
+                                height: h,
                                 opacity: 0
                             }).show().animate({
                                 opacity: 1
                             }, 200);
 
                             setTimeout(function() {
-                                video.load( data.iframe+'&autoplay=1', function(video) {
-                                    video.scale({
-                                        width: self._stageWidth,
-                                        height: self._stageHeight,
-                                        iframelimit: self._options.maxVideoSize
+                                frame.load( data.iframe + ( data.video ? '&autoplay=1' : '' ), {
+                                    width: w,
+                                    height: h
+                                }, function( frame ) {
+                                    self.$( 'container' ).addClass( 'videoplay' );
+                                    frame.scale({
+                                        width: w,
+                                        height: h,
+                                        iframelimit: data.video ? self._options.maxVideoSize : undef
                                     });
                                 });
                             }, 100);
@@ -5968,13 +5995,15 @@ Galleria.Picture.prototype = {
         if( this.isIframe ) {
             var id = 'if'+new Date().getTime();
 
-            this.image = $('<iframe>', {
+            var iframe = this.image = $('<iframe>', {
                 src: src,
                 frameborder: 0,
                 id: id,
                 allowfullscreen: true,
                 css: { visibility: 'hidden' }
             })[0];
+
+            size && $( iframe ).css( size );
 
             $( this.container ).find( 'iframe,img' ).remove();
 

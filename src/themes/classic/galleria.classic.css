@@ -215,3 +215,5 @@
     background-image: url(classic-map.png);
     background-repeat: no-repeat;
 }
+.galleria-container.videoplay .galleria-info,
+.galleria-container.videoplay .galleria-counter{ display:none!important; }
