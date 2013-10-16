@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3 2013-11-09
+ * Galleria v 1.3 2013-11-16
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -115,44 +115,46 @@ var window = this,
     _video = {
         youtube: {
             reg: /https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i,
-            embed: function(id) {
-                return 'http://www.youtube.com/embed/'+id;
+            embed: function() {
+                return 'http://www.youtube.com/embed/' + this.id;
             },
-            getUrl: function(id) {
-                return window.location.protocol+'//gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script&callback=?';
+            getUrl: function() {
+                return window.location.protocol+'//gdata.youtube.com/feeds/api/videos/' + this.id + '?v=2&alt=json-in-script&callback=?';
             },
             get_thumb: function(data) {
                 return data.entry.media$group.media$thumbnail[0].url;
             },
             get_image: function(data) {
-                return data.entry.media$group.media$thumbnail[0].url;
-            },
-            cache: {}
-        }
+                return data.entry.media$group.media$thumbnail[2].url;
+            }
+        },
+        _inst: []
     },
     Video = function( type, id ) {
-        var readys = [],
-            self = this,
-            onload = function( data ) {
-                
-            };
 
-        self.type = type;
+        for( var i=0; i<_video._inst.length; i++ ) {
+            if ( _video._inst[i].id === id && _video._inst[i].type == type ) {
+                return _video._inst[i];
+            }
+        }
+
+        this.type = type;
+        this.id = id;
+        this.readys = [];
+
+        _video._inst.push(this);
+
+        var self = this;
 
         $.extend( this, _video[type] );
 
-        this.data = _video[ type ].cache[ id ] || null;
-
-        if ( !this.data ) {
-
-            $.getJSON( this.getUrl( id ), function(data) {
-                self.data = data;
-                _video[ self.type ].cache[ id ] = data;
-                $.each( readys, function( i, fn ) {
-                    fn( self.data );
-                })
+        $.getJSON( this.getUrl(), function(data) {
+            self.data = data;
+            $.each( self.readys, function( i, fn ) {
+                fn( self.data );
             });
-        }
+            self.readys = [];
+        });
 
         this.getMedia = function( type, callback, fail ) {
             fail = fail || F;
@@ -164,7 +166,7 @@ var window = this,
                 if ( self.data ) {
                     success( self.data );
                 } else {
-                    readys.push( success );
+                    self.readys.push( success );
                 }
             } catch(e) {
                 fail();
@@ -209,7 +211,7 @@ var window = this,
     _videoTest = function( url ) {
         var match;
         for ( var v in _video ) {
-            match = url && url.match( _video[v].reg );
+            match = url && _video[v].reg && url.match( _video[v].reg );
             if( match && match.length ) {
                 return {
                     id: match[2],
@@ -2289,16 +2291,16 @@ Galleria = window.Galleria = function() {
                 for ( i = self._options.preload; i > 0; i-- ) {
                     p = new Galleria.Picture();
                     ndata = self.getData( n );
-                    p.preload( 'big' in ndata ? ndata.big : ndata.image );
+                    p.preload( ndata.big ? ndata.big : ndata.image );
                     n = self.getNext( n );
                 }
             } catch(e) {}
 
-            lightbox.image.isIframe = !!data.iframe;
+            lightbox.image.isIframe = ( data.iframe && !data.image );
 
-            $(lightbox.elems.box).toggleClass( 'iframe', !!data.iframe );
+            $(lightbox.elems.box).toggleClass( 'iframe', lightbox.image.isIframe );
 
-            lightbox.image.load( data.iframe || data.big || data.image, function( image ) {
+            lightbox.image.load( data.big || data.image || data.iframe, function( image ) {
 
                 if ( image.isIframe ) {
 
@@ -2319,20 +2321,36 @@ Galleria = window.Galleria = function() {
                     lightbox.width = image.original.width;
                     lightbox.height = image.original.height;
                 }
-
                 $( image.image ).css({
                     width: image.isIframe ? '100%' : '100.1%',
                     height: image.isIframe ? '100%' : '100.1%',
                     top: 0,
+                    bottom: 0,
                     zIndex: 99998,
                     opacity: 0,
                     visibility: 'visible'
-                });
+                }).parent().height('100%');
 
                 lightbox.elems.title.innerHTML = data.title || '';
                 lightbox.elems.counter.innerHTML = (index + 1) + ' / ' + total;
                 $win.resize( lightbox.rescale );
                 lightbox.rescale();
+
+                if( data.image && data.iframe ) {
+                    $( lightbox.elems.box ).addClass('iframe');
+                    $( image.image ).css( 'cursor', 'pointer' ).click((function(data, image) {
+                        return function(e) {
+                            e.preventDefault();
+                            image.isIframe = true;
+                            image.load(data.iframe+'&autoplay=1', function(image) {
+                                image.scale({
+                                    width: '100%',
+                                    height: '100%'
+                                });
+                            });
+                        }
+                    }(data, image)));
+                }
             });
 
             $( lightbox.elems.overlay ).show().css( 'visibility', 'visible' );
@@ -2499,6 +2517,7 @@ Galleria.prototype = {
             transitionSpeed: 400,
             trueFullscreen: true, // 1.2.7
             useCanvas: false, // 1.2.4
+            videoPoster: true, // 1.3
             vimeo: {
                 title: 0,
                 byline: 0,
@@ -2774,7 +2793,7 @@ Galleria.prototype = {
                        return;
                     }
 
-                    var src = self.isFullscreen() && 'big' in data ? data.big : ( data.image || data.iframe ),
+                    var src = self.isFullscreen() && data.big ? data.big : ( data.image || data.iframe ),
                         image = self._controls.slides[index],
                         cached = image.isCached( src ),
                         thumb = self._thumbnails[ index ];
@@ -2828,7 +2847,7 @@ Galleria.prototype = {
                 $.each(filtered, function(i, loadme) {
                     var d = self.getData(loadme),
                         img = self._controls.slides[loadme],
-                        src = self.isFullscreen() && 'big' in d ? d.big : ( d.image || d.iframe );
+                        src = self.isFullscreen() && d.big ? d.big : ( d.image || d.iframe );
 
                     if ( !img.ready ) {
                         self._controls.slides[loadme].load(src, function(img) {
@@ -3246,9 +3265,12 @@ Galleria.prototype = {
             } else if ( data.iframe || optval === 'empty' || optval === 'numbers' ) {
 
                 thumb = {
-                    container:  Utils.create( 'galleria-image' ),
+                    container: Utils.create( 'galleria-image' ),
                     image: Utils.create( 'img', 'span' ),
-                    ready: true
+                    ready: true,
+                    data: {
+                        order: i
+                    }
                 };
 
                 // create numbered thumbnails
@@ -3616,11 +3638,15 @@ Galleria.prototype = {
                 }
 
                 // alternative extraction from HTML5 data attribute, added in 1.2.7
-                $.each( 'big title description link layer'.split(' '), function( i, val ) {
+                $.each( 'big title description link layer image'.split(' '), function( i, val ) {
                     if ( elem.data(val) ) {
                         data[ val ] = elem.data(val).toString();
                     }
                 });
+
+                if ( !data.big ) {
+                    data.big = data.image;
+                }
 
                 // mix default extractions with the hrefs and config
                 // and push it into the data array
@@ -3660,8 +3686,6 @@ Galleria.prototype = {
     // make sure the data works properly
     _parseData : function( callback ) {
 
-        console.log('_parse')
-
         var self = this,
             current,
             ready = false;
@@ -3688,7 +3712,7 @@ Galleria.prototype = {
                 current.thumb = data.image;
             }
             // copy image as big image if no biggie exists
-            if ( !'big' in data ) {
+            if ( !data.big ) {
                 current.big = data.image;
             }
             // parse video
@@ -3696,7 +3720,7 @@ Galleria.prototype = {
                 var result = _videoTest( data.video )
 
                 if ( result ) {
-                    current.iframe = _video[ result.provider ].embed( result.id ) + (function() {
+                    current.iframe = new Video(result.provider, result.id ).embed() + (function() {
 
                         // add options
                         if ( typeof self._options[ result.provider ] == 'object' ) {
@@ -3713,19 +3737,24 @@ Galleria.prototype = {
                         }
                         return '';
                     }());
-                    
-                    delete current.video;
 
                     // pre-fetch video providers media
 
                     if( !current.thumb || !current.image ) {
                         $.each( ['thumb', 'image'], function( i, type ) {
+                            if ( type == 'image' && !self._options.videoPoster ) {
+                                current.image = undef;
+                                return;
+                            }
                             var video = new Video( result.provider, result.id );
                             if ( !current[ type ] ) {
                                 current.loading = true;
                                 video.getMedia( type, (function(current, type) {
                                     return function(src) {
                                         current[ type ] = src;
+                                        if ( type == 'image' && !current.big ) {
+                                            current.big = current.image;
+                                        }
                                         delete current.loading;
                                         onload();
                                     }
@@ -4364,7 +4393,7 @@ this.prependChild( 'info', 'myElement' );
         var complete,
 
             scaleLayer = function( img ) {
-                $( img.container ).children(':first').css({
+                $( img.container ).children('.galleria-layer').css({
                     top: Math.max(0, Utils.parseValue( img.image.style.top )),
                     left: Math.max(0, Utils.parseValue( img.image.style.left )),
                     width: Utils.parseValue( img.image.width ),
@@ -4568,7 +4597,7 @@ this.prependChild( 'info', 'myElement' );
                 return;
             }
 
-            var src = this.isFullscreen() && 'big' in data ? data.big : ( data.image || data.iframe ),
+            var src = this.isFullscreen() && data.big ? data.big : ( data.image || data.iframe ),
                 image = this._controls.slides[index],
                 cached = image.isCached( src ),
                 thumb = this._thumbnails[ index ];
@@ -4641,7 +4670,7 @@ this.prependChild( 'info', 'myElement' );
             return;
         }
 
-        var src = this.isFullscreen() && 'big' in data ? data.big : ( data.image || data.iframe ),
+        var src = this.isFullscreen() && data.big ? data.big : ( data.image || data.iframe ),
             active = this._controls.getActive(),
             next = this._controls.getNext(),
             cached = next.isCached( src ),
@@ -4649,6 +4678,8 @@ this.prependChild( 'info', 'myElement' );
             mousetrigger = function() {
                 $( next.image ).trigger( 'mouseup' );
             };
+
+        self.$('container').toggleClass('iframe', !!data.isIframe);
 
         // to be fired when loading & transition is complete:
         var complete = (function( data, next, active, queue, thumb ) {
@@ -4671,11 +4702,7 @@ this.prependChild( 'info', 'myElement' );
                     opacity: 0
                 }).show();
 
-                if( active.isIframe ) {
-                    $( active.container ).find( 'iframe' ).remove();
-                }
-
-                self.$('container').toggleClass('iframe', !!data.iframe);
+                $( active.container ).find( 'iframe, .galleria-videoplay' ).remove();
 
                 $( next.container ).css({
                     zIndex: 1,
@@ -4690,9 +4717,9 @@ this.prependChild( 'info', 'myElement' );
                     self.addPan( next.image );
                 }
 
-                // make the image link or add lightbox
-                // link takes precedence over lightbox if both are detected
-                if ( data.link || self._options.lightbox || self._options.clicknext ) {
+                // make the image clickable
+                // order of precedence: iframe, link, lightbox, clicknext
+                if ( ( data.iframe && data.image ) || data.link || self._options.lightbox || self._options.clicknext ) {
 
                     $( next.image ).css({
                         cursor: 'pointer'
@@ -4700,6 +4727,27 @@ this.prependChild( 'info', 'myElement' );
 
                         // non-left click
                         if ( typeof e.which == 'number' && e.which > 1 ) {
+                            return;
+                        }
+
+                        // iframe / video
+                        if ( data.iframe ) {
+
+                            if ( self.isPlaying() ) {
+                                self.pause();
+                            }
+
+                            $( next.container ).find( '.galleria-videoplay' ).remove();
+
+                            next.isIframe = true;
+                            
+                            next.load(data.iframe+'&autoplay=1', function(frame) {
+                                frame.scale({
+                                    width: self._stageWidth,
+                                    height: self._stageHeight
+                                });
+                            });
+                            self.$( 'container' ).addClass( 'iframe' );
                             return;
                         }
 
@@ -4771,7 +4819,7 @@ this.prependChild( 'info', 'myElement' );
                 for ( i = this._options.preload; i > 0; i-- ) {
                     p = new Galleria.Picture();
                     ndata = self.getData( n );
-                    p.preload( this.isFullscreen() && 'big' in ndata ? ndata.big : ndata.image );
+                    p.preload( this.isFullscreen() && ndata.big ? ndata.big : ndata.image );
                     n = self.getNext( n );
                 }
             } catch(e) {}
@@ -4780,7 +4828,7 @@ this.prependChild( 'info', 'myElement' );
         // show the next image, just in case
         Utils.show( next.container );
 
-        //next.isIframe = !!data.iframe;
+        next.isIframe = data.iframe && !data.image;
 
         // add active classes
         $( self._thumbnails[ queue.index ].container )
@@ -4807,6 +4855,28 @@ this.prependChild( 'info', 'myElement' );
 
             // add layer HTML
             var layer = $( self._layers[ 1-self._controls.active ] ).html( data.layer || '' ).hide();
+
+            // add play icon
+            if( data.video && data.image ) {
+                self.addElement('videoplay').$('videoplay').html('&#9654;').css({
+                    fontSize: 40,
+                    width: 80,
+                    height: 80,
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -40,
+                    marginLeft: -40,
+                    color: '#fff',
+                    cursor: 'pointer',
+                    background: 'rgba(0,0,0,.4)',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    lineHeight: '85px'
+                }).appendTo( next.container ).click( function() {
+                    $( this ).siblings( 'img' ).mouseup();
+                });
+            }
 
             self._scaleImage( next, {
 
