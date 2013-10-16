@@ -122,13 +122,26 @@ var window = this,
                 return window.location.protocol+'//gdata.youtube.com/feeds/api/videos/' + this.id + '?v=2&alt=json-in-script&callback=?';
             },
             get_thumb: function(data) {
-                return data.entry.media$group.media$thumbnail[0].url;
+                return data.entry.media$group.media$thumbnail[2].url;
             },
             get_image: function(data) {
-                return data.entry.media$group.media$thumbnail[2].url;
+                if ( data.entry.yt$hd ) {
+                    return window.location.protocol+'//img.youtube.com/vi/'+this.id+'/maxresdefault.jpg';
+                }
+                return data.entry.media$group.media$thumbnail[3].url;
             }
         },
-        _inst: []
+        _inst: [],
+        appendIcon: function( container ) {
+
+            var css = '.galleria-videoplay{font-size:24px;width:60px;height:60px;position:absolute;top:50%;left:50%;' +
+                      'margin:-30px 0 0 -30px;color:#fff;cursor:pointer;background:rgba(0,0,0,.7);border-radius:3px;text-align:center;line-height:63px}';
+
+            Utils.insertStyleTag( css, 'galleria-videoplay' );
+
+            return $( Utils.create( 'galleria-videoplay' ) ).html( '&#9654;' ).appendTo( container )
+                .click( function() { $( this ).siblings( 'img' ).mouseup(); });
+        }
     },
     Video = function( type, id ) {
 
@@ -1188,7 +1201,9 @@ Galleria = window.Galleria = function() {
             return self._options.swipe ? controls.slides[ self.getNext( self._active ) ] : controls[ 1 - controls.active ];
         },
 
-        slides : []
+        slides : [],
+
+        videos: []
     };
 
     // internal carousel object
@@ -1982,7 +1997,7 @@ Galleria = window.Galleria = function() {
 
         hide : function() {
 
-            if ( !self._options.idleMode || self.getIndex() === false || self.getData().iframe ) {
+            if ( !self._options.idleMode || self.getIndex() === false ) {
                 return;
             }
 
@@ -2300,6 +2315,8 @@ Galleria = window.Galleria = function() {
 
             $(lightbox.elems.box).toggleClass( 'iframe', lightbox.image.isIframe );
 
+            $( lightbox.image.container ).find( '.galleria-videoplay' ).remove()
+
             lightbox.image.load( data.big || data.image || data.iframe, function( image ) {
 
                 if ( image.isIframe ) {
@@ -2338,8 +2355,14 @@ Galleria = window.Galleria = function() {
 
                 if( data.image && data.iframe ) {
                     $( lightbox.elems.box ).addClass('iframe');
-                    $( image.image ).css( 'cursor', 'pointer' ).click((function(data, image) {
+                    var $icon = _video.appendIcon( image.container ).hide();
+                    setTimeout(function() {
+                        $icon.fadeIn(200);
+                    }, 200);
+
+                    $( image.image ).css( 'cursor', 'pointer' ).mouseup((function(data, image) {
                         return function(e) {
+                            $( lightbox.image.container ).find( '.galleria-videoplay' ).remove();
                             e.preventDefault();
                             image.isIframe = true;
                             image.load(data.iframe+'&autoplay=1', function(image) {
@@ -2758,7 +2781,23 @@ Galleria.prototype = {
                 // reload the controls
                 self._controls[i] = image;
 
+                var video = new Galleria.Picture();
+                video.isIframe = true;
+
+                $( video.container ).attr('class', 'galleria-video').css({
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    zIndex: 4,
+                    background: '#000',
+                    display: 'none'
+                }).appendTo( image.container );
+
+                self._controls.videos[i] = video;
+
             });
+            // greate a video frame
+            
         }
 
         // some forced generic styling
@@ -4393,7 +4432,7 @@ this.prependChild( 'info', 'myElement' );
         var complete,
 
             scaleLayer = function( img ) {
-                $( img.container ).children('.galleria-layer').css({
+                $( img.container ).children(':first').css({
                     top: Math.max(0, Utils.parseValue( img.image.style.top )),
                     left: Math.max(0, Utils.parseValue( img.image.style.left )),
                     width: Utils.parseValue( img.image.width ),
@@ -4513,15 +4552,19 @@ this.prependChild( 'info', 'myElement' );
                 });
                 self.$('images').css('width', self._stageWidth * self.getDataLength());
             } else {
-
                 // scale the active image
                 self._scaleImage();
-
             }
 
             if ( self._options.carousel ) {
                 self.updateCarousel();
             }
+
+            self._controls.videos[ self._controls.active ].scale({
+                width: self._stageWidth,
+                height: self._stageHeight,
+                iframelimit: self._options.maxVideoSize
+            });
 
             self.trigger( Galleria.RESCALE );
 
@@ -4703,6 +4746,7 @@ this.prependChild( 'info', 'myElement' );
                 }).show();
 
                 $( active.container ).find( 'iframe, .galleria-videoplay' ).remove();
+                $( self._controls.videos[ self._controls.active ].container ).hide();
 
                 $( next.container ).css({
                     zIndex: 1,
@@ -4737,17 +4781,40 @@ this.prependChild( 'info', 'myElement' );
                                 self.pause();
                             }
 
-                            $( next.container ).find( '.galleria-videoplay' ).remove();
+                            var video = self._controls.videos[ self._controls.active ];
+
+                            $( video.container ).css({
+                                width: self._stageWidth,
+                                height: self._stageHeight,
+                                opacity: 0
+                            }).show().animate({
+                                opacity: 1
+                            }, 200);
+
+                            setTimeout(function() {
+                                video.load( data.iframe+'&autoplay=1', function(video) {
+                                    video.scale({
+                                        width: self._stageWidth,
+                                        height: self._stageHeight,
+                                        iframelimit: self._options.maxVideoSize
+                                    });
+                                });
+                            }, 100);
+
+                            /*
+                            $( '.galleria-videoplay' ).remove();
 
                             next.isIframe = true;
                             
                             next.load(data.iframe+'&autoplay=1', function(frame) {
                                 frame.scale({
                                     width: self._stageWidth,
-                                    height: self._stageHeight
+                                    height: self._stageHeight,
+                                    iframelimit: self._options.maxVideoSize
                                 });
                             });
                             self.$( 'container' ).addClass( 'iframe' );
+                            */
                             return;
                         }
 
@@ -4856,28 +4923,6 @@ this.prependChild( 'info', 'myElement' );
             // add layer HTML
             var layer = $( self._layers[ 1-self._controls.active ] ).html( data.layer || '' ).hide();
 
-            // add play icon
-            if( data.video && data.image ) {
-                self.addElement('videoplay').$('videoplay').html('&#9654;').css({
-                    fontSize: 40,
-                    width: 80,
-                    height: 80,
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -40,
-                    marginLeft: -40,
-                    color: '#fff',
-                    cursor: 'pointer',
-                    background: 'rgba(0,0,0,.4)',
-                    borderRadius: '8px',
-                    textAlign: 'center',
-                    lineHeight: '85px'
-                }).appendTo( next.container ).click( function() {
-                    $( this ).siblings( 'img' ).mouseup();
-                });
-            }
-
             self._scaleImage( next, {
 
                 complete: function( next ) {
@@ -4900,9 +4945,14 @@ this.prependChild( 'info', 'myElement' );
                     if ( data.layer ) {
                         layer.show();
                         // inherit click events set on image
-                        if ( data.link || self._options.lightbox || self._options.clicknext ) {
+                        if ( ( data.iframe && data.image ) || data.link || self._options.lightbox || self._options.clicknext ) {
                             layer.css( 'cursor', 'pointer' ).unbind( 'mouseup' ).mouseup( mousetrigger );
                         }
+                    }
+
+                    // add play icon
+                    if( data.video && data.image ) {
+                        _video.appendIcon( next.container );
                     }
 
                     var transition = self._options.transition;
