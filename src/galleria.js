@@ -897,13 +897,14 @@ var window = this,
     // play icon
     _playIcon = function( container ) {
 
-        var css = '.galleria-videoicon{font-size:24px;width:60px;height:60px;position:absolute;top:50%;left:50%;' +
-                  'margin:-30px 0 0 -30px;color:#fff;cursor:pointer;background:rgba(0,0,0,.7);border-radius:3px;' +
-                  'text-align:center;line-height:63px}.galleria-image:hover .galleria-videoicon{background:#000}';
+        var css = '.galleria-videoicon{width:60px;height:60px;position:absolute;top:50%;left:50%;' +
+                  'margin:-30px 0 0 -30px;cursor:pointer;background:#000;background:rgba(0,0,0,.5);border-radius:3px;}' +
+                  '.galleria-videoicon i{width:0px;height:0px;border-style:solid;border-width: 10px 0 10px 16px;display:block;' +
+                  'border-color:transparent transparent transparent #ffffff;margin:20px 0 0 22px}.galleria-image:hover .galleria-videoicon{background:#000}';
 
         Utils.insertStyleTag( css, 'galleria-videoicon' );
 
-        return $( Utils.create( 'galleria-videoicon' ) ).html( '&#9654;' ).appendTo( container )
+        return $( Utils.create( 'galleria-videoicon' ) ).html( '<i></i>' ).appendTo( container )
             .click( function() { $( this ).siblings( 'img' ).mouseup(); });
     },
 
@@ -2341,7 +2342,7 @@ Galleria = window.Galleria = function() {
 
             lightbox.image.isIframe = ( data.iframe && !data.image );
 
-            $(lightbox.elems.box).toggleClass( 'iframe', lightbox.image.isIframe );
+            $( lightbox.elems.box ).toggleClass( 'iframe', lightbox.image.isIframe );
 
             $( lightbox.image.container ).find( '.galleria-videoicon' ).remove();
 
@@ -2366,6 +2367,7 @@ Galleria = window.Galleria = function() {
                     lightbox.width = image.original.width;
                     lightbox.height = image.original.height;
                 }
+
                 $( image.image ).css({
                     width: image.isIframe ? '100%' : '100.1%',
                     height: image.isIframe ? '100%' : '100.1%',
@@ -2397,11 +2399,9 @@ Galleria = window.Galleria = function() {
                             $( lightbox.image.container ).find( '.galleria-videoicon' ).remove();
                             e.preventDefault();
                             image.isIframe = true;
-                            image.load( data.iframe + ( data.video ? '&autoplay=1' : '' ), function(image) {
-                                image.scale({
-                                    width: '100%',
-                                    height: '100%'
-                                });
+                            image.load( data.iframe + ( data.video ? '&autoplay=1' : '' ), { 
+                                width: '100%', 
+                                height: IE < 8 ? $( lightbox.image.container ).height() : '100%'
                             });
                         };
                     }(data, image)));
@@ -3879,7 +3879,9 @@ Galleria.prototype = {
             args = Utils.array( arguments );
         window.setTimeout(function() {
             protoArray.splice.apply( self._data, args );
-            self._parseData()._createThumbnails();
+            self._parseData( function() {
+                self._createThumbnails();
+            });
         },2);
         return self;
     },
@@ -3904,8 +3906,10 @@ Galleria.prototype = {
 
         window.setTimeout(function() {
             protoArray.push.apply( self._data, args );
-            self._parseData()._createThumbnails( args );
-        },2);
+            self._parseData( function() {
+                self._createThumbnails( args );
+            });
+        }, 2);
         return self;
     },
 
