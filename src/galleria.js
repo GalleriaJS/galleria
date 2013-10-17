@@ -912,9 +912,9 @@ var window = this,
     // play icon
     _playIcon = function( container ) {
 
-        var css = '.galleria-videoicon{width:60px;height:60px;position:absolute;top:50%;left:50%;' +
-                  'margin:-30px 0 0 -30px;cursor:pointer;background:#000;background:rgba(0,0,0,.6);border-radius:3px;-webkit-transition:background 150ms}' +
-                  '.galleria-videoicon i{width:0px;height:0px;border-style:solid;border-width: 10px 0 10px 16px;display:block;' +
+        var css = '.galleria-videoicon{width:60px;height:60px;position:absolute;top:50%;left:50%;z-index:1;' +
+                  'margin:-30px 0 0 -30px;cursor:pointer;background:#000;background:rgba(0,0,0,.8);border-radius:3px;-webkit-transition:all 150ms}' +
+                  '.galleria-videoicon i{width:0px;height:0px;border-style:solid;border-width:10px 0 10px 16px;display:block;' +
                   'border-color:transparent transparent transparent #ffffff;margin:20px 0 0 22px}.galleria-image:hover .galleria-videoicon{background:#000}';
 
         Utils.insertStyleTag( css, 'galleria-videoicon' );
@@ -2878,6 +2878,9 @@ Galleria.prototype = {
                        return;
                     }
 
+                    self.$( 'images' ).find( 'iframe' ).remove();
+                    self.$( 'images' ).find( '.galleria-frame' ).css('opacity', 0)
+
                     var src = self.isFullscreen() && data.big ? data.big : ( data.image || data.iframe ),
                         image = self._controls.slides[index],
                         cached = image.isCached( src ),
@@ -2902,12 +2905,51 @@ Galleria.prototype = {
             });
             this.$('stage').bind('click', function(e) {
                 var data = self.getData();
-                if ( data && data.link ) {
+                if ( !data ) {
+                    return;
+                }
+                console.log(data, self._controls.active)
+                if ( data.iframe ) {
+
+                    if ( self.isPlaying() ) {
+                        self.pause();
+                    }
+                    var frame = self._controls.frames[ self._active ],
+                        w = self._stageWidth,
+                        h = self._stageHeight;
+
+                    $( frame.container ).css({
+                        width: w,
+                        height: h,
+                        opacity: 0
+                    }).show().animate({
+                        opacity: 1
+                    }, 200);
+
+                    window.setTimeout(function() {
+                        frame.load( data.iframe + ( data.video ? '&autoplay=1' : '' ), {
+                            width: w,
+                            height: h
+                        }, function( frame ) {
+                            self.$( 'container' ).addClass( 'videoplay' );
+                            frame.scale({
+                                width: self._stageWidth,
+                                height: self._stageHeight,
+                                iframelimit: data.video ? self._options.maxVideoSize : undef
+                            });
+                        });
+                    }, 100);
+
+                    return;
+                }
+
+                if ( data.link ) {
                     if ( self._options.popupLinks ) {
                         var win = window.open( data.link, '_blank' );
                     } else {
                         window.location.href = data.link;
                     }
+                    return;
                 }
             });
             this.bind( Galleria.IMAGE, function(e) {
@@ -3533,7 +3575,8 @@ Galleria.prototype = {
                     var $images = self.$( 'images' ).width( self.getDataLength() * self._stageWidth );
                     $.each( new Array( self.getDataLength() ), function(i) {
 
-                        var image = new Galleria.Picture();
+                        var image = new Galleria.Picture(),
+                            data = self.getData(i);
 
                         $( image.container ).css({
                             position: 'absolute',
@@ -3545,7 +3588,25 @@ Galleria.prototype = {
                             zIndex:2
                         })[0] ).appendTo( $images );
 
+                        if( data.video ) {
+                            _playIcon( image.container );
+                        }
+
                         self._controls.slides.push(image);
+
+                        var frame = new Galleria.Picture();
+                        frame.isIframe = true;
+
+                        $( frame.container ).attr('class', 'galleria-frame').css({
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            zIndex: 4,
+                            background: '#000',
+                            display: 'none'
+                        }).appendTo( image.container );
+
+                        self._controls.frames.push(frame);
                     });
 
                     self.finger.setup();
@@ -4708,12 +4769,12 @@ this.prependChild( 'info', 'myElement' );
                 type: Galleria.LOADSTART
             }));
 
-            $( this._thumbnails[ index ].container )
+            $( self._thumbnails[ index ].container )
                 .addClass( 'active' )
                 .siblings( '.active' )
                 .removeClass( 'active' );
-
-            var complete = function(image) {
+            
+            var complete = function() {
 
                 self._layers[index].innerHTML = self.getData().layer || '';
 
@@ -4723,20 +4784,23 @@ this.prependChild( 'info', 'myElement' );
                 self._playCheck();
             };
 
-            // load if not ready
-            if ( !image.ready ) {
-                image.load(src, function(image) {
-                    self._scaleImage(image, complete).trigger($.extend(evObj, {
+            setTimeout(function() {
+
+                // load if not ready
+                if ( !image.ready ) {
+                    image.load(src, function(image) {
+                        self._scaleImage(image, complete).trigger($.extend(evObj, {
+                            type: Galleria.IMAGE
+                        }));
+                        complete();
+                    });
+                } else {
+                    self.trigger($.extend(evObj, {
                         type: Galleria.IMAGE
                     }));
                     complete();
-                });
-            } else {
-                self.trigger($.extend(evObj, {
-                    type: Galleria.IMAGE
-                }));
-                complete();
-            }
+                }
+            },800);
 
         } else {
             protoArray.push.call( this._queue, {

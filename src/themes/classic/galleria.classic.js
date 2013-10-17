@@ -72,18 +72,24 @@ Galleria.addTheme({
                     $(e.thumbTarget).css('opacity',1);
                 }
             } else {
-                $(e.thumbTarget).css('opacity', this.getIndex() ? 1 : 0.6);
+                $(e.thumbTarget).css('opacity', this.getIndex() ? 1 : 0.6).click( function() {
+                    $(this).css( 'opacity', 1 ).parent().siblings().children().css('opacity', 0.6);
+                })
             }
         });
+
+        var activate = function(e) {
+            $(e.thumbTarget).css('opacity',1).parent().siblings().children().css('opacity', 0.6);
+        };
 
         this.bind('loadstart', function(e) {
             if (!e.cached) {
                 this.$('loader').show().fadeTo(200, 0.4);
             }
-
+            setTimeout(function() {
+                activate(e);
+            }, touch ? 300 : 0)
             this.$('info').toggle( this.hasInfo() );
-
-            $(e.thumbTarget).css('opacity',1).parent().siblings().children().css('opacity', 0.6);
         });
 
         this.bind('loadfinish', function(e) {
