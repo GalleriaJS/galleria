@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3 2013-11-16
+ * Galleria v 1.3 2013-11-17
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -27,6 +27,7 @@ var window = this,
     DUMMY = false,
     NAV = navigator.userAgent.toLowerCase(),
     HASH = window.location.hash.replace(/#\//, ''),
+    PROT = window.location.protocol,
     F = function(){},
     FALSE = function() { return false; },
     IE = (function() {
@@ -119,14 +120,14 @@ var window = this,
                 return 'http://www.youtube.com/embed/' + this.id;
             },
             getUrl: function() {
-                return window.location.protocol+'//gdata.youtube.com/feeds/api/videos/' + this.id + '?v=2&alt=json-in-script&callback=?';
+                return PROT + '//gdata.youtube.com/feeds/api/videos/' + this.id + '?v=2&alt=json-in-script&callback=?';
             },
             get_thumb: function(data) {
                 return data.entry.media$group.media$thumbnail[2].url;
             },
             get_image: function(data) {
                 if ( data.entry.yt$hd ) {
-                    return window.location.protocol+'//img.youtube.com/vi/'+this.id+'/maxresdefault.jpg';
+                    return PROT + '//img.youtube.com/vi/'+this.id+'/maxresdefault.jpg';
                 }
                 return data.entry.media$group.media$thumbnail[3].url;
             }
@@ -137,27 +138,16 @@ var window = this,
                 return 'http://player.vimeo.com/video/' + this.id;
             },
             getUrl: function() {
-                return window.location.protocol+'//vimeo.com/api/v2/video/' + this.id + '.json?callback=?'
+                return PROT + '//vimeo.com/api/v2/video/' + this.id + '.json?callback=?';
             },
             get_thumb: function( data ) {
                 return data[0].thumbnail_medium;
             },
             get_image: function( data ) {
-                console.log(data)
                 return data[0].thumbnail_large;
             }
         },
-        _inst: [],
-        appendIcon: function( container ) {
-
-            var css = '.galleria-videoicon{font-size:24px;width:60px;height:60px;position:absolute;top:50%;left:50%;' +
-                      'margin:-30px 0 0 -30px;color:#fff;cursor:pointer;background:rgba(0,0,0,.7);border-radius:3px;text-align:center;line-height:63px}';
-
-            Utils.insertStyleTag( css, 'galleria-videoicon' );
-
-            return $( Utils.create( 'galleria-videoicon' ) ).html( '&#9654;' ).appendTo( container )
-                .click( function() { $( this ).siblings( 'img' ).mouseup(); });
-        }
+        _inst: []
     },
     Video = function( type, id ) {
 
@@ -200,7 +190,7 @@ var window = this,
             } catch(e) {
                 fail();
             }
-        }
+        };
     /*,
         vimeo: {
             reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
@@ -904,6 +894,19 @@ var window = this,
         };
     }()),
 
+    // play icon
+    _playIcon = function( container ) {
+
+        var css = '.galleria-videoicon{font-size:24px;width:60px;height:60px;position:absolute;top:50%;left:50%;' +
+                  'margin:-30px 0 0 -30px;color:#fff;cursor:pointer;background:rgba(0,0,0,.7);border-radius:3px;' +
+                  'text-align:center;line-height:63px}.galleria-image:hover .galleria-videoicon{background:#000}';
+
+        Utils.insertStyleTag( css, 'galleria-videoicon' );
+
+        return $( Utils.create( 'galleria-videoicon' ) ).html( '&#9654;' ).appendTo( container )
+            .click( function() { $( this ).siblings( 'img' ).mouseup(); });
+    },
+
     // the transitions holder
     _transitions = (function() {
 
@@ -1060,7 +1063,7 @@ var window = this,
 _nativeFullscreen.listen();
 
 // trigger resize on orientationchange (IOS7)
-$win.bind( 'orientationchange', function() { 
+$win.bind( 'orientationchange', function() {
     $(this).resize();
 });
 
@@ -1714,7 +1717,7 @@ Galleria = window.Galleria = function() {
                 }
 
                 // move
-                self.$('container').appendTo('body');
+                self.$( 'container' ).appendTo( 'body' );
 
                 // begin styleforce
 
@@ -1814,6 +1817,7 @@ Galleria = window.Galleria = function() {
                     if (typeof callback === 'function') {
                         callback.call( self );
                     }
+                    self.rescale();
 
                 }, 100);
 
@@ -1869,6 +1873,12 @@ Galleria = window.Galleria = function() {
                 // scroll back
                 if( !Galleria.TOUCH ) {
                     window.scrollTo(0, fullscreen.scrolled);
+                }
+
+                // reload iframe src manually
+                var frame = self._controls.frames[ self._controls.active ];
+                if ( frame ) {
+                    frame.image.src = frame.image.src;
                 }
             }
 
@@ -2333,7 +2343,7 @@ Galleria = window.Galleria = function() {
 
             $(lightbox.elems.box).toggleClass( 'iframe', lightbox.image.isIframe );
 
-            $( lightbox.image.container ).find( '.galleria-videoicon' ).remove()
+            $( lightbox.image.container ).find( '.galleria-videoicon' ).remove();
 
             lightbox.image.load( data.big || data.image || data.iframe, function( image ) {
 
@@ -2376,8 +2386,8 @@ Galleria = window.Galleria = function() {
                     $( lightbox.elems.box ).addClass('iframe');
 
                     if ( data.video ) {
-                        var $icon = _video.appendIcon( image.container ).hide();
-                        setTimeout(function() {
+                        var $icon = _playIcon( image.container ).hide();
+                        window.setTimeout(function() {
                             $icon.fadeIn(200);
                         }, 200);
                     }
@@ -2393,7 +2403,7 @@ Galleria = window.Galleria = function() {
                                     height: '100%'
                                 });
                             });
-                        }
+                        };
                     }(data, image)));
                 }
             });
@@ -3748,7 +3758,7 @@ Galleria.prototype = {
 
         var self = this,
             current,
-            ready = false;
+            ready = false,
             onload = function() {
                 var complete = true;
                 $.each( self._data, function( i, data ) {
@@ -3777,7 +3787,7 @@ Galleria.prototype = {
             }
             // parse video
             if ( 'video' in data ) {
-                var result = _videoTest( data.video )
+                var result = _videoTest( data.video );
 
                 if ( result ) {
                     current.iframe = new Video(result.provider, result.id ).embed() + (function() {
@@ -3817,7 +3827,7 @@ Galleria.prototype = {
                                         }
                                         delete current.loading;
                                         onload();
-                                    }
+                                    };
                                 }( current, type )));
                             }
                         });
@@ -4801,7 +4811,6 @@ this.prependChild( 'info', 'myElement' );
                             if ( self.isPlaying() ) {
                                 self.pause();
                             }
-
                             var frame = self._controls.frames[ self._controls.active ],
                                 w = self._stageWidth,
                                 h = self._stageHeight;
@@ -4814,34 +4823,20 @@ this.prependChild( 'info', 'myElement' );
                                 opacity: 1
                             }, 200);
 
-                            setTimeout(function() {
+                            window.setTimeout(function() {
                                 frame.load( data.iframe + ( data.video ? '&autoplay=1' : '' ), {
                                     width: w,
                                     height: h
                                 }, function( frame ) {
                                     self.$( 'container' ).addClass( 'videoplay' );
                                     frame.scale({
-                                        width: w,
-                                        height: h,
+                                        width: self._stageWidth,
+                                        height: self._stageHeight,
                                         iframelimit: data.video ? self._options.maxVideoSize : undef
                                     });
                                 });
                             }, 100);
 
-                            /*
-                            $( '.galleria-videoplay' ).remove();
-
-                            next.isIframe = true;
-                            
-                            next.load(data.iframe+'&autoplay=1', function(frame) {
-                                frame.scale({
-                                    width: self._stageWidth,
-                                    height: self._stageHeight,
-                                    iframelimit: self._options.maxVideoSize
-                                });
-                            });
-                            self.$( 'container' ).addClass( 'iframe' );
-                            */
                             return;
                         }
 
@@ -4979,7 +4974,7 @@ this.prependChild( 'info', 'myElement' );
 
                     // add play icon
                     if( data.video && data.image ) {
-                        _video.appendIcon( next.container );
+                        _playIcon( next.container );
                     }
 
                     var transition = self._options.transition;
@@ -6003,7 +5998,9 @@ Galleria.Picture.prototype = {
                 css: { visibility: 'hidden' }
             })[0];
 
-            size && $( iframe ).css( size );
+            if ( size ) {
+                $( iframe ).css( size );
+            }
 
             $( this.container ).find( 'iframe,img' ).remove();
 
