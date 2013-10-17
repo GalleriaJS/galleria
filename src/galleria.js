@@ -134,7 +134,7 @@ var window = this,
         },
         vimeo: {
             reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
-            embed: function(id) {
+            embed: function() {
                 return 'http://player.vimeo.com/video/' + this.id;
             },
             getUrl: function() {
@@ -145,6 +145,21 @@ var window = this,
             },
             get_image: function( data ) {
                 return data[0].thumbnail_large;
+            }
+        },
+        dailymotion: {
+            reg: /https?:\/\/(?:www\.)?(dailymotion\.com)\/video\/([^_]+)/,
+            embed: function() {
+                return PROT + '//www.dailymotion.com/embed/video/' + this.id;
+            },
+            getUrl: function() {
+                return 'https://api.dailymotion.com/video/' + this.id + '?fields=thumbnail_240_url,thumbnail_720_url&callback=?';
+            },
+            get_thumb: function( data ) {
+                return data.thumbnail_240_url;
+            },
+            get_image: function( data ) {
+                return data.thumbnail_720_url;
             }
         },
         _inst: []
@@ -898,7 +913,7 @@ var window = this,
     _playIcon = function( container ) {
 
         var css = '.galleria-videoicon{width:60px;height:60px;position:absolute;top:50%;left:50%;' +
-                  'margin:-30px 0 0 -30px;cursor:pointer;background:#000;background:rgba(0,0,0,.5);border-radius:3px;}' +
+                  'margin:-30px 0 0 -30px;cursor:pointer;background:#000;background:rgba(0,0,0,.6);border-radius:3px;-webkit-transition:background 150ms}' +
                   '.galleria-videoicon i{width:0px;height:0px;border-style:solid;border-width: 10px 0 10px 16px;display:block;' +
                   'border-color:transparent transparent transparent #ffffff;margin:20px 0 0 22px}.galleria-image:hover .galleria-videoicon{background:#000}';
 
@@ -2399,8 +2414,8 @@ Galleria = window.Galleria = function() {
                             $( lightbox.image.container ).find( '.galleria-videoicon' ).remove();
                             e.preventDefault();
                             image.isIframe = true;
-                            image.load( data.iframe + ( data.video ? '&autoplay=1' : '' ), { 
-                                width: '100%', 
+                            image.load( data.iframe + ( data.video ? '&autoplay=1' : '' ), {
+                                width: '100%',
                                 height: IE < 8 ? $( lightbox.image.container ).height() : '100%'
                             });
                         };
