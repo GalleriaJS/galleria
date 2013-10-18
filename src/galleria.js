@@ -2879,7 +2879,7 @@ Galleria.prototype = {
                     }
 
                     self.$( 'images' ).find( 'iframe' ).remove();
-                    self.$( 'images' ).find( '.galleria-frame' ).css('opacity', 0)
+                    self.$( 'images' ).find( '.galleria-frame' ).css('opacity', 0);
 
                     var src = self.isFullscreen() && data.big ? data.big : ( data.image || data.iframe ),
                         image = self._controls.slides[index],
@@ -4780,7 +4780,7 @@ this.prependChild( 'info', 'myElement' );
                 .addClass( 'active' )
                 .siblings( '.active' )
                 .removeClass( 'active' );
-            
+
             var complete = function() {
 
                 self._layers[index].innerHTML = self.getData().layer || '';
@@ -4791,7 +4791,7 @@ this.prependChild( 'info', 'myElement' );
                 self._playCheck();
             };
 
-            setTimeout(function() {
+            window.setTimeout(function() {
 
                 // load if not ready
                 if ( !image.ready ) {
