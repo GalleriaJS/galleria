@@ -2917,6 +2917,10 @@ Galleria.prototype = {
                         w = self._stageWidth,
                         h = self._stageHeight;
 
+                    if ( $( frame.container ).find( 'iframe' ).length ) {
+                        return;
+                    }
+
                     $( frame.container ).css({
                         width: w,
                         height: h,
