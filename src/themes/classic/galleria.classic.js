@@ -9,7 +9,7 @@
 
 (function($) {
 
-/*global jQuery, Galleria */
+/*global window, jQuery, Galleria */
 
 Galleria.addTheme({
     name: 'classic',
@@ -74,7 +74,7 @@ Galleria.addTheme({
             } else {
                 $(e.thumbTarget).css('opacity', this.getIndex() ? 1 : 0.6).click( function() {
                     $(this).css( 'opacity', 1 ).parent().siblings().children().css('opacity', 0.6);
-                })
+                });
             }
         });
 
@@ -86,9 +86,9 @@ Galleria.addTheme({
             if (!e.cached) {
                 this.$('loader').show().fadeTo(200, 0.4);
             }
-            setTimeout(function() {
+            window.setTimeout(function() {
                 activate(e);
-            }, touch ? 300 : 0)
+            }, touch ? 300 : 0);
             this.$('info').toggle( this.hasInfo() );
         });
 

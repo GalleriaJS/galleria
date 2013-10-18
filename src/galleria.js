@@ -4781,6 +4781,8 @@ this.prependChild( 'info', 'myElement' );
                 .siblings( '.active' )
                 .removeClass( 'active' );
 
+            self.$('container').removeClass( 'videoplay' );
+
             var complete = function() {
 
                 self._layers[index].innerHTML = self.getData().layer || '';
