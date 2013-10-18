@@ -2908,7 +2908,6 @@ Galleria.prototype = {
                 if ( !data ) {
                     return;
                 }
-                console.log(data, self._controls.active)
                 if ( data.iframe ) {
 
                     if ( self.isPlaying() ) {
@@ -2976,17 +2975,25 @@ Galleria.prototype = {
                         img = self._controls.slides[loadme],
                         src = self.isFullscreen() && d.big ? d.big : ( d.image || d.iframe );
 
+                    if ( d.iframe && !d.image ) {
+                        img.isIframe = true;
+                    }
+
                     if ( !img.ready ) {
                         self._controls.slides[loadme].load(src, function(img) {
-                            $(img.image).css('visibility', 'hidden');
+                            if ( !img.isIframe ) {
+                                $(img.image).css('visibility', 'hidden');
+                            }
                             self._scaleImage(img, {
                                 complete: function(img) {
-                                    $(img.image).css({
-                                        opacity: 0,
-                                        visibility: 'visible'
-                                    }).animate({
-                                        opacity: 1
-                                    }, 200);
+                                    if ( !img.isIframe ) {
+                                        $(img.image).css({
+                                            opacity: 0,
+                                            visibility: 'visible'
+                                        }).animate({
+                                            opacity: 1
+                                        }, 200);
+                                    }
                                 }
                             });
                         });
@@ -4788,6 +4795,9 @@ this.prependChild( 'info', 'myElement' );
 
                 // load if not ready
                 if ( !image.ready ) {
+                    if ( data.iframe && !data.image ) {
+                        image.isIframe = true;
+                    }
                     image.load(src, function(image) {
                         self._scaleImage(image, complete).trigger($.extend(evObj, {
                             type: Galleria.IMAGE
