@@ -5610,28 +5610,40 @@ Galleria.addTheme = function( theme ) {
         if ( !css ) {
 
             $(function() {
+                // Try to determine the css-path from the theme script.
+                // In IE8/9, the script-dom-element seems to be not present
+                // at once, if galleria itself is inserted into the dom
+                // dynamically. We therefore try multiple times before raising
+                // an error.
+                var retryCount = 0;
+                var tryLoadCss = function() {
+                    $('script').each(function (i, script) {
+                        // look for the theme script
+                        reg = new RegExp('galleria\\.' + theme.name.toLowerCase() + '\\.');
+                        if (reg.test(script.src)) {
 
-                $('script').each(function( i, script ) {
-                    // look for the theme script
-                    reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
-                    if( reg.test( script.src )) {
+                            // we have a match
+                            css = script.src.replace(/[^\/]*$/, '') + theme.css;
 
-                        // we have a match
-                        css = script.src.replace(/[^\/]*$/, '') + theme.css;
+                            window.setTimeout(function () {
+                                Utils.loadCSS(css, 'galleria-theme', function () {
 
-                        window.setTimeout(function() {
-                            Utils.loadCSS( css, 'galleria-theme', function() {
+                                    // the themeload trigger
+                                    _themeLoad(theme);
 
-                                // the themeload trigger
-                                _themeLoad( theme );
-
-                            });
-                        }, 1);
+                                });
+                            }, 1);
+                        }
+                    });
+                    if (!css) {
+                        if (retryCount++ > 5) {
+                            Galleria.raise('No theme CSS loaded');
+                        } else {
+                            window.setTimeout(tryLoadCss,500);
+                        }
                     }
-                });
-                if ( !css ) {
-                    Galleria.raise('No theme CSS loaded');
                 }
+                tryLoadCss();
             });
         }
 
