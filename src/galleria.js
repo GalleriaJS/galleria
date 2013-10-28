@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3 2013-11-17
+ * Galleria v 1.3.1 2013-11-28
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -21,7 +21,7 @@ var window = this,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.3,
+    VERSION = 1.31,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -206,39 +206,6 @@ var window = this,
                 fail();
             }
         };
-    /*,
-        vimeo: {
-            reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
-            embed: function(id) {
-                return 'http://player.vimeo.com/video/'+id;
-            },
-            getThumb: function( id, success, fail ) {
-                fail = fail || F;
-                $.getJSON('http://vimeo.com/api/v2/video/' + id + '.json?callback=?', function(data) {
-                    try {
-                        success( data[0].thumbnail_medium );
-                    } catch(e) {
-                        fail();
-                    }
-                });
-            }
-        },
-        dailymotion: {
-            reg: /https?:\/\/(?:www\.)?(dailymotion\.com)\/video\/([^_]+)/,
-            embed: function(id) {
-                return 'http://www.dailymotion.com/embed/video/'+id;
-            },
-            getThumb: function( id, success, fail ) {
-                fail = fail || F;
-                $.getJSON('https://api.dailymotion.com/video/'+id+'?fields=thumbnail_medium_url&callback=?', function(data) {
-                    try {
-                        success( data.thumbnail_medium_url );
-                    } catch(e) {
-                        fail();
-                    }
-                });
-            }
-        }*/
     },
 
     // utility for testing the video URL and getting the video ID
@@ -2695,7 +2662,7 @@ Galleria.prototype = {
         }( doc.createElement( 'canvas' ) ) );
 
 
-        //Galleria.Fastclick.init( this.get('target' ));
+        Galleria.Fastclick.init( this.get('target' ));
 
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
@@ -2917,7 +2884,7 @@ Galleria.prototype = {
                         w = self._stageWidth,
                         h = self._stageHeight;
 
-                    if ( $( frame.container ).find('iframe').length ) {
+                    if ( $( frame.container ).find( 'iframe' ).length ) {
                         return;
                     }
 
@@ -6854,7 +6821,7 @@ Galleria.Finger = (function() {
             var touch = e.originalEvent.touches;
 
             // ensure swiping with one touch and not pinching
-            if( touch && touch.length > 1 || e.scale && e.scale !== 1 || doc.documentElement.clientWidth !== window.innerWidth ) {
+            if( touch && touch.length > 1 || e.scale && e.scale !== 1 ) {
                 return;
             }
 
