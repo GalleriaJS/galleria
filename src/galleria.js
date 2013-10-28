@@ -1860,7 +1860,7 @@ Galleria = window.Galleria = function() {
 
                 // reload iframe src manually
                 var frame = self._controls.frames[ self._controls.active ];
-                if ( frame ) {
+                if ( frame && frame.image ) {
                     frame.image.src = frame.image.src;
                 }
             }
