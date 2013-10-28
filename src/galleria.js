@@ -2695,7 +2695,7 @@ Galleria.prototype = {
         }( doc.createElement( 'canvas' ) ) );
 
 
-        Galleria.Fastclick.init( this.get('target' ));
+        //Galleria.Fastclick.init( this.get('target' ));
 
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
@@ -2879,7 +2879,7 @@ Galleria.prototype = {
                     }
 
                     self.$( 'images' ).find( 'iframe' ).remove();
-                    self.$( 'images' ).find( '.galleria-frame' ).css('opacity', 0);
+                    self.$( 'images' ).find( '.galleria-frame' ).css('opacity', 0).hide();
 
                     var src = self.isFullscreen() && data.big ? data.big : ( data.image || data.iframe ),
                         image = self._controls.slides[index],
@@ -2916,6 +2916,10 @@ Galleria.prototype = {
                     var frame = self._controls.frames[ self._active ],
                         w = self._stageWidth,
                         h = self._stageHeight;
+
+                    if ( $( frame.container ).find('iframe').length ) {
+                        return;
+                    }
 
                     $( frame.container ).css({
                         width: w,

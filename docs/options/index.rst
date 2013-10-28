@@ -163,6 +163,8 @@ List of options
 
 - :doc:`trueFullscreen` Makes Galleria enter a native fullscreen mode where supported.
 
+- :doc:`videoPoster` Defines if a poster image should be used for videos
+
 - :doc:`vimeo` Sets options for the Vimeo player
 
 - :doc:`wait` Defines if and how Galleria should wait until it can be displayed using user interaction.

@@ -11,6 +11,8 @@ Changelog
 * Added thumbPosition option, same as imagePosition but for thumbnails
 * Fixed FF fullscreen class bug
 * Fixed FF carousel animation bug
+* Added a poster image for videos, and an option for disabling it.
+* Much improved general video handling using poster images, better media fetching and overall improved user experience
 
 1.2.9
 -----

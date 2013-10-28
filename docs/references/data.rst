@@ -130,7 +130,10 @@ If you want Galleria to fetch thumbnails from the provider API’s, just provide
 
    <a href="http://www.youtube.com/watch?v=GCZrz8siv4Q"><span class="video">Watch this at YouTube</span></a>
 
-Galleria will first add an empty image as thumbnail, then fetch the thumbnail from the provider and swap the src when ready.
+Since 1.3, Galleria supports poster images for videos. It will automatically fetch posters from it’s provider, but you
+may also manually add one using the ``data-image`` attribute::
+
+    <a href="http://www.youtube.com/watch?v=GCZrz8siv4Q"><span class="video" data-image="/myposter.jpg">Watch this at YouTube</span></a>
 
 Displaying iframes
 ------------------
