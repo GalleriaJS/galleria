@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3.1 2013-11-28
+ * Galleria v 1.3.2 2013-11-01
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -21,7 +21,7 @@ var window = this,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.31,
+    VERSION = 1.32,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -2554,6 +2554,7 @@ Galleria.prototype = {
             transitionSpeed: 400,
             trueFullscreen: true, // 1.2.7
             useCanvas: false, // 1.2.4
+            variation: '', // 1.3.1
             videoPoster: true, // 1.3
             vimeo: {
                 title: 0,
@@ -2769,7 +2770,7 @@ Galleria.prototype = {
         Utils.hide( self.get('tooltip') );
 
         // add a notouch class on the container to prevent unwanted :hovers on touch devices
-        this.$( 'container' ).addClass( Galleria.TOUCH ? 'touch' : 'notouch' );
+        this.$( 'container' ).addClass( ( Galleria.TOUCH ? 'touch' : 'notouch' ) + ' ' + this._options.variation );
 
         // add images to the controls
         if ( !this._options.swipe ) {
@@ -4197,6 +4198,16 @@ Galleria.prototype = {
     closeLightbox: function() {
         this._lightbox.hide.apply( this._lightbox, Utils.array( arguments ) );
         return this;
+    },
+
+    /**
+        Check if a variation exists
+
+        @returns {Boolean} If the variation has been applied
+    */
+
+    hasVariation: function( variation ) {
+        return $.inArray( variation, this._options.variation.split(/\s+/) ) > -1;
     },
 
     /**
