@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3.1 2013-11-28
+ * Galleria v 1.3.2 2013-11-01
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -21,7 +21,7 @@ var window = this,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.31,
+    VERSION = 1.32,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -4206,6 +4206,16 @@ Galleria.prototype = {
     closeLightbox: function() {
         this._lightbox.hide.apply( this._lightbox, Utils.array( arguments ) );
         return this;
+    },
+
+    /**
+        Check if a variation exists
+
+        @returns {Boolean} If the variation has been applied
+    */
+
+    hasVariation: function( variation ) {
+        return $.inArray( variation, this._options.variation.split(/\s+/) ) > -1;
     },
 
     /**
