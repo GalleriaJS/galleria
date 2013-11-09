@@ -2704,10 +2704,10 @@ Galleria.prototype = {
                 self._userRatio = self._ratio = self._options.height;
             }
 
-            // the gallery is ready, let's just wait for the css
+            // the gallery is ready, let's just wait for the css or use config by default
             var num = { width: 0, height: 0 };
             var testHeight = function() {
-                return self.$( 'stage' ).height();
+                return self._options.height || self.$( 'stage' ).height();
             };
 
             // check container and thumbnail height
