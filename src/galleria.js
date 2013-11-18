@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3.2 2013-11-04
+ * Galleria v 1.3.3 2013-11-18
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -21,7 +21,7 @@ var window = this,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.32,
+    VERSION = 1.33,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -1053,6 +1053,49 @@ var window = this,
 // listen to fullscreen
 _nativeFullscreen.listen();
 
+// create special clicktouch event
+$.event.special.clicktouch = {
+    add: function(handleObj) {
+        if ( Galleria.TOUCH ) {
+            var c = [];
+            $(this).bind('touchstart.ct', function start(e) {
+                var t = e.originalEvent.touches;
+                if ( t.length ) {
+                    c = [ t[0].pageX, t[0].pageY ];
+                    $(this).bind('touchend.ct', function() {
+                        if( M.abs(c[0] - t[0].pageX) > 4 ||
+                            M.abs(c[1] - t[0].pageY) > 4 ) {
+                            return $(this).unbind('touchend.ct');
+                        }
+                        handleObj.handler.call(this, e);
+                        $(this).unbind('touchend.ct');
+                    });
+                }
+            });
+        } else {
+            $(this).bind('click.ct', handleObj.handler);
+        }
+    },
+    remove: function() {
+        if ( Galleria.TOUCH ) {
+            $(this).unbind('touchstart.ct touchend.ct');
+        } else {
+            $(this).unbind('click.ct');
+        }
+    }
+};
+
+/* TODO: try if this is a better idea
+$(document).bind('touchstart', function(e) {
+    var events = $._data(e.target).events;
+    $.each( events, function(type, eventObject) {
+        if ( type == 'click' || type == 'mousedown' ) {
+            console.log(eventObject);
+        }
+    })
+})
+*/
+
 // trigger resize on orientationchange (IOS7)
 $win.bind( 'orientationchange', function() {
     $(this).resize();
@@ -1279,7 +1322,7 @@ Galleria = window.Galleria = function() {
 
             var i;
 
-            carousel.next.bind( 'click', function(e) {
+            carousel.next.bind( 'clicktouch', function(e) {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
@@ -1296,7 +1339,7 @@ Galleria = window.Galleria = function() {
                 }
             });
 
-            carousel.prev.bind( 'click', function(e) {
+            carousel.prev.bind( 'clicktouch', function(e) {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
@@ -2185,14 +2228,14 @@ Galleria = window.Galleria = function() {
 
             // add the prev/next nav and bind some controls
 
-            hover( $( el.close ).bind( 'click', lightbox.hide ).html('&#215;') );
+            hover( $( el.close ).bind( 'clicktouch', lightbox.hide ).html('&#215;') );
 
             $.each( ['Prev','Next'], function(i, dir) {
 
                 var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&#160;' : '&#160;&#8250;' ),
                     $e = $( el[ dir.toLowerCase()+'holder'] );
 
-                $e.bind( 'click', function() {
+                $e.bind( 'clicktouch', function() {
                     lightbox[ 'show' + dir ]();
                 });
 
@@ -2209,7 +2252,7 @@ Galleria = window.Galleria = function() {
                 });
 
             });
-            $( el.overlay ).bind( 'click', lightbox.hide );
+            $( el.overlay ).bind( 'clicktouch', lightbox.hide );
 
             // the lightbox animation is slow on ipad
             if ( Galleria.IPAD ) {
@@ -2550,7 +2593,7 @@ Galleria.prototype = {
             showImagenav: true,
             swipe: true, // 1.2.4 -> revised in 1.3
             thumbCrop: true,
-            thumbEventType: 'click',
+            thumbEventType: 'clicktouch',
             thumbMargin: 0,
             thumbQuality: 'auto',
             thumbDisplayOrder: true, // 1.2.8
@@ -2669,9 +2712,6 @@ Galleria.prototype = {
             };
 
         }( doc.createElement( 'canvas' ) ) );
-
-
-        Galleria.Fastclick.init( this.get('target' ));
 
         // bind the gallery to run when data is ready
         this.bind( Galleria.DATA, function() {
@@ -2879,7 +2919,7 @@ Galleria.prototype = {
             this.bind( Galleria.RESCALE, function() {
                 this.finger.setup();
             });
-            this.$('stage').bind('click', function(e) {
+            this.$('stage').bind('clicktouch', function(e) {
                 var data = self.getData();
                 if ( !data ) {
                     return;
@@ -2988,7 +3028,7 @@ Galleria.prototype = {
         });
 
         // bind image navigation arrows
-        this.$( 'image-nav-right, image-nav-left' ).bind( 'click', function(e) {
+        this.$( 'image-nav-right, image-nav-left' ).bind( 'clicktouch', function(e) {
 
             // tune the clicknext option
             if ( options.clicknext ) {
@@ -4736,7 +4776,6 @@ this.prependChild( 'info', 'myElement' );
             this.finger.to = -( index*this.finger.width );
             this.finger.index = index;
         }
-
         this._active = index;
 
         // we do things a bit simpler in swipe:
@@ -6458,233 +6497,6 @@ $.extend( $.easing, {
 
 });
 
-// fastclick, for faster touch interactions
-// loosely based on FastClick by FTLabs (Financial Times)
-
-Galleria.Fastclick = (function() {
-
-    var deviceIsIOS = /iP(ad|hone|od)/.test(navigator.userAgent),
-        deviceIsIOS4 = deviceIsIOS && (/OS 4_\d(_\d)?/).test(navigator.userAgent),
-        deviceIsIOSWithBadTarget = deviceIsIOS && (/OS ([6-9]|\d{2})_\d/).test(navigator.userAgent);
-
-    return {
-        init: function(layer) {
-            var oldOnClick, self = this;
-            this.trackingClick = false;
-            this.trackingClickStart = 0;
-            this.targetElement = null;
-            this.touchStartX = 0;
-            this.touchStartY = 0;
-            this.lastTouchIdentifier = 0;
-            this.layer = layer;
-
-            $.each(['Click', 'TouchStart', 'TouchMove', 'TouchEnd', 'TouchCancel'], function(i, fn) {
-                self['on'+fn] = (function(caller) {
-                    return function() {
-                        caller.apply( self, arguments );
-                    };
-                }(self['on'+fn]));
-            });
-
-            if (!Galleria.TOUCH) {
-                return;
-            }
-
-            // Set up event handlers as required
-            layer.addEventListener('click', this.onClick, true);
-            layer.addEventListener('touchstart', this.onTouchStart, false);
-            layer.addEventListener('touchmove', this.onTouchMove, false);
-            layer.addEventListener('touchend', this.onTouchEnd, false);
-            layer.addEventListener('touchcancel', this.onTouchCancel, false);
-
-            if (!window.Event.prototype.stopImmediatePropagation) {
-                layer.removeEventListener = function(type, callback, capture) {
-                    var rmv = window.Node.prototype.removeEventListener;
-                    if (type === 'click') {
-                        rmv.call(layer, type, callback.hijacked || callback, capture);
-                    } else {
-                        rmv.call(layer, type, callback, capture);
-                    }
-                };
-                layer.addEventListener = function(type, callback, capture) {
-                    var adv = window.Node.prototype.addEventListener;
-                    if (type === 'click') {
-                        adv.call(layer, type, callback.hijacked || (callback.hijacked = function(event) {
-                            if (!event.propagationStopped) {
-                                callback(event);
-                            }
-                        }), capture);
-                    } else {
-                        adv.call(layer, type, callback, capture);
-                    }
-                };
-            }
-            if (typeof layer.onclick === 'function') {
-                oldOnClick = layer.onclick;
-                layer.addEventListener('click', function(event) {
-                    oldOnClick(event);
-                }, false);
-                layer.onclick = null;
-            }
-
-        },
-        sendClick: function(targetElement, event) {
-            var clickEvent, touch;
-
-            if (doc.activeElement && doc.activeElement !== targetElement) {
-                doc.activeElement.blur();
-            }
-
-            touch = event.changedTouches[0];
-
-            // Synthesise a click event, with an extra attribute so it can be tracked
-            clickEvent = doc.createEvent('MouseEvents');
-            clickEvent.initMouseEvent('click', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
-            clickEvent.forwardedTouchEvent = true;
-            targetElement.dispatchEvent(clickEvent);
-        },
-        onTouchStart: function(event) {
-            var targetElement, touch, selection;
-
-            targetElement = event.target;
-            touch = event.targetTouches[0];
-
-            if (deviceIsIOS) {
-
-                selection = window.getSelection();
-                if (selection.rangeCount && !selection.isCollapsed) {
-                    return true;
-                }
-
-                if (!deviceIsIOS4) {
-                    if (touch.identifier === this.lastTouchIdentifier) {
-                        event.preventDefault();
-                        return false;
-                    }
-
-                    this.lastTouchIdentifier = touch.identifier;
-                }
-            }
-
-            this.trackingClick = true;
-            this.trackingClickStart = event.timeStamp;
-            this.targetElement = targetElement;
-
-            this.touchStartX = touch.pageX;
-            this.touchStartY = touch.pageY;
-
-            if ((event.timeStamp - this.lastClickTime) < 200) {
-                event.preventDefault();
-            }
-
-            return true;
-        },
-        touchHasMoved: function(event) {
-            var touch = event.targetTouches[0];
-
-            if (M.abs(touch.pageX - this.touchStartX) > 10 || M.abs(touch.pageY - this.touchStartY) > 10) {
-                return true;
-            }
-
-            return false;
-        },
-        onTouchMove: function(event) {
-            if (!this.trackingClick) {
-                return true;
-            }
-
-            // If the touch has moved, cancel the click tracking
-            if (this.targetElement !== event.target || this.touchHasMoved(event)) {
-                this.trackingClick = false;
-                this.targetElement = null;
-            }
-
-            return true;
-        },
-        onTouchEnd: function(event) {
-            var trackingClickStart, targetTagName, touch, targetElement = this.targetElement;
-
-            if (!this.trackingClick) {
-                return true;
-            }
-
-            // Prevent phantom clicks on fast double-tap (issue #36)
-            if ((event.timeStamp - this.lastClickTime) < 200) {
-                this.cancelNextClick = true;
-                return true;
-            }
-
-            this.lastClickTime = event.timeStamp;
-
-            trackingClickStart = this.trackingClickStart;
-            this.trackingClick = false;
-            this.trackingClickStart = 0;
-
-            if (deviceIsIOSWithBadTarget) {
-                touch = event.changedTouches[0];
-                targetElement = event.target;
-                targetElement = doc.elementFromPoint(touch.pageX - window.pageXOffset, touch.pageY - window.pageYOffset);
-            }
-
-            targetTagName = targetElement.tagName.toLowerCase();
-
-            event.preventDefault();
-            this.sendClick(targetElement, event);
-
-            return false;
-        },
-        onTouchCancel: function() {
-            this.trackingClick = false;
-            this.targetElement = null;
-        },
-        onClick: function(event) {
-            var oldTargetElement;
-
-            // If a target element was never set (because a touch event was never fired) allow the click
-            if (!this.targetElement) {
-                return true;
-            }
-
-            if (event.forwardedTouchEvent) {
-                return true;
-            }
-
-            oldTargetElement = this.targetElement;
-            this.targetElement = null;
-
-            if (this.trackingClick) {
-                this.trackingClick = false;
-                return true;
-            }
-
-            // Programmatically generated events targeting a specific element should be permitted
-            if (!event.cancelable) {
-                return true;
-            }
-
-            if (this.cancelNextClick) {
-                this.cancelNextClick = false;
-
-                // Prevent any user-added listeners declared on FastClick element from being fired.
-                if (event.stopImmediatePropagation) {
-                    event.stopImmediatePropagation();
-                } else {
-
-                    // Part of the hack for browsers that don't support Event#stopImmediatePropagation (e.g. Android 2)
-                    event.propagationStopped = true;
-                }
-
-                // Cancel the event
-                event.stopPropagation();
-                event.preventDefault();
-
-                return false;
-            }
-            return true;
-        }
-    };
-}());
-
 // Forked version of Ainos Finger.js for native-style touch
 
 Galleria.Finger = (function() {
@@ -6850,7 +6662,7 @@ Galleria.Finger = (function() {
             if ( this.isScrolling === null ) {
                 this.isScrolling = !!(
                     this.isScrolling ||
-                    abs(this.deltaX) < abs(touch[0].pageY - this.start.pageY)
+                    M.abs(this.deltaX) < M.abs(touch[0].pageY - this.start.pageY)
                 );
             }
 
@@ -6862,7 +6674,7 @@ Galleria.Finger = (function() {
 
                 // increase resistance if first or last slide
                 this.deltaX /= ( (!this.index && this.deltaX > 0 || this.index == this.length - 1 && this.deltaX < 0 ) ?
-                    ( abs(this.deltaX) / this.width + 1.8 )  : 1 );
+                    ( M.abs(this.deltaX) / this.width + 1.8 )  : 1 );
                 this.to = this.deltaX - this.index * this.width;
             }
             e.stopPropagation();
@@ -6874,8 +6686,8 @@ Galleria.Finger = (function() {
 
             // determine if slide attempt triggers next/prev slide
             var isValidSlide = +new Date() - this.start.time < 250 &&
-                abs(this.deltaX) > 40 ||
-                abs(this.deltaX) > this.width/2,
+                M.abs(this.deltaX) > 40 ||
+                M.abs(this.deltaX) > this.width/2,
 
                 isPastBounds = !this.index && this.deltaX > 0 ||
                     this.index == this.length - 1 && this.deltaX < 0;
@@ -6914,7 +6726,7 @@ Galleria.Finger = (function() {
             }
 
             // if distance is short or the user is touching, do a 1-1 animation
-            if ( this.touching || abs(distance) <= 1 ) {
+            if ( this.touching || M.abs(distance) <= 1 ) {
               this.pos = this.to;
               if ( this.anim ) {
                 this.config.oncomplete( this.index );
@@ -6927,6 +6739,7 @@ Galleria.Finger = (function() {
                 }
                 // apply easing
                 this.pos = this.config.easing(null, +new Date() - this.anim.t, this.anim.v, this.anim.c, this.config.duration*this.anim.f);
+
             }
             this.setX();
         }
