@@ -1057,18 +1057,27 @@ _nativeFullscreen.listen();
 $.event.special['click:fast'] = {
     add: function(handleObj) {
         if ( Galleria.TOUCH ) {
-            var c = [];
             $(this).bind('touchstart.fast', function start(e) {
-                var t = e.originalEvent.touches;
-                if ( t.length == 1 ) {
-                    c = [ t[0].pageX, t[0].pageY ];
+                var ev = e.originalEvent,
+                    x, y, dist = 0;
+                if ( ev.touches.length == 1 ) {
+                    x = ev.touches[0].pageX;
+                    y = ev.touches[0].pageY;
+                    $(this).bind('touchmove.fast', function(f) {
+                        var ft = f.originalEvent.touches;
+                        if ( ft.length == 1 ) {
+                            dist = M.max(
+                                M.abs( x - ft[0].pageX ),
+                                M.abs( y - ft[0].pageY )
+                            );
+                        }
+                    });
                     $(this).bind('touchend.fast', function() {
-                        if( M.abs(c[0] - t[0].pageX) > 4 ||
-                            M.abs(c[1] - t[0].pageY) > 4 ) {
-                            return $(this).unbind('touchend.ct');
+                        if( dist > 4 ) {
+                            return $(this).unbind('touchend.fast touchmove.fast');
                         }
                         handleObj.handler.call(this, e);
-                        $(this).unbind('touchend.fast');
+                        $(this).unbind('touchend.fast touchmove.fast');
                     });
                 }
             });
@@ -2894,6 +2903,9 @@ Galleria.prototype = {
                 this.finger.setup();
             });
             this.$('stage').bind('click:fast', function(e) {
+                if ( !$(e.target).hasClass('galleria-layer') ) {
+                    return;
+                }
                 var data = self.getData();
                 if ( !data ) {
                     return;
