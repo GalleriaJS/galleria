@@ -1053,48 +1053,37 @@ var window = this,
 // listen to fullscreen
 _nativeFullscreen.listen();
 
-// create special clicktouch event
-$.event.special.clicktouch = {
+// create special click:fast event for fast touch interaction
+$.event.special['click:fast'] = {
     add: function(handleObj) {
         if ( Galleria.TOUCH ) {
             var c = [];
-            $(this).bind('touchstart.ct', function start(e) {
+            $(this).bind('touchstart.fast', function start(e) {
                 var t = e.originalEvent.touches;
-                if ( t.length ) {
+                if ( t.length == 1 ) {
                     c = [ t[0].pageX, t[0].pageY ];
-                    $(this).bind('touchend.ct', function() {
+                    $(this).bind('touchend.fast', function() {
                         if( M.abs(c[0] - t[0].pageX) > 4 ||
                             M.abs(c[1] - t[0].pageY) > 4 ) {
                             return $(this).unbind('touchend.ct');
                         }
                         handleObj.handler.call(this, e);
-                        $(this).unbind('touchend.ct');
+                        $(this).unbind('touchend.fast');
                     });
                 }
             });
         } else {
-            $(this).bind('click.ct', handleObj.handler);
+            $(this).bind('click.fast', handleObj.handler);
         }
     },
-    remove: function() {
+    remove: function(handleObj) {
         if ( Galleria.TOUCH ) {
-            $(this).unbind('touchstart.ct touchend.ct');
+            $(this).unbind('touchstart.fast touchend.fast');
         } else {
-            $(this).unbind('click.ct');
+            $(this).unbind('click.fast', handleObj.handler);
         }
     }
 };
-
-/* TODO: try if this is a better idea
-$(document).bind('touchstart', function(e) {
-    var events = $._data(e.target).events;
-    $.each( events, function(type, eventObject) {
-        if ( type == 'click' || type == 'mousedown' ) {
-            console.log(eventObject);
-        }
-    })
-})
-*/
 
 // trigger resize on orientationchange (IOS7)
 $win.bind( 'orientationchange', function() {
@@ -1322,7 +1311,7 @@ Galleria = window.Galleria = function() {
 
             var i;
 
-            carousel.next.bind( 'clicktouch', function(e) {
+            carousel.next.bind( 'click:fast', function(e) {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
@@ -1339,7 +1328,7 @@ Galleria = window.Galleria = function() {
                 }
             });
 
-            carousel.prev.bind( 'clicktouch', function(e) {
+            carousel.prev.bind( 'click:fast', function(e) {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
@@ -2228,14 +2217,14 @@ Galleria = window.Galleria = function() {
 
             // add the prev/next nav and bind some controls
 
-            hover( $( el.close ).bind( 'clicktouch', lightbox.hide ).html('&#215;') );
+            hover( $( el.close ).bind( 'click:fast', lightbox.hide ).html('&#215;') );
 
             $.each( ['Prev','Next'], function(i, dir) {
 
                 var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&#160;' : '&#160;&#8250;' ),
                     $e = $( el[ dir.toLowerCase()+'holder'] );
 
-                $e.bind( 'clicktouch', function() {
+                $e.bind( 'click:fast', function() {
                     lightbox[ 'show' + dir ]();
                 });
 
@@ -2252,7 +2241,7 @@ Galleria = window.Galleria = function() {
                 });
 
             });
-            $( el.overlay ).bind( 'clicktouch', lightbox.hide );
+            $( el.overlay ).bind( 'click:fast', lightbox.hide );
 
             // the lightbox animation is slow on ipad
             if ( Galleria.IPAD ) {
@@ -2593,7 +2582,7 @@ Galleria.prototype = {
             showImagenav: true,
             swipe: true, // 1.2.4 -> revised in 1.3
             thumbCrop: true,
-            thumbEventType: 'clicktouch',
+            thumbEventType: 'click:fast',
             thumbMargin: 0,
             thumbQuality: 'auto',
             thumbDisplayOrder: true, // 1.2.8
@@ -2881,8 +2870,7 @@ Galleria.prototype = {
             });
             this.finger = new Galleria.Finger(this.get('stage'), {
                 onchange: function(page) {
-                    self.setCounter( page );
-                    self.pause();
+                    self.setCounter( page ).setInfo( page ).pause();
                     self.show(page);
                 },
                 oncomplete: function(page) {
@@ -2897,20 +2885,6 @@ Galleria.prototype = {
                     self.$( 'images' ).find( 'iframe' ).remove();
                     self.$( 'images' ).find( '.galleria-frame' ).css('opacity', 0).hide();
 
-                    var src = self.isFullscreen() && data.big ? data.big : ( data.image || data.iframe ),
-                        image = self._controls.slides[index],
-                        cached = image.isCached( src ),
-                        thumb = self._thumbnails[ index ];
-
-                    self.trigger({
-                        type: Galleria.IMAGE,
-                        cached: cached,
-                        index: index,
-                        imageTarget: image.image,
-                        thumbTarget: thumb.image,
-                        galleriaData: data
-                    });
-
                     if ( self._options.carousel && self._options.carouselFollow ) {
                         self._carousel.follow( index );
                     }
@@ -2919,7 +2893,7 @@ Galleria.prototype = {
             this.bind( Galleria.RESCALE, function() {
                 this.finger.setup();
             });
-            this.$('stage').bind('clicktouch', function(e) {
+            this.$('stage').bind('click:fast', function(e) {
                 var data = self.getData();
                 if ( !data ) {
                     return;
@@ -3028,7 +3002,7 @@ Galleria.prototype = {
         });
 
         // bind image navigation arrows
-        this.$( 'image-nav-right, image-nav-left' ).bind( 'clicktouch', function(e) {
+        this.$( 'image-nav-right, image-nav-left' ).bind( 'click:fast', function(e) {
 
             // tune the clicknext option
             if ( options.clicknext ) {
@@ -3702,7 +3676,6 @@ Galleria.prototype = {
                         fn.call( self, self._options );
                     }
                 });
-                Galleria.ready.callbacks = [];
 
                 // call the extend option
                 self._options.extend.call( self, self._options );
@@ -4841,7 +4814,7 @@ this.prependChild( 'info', 'myElement' );
                     }));
                     complete();
                 }
-            },800);
+            }, 100);
 
         } else {
             protoArray.push.call( this._queue, {
@@ -6508,7 +6481,10 @@ Galleria.Finger = (function() {
 
         var el = doc.createElement('p'),
             has3d,
-            t = ['webkit','O','ms','Moz',''], s, i=0, a = 'transform';
+            t = ['webkit','O','ms','Moz',''], 
+            s, 
+            i=0, 
+            a = 'transform';
 
         DOM().html.insertBefore(el, null);
 
@@ -6722,7 +6698,7 @@ Galleria.Finger = (function() {
                 factor = 1;
 
             if ( this.width && distance ) {
-                factor = M.max(0.5, M.min(2, M.abs(distance / this.width) ) );
+                factor = M.max(0.5, M.min(1.5, M.abs(distance / this.width) ) );
             }
 
             // if distance is short or the user is touching, do a 1-1 animation
@@ -6735,7 +6711,11 @@ Galleria.Finger = (function() {
             } else {
                 if ( !this.anim ) {
                     // save animation parameters
-                    this.anim = { v: this.pos, c: distance, t: +new Date(), f: factor };
+                    this.anim = { v: this.pos, t: +new Date(), c: distance, f: factor, q: this.to };
+                }
+                // check if destination has changed
+                if ( this.anim.q != this.to ) {
+                    this.anim.c = distance;
                 }
                 // apply easing
                 this.pos = this.config.easing(null, +new Date() - this.anim.t, this.anim.v, this.anim.c, this.config.duration*this.anim.f);
