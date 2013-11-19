@@ -474,7 +474,7 @@ var window = this,
                     // stop
                     if ( options.stop ) {
                         // clear the animation
-                        elem.unbind( endEvent );
+                        elem.off( endEvent );
                         clearStyle( elem );
                     }
 
@@ -1055,15 +1055,17 @@ _nativeFullscreen.listen();
 
 // create special click:fast event for fast touch interaction
 $.event.special['click:fast'] = {
+    propagate: true,
     add: function(handleObj) {
+        var prop = this.propagate;
         if ( Galleria.TOUCH ) {
-            $(this).bind('touchstart.fast', function start(e) {
+            $(this).on('touchstart.fast', function start(e) {
                 var ev = e.originalEvent,
                     x, y, dist = 0;
                 if ( ev.touches.length == 1 ) {
                     x = ev.touches[0].pageX;
                     y = ev.touches[0].pageY;
-                    $(this).bind('touchmove.fast', function(f) {
+                    $(this).on('touchmove.fast', function(f) {
                         var ft = f.originalEvent.touches;
                         if ( ft.length == 1 ) {
                             dist = M.max(
@@ -1072,30 +1074,30 @@ $.event.special['click:fast'] = {
                             );
                         }
                     });
-                    $(this).bind('touchend.fast', function() {
+                    $(this).on('touchend.fast', function() {
                         if( dist > 4 ) {
-                            return $(this).unbind('touchend.fast touchmove.fast');
+                            return $(this).off('touchend.fast touchmove.fast');
                         }
                         handleObj.handler.call(this, e);
-                        $(this).unbind('touchend.fast touchmove.fast');
+                        $(this).off('touchend.fast touchmove.fast');
                     });
                 }
             });
         } else {
-            $(this).bind('click.fast', handleObj.handler);
+            $(this).on('click.fast', handleObj.handler);
         }
     },
     remove: function(handleObj) {
         if ( Galleria.TOUCH ) {
-            $(this).unbind('touchstart.fast touchend.fast');
+            $(this).off('touchstart.fast touchmove.fast touchend.fast');
         } else {
-            $(this).unbind('click.fast', handleObj.handler);
+            $(this).off('click.fast', handleObj.handler);
         }
     }
 };
 
 // trigger resize on orientationchange (IOS7)
-$win.bind( 'orientationchange', function() {
+$win.on( 'orientationchange', function() {
     $(this).resize();
 });
 
@@ -1220,14 +1222,14 @@ Galleria = window.Galleria = function() {
             }
             if ( !keyboard.bound ) {
                 keyboard.bound = true;
-                $doc.bind('keydown', keyboard.press);
+                $doc.on('keydown', keyboard.press);
             }
         },
 
         detach: function() {
             keyboard.bound = false;
             keyboard.map = {};
-            $doc.unbind('keydown', keyboard.press);
+            $doc.off('keydown', keyboard.press);
         }
     };
 
@@ -1320,7 +1322,7 @@ Galleria = window.Galleria = function() {
 
             var i;
 
-            carousel.next.bind( 'click:fast', function(e) {
+            carousel.next.on( 'click:fast', function(e) {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
@@ -1337,7 +1339,7 @@ Galleria = window.Galleria = function() {
                 }
             });
 
-            carousel.prev.bind( 'click:fast', function(e) {
+            carousel.prev.on( 'click:fast', function(e) {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
@@ -1500,7 +1502,7 @@ Galleria = window.Galleria = function() {
             }
 
             var mouseout = function() {
-                self.$( 'container' ).unbind( 'mousemove', tooltip.move );
+                self.$( 'container' ).off( 'mousemove', tooltip.move );
                 self.clearTimer( tooltip.timer );
 
                 self.$( 'tooltip' ).stop().animate({
@@ -1522,7 +1524,7 @@ Galleria = window.Galleria = function() {
                 $( elem ).hover(function() {
 
                     self.clearTimer( tooltip.swapTimer );
-                    self.$('container').unbind( 'mousemove', tooltip.move ).bind( 'mousemove', tooltip.move ).trigger( 'mousemove' );
+                    self.$('container').off( 'mousemove', tooltip.move ).on( 'mousemove', tooltip.move ).trigger( 'mousemove' );
                     tooltip.show( elem );
 
                     self.addTimer( tooltip.timer, function() {
@@ -1560,7 +1562,7 @@ Galleria = window.Galleria = function() {
                         };
                     }( e )), 10);
 
-                    elem.unbind( 'mouseup', mouseup );
+                    elem.off( 'mouseup', mouseup );
 
                 };
 
@@ -1573,7 +1575,7 @@ Galleria = window.Galleria = function() {
             self.$( 'tooltip' ).html( text.replace(/\s/, '&#160;') );
 
             // trigger mousemove on mouseup in case of click
-            elem.bind( 'mouseup', mouseup );
+            elem.on( 'mouseup', mouseup );
         },
 
         define: function( elem, value ) {
@@ -1960,7 +1962,7 @@ Galleria = window.Galleria = function() {
                 self.trigger( Galleria.FULLSCREEN_EXIT );
             });
 
-            $win.unbind('resize', fullscreen.scale);
+            $win.off('resize', fullscreen.scale);
         }
     };
 
@@ -2032,17 +2034,17 @@ Galleria = window.Galleria = function() {
 
         addEvent : function() {
             idle.bound = true;
-            self.$('container').bind( 'mousemove click', idle.showAll );
+            self.$('container').on( 'mousemove click', idle.showAll );
             if ( self._options.idleMode == 'hover' ) {
-                self.$('container').bind( 'mouseleave', idle.hide );
+                self.$('container').on( 'mouseleave', idle.hide );
             }
         },
 
         removeEvent : function() {
             idle.bound = false;
-            self.$('container').bind( 'mousemove click', idle.showAll );
+            self.$('container').on( 'mousemove click', idle.showAll );
             if ( self._options.idleMode == 'hover' ) {
-                self.$('container').unbind( 'mouseleave', idle.hide );
+                self.$('container').off( 'mouseleave', idle.hide );
             }
         },
 
@@ -2226,14 +2228,14 @@ Galleria = window.Galleria = function() {
 
             // add the prev/next nav and bind some controls
 
-            hover( $( el.close ).bind( 'click:fast', lightbox.hide ).html('&#215;') );
+            hover( $( el.close ).on( 'click:fast', lightbox.hide ).html('&#215;') );
 
             $.each( ['Prev','Next'], function(i, dir) {
 
                 var $d = $( el[ dir.toLowerCase() ] ).html( /v/.test( dir ) ? '&#8249;&#160;' : '&#160;&#8250;' ),
                     $e = $( el[ dir.toLowerCase()+'holder'] );
 
-                $e.bind( 'click:fast', function() {
+                $e.on( 'click:fast', function() {
                     lightbox[ 'show' + dir ]();
                 });
 
@@ -2250,7 +2252,7 @@ Galleria = window.Galleria = function() {
                 });
 
             });
-            $( el.overlay ).bind( 'click:fast', lightbox.hide );
+            $( el.overlay ).on( 'click:fast', lightbox.hide );
 
             // the lightbox animation is slow on ipad
             if ( Galleria.IPAD ) {
@@ -2304,7 +2306,7 @@ Galleria = window.Galleria = function() {
             // remove the image
             lightbox.image.image = null;
 
-            $win.unbind('resize', lightbox.rescale);
+            $win.off('resize', lightbox.rescale);
 
             $( lightbox.elems.box ).hide().find( 'iframe' ).remove();
 
@@ -2353,7 +2355,7 @@ Galleria = window.Galleria = function() {
                 });
             }
 
-            $win.unbind('resize', lightbox.rescale );
+            $win.off('resize', lightbox.rescale );
 
             var data = self.getData(index),
                 total = self.getDataLength(),
@@ -2902,10 +2904,7 @@ Galleria.prototype = {
             this.bind( Galleria.RESCALE, function() {
                 this.finger.setup();
             });
-            this.$('stage').bind('click:fast', function(e) {
-                if ( !$(e.target).hasClass('galleria-layer') ) {
-                    return;
-                }
+            this.$('stage').on('click', function(e) {
                 var data = self.getData();
                 if ( !data ) {
                     return;
@@ -3014,12 +3013,7 @@ Galleria.prototype = {
         });
 
         // bind image navigation arrows
-        this.$( 'image-nav-right, image-nav-left' ).bind( 'click:fast', function(e) {
-
-            // tune the clicknext option
-            if ( options.clicknext ) {
-                e.stopPropagation();
-            }
+        this.$( 'image-nav-right, image-nav-left' ).on( 'click:fast', function(e) {
 
             // pause if options is set
             if ( options.pauseOnInteraction ) {
@@ -3030,6 +3024,14 @@ Galleria.prototype = {
             var fn = /right/.test( this.className ) ? 'next' : 'prev';
             self[ fn ]();
 
+        }).on('click', function(e) {
+            
+            e.preventDefault();
+
+            // tune the clicknext option
+            if ( options.clicknext || options.swipe ) {
+                e.stopPropagation();
+            }
         });
 
         // hide controls if chosen to
@@ -3070,7 +3072,7 @@ Galleria.prototype = {
 
         // bind window resize for responsiveness
         if ( options.responsive ) {
-            $win.bind( 'resize', function() {
+            $win.on( 'resize', function() {
                 if ( !self.isFullscreen() ) {
                     self.resize();
                 }
@@ -3081,12 +3083,12 @@ Galleria.prototype = {
 
         if ( options.fullscreenDoubleTap ) {
 
-            this.$( 'stage' ).bind( 'touchstart', (function() {
+            this.$( 'stage' ).on( 'touchstart', (function() {
                 var last, cx, cy, lx, ly, now,
                     getData = function(e) {
                         return e.originalEvent.touches ? e.originalEvent.touches[0] : e;
                     };
-                self.$( 'stage' ).bind('touchmove', function() {
+                self.$( 'stage' ).on('touchmove', function() {
                     last = 0;
                 });
                 return function(e) {
@@ -3442,7 +3444,7 @@ Galleria.prototype = {
             // we'll add the same event to the source if it's kept
 
             $( thumb.container ).add( o.keepSource && o.linkSourceImages ? data.original : null )
-                .data('index', i).bind( o.thumbEventType, onThumbEvent )
+                .data('index', i).on( o.thumbEventType, onThumbEvent )
                 .data('thumbload', onThumbLoad);
 
             if (active === src) {
@@ -3939,7 +3941,7 @@ Galleria.prototype = {
 
     destroy : function() {
         this.$( 'target' ).data( 'galleria', null );
-        this.$( 'container' ).unbind( 'galleria' );
+        this.$( 'container' ).off( 'galleria' );
         this.get( 'target' ).innerHTML = this._original.html;
         this.clearTimer();
         Utils.removeFromArray( _instances, this );
@@ -4026,7 +4028,7 @@ Galleria.prototype = {
         // allow 'image' instead of Galleria.IMAGE
         type = _patchEvent( type );
 
-        this.$( 'container' ).bind( type, this.proxy(fn) );
+        this.$( 'container' ).on( type, this.proxy(fn) );
         return this;
     },
 
@@ -4042,7 +4044,7 @@ Galleria.prototype = {
 
         type = _patchEvent( type );
 
-        this.$( 'container' ).unbind( type );
+        this.$( 'container' ).off( type );
         return this;
     },
 
@@ -4377,7 +4379,7 @@ $(document).mousemove(function(e) {
         }
 
         // unbind and bind event
-        this.$( 'stage' ).unbind( 'mousemove', calculate ).bind( 'mousemove', calculate );
+        this.$( 'stage' ).off( 'mousemove', calculate ).on( 'mousemove', calculate );
 
         // loop the loop
         this.addTimer( 'pan' + self._id, loop, 50, true);
@@ -4416,7 +4418,7 @@ $(document).mousemove(function(e) {
 
         // todo: doublecheck IE8
 
-        this.$( 'stage' ).unbind( 'mousemove' );
+        this.$( 'stage' ).off( 'mousemove' );
 
         this.clearTimer( 'pan' + this._id );
 
@@ -4907,7 +4909,7 @@ this.prependChild( 'info', 'myElement' );
 
                     $( next.image ).css({
                         cursor: 'pointer'
-                    }).bind( 'mouseup', function( e ) {
+                    }).on( 'mouseup', function( e ) {
 
                         // non-left click
                         if ( typeof e.which == 'number' && e.which > 1 ) {
@@ -5077,7 +5079,7 @@ this.prependChild( 'info', 'myElement' );
                         layer.show();
                         // inherit click events set on image
                         if ( ( data.iframe && data.image ) || data.link || self._options.lightbox || self._options.clicknext ) {
-                            layer.css( 'cursor', 'pointer' ).unbind( 'mouseup' ).mouseup( mousetrigger );
+                            layer.css( 'cursor', 'pointer' ).off( 'mouseup' ).mouseup( mousetrigger );
                         }
                     }
 
@@ -6169,7 +6171,7 @@ Galleria.Picture.prototype = {
 
                     var complete = function() {
 
-                        $( this ).unbind( 'load' );
+                        $( this ).off( 'load' );
 
                         // save the original size
                         self.original = size || {
@@ -6233,7 +6235,7 @@ Galleria.Picture.prototype = {
         });
 
         // begin load and insert in cache when done
-        $image.load( onload ).bind( 'error', onerror ).attr( 'src', src );
+        $image.load( onload ).on( 'error', onerror ).attr( 'src', src );
 
         // return the container
         return this.container;
@@ -6584,9 +6586,9 @@ Galleria.Finger = (function() {
         };
 
         // bind events
-        $(elem).bind('touchstart', this.ontouchstart);
-        $(window).bind('resize', this.setup);
-        $(window).bind('orientationchange', this.setup);
+        $(elem).on('touchstart', this.ontouchstart);
+        $(window).on('resize', this.setup);
+        $(window).on('orientationchange', this.setup);
 
         // set up width
         this.setup();
@@ -6631,8 +6633,8 @@ Galleria.Finger = (function() {
             this.touching = true;
             this.deltaX = 0;
 
-            $doc.bind('touchmove', this.ontouchmove);
-            $doc.bind('touchend', this.ontouchend);
+            $doc.on('touchmove', this.ontouchmove);
+            $doc.on('touchend', this.ontouchend);
         },
 
         ontouchmove: function(e) {
@@ -6685,8 +6687,8 @@ Galleria.Finger = (function() {
                 this.show( this.index + ( isValidSlide && !isPastBounds ? (this.deltaX < 0 ? 1 : -1) : 0 ) );
             }
 
-            $doc.unbind('touchmove', this.ontouchmove);
-            $doc.unbind('touchend', this.ontouchend);
+            $doc.off('touchmove', this.ontouchmove);
+            $doc.off('touchend', this.ontouchend);
         },
 
         show: function( index ) {
