@@ -5621,6 +5621,7 @@ Galleria.addTheme = function( theme ) {
         // else look for the absolute path and load the CSS dynamic
         if ( !css ) {
 
+
             $(function() {
                 // Try to determine the css-path from the theme script.
                 // In IE8/9, the script-dom-element seems to be not present
@@ -6210,12 +6211,15 @@ Galleria.Picture.prototype = {
                     // Delay the callback to "fix" the Adblock Bug
                     // http://code.google.com/p/adblockforchrome/issues/detail?id=3701
                     if ( ( !this.width || !this.height ) ) {
-                        window.setTimeout( (function( img ) {
-                            return function() {
-                                if ( img.width && img.height ) {
+                        (function( img) {
+                            Utils.wait({
+                                until : function() {
+                                    return img.width && img.height;
+                                },
+                                success : function() {
                                     complete.call( img );
-                                } else {
-                                    // last resort, this should never happen but just in case it does...
+                                },
+                                error : function() {
                                     if ( !resort ) {
                                         $(new Image()).load( onload ).attr( 'src', img.src );
                                         resort = true;
@@ -6223,9 +6227,10 @@ Galleria.Picture.prototype = {
                                         Galleria.raise('Could not extract width/height from image: ' + img.src +
                                             '. Traced measures: width:' + img.width + 'px, height: ' + img.height + 'px.');
                                     }
-                                }
-                            };
-                        }( this )), 2);
+                                },
+                                timeout: 100
+                            });
+                        }( this ));
                     } else {
                         complete.call( this );
                     }
