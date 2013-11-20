@@ -5620,29 +5620,42 @@ Galleria.addTheme = function( theme ) {
         // else look for the absolute path and load the CSS dynamic
         if ( !css ) {
 
+
             $(function() {
+                // Try to determine the css-path from the theme script.
+                // In IE8/9, the script-dom-element seems to be not present
+                // at once, if galleria itself is inserted into the dom
+                // dynamically. We therefore try multiple times before raising
+                // an error.
+                var retryCount = 0;
+                var tryLoadCss = function() {
+                    $('script').each(function (i, script) {
+                        // look for the theme script
+                        reg = new RegExp('galleria\\.' + theme.name.toLowerCase() + '\\.');
+                        if (reg.test(script.src)) {
 
-                $('script').each(function( i, script ) {
-                    // look for the theme script
-                    reg = new RegExp( 'galleria\\.' + theme.name.toLowerCase() + '\\.' );
-                    if( reg.test( script.src )) {
+                            // we have a match
+                            css = script.src.replace(/[^\/]*$/, '') + theme.css;
 
-                        // we have a match
-                        css = script.src.replace(/[^\/]*$/, '') + theme.css;
+                            window.setTimeout(function () {
+                                Utils.loadCSS(css, 'galleria-theme', function () {
 
-                        window.setTimeout(function() {
-                            Utils.loadCSS( css, 'galleria-theme', function() {
+                                    // the themeload trigger
+                                    _themeLoad(theme);
 
-                                // the themeload trigger
-                                _themeLoad( theme );
-
-                            });
-                        }, 1);
+                                });
+                            }, 1);
+                        }
+                    });
+                    if (!css) {
+                        if (retryCount++ > 5) {
+                            Galleria.raise('No theme CSS loaded');
+                        } else {
+                            window.setTimeout(tryLoadCss,500);
+                        }
                     }
-                });
-                if ( !css ) {
-                    Galleria.raise('No theme CSS loaded');
                 }
+                tryLoadCss();
             });
         }
 
@@ -6150,7 +6163,7 @@ Galleria.Picture.prototype = {
                     // reload the image with a timestamp
                     window.setTimeout((function(image, src) {
                         return function() {
-                            image.attr('src', src + '?' + Utils.timestamp() );
+                            image.attr('src', src + (src.indexOf('?') > -1 ? '&' : '?') + Utils.timestamp() );
                         };
                     }( $(this), src )), 50);
                 } else {
@@ -6197,12 +6210,15 @@ Galleria.Picture.prototype = {
                     // Delay the callback to "fix" the Adblock Bug
                     // http://code.google.com/p/adblockforchrome/issues/detail?id=3701
                     if ( ( !this.width || !this.height ) ) {
-                        window.setTimeout( (function( img ) {
-                            return function() {
-                                if ( img.width && img.height ) {
+                        (function( img) {
+                            Utils.wait({
+                                until : function() {
+                                    return img.width && img.height;
+                                },
+                                success : function() {
                                     complete.call( img );
-                                } else {
-                                    // last resort, this should never happen but just in case it does...
+                                },
+                                error : function() {
                                     if ( !resort ) {
                                         $(new Image()).load( onload ).attr( 'src', img.src );
                                         resort = true;
@@ -6210,9 +6226,10 @@ Galleria.Picture.prototype = {
                                         Galleria.raise('Could not extract width/height from image: ' + img.src +
                                             '. Traced measures: width:' + img.width + 'px, height: ' + img.height + 'px.');
                                     }
-                                }
-                            };
-                        }( this )), 2);
+                                },
+                                timeout: 100
+                            });
+                        }( this ));
                     } else {
                         complete.call( this );
                     }
