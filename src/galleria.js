@@ -7,13 +7,12 @@
  *
  */
 
-(function( $, Galleria, undef ) {
+(function( $, window, Galleria, undef ) {
 
 /*global jQuery, navigator, Image */
 
 // some references
-var window = this,
-    doc    = window.document,
+var doc    = window.document,
     $doc   = $( doc ),
     $win   = $( window ),
 
@@ -1115,7 +1114,7 @@ $win.on( 'orientationchange', function() {
 
 */
 
-Galleria = window.Galleria = function() {
+Galleria = function() {
 
     var self = this;
 
@@ -6792,6 +6791,16 @@ $.fn.galleria = function( options ) {
 
 };
 
+// export as AMD or CommonJS
+if ( typeof module === "object" && module && typeof module.exports === "object" ) {
+    module.exports = Galleria;
+} else {
+    window.Galleria = Galleria;
+    if ( typeof define === "function" && define.amd ) {
+        define( "galleria", ['jquery'], function() { return Galleria; } );
+    }
+}
+
 // phew
 
-}( jQuery ) );
+}( jQuery, this ) );
