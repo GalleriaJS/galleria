@@ -6210,15 +6210,15 @@ Galleria.Picture.prototype = {
                     // Delay the callback to "fix" the Adblock Bug
                     // http://code.google.com/p/adblockforchrome/issues/detail?id=3701
                     if ( ( !this.width || !this.height ) ) {
-                        (function( img) {
+                        (function( img ) {
                             Utils.wait({
-                                until : function() {
+                                until: function() {
                                     return img.width && img.height;
                                 },
-                                success : function() {
+                                success: function() {
                                     complete.call( img );
                                 },
-                                error : function() {
+                                error: function() {
                                     if ( !resort ) {
                                         $(new Image()).load( onload ).attr( 'src', img.src );
                                         resort = true;
