@@ -6164,7 +6164,7 @@ Galleria.Picture.prototype = {
                     // reload the image with a timestamp
                     window.setTimeout((function(image, src) {
                         return function() {
-                            image.attr('src', src + '?' + Utils.timestamp() );
+                            image.attr('src', src + (src.indexOf('?') > -1 ? '&' : '?') + Utils.timestamp() );
                         };
                     }( $(this), src )), 50);
                 } else {
