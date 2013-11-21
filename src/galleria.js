@@ -1289,6 +1289,7 @@ Galleria = window.Galleria = function() {
 
             $.each( self._thumbnails, function( i, thumb ) {
                 if ( thumb.ready ) {
+                    $(thumb.container).css("position","relative");
                     w += thumb.outerWidth || $( thumb.container ).outerWidth( true );
                     // Due to a bug in jquery, outerwidth() returns the floor of the actual outerwidth,
                     // if the browser is zoom to a value other than 100%. height() returns the floating point value.
@@ -1297,6 +1298,8 @@ Galleria = window.Galleria = function() {
 
                     hooks[ i+1 ] = w;
                     h = M.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
+                } else {
+                    $(thumb.container).css("position","absolute");
                 }
             });
 
