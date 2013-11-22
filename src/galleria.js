@@ -41,7 +41,7 @@ var window = this,
             div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->';
         } while ( all[0] );
 
-        return v > 4 ? v : undef;
+        return v > 4 ? v : doc.documentMode || undef;
 
     }() ),
     DOM = function() {
@@ -2645,7 +2645,7 @@ Galleria.prototype = {
 
         // disable swipe if no touch
         if ( !Galleria.TOUCH ) {
-           this._options.swipe = false;
+           //this._options.swipe = false;
         }
 
         // hide all content
@@ -6540,6 +6540,10 @@ Galleria.Finger = (function() {
             }
         };
 
+        this.easeout = function (x, t, b, c, d) {
+            return c*((t=t/d-1)*t*t*t*t + 1) + b;
+        };
+
         if ( !elem.children.length ) {
             return;
         }
@@ -6556,6 +6560,7 @@ Galleria.Finger = (function() {
         this.start = {};
         this.index = this.config.start;
         this.anim = 0;
+        this.easing = this.config.easing;
 
         if ( !has3d ) {
           this.child.style.position = 'absolute';
@@ -6717,22 +6722,32 @@ Galleria.Finger = (function() {
 
             // if distance is short or the user is touching, do a 1-1 animation
             if ( this.touching || M.abs(distance) <= 1 ) {
-              this.pos = this.to;
-              if ( this.anim ) {
-                this.config.oncomplete( this.index );
-              }
-              this.anim = 0;
+                this.pos = this.to;
+                distance = 0;
+                if ( this.anim && !this.touching ) {
+                    this.config.oncomplete( this.index );
+                }
+                this.anim = 0;
+                this.easing = this.config.easing;
             } else {
                 if ( !this.anim ) {
                     // save animation parameters
-                    this.anim = { v: this.pos, t: +new Date(), c: distance, f: factor, q: this.to };
+                    this.anim = { start: this.pos, time: +new Date(), distance: distance, factor: factor, destination: this.to };
                 }
-                // check if destination has changed
-                if ( this.anim.q != this.to ) {
-                    this.anim.c = distance;
+                // check if to has changed
+                if ( this.anim.destination != this.to ) {
+                    this.anim = 0;
+                    this.easing = this.easeout;
+                    return;
                 }
                 // apply easing
-                this.pos = this.config.easing(null, +new Date() - this.anim.t, this.anim.v, this.anim.c, this.config.duration*this.anim.f);
+                this.pos = this.easing(
+                    null, 
+                    +new Date() - this.anim.time, 
+                    this.anim.start, 
+                    this.anim.distance, 
+                    this.config.duration*this.anim.factor
+                );
 
             }
             this.setX();
