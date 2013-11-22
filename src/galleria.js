@@ -9,7 +9,7 @@
 
 (function( $, window, Galleria, undef ) {
 
-/*global jQuery, navigator, Image */
+/*global jQuery, navigator, Image, module, define */
 
 // some references
 var doc    = window.document,
@@ -3024,7 +3024,7 @@ Galleria.prototype = {
             self[ fn ]();
 
         }).on('click', function(e) {
-            
+
             e.preventDefault();
 
             // tune the clicknext option
@@ -5651,10 +5651,10 @@ Galleria.addTheme = function( theme ) {
                         if (retryCount++ > 5) {
                             Galleria.raise('No theme CSS loaded');
                         } else {
-                            window.setTimeout(tryLoadCss,500);
+                            window.setTimeout(tryLoadCss, 500);
                         }
                     }
-                }
+                };
                 tryLoadCss();
             });
         }
@@ -6511,9 +6511,9 @@ Galleria.Finger = (function() {
 
         var el = doc.createElement('p'),
             has3d,
-            t = ['webkit','O','ms','Moz',''], 
-            s, 
-            i=0, 
+            t = ['webkit','O','ms','Moz',''],
+            s,
+            i=0,
             a = 'transform';
 
         DOM().html.insertBefore(el, null);
@@ -6758,10 +6758,10 @@ Galleria.Finger = (function() {
                 }
                 // apply easing
                 this.pos = this.easing(
-                    null, 
-                    +new Date() - this.anim.time, 
-                    this.anim.start, 
-                    this.anim.distance, 
+                    null,
+                    +new Date() - this.anim.time,
+                    this.anim.start,
+                    this.anim.distance,
                     this.config.duration*this.anim.factor
                 );
 
