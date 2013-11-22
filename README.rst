@@ -32,9 +32,7 @@ Changes compared to original (aino) version of galleria
 
 * Experimental "ondemand"-loading of thumbnails. The option `thumbnails: 'ondemand'` can be set in order to load thumbnails
   when needed:
-
   * Thumbnails that are in the visible range of the thumbnails-view are loaded
   * Thumbnails, that are adjacent to the visible range (one carousel-width before or after) are loaded.
   * As the carousel moves, more thumbnails are loaded.
-
-
+  Thumbs are loaded in chunks. The chunk size is read from the option `onDemandChunkSize` (default: 5)

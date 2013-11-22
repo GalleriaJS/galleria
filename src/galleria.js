@@ -448,7 +448,7 @@ var doc    = window.document,
                 // the actual animation method
                 return function( elem, to, options ) {
 
-                    // extend defaults
+                    // extend s
                     options = $.extend({
                         duration: 400,
                         complete: F,
@@ -1347,13 +1347,12 @@ Galleria = function() {
                 return NaN;
             };
 
-            var maxLoad = 5;
             var toLoad = [];
             // Search ahead for not-loaded thumbnail in (doubled) visible range
             var currentHook = hookOrNaN(carousel.current);
             if (isNaN(currentHook)) {
                 // Cannot determine any positions, just loading thumbs ahead.
-                for(var i=0;i<maxLoad;i++) {
+                for(var i=0;i<self._options.onDemandChunkSize;i++) {
                     toLoad.push(i+carousel.current);
                 }
             } else {
@@ -1361,8 +1360,9 @@ Galleria = function() {
                 var min = currentHook - carousel.width;
                 var max = currentHook + carousel.width * 2;
 
+                // First look ahead and then backwards
                 $([1,-1]).each(function(index, increment) {
-                    for (var c = 1; c < self._data.length && toLoad.length<maxLoad; c++) {
+                    for (var c = 1; c < self._data.length && toLoad.length<self._options.onDemandChunkSize; c++) {
                         var thumb = (carousel.current + (c*increment)+self._data.length) % self._data.length;
                         var hook = hookOrNaN(thumb + 1);
                         if (isNaN(hook)) {
@@ -1370,7 +1370,7 @@ Galleria = function() {
                             } else if (!((min <= hook && hook <= max)
                                 || (max > carousel.max && hook <= max - carousel.max)
                                 || (min < 0 && min + carousel.max <= hook))) {
-                            // Out of range. Break loop.
+                            // Out of loadable range. Break loop.
                             break;
                         }
                     }
@@ -1378,6 +1378,7 @@ Galleria = function() {
             }
 
             if (toLoad.length>0) {
+                // If loadable thumbs have been detected, load them and re-run the whole process until no image are loaded anymore.
                 self.lazyLoad(toLoad,function() {
                     carousel.loadThumbsOnDemand(complete);
                 });
@@ -2657,6 +2658,7 @@ Galleria.prototype = {
             popupLinks: false,
             preload: 2,
             queue: true,
+            onDemandChunkSize: 5, // 1.3.3
             responsive: true,
             show: 0,
             showInfo: true,
