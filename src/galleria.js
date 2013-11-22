@@ -2644,7 +2644,7 @@ Galleria.prototype = {
 
         // disable swipe if no touch
         if ( !Galleria.TOUCH ) {
-           //this._options.swipe = false;
+           this._options.swipe = false;
         }
 
         // hide all content
