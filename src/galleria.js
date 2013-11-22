@@ -7,13 +7,12 @@
  *
  */
 
-(function( $, Galleria, undef ) {
+(function( $, window, Galleria, undef ) {
 
 /*global jQuery, navigator, Image */
 
 // some references
-var window = this,
-    doc    = window.document,
+var doc    = window.document,
     $doc   = $( doc ),
     $win   = $( window ),
 
@@ -1115,7 +1114,7 @@ $win.on( 'orientationchange', function() {
 
 */
 
-Galleria = window.Galleria = function() {
+Galleria = function() {
 
     var self = this;
 
@@ -6283,15 +6282,15 @@ Galleria.Picture.prototype = {
                     // Delay the callback to "fix" the Adblock Bug
                     // http://code.google.com/p/adblockforchrome/issues/detail?id=3701
                     if ( ( !this.width || !this.height ) ) {
-                        (function( img) {
+                        (function( img ) {
                             Utils.wait({
-                                until : function() {
+                                until: function() {
                                     return img.width && img.height;
                                 },
-                                success : function() {
+                                success: function() {
                                     complete.call( img );
                                 },
-                                error : function() {
+                                error: function() {
                                     if ( !resort ) {
                                         $(new Image()).load( onload ).attr( 'src', img.src );
                                         resort = true;
@@ -6881,6 +6880,16 @@ $.fn.galleria = function( options ) {
 
 };
 
+// export as AMD or CommonJS
+if ( typeof module === "object" && module && typeof module.exports === "object" ) {
+    module.exports = Galleria;
+} else {
+    window.Galleria = Galleria;
+    if ( typeof define === "function" && define.amd ) {
+        define( "galleria", ['jquery'], function() { return Galleria; } );
+    }
+}
+
 // phew
 
-}( jQuery ) );
+}( jQuery, this ) );
