@@ -1400,7 +1400,7 @@ Galleria = function() {
                     carousel.loadThumbsOnDemand(function() {
                         for ( i = carousel.current; i < carousel.hooks.length; i++ ) {
                             if ( carousel.hooks[i] - carousel.hooks[ carousel.current ] > carousel.width ) {
-                                carousel.set(i - 2);
+                                carousel.set(Math.max(i-2,carousel.current+1));
                                 break;
                             }
                         }
@@ -1417,7 +1417,7 @@ Galleria = function() {
                     carousel.loadThumbsOnDemand(function() {
                         for ( i = carousel.current; i >= 0; i-- ) {
                             if ( carousel.hooks[ carousel.current ] - carousel.hooks[i] > carousel.width ) {
-                                carousel.set( i + 2 );
+                                carousel.set(Math.min(i+2,carousel.current-1));
                                 break;
                             } else if ( i === 0 ) {
                                 carousel.set( 0 );
