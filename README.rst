@@ -36,3 +36,5 @@ Changes compared to original (aino) version of galleria
   * Thumbnails, that are adjacent to the visible range (one carousel-width before or after) are loaded.
   * As the carousel moves, more thumbnails are loaded.
   Thumbs are loaded in chunks. The chunk size is read from the option `onDemandChunkSize` (default: 5)
+
+* Ensure that the carousel moves at least one image in the desired direction, even if to few images fit into it.
