@@ -1286,20 +1286,27 @@ Galleria = function() {
                 h = 0,
                 hooks = [0];
 
+            var maxImgHeight = 1;
+            var unloadedImg = [];
             $.each( self._thumbnails, function( i, thumb ) {
-                if ( thumb.ready ) {
-                    $(thumb.container).css("position","relative");
                     w += thumb.outerWidth || $( thumb.container ).outerWidth( true );
                     // Due to a bug in jquery, outerwidth() returns the floor of the actual outerwidth,
                     // if the browser is zoom to a value other than 100%. height() returns the floating point value.
                     var containerWidth = $( thumb.container).width();
                     w += containerWidth - M.floor(containerWidth);
-
+                if ( thumb.ready ) {
                     hooks[ i+1 ] = w;
                     h = M.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
+                    maxImgHeight = Math.max(thumb.image.height,maxImgHeight);
                 } else {
-                    $(thumb.container).css("position","absolute");
+                	unloadedImg.push(thumb);
                 }
+            });
+            // Make sure that lazy image push images to the right
+            $.each (unloadedImg, function(i,thumb) {
+                $(thumb.container).css({
+                	"height": maxImgHeight+"px"
+                });
             });
 
             self.$( 'thumbnails' ).css({
