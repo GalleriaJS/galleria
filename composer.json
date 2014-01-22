@@ -1,0 +1,19 @@
+{
+  "name": "aino/galleria",
+  "type": "component",
+  "description": "The JavaScript Image Gallery",
+  "homepage": "http://galleria.io",
+  "license": "MIT",
+  "keywords": ["gallery", "galleria", "jquery", "lightbox"],
+  "extra": {
+        "component": {
+            "name": "galleria",
+            "files": [
+                "src/themes/classic/galleria.classic.js",
+                "src/themes/classic/galleria.classic.css",
+                "src/plugins/*",
+                "src/galleria.js"
+            ]
+        }
+    }
+}
