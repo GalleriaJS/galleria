@@ -4,17 +4,5 @@
   "description": "The JavaScript Image Gallery",
   "homepage": "http://galleria.io",
   "license": "MIT",
-  "keywords": ["gallery", "galleria", "jquery", "lightbox"],
-  "extra": {
-        "component": {
-            "name": "galleria",
-            "files": [
-                "src/themes/classic/*",
-                "src/plugins/flickr/*",
-                "src/plugins/history/*",
-                "src/plugins/picasa/*",
-                "src/galleria.js"
-            ]
-        }
-    }
+  "keywords": ["gallery", "galleria", "jquery", "lightbox"]
 }
