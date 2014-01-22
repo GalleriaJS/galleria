@@ -9,9 +9,10 @@
         "component": {
             "name": "galleria",
             "files": [
-                "src/themes/classic/galleria.classic.js",
-                "src/themes/classic/galleria.classic.css",
-                "src/plugins/*",
+                "src/themes/classic/*",
+                "src/plugins/flickr/*",
+                "src/plugins/history/*",
+                "src/plugins/picasa/*",
                 "src/galleria.js"
             ]
         }
