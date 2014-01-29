@@ -2887,8 +2887,7 @@ Galleria.prototype = {
             });
             this.finger = new Galleria.Finger(this.get('stage'), {
                 onchange: function(page) {
-                    self.setCounter( page ).setInfo( page ).pause();
-                    self.show(page);
+                    self.pause().show(page);
                 },
                 oncomplete: function(page) {
 
@@ -4706,11 +4705,15 @@ this.prependChild( 'info', 'myElement' );
                 self.updateCarousel();
             }
 
-            self._controls.frames[ self._controls.active ].scale({
-                width: self._stageWidth,
-                height: self._stageHeight,
-                iframelimit: self._options.maxVideoSize
-            });
+            var frame = self._controls.frames[ self._controls.active ];
+
+            if (frame) {
+                self._controls.frames[ self._controls.active ].scale({
+                    width: self._stageWidth,
+                    height: self._stageHeight,
+                    iframelimit: self._options.maxVideoSize
+                });
+            }
 
             self.trigger( Galleria.RESCALE );
 
@@ -4819,6 +4822,8 @@ this.prependChild( 'info', 'myElement' );
                 type: Galleria.LOADSTART
             }));
 
+            var frame = self._controls.frames[ self._controls.active ];
+
             self.$('container').removeClass( 'videoplay' );
 
             var complete = function() {
@@ -4836,7 +4841,7 @@ this.prependChild( 'info', 'myElement' );
             window.setTimeout(function() {
 
                 // load if not ready
-                if ( !image.ready || image.image.src != src ) {
+                if ( !image.ready || $(image.image).attr('src') != src ) {
                     if ( data.iframe && !data.image ) {
                         image.isIframe = true;
                     }
