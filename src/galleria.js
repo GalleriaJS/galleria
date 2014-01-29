@@ -2600,7 +2600,7 @@ Galleria.prototype = {
             showInfo: true,
             showCounter: true,
             showImagenav: true,
-            swipe: true, // 1.2.4 -> revised in 1.3
+            swipe: 'auto', // 1.2.4 -> revised in 1.3 -> changed type in 1.3.5
             thumbCrop: true,
             thumbEventType: 'click:fast',
             thumbMargin: 0,
@@ -2652,11 +2652,6 @@ Galleria.prototype = {
             DUMMY = options.dummy;
         }
 
-        // disable swipe if no touch
-        if ( !Galleria.TOUCH ) {
-           this._options.swipe = false;
-        }
-
         // hide all content
         $( this._target ).children().hide();
 
@@ -2698,6 +2693,18 @@ Galleria.prototype = {
 
         // merge the theme & caller options
         $.extend( true, options, Galleria.theme.defaults, this._original.options, Galleria.configure.options );
+
+        // internally we use boolean for swipe
+        options.swipe = (function(s) {
+
+            if ( s == 'enforced' ) { return true; }
+
+            // legacy patch
+            if( s === false || s == 'disabled' ) { return false; }
+            
+            return !!Galleria.TOUCH;
+
+        }( options.swipe ));
 
         // disable options that arent compatible with swipe
         if ( options.swipe ) {
