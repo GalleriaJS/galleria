@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3.4 2014-01-28
+ * Galleria v 1.3.5 2014-01-25
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -20,7 +20,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.33,
+    VERSION = 1.35,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -4821,8 +4821,6 @@ this.prependChild( 'info', 'myElement' );
             this.trigger($.extend(evObj, {
                 type: Galleria.LOADSTART
             }));
-
-            var frame = self._controls.frames[ self._controls.active ];
 
             self.$('container').removeClass( 'videoplay' );
 
