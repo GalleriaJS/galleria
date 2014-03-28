@@ -6624,7 +6624,7 @@ Galleria.Finger = (function() {
                 style.left = self.pos+'px';
                 return;
             }
-            style.MozTransform = style.webkitTransform = 'translate3d(' + self.pos + 'px,0,0)';
+            style.MozTransform = style.webkitTransform = style.transform = 'translate3d(' + self.pos + 'px,0,0)';
             return;
         };
 
