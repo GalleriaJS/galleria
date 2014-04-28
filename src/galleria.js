@@ -1367,6 +1367,10 @@ Galleria = function() {
                 var min = currentHook - carousel.width;
                 var max = currentHook + carousel.width * 2;
 
+                // Check if the current thumbnail is loaded, and add it to the list if not.
+                if (!self._thumbnails[carousel.current].ready) {
+                    toLoad.push(carousel.current);
+                }
                 // First look ahead and then backwards
                 $([1,-1]).each(function(index, increment) {
                     for (var c = 1; c < self._data.length && toLoad.length<self._options.onDemandChunkSize; c++) {
