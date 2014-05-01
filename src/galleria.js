@@ -5591,9 +5591,12 @@ $.extend( Galleria, {
     IPHONE:  /iphone/.test( NAV ),
     IPAD:    /ipad/.test( NAV ),
     ANDROID: /android/.test( NAV ),
-    TOUCH:   ('ontouchstart' in doc)
 
 });
+
+$.extend( Galleria, {
+  TOUCH: (Galleria.IPHONE || Galleria.IPAD || Galleria.ANDROID)
+} )
 
 // Galleria static methods
 
