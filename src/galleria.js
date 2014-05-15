@@ -6219,11 +6219,6 @@ Galleria.Picture.prototype = {
                             width: this.width
                         };
 
-                        // translate3d if needed
-                        if ( Galleria.HAS3D ) {
-                            this.style.MozTransform = this.style.webkitTransform = 'translate3d(0,0,0)';
-                        }
-
                         $container.append( this );
 
                         self.cache[ src ] = src; // will override old cache
