@@ -4858,6 +4858,7 @@ this.prependChild( 'info', 'myElement' );
                         image.isIframe = true;
                     }
                     image.load(src, function(image) {
+                        evObj.imageTarget = image.image;
                         self._scaleImage(image, complete).trigger($.extend(evObj, {
                             type: Galleria.IMAGE
                         }));
