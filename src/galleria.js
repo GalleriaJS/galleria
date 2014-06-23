@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3.5 2014-01-25
+ * Galleria v 1.3.6 2014-06-23
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -20,7 +20,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.35,
+    VERSION = 1.36,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -1081,41 +1081,49 @@ $.event.special['click:fast'] = {
             evObj: {}
         };
 
-        $(this).data('clickstate', def).data('timer', 0).on('touchstart.fast', function(e) {
-            clearTimeout($(this).data('timer'));
-            $(this).data('state', {
+        $(this).data({
+            clickstate: def,
+            timer: 0
+        }).on('touchstart.fast', function(e) {
+            window.clearTimeout($(this).data('timer'));
+            $(this).data('clickstate', {
                 touched: true, 
                 touchdown: true,
-                coords: getCoords(e),
+                coords: getCoords(e.originalEvent),
                 evObj: e
             });
         }).on('touchmove.fast', function(e) {
-            var coords = getCoords(e);
-            var state = $(this).data('clickstate');
-            var distance = Math.max( 
-                Math.abs(state.coords.x - coords.x), 
-                Math.abs(state.coords.y - coords.y) 
-            );
+            var coords = getCoords(e.originalEvent),
+                state = $(this).data('clickstate'),
+                distance = Math.max( 
+                    Math.abs(state.coords.x - coords.x), 
+                    Math.abs(state.coords.y - coords.y) 
+                );
             if ( distance > 6 ) {
-                state.touchdown = false;
+                $(this).data('clickstate', $.extend(state, {
+                    touchdown: false
+                }));
             }
         }).on('touchend.fast', function(e) {
-            var $this = $(this);
-            var state = $this.data('clickstate');
+            var $this = $(this),
+                state = $this.data('clickstate');
             if(state.touchdown) {
               handleObj.handler.call(this, e);
             }
-            $this.data('timer', setTimeout(function() {
+            $this.data('timer', window.setTimeout(function() {
                 $this.data('clickstate', def);
             }, 400));
         }).on('click.fast', function(e) {
-            var state = $this.data('clickstate');
+            var state = $(this).data('clickstate');
             if ( state.touched ) {
                 return false;
             }
-            $this.data('clickstate', def);
+            $(this).data('clickstate', def);
             handleObj.handler.call(this, e);
         });
+    },
+    remove: function() {
+        $(this).off('touchstart.fast touchmove.fast touchend.fast click.fast');
     }
 };
 
