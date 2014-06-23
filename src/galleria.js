@@ -1063,7 +1063,64 @@ _nativeFullscreen.listen();
 $.event.special['click:fast'] = {
     propagate: true,
     add: function(handleObj) {
-        var prop = this.propagate;
+
+        var getCoords = function(e) {
+            if ( e.touches && e.touches.length ) {
+                var touch = e.touches[0];
+                return {
+                    x: touch.pageX,
+                    y: touch.pageY
+                };
+            }
+        };
+
+        var def = {
+            touched: false,
+            touchdown: false,
+            coords: { x:0, y:0 },
+            evObj: {}
+        };
+
+        $(this).data('clickstate', def).data('timer', 0).on('touchstart.fast', function(e) {
+            clearTimeout($(this).data('timer'));
+            $(this).data('state', {
+                touched: true, 
+                touchdown: true,
+                coords: getCoords(e),
+                evObj: e
+            });
+        }).on('touchmove.fast', function(e) {
+            var coords = getCoords(e);
+            var state = $(this).data('clickstate');
+            var distance = Math.max( 
+                Math.abs(state.coords.x - coords.x), 
+                Math.abs(state.coords.y - coords.y) 
+            );
+            if ( distance > 6 ) {
+                state.touchdown = false;
+            }
+        }).on('touchend.fast', function(e) {
+            var $this = $(this);
+            var state = $this.data('clickstate');
+            if(state.touchdown) {
+              handleObj.handler.call(this, e);
+            }
+            $this.data('timer', setTimeout(function() {
+                $this.data('clickstate', def);
+            }, 400));
+        }).on('click.fast', function(e) {
+            var state = $this.data('clickstate');
+            if ( state.touched ) {
+                return false;
+            }
+            $this.data('clickstate', def);
+            handleObj.handler.call(this, e);
+        });
+    }
+};
+
+        /*
+
         if ( Galleria.TOUCH ) {
             $(this).on('touchstart.fast', function start(e) {
                 var ev = e.originalEvent,
@@ -1101,6 +1158,8 @@ $.event.special['click:fast'] = {
         }
     }
 };
+
+*/
 
 // trigger resize on orientationchange (IOS7)
 $win.on( 'orientationchange', function() {
