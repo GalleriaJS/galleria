@@ -1,0 +1,28 @@
+{
+  "name": "Galleria",
+  "version": "0.0.0",
+  "description": "The JavaScript Image Gallery",
+  "main": "src/galleria.js",
+  "scripts": {
+    "test": "./runtest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aino/galleria"
+  },
+  "keywords": [
+    "gallery"
+  ],
+  "author": "Aino",
+  "license": "MIT",
+  "bugs": {
+    "url": "http://support.galleria.io"
+  },
+  "homepage": "http://galleria.io",
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "gulp": "^3.8.2",
+    "gulp-mocha-phantomjs": "^0.2.2",
+    "mocha": "^1.20.1"
+  }
+}
