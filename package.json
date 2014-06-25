@@ -23,6 +23,7 @@
     "chai": "^1.9.1",
     "gulp": "^3.8.2",
     "gulp-mocha-phantomjs": "^0.2.2",
-    "mocha": "^1.20.1"
+    "mocha": "^1.20.1",
+    "casperjs": "^1.1.0-beta3"
   }
 }

@@ -62,7 +62,7 @@
       var elem = createElement('image')
       this.elems.push(elem)
       target.appendChild(elem)
-    })
+    }.bind(this))
 
   }
 

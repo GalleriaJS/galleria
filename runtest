@@ -1,2 +1,3 @@
 #!/bin/bash
 ./node_modules/.bin/gulp test --color
+./node_modules/.bin/casperjs test tests/casper.js
