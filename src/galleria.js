@@ -2710,23 +2710,28 @@ Galleria.prototype = {
         // legacy support for transitionInitial
         this._options.initialTransition = this._options.initialTransition || this._options.transitionInitial;
 
-        // turn off debug
-        if ( options && options.debug === false ) {
-            DEBUG = false;
-        }
+        if ( options ) {
 
-        // set timeout
-        if ( options && typeof options.imageTimeout === 'number' ) {
-            TIMEOUT = options.imageTimeout;
-        }
+            // turn off debug
+            if ( options.debug === false ) {
+                DEBUG = false;
+            }
 
-        // set dummy
-        if ( options && typeof options.dummy === 'string' ) {
-            DUMMY = options.dummy;
-        }
+            // set timeout
+            if ( typeof options.imageTimeout === 'number' ) {
+                TIMEOUT = options.imageTimeout;
+            }
 
-        // set theme
-        this._options.theme = options.theme
+            // set dummy
+            if ( typeof options.dummy === 'string' ) {
+                DUMMY = options.dummy;
+            }
+
+            // set theme
+            if ( typeof options.theme == 'string' ) {
+                this._options.theme = options.theme
+            }
+        }
 
         // hide all content
         $( this._target ).children().hide();
@@ -2910,7 +2915,7 @@ Galleria.prototype = {
         this.$( 'container' ).addClass([
             ( Galleria.TOUCH ? 'touch' : 'notouch' ),
             this._options.variation,
-            this.theme.name
+            'galleria-theme-'+this.theme.name
         ].join(' '));
 
         // add images to the controls
