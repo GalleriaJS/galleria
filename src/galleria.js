@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.4b 2014-08-06
+ * Galleria v 1.4 2014-08-06
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -2729,7 +2729,7 @@ Galleria.prototype = {
 
             // set theme
             if ( typeof options.theme == 'string' ) {
-                this._options.theme = options.theme
+                this._options.theme = options.theme;
             }
         }
 
