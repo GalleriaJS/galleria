@@ -6236,6 +6236,12 @@ Galleria.Picture.prototype = {
             $( this.image ).css( 'filter', 'inherit' );
         }
 
+        // FF shaking images bug:
+        // http://support.galleria.io/discussions/problems/12245-shaking-photos
+        if ( !Galleria.IE && !Galleria.CHROME && !Galleria.SAFARI ) {
+            $( this.image ).css( 'image-rendering', 'optimizequality' );
+        }
+
         var reload = false,
             resort = false,
 
