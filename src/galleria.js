@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.3.6 2014-06-23
+ * Galleria v 1.4b 2014-08-06
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -20,7 +20,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.36,
+    VERSION = 1.4,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -318,16 +318,14 @@ var doc    = window.document,
     // themeLoad trigger
     _themeLoad = function( theme ) {
 
-        Galleria.theme = theme;
-
         // run the instances we have in the pool
+        // and apply the last theme if not specified
         $.each( _pool, function( i, instance ) {
-            if ( !instance._initialized ) {
+            if ( instance._options.theme == theme.name || (!instance._initialized && !instance._options.theme) ) {
+                instance.theme = theme;
                 instance._init.call( instance );
             }
         });
-
-        _pool = [];
     },
 
     // the Utils singleton
@@ -2675,6 +2673,7 @@ Galleria.prototype = {
             showCounter: true,
             showImagenav: true,
             swipe: 'auto', // 1.2.4 -> revised in 1.3 -> changed type in 1.3.5
+            theme: null,
             thumbCrop: true,
             thumbEventType: 'click:fast',
             thumbMargin: 0,
@@ -2726,6 +2725,9 @@ Galleria.prototype = {
             DUMMY = options.dummy;
         }
 
+        // set theme
+        this._options.theme = options.theme
+
         // hide all content
         $( this._target ).children().hide();
 
@@ -2735,7 +2737,7 @@ Galleria.prototype = {
         }
 
         // now we just have to wait for the theme...
-        if ( typeof Galleria.theme === 'object' ) {
+        if ( typeof this.theme === 'object' ) {
             this._init();
         } else {
             // push the instance into the pool and run it when the theme is ready
@@ -2760,13 +2762,13 @@ Galleria.prototype = {
 
         this._initialized = true;
 
-        if ( !Galleria.theme ) {
+        if ( !this.theme ) {
             Galleria.raise( 'Init failed: No theme found.', true );
             return this;
         }
 
         // merge the theme & caller options
-        $.extend( true, options, Galleria.theme.defaults, this._original.options, Galleria.configure.options );
+        $.extend( true, options, this.theme.defaults, this._original.options, Galleria.configure.options );
 
         // internally we use boolean for swipe
         options.swipe = (function(s) {
@@ -2905,7 +2907,11 @@ Galleria.prototype = {
         Utils.hide( self.get('tooltip') );
 
         // add a notouch class on the container to prevent unwanted :hovers on touch devices
-        this.$( 'container' ).addClass( ( Galleria.TOUCH ? 'touch' : 'notouch' ) + ' ' + this._options.variation );
+        this.$( 'container' ).addClass([
+            ( Galleria.TOUCH ? 'touch' : 'notouch' ),
+            this._options.variation,
+            this.theme.name
+        ].join(' '));
 
         // add images to the controls
         if ( !this._options.swipe ) {
@@ -3773,7 +3779,7 @@ Galleria.prototype = {
                 self.trigger( Galleria.READY );
 
                 // call the theme init method
-                Galleria.theme.init.call( self, self._options );
+                self.theme.init.call( self, self._options );
 
                 // Trigger Galleria.ready
                 $.each( Galleria.ready.callbacks, function(i ,fn) {
@@ -4497,6 +4503,16 @@ $(document).mousemove(function(e) {
         return function() {
             return fn.apply( scope, Utils.array( arguments ) );
         };
+    },
+
+    /**
+        Tells you the theme name of the gallery
+
+        @returns {String} theme name
+    */
+
+    getThemeName : function() {
+        return this.theme.name;
     },
 
     /**
@@ -5734,7 +5750,7 @@ Galleria.addTheme = function( theme ) {
                             css = script.src.replace(/[^\/]*$/, '') + theme.css;
 
                             window.setTimeout(function () {
-                                Utils.loadCSS(css, 'galleria-theme', function () {
+                                Utils.loadCSS(css, 'galleria-theme-'+theme.name, function () {
 
                                     // the themeload trigger
                                     _themeLoad(theme);
@@ -5788,44 +5804,18 @@ Galleria.loadTheme = function( src, options ) {
         if ( !loaded ) {
             // give it another 20 seconds
             err = window.setTimeout(function() {
-                if ( !loaded && !Galleria.theme ) {
+                if ( !loaded ) {
                     Galleria.raise( "Galleria had problems loading theme at " + src + ". Please check theme path or load manually.", true );
                 }
             }, 20000);
         }
     });
 
-    // first clear the current theme, if exists
-    Galleria.unloadTheme();
-
     // load the theme
     Utils.loadScript( src, function() {
         loaded = true;
         window.clearTimeout( err );
     });
-
-    return Galleria;
-};
-
-/**
-    unloadTheme unloads the Galleria theme and prepares for a new theme
-
-    @returns Galleria
-*/
-
-Galleria.unloadTheme = function() {
-
-    if ( typeof Galleria.theme == 'object' ) {
-
-        $('script').each(function( i, script ) {
-
-            if( new RegExp( 'galleria\\.' + Galleria.theme.name + '\\.' ).test( script.src ) ) {
-                $( script ).remove();
-            }
-        });
-
-        Galleria.theme = undef;
-    }
 
     return Galleria;
 };
