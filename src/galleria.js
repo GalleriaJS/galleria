@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.4 2014-08-06
+ * Galleria v 1.4.1 2014-08-07
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -20,7 +20,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.4,
+    VERSION = 1.41,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -315,8 +315,11 @@ var doc    = window.document,
     // instance pool, holds the galleries until themeLoad is triggered
     _pool = [],
 
-    // themeLoad trigger
+    // Run galleries from theme trigger
+    _loadedThemes = [],
     _themeLoad = function( theme ) {
+
+        _loadedThemes.push(theme);
 
         // run the instances we have in the pool
         // and apply the last theme if not specified
@@ -1124,48 +1127,6 @@ $.event.special['click:fast'] = {
         $(this).off('touchstart.fast touchmove.fast touchend.fast click.fast');
     }
 };
-
-        /*
-
-        if ( Galleria.TOUCH ) {
-            $(this).on('touchstart.fast', function start(e) {
-                var ev = e.originalEvent,
-                    x, y, dist = 0;
-                if ( ev.touches.length == 1 ) {
-                    x = ev.touches[0].pageX;
-                    y = ev.touches[0].pageY;
-                    $(this).on('touchmove.fast', function(f) {
-                        var ft = f.originalEvent.touches;
-                        if ( ft.length == 1 ) {
-                            dist = M.max(
-                                M.abs( x - ft[0].pageX ),
-                                M.abs( y - ft[0].pageY )
-                            );
-                        }
-                    });
-                    $(this).on('touchend.fast', function() {
-                        if( dist > 4 ) {
-                            return $(this).off('touchend.fast touchmove.fast');
-                        }
-                        handleObj.handler.call(this, e);
-                        $(this).off('touchend.fast touchmove.fast');
-                    });
-                }
-            });
-        } else {
-            $(this).on('click.fast', handleObj.handler);
-        }
-    },
-    remove: function(handleObj) {
-        if ( Galleria.TOUCH ) {
-            $(this).off('touchstart.fast touchmove.fast touchend.fast');
-        } else {
-            $(this).off('click.fast', handleObj.handler);
-        }
-    }
-};
-
-*/
 
 // trigger resize on orientationchange (IOS7)
 $win.on( 'orientationchange', function() {
@@ -2742,10 +2703,25 @@ Galleria.prototype = {
         }
 
         // now we just have to wait for the theme...
-        if ( typeof this.theme === 'object' ) {
+        // first check if it has already loaded
+        if ( _loadedThemes.length ) {
+            if ( this._options.theme ) {
+                for ( var i=0; i<_loadedThemes.length; i++ ) {
+                    if( this._options.theme === _loadedThemes[i].name ) {
+                        this.theme = _loadedThemes[i];
+                        break;
+                    }
+                }
+            } else {
+                // if no theme sepcified, apply the first loaded theme
+                this.theme = _loadedThemes[0];
+            }
+        }
+
+        if ( typeof this.theme == 'object' ) {
             this._init();
         } else {
-            // push the instance into the pool and run it when the theme is ready
+            // if no theme is loaded yet, push the instance into a pool and run it when the theme is ready
             _pool.push( this );
         }
 
@@ -5757,7 +5733,7 @@ Galleria.addTheme = function( theme ) {
                             window.setTimeout(function () {
                                 Utils.loadCSS(css, 'galleria-theme-'+theme.name, function () {
 
-                                    // the themeload trigger
+                                    // run galleries with this theme
                                     _themeLoad(theme);
 
                                 });
