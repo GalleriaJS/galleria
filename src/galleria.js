@@ -3482,8 +3482,7 @@ Galleria.prototype = {
                 }
 
             // create empty spans if thumbnails is set to 'empty'
-            } else if ( data.iframe || optval === 'empty' || optval === 'numbers' ) {
-
+            } else if ( ( data.iframe && optval !== null ) || optval === 'empty' || optval === 'numbers' ) {
                 thumb = {
                     container: Utils.create( 'galleria-image' ),
                     image: Utils.create( 'img', 'span' ),
