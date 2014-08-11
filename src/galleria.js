@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.4.1 2014-08-07
+ * Galleria v 1.4.2 2014-08-07
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -6050,6 +6050,12 @@ Galleria.raise = function( msg, fatal ) {
 
 // Add the version
 Galleria.version = VERSION;
+
+Galleria.getLoadedThemes = function() {
+    return $.map(_loadedThemes, function(theme) {
+        return theme.name;
+    });
+};
 
 /**
     A method for checking what version of Galleria the user has installed and throws a readable error if the user needs to upgrade.
