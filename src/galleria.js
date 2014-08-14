@@ -456,7 +456,7 @@ var doc    = window.document,
                 // the actual animation method
                 return function( elem, to, options ) {
 
-                    // extend defaults
+                    // extend s
                     options = $.extend({
                         duration: 400,
                         complete: F,
@@ -1319,17 +1319,27 @@ Galleria = function() {
                 h = 0,
                 hooks = [0];
 
+            var maxImgHeight = 1;
+            var unloadedImg = [];
             $.each( self._thumbnails, function( i, thumb ) {
-                if ( thumb.ready ) {
                     w += thumb.outerWidth || $( thumb.container ).outerWidth( true );
                     // Due to a bug in jquery, outerwidth() returns the floor of the actual outerwidth,
                     // if the browser is zoom to a value other than 100%. height() returns the floating point value.
                     var containerWidth = $( thumb.container).width();
                     w += containerWidth - M.floor(containerWidth);
-
+                if ( thumb.ready ) {
                     hooks[ i+1 ] = w;
                     h = M.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
+                    maxImgHeight = Math.max(thumb.image.height,maxImgHeight);
+                } else {
+                	unloadedImg.push(thumb);
                 }
+            });
+            // Make sure that lazy image push images to the right
+            $.each (unloadedImg, function(i,thumb) {
+                $(thumb.container).css({
+                	"height": maxImgHeight+"px"
+                });
             });
 
             self.$( 'thumbnails' ).css({
@@ -1350,6 +1360,79 @@ Galleria = function() {
             // todo: fix so the carousel moves to the left
         },
 
+        /**
+         * Load thumbs that are currently visible in the thumbnails-container and thumbs
+         * that are close the the thumbnail-container.
+         *
+         * This method loads enough thumbnails to ensure, that moving the thumbnail-viewport
+         * to the left or to the right is possible without loading.
+         *
+         * This method only executes, if the current "thumbnails"-option is set to "ondemand".
+         *
+         * @param complete {Function} callback function that is called when all thumbnails have been loaded.
+         */
+        loadThumbsOnDemand: function(complete) {
+
+
+            if (self._options.thumbnails !== 'ondemand') {
+                complete && complete();
+                return;
+            }
+
+            // Return the hook or NaN, if the image is not loaded
+            function hookOrNaN(hookIndex) {
+                if (carousel.hooks.length > hookIndex) {
+                    return carousel.hooks[hookIndex];
+                }
+                return NaN;
+            };
+
+            var toLoad = [];
+            // Search ahead for not-loaded thumbnail in (doubled) visible range
+            var currentHook = hookOrNaN(carousel.current);
+            if (isNaN(currentHook)) {
+                // Cannot determine any positions, just loading thumbs ahead.
+                for(var i=0;i<self._options.onDemandChunkSize;i++) {
+                    toLoad.push(i+carousel.current);
+                }
+            } else {
+                // Determine thumbs range and load thumbs if needed
+                var min = currentHook - carousel.width;
+                var max = currentHook + carousel.width * 2;
+
+                // Check if the current thumbnail is loaded, and add it to the list if not.
+                if (!self._thumbnails[carousel.current].ready) {
+                    toLoad.push(carousel.current);
+                }
+                // First look ahead and then backwards
+                $([1,-1]).each(function(index, increment) {
+                    for (var c = 1; c < self._data.length && toLoad.length<self._options.onDemandChunkSize; c++) {
+                        var thumb = (carousel.current + (c*increment)+self._data.length) % self._data.length;
+                        var hook = hookOrNaN(thumb + 1);
+                        if (isNaN(hook)) {
+                            toLoad.push(thumb);
+                            } else if (!((min <= hook && hook <= max)
+                                || (max > carousel.max && hook <= max - carousel.max)
+                                || (min < 0 && min + carousel.max <= hook))) {
+                            // Out of loadable range. Break loop.
+                            break;
+                        }
+                    }
+                });
+            }
+
+            if (toLoad.length>0) {
+                // If loadable thumbs have been detected, load them and re-run the whole process until no image are loaded anymore.
+                self.lazyLoad(toLoad,function() {
+                    carousel.loadThumbsOnDemand(complete);
+                });
+            } else if (complete) {
+                complete();
+            }
+
+        },
+
+
         bindControls: function() {
 
             var i;
@@ -1358,14 +1441,14 @@ Galleria = function() {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
-
-                    for ( i = carousel.current; i < carousel.hooks.length; i++ ) {
-                        if ( carousel.hooks[i] - carousel.hooks[ carousel.current ] > carousel.width ) {
-                            carousel.set(i - 2);
-                            break;
+                    carousel.loadThumbsOnDemand(function() {
+                        for ( i = carousel.current; i < carousel.hooks.length; i++ ) {
+                            if ( carousel.hooks[i] - carousel.hooks[ carousel.current ] > carousel.width ) {
+                                carousel.set(Math.max(i-2,carousel.current+1));
+                                break;
+                            }
                         }
-                    }
-
+                    });
                 } else {
                     carousel.set( carousel.current + self._options.carouselSteps);
                 }
@@ -1375,16 +1458,17 @@ Galleria = function() {
                 e.preventDefault();
 
                 if ( self._options.carouselSteps === 'auto' ) {
-
-                    for ( i = carousel.current; i >= 0; i-- ) {
-                        if ( carousel.hooks[ carousel.current ] - carousel.hooks[i] > carousel.width ) {
-                            carousel.set( i + 2 );
-                            break;
-                        } else if ( i === 0 ) {
-                            carousel.set( 0 );
-                            break;
+                    carousel.loadThumbsOnDemand(function() {
+                        for ( i = carousel.current; i >= 0; i-- ) {
+                            if ( carousel.hooks[ carousel.current ] - carousel.hooks[i] > carousel.width ) {
+                                carousel.set(Math.min(i+2,carousel.current-1));
+                                break;
+                            } else if ( i === 0 ) {
+                                carousel.set( 0 );
+                                break;
+                            }
                         }
-                    }
+                    });
                 } else {
                     carousel.set( carousel.current - self._options.carouselSteps );
                 }
@@ -1398,7 +1482,7 @@ Galleria = function() {
                 i--;
             }
             carousel.current = i;
-            carousel.animate();
+            carousel.loadThumbsOnDemand(carousel.animate);
         },
 
         // get the last position
@@ -2628,6 +2712,7 @@ Galleria.prototype = {
             popupLinks: false,
             preload: 2,
             queue: true,
+            onDemandChunkSize: 5, // 1.3.3
             responsive: true,
             show: 0,
             showInfo: true,
@@ -3420,7 +3505,7 @@ Galleria.prototype = {
             // get source from thumb or image
             src = data.thumb || data.image;
 
-            if ( ( o.thumbnails === true || optval == 'lazy' ) && ( data.thumb || data.image ) ) {
+            if ( ( o.thumbnails === true || optval == 'lazy' || optval == 'ondemand') && ( data.thumb || data.image ) ) {
 
                 // add a new Picture instance
                 thumb = new Galleria.Picture(i);
@@ -3461,7 +3546,7 @@ Galleria.prototype = {
                 }
 
                 // load the thumbnail
-                if ( optval == 'lazy' ) {
+                if ( optval == 'lazy' || optval == 'ondemand' ) {
 
                     $container.addClass( 'lazy' );
 
