@@ -20,7 +20,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.41,
+    VERSION = 1.42,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
