@@ -128,7 +128,7 @@ var doc    = window.document,
             get_image: function(data) {
                 if ( data.entry.yt$hd ) {
                     return PROT + '//img.youtube.com/vi/'+this.id+'/maxresdefault.jpg';
-                }
+                    }
                 return data.entry.media$group.media$thumbnail[3].url;
             }
         },
@@ -191,20 +191,20 @@ var doc    = window.document,
         });
 
         this.getMedia = function( type, callback, fail ) {
-            fail = fail || F;
+                fail = fail || F;
             var self = this;
             var success = function( data ) {
                 callback( self['get_'+type]( data ) );
             };
-            try {
+                    try {
                 if ( self.data ) {
                     success( self.data );
                 } else {
                     self.readys.push( success );
                 }
-            } catch(e) {
-                fail();
-            }
+                    } catch(e) {
+                        fail();
+                    }
         };
     },
 
@@ -1300,8 +1300,8 @@ Galleria = function() {
         next: self.$('thumb-nav-right'),
         prev: self.$('thumb-nav-left'),
 
-        // cache the width
-        width: 0,
+        // cache the size (width or height, depends on vertical option)
+        size: 0,
 
         // track the current position
         current: 0,
@@ -1317,35 +1317,42 @@ Galleria = function() {
         update: function() {
             var w = 0,
                 h = 0,
+                wh = 0,
                 hooks = [0];
+                vertical = ( self._options.carousel === "vertical" );
 
             $.each( self._thumbnails, function( i, thumb ) {
                 if ( thumb.ready ) {
-                    w += thumb.outerWidth || $( thumb.container ).outerWidth( true );
-                    // Due to a bug in jquery, outerwidth() returns the floor of the actual outerwidth,
+                    w = thumb.outerWidth || $( thumb.container ).outerWidth( true );
+                    h = thumb.outerHeight || $( thumb.container ).outerHeight( true );
+                     // Due to a bug in jquery, outerwidth() returns the floor of the actual outerwidth,
                     // if the browser is zoom to a value other than 100%. height() returns the floating point value.
                     var containerWidth = $( thumb.container).width();
                     w += containerWidth - M.floor(containerWidth);
+                    var containerHeight = $( thumb.container).height();
+                    h += containerHeight - M.floor(containerHeight);
 
-                    hooks[ i+1 ] = w;
+                   wh += vertical ? ( h ) : ( w );
+                    hooks[ i+1 ] = wh;
                     h = M.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
+                    w = M.max( w, thumb.outerWidth || $( thumb.container).outerWidth( true ) );
                 }
             });
 
             self.$( 'thumbnails' ).css({
-                width: w,
-                height: h
+                width: vertical ? w : wh, 
+                height: vertical ? wh : h
             });
 
-            carousel.max = w;
+            carousel.max = wh;
             carousel.hooks = hooks;
-            carousel.width = self.$( 'thumbnails-list' ).width();
+            carousel.size = vertical ? self.$( 'thumbnails-list' ).height() : self.$( 'thumbnails-list' ).width();
             carousel.setClasses();
 
-            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > carousel.width );
+            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', wh > carousel.size );
 
             // one extra calculation
-            carousel.width = self.$( 'thumbnails-list' ).width();
+            carousel.size = vertical ? self.$( 'thumbnails-list' ).height() : self.$( 'thumbnails-list' ).width();
 
             // todo: fix so the carousel moves to the left
         },
@@ -1360,7 +1367,7 @@ Galleria = function() {
                 if ( self._options.carouselSteps === 'auto' ) {
 
                     for ( i = carousel.current; i < carousel.hooks.length; i++ ) {
-                        if ( carousel.hooks[i] - carousel.hooks[ carousel.current ] > carousel.width ) {
+                        if ( carousel.hooks[i] - carousel.hooks[ carousel.current ] > carousel.size ) {
                             carousel.set(i - 2);
                             break;
                         }
@@ -1377,7 +1384,7 @@ Galleria = function() {
                 if ( self._options.carouselSteps === 'auto' ) {
 
                     for ( i = carousel.current; i >= 0; i-- ) {
-                        if ( carousel.hooks[ carousel.current ] - carousel.hooks[i] > carousel.width ) {
+                        if ( carousel.hooks[ carousel.current ] - carousel.hooks[i] > carousel.size ) {
                             carousel.set( i + 2 );
                             break;
                         } else if ( i === 0 ) {
@@ -1394,7 +1401,7 @@ Galleria = function() {
         // calculate and set positions
         set: function( i ) {
             i = M.max( i, 0 );
-            while ( carousel.hooks[i - 1] + carousel.width >= carousel.max && i >= 0 ) {
+            while ( carousel.hooks[i - 1] + carousel.size >= carousel.max && i >= 0 ) {
                 i--;
             }
             carousel.current = i;
@@ -1418,7 +1425,7 @@ Galleria = function() {
             // calculate last position
             var last = carousel.current;
             while( carousel.hooks[last] - carousel.hooks[ carousel.current ] <
-                   carousel.width && last <= carousel.hooks.length ) {
+                   carousel.size && last <= carousel.hooks.length ) {
                 last ++;
             }
 
@@ -1433,7 +1440,7 @@ Galleria = function() {
         // helper for setting disabled classes
         setClasses: function() {
             carousel.prev.toggleClass( 'disabled', !carousel.current );
-            carousel.next.toggleClass( 'disabled', carousel.hooks[ carousel.current ] + carousel.width >= carousel.max );
+            carousel.next.toggleClass( 'disabled', carousel.hooks[ carousel.current ] + carousel.size >= carousel.max );
         },
 
         // the animation method
@@ -1450,7 +1457,10 @@ Galleria = function() {
                 return $(this).css('left');
             });
 
-            Utils.animate(self.get( 'thumbnails' ), {
+            Utils.animate(self.get( 'thumbnails' ), (self._options.carousel === "vertical" ) ? {
+                top: num
+                } :
+                {
                 left: num
             },{
                 duration: self._options.carouselSpeed,
@@ -2673,20 +2683,20 @@ Galleria.prototype = {
 
         if ( options ) {
 
-            // turn off debug
+        // turn off debug
             if ( options.debug === false ) {
-                DEBUG = false;
-            }
+            DEBUG = false;
+        }
 
-            // set timeout
+        // set timeout
             if ( typeof options.imageTimeout === 'number' ) {
-                TIMEOUT = options.imageTimeout;
-            }
+            TIMEOUT = options.imageTimeout;
+        }
 
-            // set dummy
+        // set dummy
             if ( typeof options.dummy === 'string' ) {
-                DUMMY = options.dummy;
-            }
+            DUMMY = options.dummy;
+        }
 
             // set theme
             if ( typeof options.theme == 'string' ) {
@@ -2894,6 +2904,11 @@ Galleria.prototype = {
             'galleria-theme-'+this.theme.name
         ].join(' '));
 
+        // add a vertical class on the container if option carousel: "vertical"
+        if ( options.carousel ) {
+            this.$( 'container' ).addClass( (options.carousel === "vertical") ? 'vertical' : 'horizontal' );
+        }
+        
         // add images to the controls
         if ( !this._options.swipe ) {
             $.each( new Array(2), function( i ) {
@@ -3089,6 +3104,14 @@ Galleria.prototype = {
             overflow: 'hidden',
             position: 'relative'
         });
+
+        if (options.carousel === "vertical") {
+            this.$( 'thumbnails-list' ).css({
+                position: 'absolute',
+                top: 0,
+                bottom: 0
+            });
+        }
 
         // bind image navigation arrows
         this.$( 'image-nav-right, image-nav-left' ).on( 'click:fast', function(e) {
@@ -4915,24 +4938,24 @@ this.prependChild( 'info', 'myElement' );
 
             window.setTimeout(function() {
 
-                // load if not ready
+            // load if not ready
                 if ( !image.ready || $(image.image).attr('src') != src ) {
                     if ( data.iframe && !data.image ) {
                         image.isIframe = true;
                     }
-                    image.load(src, function(image) {
+                image.load(src, function(image) {
                         evObj.imageTarget = image.image;
-                        self._scaleImage(image, complete).trigger($.extend(evObj, {
-                            type: Galleria.IMAGE
-                        }));
-                        complete();
-                    });
-                } else {
-                    self.trigger($.extend(evObj, {
+                    self._scaleImage(image, complete).trigger($.extend(evObj, {
                         type: Galleria.IMAGE
                     }));
                     complete();
-                }
+                });
+            } else {
+                self.trigger($.extend(evObj, {
+                        type: Galleria.IMAGE
+                }));
+                complete();
+            }
             }, 100);
 
         } else {
@@ -5172,7 +5195,7 @@ this.prependChild( 'info', 'myElement' );
                         if ( ( data.iframe && data.image ) || data.link || self._options.lightbox || self._options.clicknext ) {
                             layer.css( 'cursor', 'pointer' ).off( 'mouseup' ).mouseup( mousetrigger );
                         }
-                    }
+                        }
 
                     // add play icon
                     if( data.video && data.image ) {
@@ -5722,12 +5745,12 @@ Galleria.addTheme = function( theme ) {
                 var retryCount = 0;
                 var tryLoadCss = function() {
                     $('script').each(function (i, script) {
-                        // look for the theme script
+                // look for the theme script
                         reg = new RegExp('galleria\\.' + theme.name.toLowerCase() + '\\.');
                         if (reg.test(script.src)) {
 
-                            // we have a match
-                            css = script.src.replace(/[^\/]*$/, '') + theme.css;
+                    // we have a match
+                    css = script.src.replace(/[^\/]*$/, '') + theme.css;
 
                             window.setTimeout(function () {
                                 Utils.loadCSS(css, 'galleria-theme-'+theme.name, function () {
@@ -5735,10 +5758,10 @@ Galleria.addTheme = function( theme ) {
                                     // run galleries with this theme
                                     _themeLoad(theme);
 
-                                });
-                            }, 1);
-                        }
-                    });
+                        });
+                    }, 1);
+                }
+            });
                     if (!css) {
                         if (retryCount++ > 5) {
                             Galleria.raise('No theme CSS loaded');
