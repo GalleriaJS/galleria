@@ -4031,6 +4031,53 @@ Galleria.prototype = {
         return this;
     },
 
+    _resetTouchSlider : function() {
+        var self = this;
+        // create the touch slider
+        if ( self._options.swipe ) {
+            self._controls.slides = [];
+            self._controls.frames = [];
+            var $images = self.$( 'images' ).empty().width( self.getDataLength() * self._stageWidth );
+                    $.each( new Array( self.getDataLength() ), function(i) {
+
+                        var image = new Galleria.Picture(),
+                            data = self.getData(i);
+
+                        $( image.container ).css({
+                            position: 'absolute',
+                            top: 0,
+                            left: self._stageWidth*i
+                        }).prepend( self._layers[i] = $( Utils.create('galleria-layer') ).css({
+                            position: 'absolute',
+                            top:0, left:0, right:0, bottom:0,
+                            zIndex:2
+                        })[0] ).appendTo( $images );
+
+                        if( data.video ) {
+                            _playIcon( image.container );
+                        }
+
+                        self._controls.slides.push(image);
+
+                        var frame = new Galleria.Picture();
+                        frame.isIframe = true;
+
+                        $( frame.container ).attr('class', 'galleria-frame').css({
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            zIndex: 4,
+                            background: '#000',
+                            display: 'none'
+                        }).appendTo( image.container );
+
+                        self._controls.frames.push(frame);
+                    });
+            self.finger.setup();
+            self.show(self.getDataLength()-1)
+          }
+    },
+
     /**
         Adds and/or removes images from the gallery
         Works just like Array.splice
@@ -4049,6 +4096,7 @@ Galleria.prototype = {
             self._parseData( function() {
                 self._createThumbnails();
             });
+            self._resetTouchSlider();
         },2);
         return self;
     },
@@ -4065,7 +4113,8 @@ Galleria.prototype = {
 
     push : function() {
         var self = this,
-            args = Utils.array( arguments );
+            args = Utils.array( arguments ),
+            oldLength = self.getDataLength();
 
         if ( args.length == 1 && args[0].constructor == Array ) {
             args = args[0];
@@ -4076,8 +4125,9 @@ Galleria.prototype = {
             self._parseData( function() {
                 self._createThumbnails( args );
             });
+            self._resetTouchSlider();
         }, 2);
-        return self;
+      return self;
     },
 
     _getActive : function() {
