@@ -4081,7 +4081,6 @@ Galleria.prototype = {
                         self._controls.frames.push(frame);
                     });
             self.finger.setup();
-            self.show(self.getDataLength()-1)
           }
     },
 
@@ -4104,6 +4103,7 @@ Galleria.prototype = {
                 self._createThumbnails();
             });
             self._resetTouchSlider();
+            self.show(args[0]);
         },2);
         return self;
     },
@@ -4133,6 +4133,7 @@ Galleria.prototype = {
                 self._createThumbnails( args );
             });
             self._resetTouchSlider();
+            self.show(self.getDataLength()-1)
         }, 2);
       return self;
     },
@@ -4912,6 +4913,11 @@ this.prependChild( 'info', 'myElement' );
         }
 
         index = M.max( 0, M.min( parseInt( index, 10 ), this.getDataLength() - 1 ) );
+        while (this.getData(index).noimage){
+          index++;
+          if (index>=this.getDataLength())
+            return;
+        }
 
         rewind = typeof rewind !== 'undefined' ? !!rewind : index < this.getIndex();
 
@@ -5012,6 +5018,12 @@ this.prependChild( 'info', 'myElement' );
         var self = this,
             queue = this._queue[ 0 ],
             data = this.getData( queue.index );
+
+        while (queue.index<this.getDataLength() && this.getData(queue.index).noimage){
+          queue.index++;
+          if (queue.index>=this.getDataLength())
+            return;
+        }
 
         if ( !data ) {
             return;
