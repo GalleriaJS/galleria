@@ -3325,10 +3325,13 @@ Galleria.prototype = {
                 // extract the index from the data
                 var index = $( e.currentTarget ).data( 'index' );
                 if ( self.getIndex() !== index ) {
+                  if (!self._data[index].noimage){
                     self.show( index );
+                    e.preventDefault();
+                  };
+
                 }
 
-                e.preventDefault();
             },
 
             thumbComplete = function( thumb, callback ) {
@@ -3482,7 +3485,7 @@ Galleria.prototype = {
                 }
 
             // create empty spans if thumbnails is set to 'empty'
-            } else if ( ( data.iframe && optval !== null ) || optval === 'empty' || optval === 'numbers' ) {
+            } else if (data.thumbLayer || (data.iframe && optval !== null) || optval === 'empty' || optval === 'numbers' ) {
                 thumb = {
                     container: Utils.create( 'galleria-image' ),
                     image: Utils.create( 'img', 'span' ),
@@ -3499,6 +3502,10 @@ Galleria.prototype = {
 
                 if ( data.iframe ) {
                     $( thumb.image ).addClass( 'iframe' );
+                }
+
+                if ( data.thumbLayer){
+                  $( thumb.container ).addClass(data.thumbLayer);
                 }
 
                 this.$( 'thumbnails' ).append( thumb.container );
