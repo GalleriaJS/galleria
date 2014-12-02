@@ -3423,7 +3423,7 @@ Galleria.prototype = {
             // get source from thumb or image
             src = data.thumb || data.image;
 
-            if ( ( o.thumbnails === true || optval == 'lazy' ) && ( data.thumb || data.image ) ) {
+            if ( ( o.thumbnails === true || optval == 'lazy' ) && ( data.thumb || data.image ) && (!data.skipThumb) ) {
 
                 // add a new Picture instance
                 thumb = new Galleria.Picture(i);
