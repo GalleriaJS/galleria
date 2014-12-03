@@ -4096,7 +4096,13 @@ Galleria.prototype = {
 
     splice : function() {
         var self = this,
-            args = Utils.array( arguments );
+            args = Utils.array( arguments ),
+            callback = false;
+
+      if (typeof(args[args.length-1]) == "function"){
+        callback = args[args.length-1];
+        args.splice(args.length-1,1);
+      }
         window.setTimeout(function() {
             protoArray.splice.apply( self._data, args );
             self._parseData( function() {
@@ -4104,6 +4110,8 @@ Galleria.prototype = {
             });
             self._resetTouchSlider();
             self.show(args[0]);
+          if (callback)
+            callback.call(self);
         },2);
         return self;
     },
@@ -4121,7 +4129,13 @@ Galleria.prototype = {
     push : function() {
         var self = this,
             args = Utils.array( arguments ),
-            oldLength = self.getDataLength();
+            oldLength = self.getDataLength(),
+            callback=false;
+
+        if (args.length > 1 && typeof(args[args.length-1]) == "function"){
+            callback = args[args.length-1];
+            args.splice(args.length-1,1);
+        }
 
         if ( args.length == 1 && args[0].constructor == Array ) {
             args = args[0];
@@ -4134,6 +4148,8 @@ Galleria.prototype = {
             });
             self._resetTouchSlider();
             self.show(self.getDataLength()-1)
+          if (callback)
+            callback.call(self);
         }, 2);
       return self;
     },
