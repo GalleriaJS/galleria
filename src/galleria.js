@@ -20,7 +20,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.41,
+    VERSION = 1.42,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -1318,26 +1318,23 @@ Galleria = function() {
             var w = 0,
                 h = 0,
                 wh = 0,
-                hooks = [0];
+                hooks = [0],
                 vertical = ( self._options.carousel === "vertical" );
 
             $.each( self._thumbnails, function( i, thumb ) {
                 if ( thumb.ready ) {
-<<<<<<< HEAD
                     wh += vertical ? ( thumb.outerHeight || $( thumb.container ).outerHeight( true ) ) : ( thumb.outerWidth || $( thumb.container ).outerWidth( true ) );
-                    hooks[ i+1 ] = wh;
-                    h = Math.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
-                    w = Math.max( w, thumb.outerWidth || $( thumb.container).outerWidth( true ) );
-=======
-                    w += thumb.outerWidth || $( thumb.container ).outerWidth( true );
                     // Due to a bug in jquery, outerwidth() returns the floor of the actual outerwidth,
                     // if the browser is zoom to a value other than 100%. height() returns the floating point value.
-                    var containerWidth = $( thumb.container).width();
-                    w += containerWidth - M.floor(containerWidth);
+                    var containerWH = vertical ? ( $( thumb.container).height() ) : ( $( thumb.container).width() );
+                    // or var containerWidth = $( thumb.container).width(),
+                    //    containerHeight = $( thumb.container).height();
+                    wh += containerWH - M.floor(containerWH);
+                    //or wh += vertical ? ( containerHeight - M.floor(containerHeight) ) : ( containerWidth - M.floor(containerWidth) );
 
-                    hooks[ i+1 ] = w;
+                    hooks[ i+1 ] = wh;
                     h = M.max( h, thumb.outerHeight || $( thumb.container).outerHeight( true ) );
->>>>>>> upstream/master
+                    w = M.max( w, thumb.outerWidth || $( thumb.container).outerWidth( true ) );
                 }
             });
 
@@ -1402,13 +1399,8 @@ Galleria = function() {
 
         // calculate and set positions
         set: function( i ) {
-<<<<<<< HEAD
-            i = Math.max( i, 0 );
-            while ( carousel.hooks[i - 1] + carousel.size >= carousel.max && i >= 0 ) {
-=======
             i = M.max( i, 0 );
-            while ( carousel.hooks[i - 1] + carousel.width >= carousel.max && i >= 0 ) {
->>>>>>> upstream/master
+            while ( carousel.hooks[i - 1] + carousel.size >= carousel.max && i >= 0 ) {
                 i--;
             }
             carousel.current = i;
@@ -1459,21 +1451,21 @@ Galleria = function() {
                 return;
             }
 
-<<<<<<< HEAD
-            Utils.animate(self.get( 'thumbnails' ), (self._options.carousel === "vertical" ) ? {
-                top: num
-                } :
-                {
-=======
             // FF 24 bug
             self.$( 'thumbnails' ).css('left', function() {
                 return $(this).css('left');
             });
+            // Needed for vertical?
+            self.$( 'thumbnails' ).css('top', function() {
+                return $(this).css('top');
+            });
 
-            Utils.animate(self.get( 'thumbnails' ), {
->>>>>>> upstream/master
-                left: num
-            },{
+            Utils.animate(self.get( 'thumbnails' ), (self._options.carousel === "vertical" ) ? {
+				top: num
+				} :
+				{
+				left: num
+			},{
                 duration: self._options.carouselSpeed,
                 easing: self._options.easing,
                 queue: false
@@ -2909,22 +2901,14 @@ Galleria.prototype = {
         Utils.hide( self.get('tooltip') );
 
         // add a notouch class on the container to prevent unwanted :hovers on touch devices
-<<<<<<< HEAD
-        this.$( 'container' ).addClass( Galleria.TOUCH ? 'touch' : 'notouch' );
-        
-        // add a vertical class on the container if option carousel: "vertical"
-        if ( options.carousel ) {
-            this.$( 'container' ).addClass( (options.carousel === "vertical") ? 'vertical' : 'horizontal' );
-        }
-        
-=======
         this.$( 'container' ).addClass([
             ( Galleria.TOUCH ? 'touch' : 'notouch' ),
+            //add vertical class if option is set
+            ( (this._options.carousel === "vertical") ? 'vertical' : 'horizontal' ),
             this._options.variation,
             'galleria-theme-'+this.theme.name
         ].join(' '));
-
->>>>>>> upstream/master
+        
         // add images to the controls
         if ( !this._options.swipe ) {
             $.each( new Array(2), function( i ) {
@@ -3120,7 +3104,7 @@ Galleria.prototype = {
             overflow: 'hidden',
             position: 'relative'
         });
-        
+
         if (options.carousel === "vertical") {
             this.$( 'thumbnails-list' ).css({
                 position: 'absolute',
