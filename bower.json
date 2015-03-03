@@ -1,0 +1,10 @@
+{
+  "name": "galleria",
+  "homepage": "https://github.com/aino/galleria",
+  "version": "1.4.2",
+  "main": [
+    "src/galleria.js",
+    "src/themes/classic/galleria.classic.js",
+    "src/themes/classic/galleria.classic.css"
+  ]
+}
