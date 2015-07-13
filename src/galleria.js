@@ -7,7 +7,27 @@
  *
  */
 
-(function( $, window, Galleria, undef ) {
+(function(root, factory) {
+
+  // Set up Galleria appropriately for the environment. Start with AMD.
+  if (typeof define === 'function' && define.amd) {
+    define('galleria', ['jquery'], function($) {
+      // Export global even in AMD case in case this script is loaded with
+      // others that may still expect a global Galleria.
+      return root.Galleria = factory($, root);
+    });
+
+    // Next for Node.js or CommonJS.
+  } else if (typeof exports !== 'undefined') {
+    var $ = require('jquery');
+    factory($, root, exports);
+
+    // Finally, as a browser global.
+  } else {
+    root.Galleria = factory((root.jQuery || root.Zepto || root.ender || root.$), root);
+  }
+
+}(this, function( $, window, Galleria, undef ) {
 
 /*global jQuery, navigator, Image, module, define */
 
@@ -15,6 +35,7 @@
 var doc    = window.document,
     $doc   = $( doc ),
     $win   = $( window ),
+    jQuery = $,
 
 // native prototypes
     protoArray = Array.prototype,
@@ -6904,16 +6925,7 @@ $.fn.galleria = function( options ) {
 
 };
 
-// export as AMD or CommonJS
-if ( typeof module === "object" && module && typeof module.exports === "object" ) {
-    module.exports = Galleria;
-} else {
-    window.Galleria = Galleria;
-    if ( typeof define === "function" && define.amd ) {
-        define( "galleria", ['jquery'], function() { return Galleria; } );
-    }
-}
-
 // phew
+return Galleria;
 
-}( jQuery, this ) );
+}));
