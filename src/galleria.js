@@ -4,7 +4,6 @@
  *
  * Licensed under the MIT license
  * https://raw.github.com/aino/galleria/master/LICENSE
- *
  */
 
 (function( $, window, Galleria, undef ) {
