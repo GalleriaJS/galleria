@@ -4,7 +4,7 @@
   "description": "arm modifications on galleria 1.4.2",
   "main": [
     "src/galleria.js",
-    "themes/classic/galleria.classic.js"
+    "themes/classic/galleria.classic.js",
     "plugins/history/galleria.history.js"
   ],
   "moduleType": [],
