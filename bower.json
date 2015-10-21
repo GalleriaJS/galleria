@@ -2,7 +2,7 @@
   "name": "arm-galleria",
   "homepage": "https://github.com/apnarm/galleria",
   "description": "arm modifications on galleria 1.4.2",
-  "main": "src/galleria.js",
+  "main": "[]",
   "moduleType": [],
   "keywords": [
     "galleria"
