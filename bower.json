@@ -14,5 +14,6 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "version": "1.4.3"
 }
