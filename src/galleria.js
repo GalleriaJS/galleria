@@ -117,7 +117,7 @@ var doc    = window.document,
         youtube: {
             reg: /https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i,
             embed: function() {
-                return 'http://www.youtube.com/embed/' + this.id;
+                return PROT + '//www.youtube.com/embed/' + this.id;
             },
             getUrl: function() {
                 return PROT + '//gdata.youtube.com/feeds/api/videos/' + this.id + '?v=2&alt=json-in-script&callback=?';
@@ -135,7 +135,7 @@ var doc    = window.document,
         vimeo: {
             reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
             embed: function() {
-                return 'http://player.vimeo.com/video/' + this.id;
+                return PROT + '//player.vimeo.com/video/' + this.id;
             },
             getUrl: function() {
                 return PROT + '//vimeo.com/api/v2/video/' + this.id + '.json?callback=?';
