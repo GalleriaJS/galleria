@@ -120,16 +120,16 @@ var doc    = window.document,
                 return 'http://www.youtube.com/embed/' + this.id;
             },
             getUrl: function() {
-                return PROT + '//gdata.youtube.com/feeds/api/videos/' + this.id + '?v=2&alt=json-in-script&callback=?';
+                return 'https://www.googleapis.com/youtube/v3/videos?id=' + this.id + '&part=contentDetails&key=[YOUR_KEY]&callback=?';
             },
             get_thumb: function(data) {
                 return data.entry.media$group.media$thumbnail[2].url;
             },
             get_image: function(data) {
-                if ( data.entry.yt$hd ) {
-                    return PROT + '//img.youtube.com/vi/'+this.id+'/maxresdefault.jpg';
-                }
-                return data.entry.media$group.media$thumbnail[3].url;
+                if ( data.items[0].contentDetails.definition === 'hd' ) {
+                        return PROT + '//img.youtube.com/vi/'+this.id+'/maxresdefault.jpg';
+                    }
+                    return PROT + '//img.youtube.com/vi/'+this.id+'/hqdefault.jpg';
             }
         },
         vimeo: {

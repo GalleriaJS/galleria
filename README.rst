@@ -2,6 +2,10 @@
 Galleria
 ********
 
+**YouTube API v3.0 Support**
+Serache for YOUR_KEY and replace it with your api key.
+https://developers.google.com/youtube/v3/getting-started
+
 **Responsive JavaScript Image Gallery**
 
 This is the open source repository for the Galleria core, the Classic theme, plugins and everything else that comes bundled with the free download.
