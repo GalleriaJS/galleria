@@ -2,6 +2,9 @@
  * Galleria v 1.4.2 2014-08-07
  * http://galleria.io
  *
+ * with YouTube API 3 bugfix from
+ * https://entp-tender-production.s3.amazonaws.com/assets/f292fa419ea935a7194b407ff7dd2f4da9b7fce0/galleria.1.4.2-youtubeV3.js?AWSAccessKeyId=AKIAISVUXXOK32ATONEQ&Expires=1772566129&Signature=u69RoOov3z2of3sfXB85CDWM4SQ%3D
+ *
  * Licensed under the MIT license
  * https://raw.github.com/aino/galleria/master/LICENSE
  *
@@ -21,7 +24,7 @@ var doc    = window.document,
 
 // internal constants
     VERSION = 1.41,
-    DEBUG = true,
+    DEBUG = false,
     TIMEOUT = 30000,
     DUMMY = false,
     NAV = navigator.userAgent.toLowerCase(),
@@ -120,16 +123,16 @@ var doc    = window.document,
                 return 'http://www.youtube.com/embed/' + this.id;
             },
             getUrl: function() {
-                return PROT + '//gdata.youtube.com/feeds/api/videos/' + this.id + '?v=2&alt=json-in-script&callback=?';
+                return 'https://www.googleapis.com/youtube/v3/videos?id=' + this.id + '?part=contentDetails&key=YOUR-API-KEY&callback=?';
             },
             get_thumb: function(data) {
-                return data.entry.media$group.media$thumbnail[2].url;
+                return PROT + '//img.youtube.com/vi/'+this.id+'/default.jpg';
             },
             get_image: function(data) {
-                if ( data.entry.yt$hd ) {
+                if ( data.items[0].contentDetails.definition === 'hd' ) {
                     return PROT + '//img.youtube.com/vi/'+this.id+'/maxresdefault.jpg';
                 }
-                return data.entry.media$group.media$thumbnail[3].url;
+                return PROT + '//img.youtube.com/vi/'+this.id+'/hqdefault.jpg';
             }
         },
         vimeo: {
@@ -1088,7 +1091,7 @@ $.event.special['click:fast'] = {
         }).on('touchstart.fast', function(e) {
             window.clearTimeout($(this).data('timer'));
             $(this).data('clickstate', {
-                touched: true, 
+                touched: true,
                 touchdown: true,
                 coords: getCoords(e.originalEvent),
                 evObj: e
@@ -1096,9 +1099,9 @@ $.event.special['click:fast'] = {
         }).on('touchmove.fast', function(e) {
             var coords = getCoords(e.originalEvent),
                 state = $(this).data('clickstate'),
-                distance = Math.max( 
-                    Math.abs(state.coords.x - coords.x), 
-                    Math.abs(state.coords.y - coords.y) 
+                distance = Math.max(
+                    Math.abs(state.coords.x - coords.x),
+                    Math.abs(state.coords.y - coords.y)
                 );
             if ( distance > 6 ) {
                 $(this).data('clickstate', $.extend(state, {
@@ -2758,7 +2761,7 @@ Galleria.prototype = {
 
             // legacy patch
             if( s === false || s == 'disabled' ) { return false; }
-            
+
             return !!Galleria.TOUCH;
 
         }( options.swipe ));
