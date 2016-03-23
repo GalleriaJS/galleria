@@ -1,0 +1,18 @@
+{
+  "name": "arm-galleria",
+  "homepage": "https://github.com/apnarm/galleria",
+  "description": "arm modifications on galleria 1.4.2",
+  "main": [],
+  "moduleType": [],
+  "keywords": [
+    "galleria"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "version": "1.4.3"
+}

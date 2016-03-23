@@ -1,10 +1,9 @@
 /**
- * Galleria v 1.4.2 2014-08-07
+ * Galleria v 1.4.3 21-10-2015
  * http://galleria.io
  *
  * Licensed under the MIT license
  * https://raw.github.com/aino/galleria/master/LICENSE
- *
  */
 
 (function( $, window, Galleria, undef ) {
@@ -1088,7 +1087,7 @@ $.event.special['click:fast'] = {
         }).on('touchstart.fast', function(e) {
             window.clearTimeout($(this).data('timer'));
             $(this).data('clickstate', {
-                touched: true, 
+                touched: true,
                 touchdown: true,
                 coords: getCoords(e.originalEvent),
                 evObj: e
@@ -1096,9 +1095,9 @@ $.event.special['click:fast'] = {
         }).on('touchmove.fast', function(e) {
             var coords = getCoords(e.originalEvent),
                 state = $(this).data('clickstate'),
-                distance = Math.max( 
-                    Math.abs(state.coords.x - coords.x), 
-                    Math.abs(state.coords.y - coords.y) 
+                distance = Math.max(
+                    Math.abs(state.coords.x - coords.x),
+                    Math.abs(state.coords.y - coords.y)
                 );
             if ( distance > 6 ) {
                 $(this).data('clickstate', $.extend(state, {
@@ -1113,7 +1112,7 @@ $.event.special['click:fast'] = {
             }
             $this.data('timer', window.setTimeout(function() {
                 $this.data('clickstate', def);
-            }, 400));
+            }, 500));
         }).on('click.fast', function(e) {
             var state = $(this).data('clickstate');
             if ( state.touched ) {
@@ -2758,7 +2757,7 @@ Galleria.prototype = {
 
             // legacy patch
             if( s === false || s == 'disabled' ) { return false; }
-            
+
             return !!Galleria.TOUCH;
 
         }( options.swipe ));
