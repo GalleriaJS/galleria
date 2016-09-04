@@ -119,18 +119,11 @@ var doc    = window.document,
             embed: function() {
                 return 'http://www.youtube.com/embed/' + this.id;
             },
-            getUrl: function() {
-                return PROT + '//gdata.youtube.com/feeds/api/videos/' + this.id + '?v=2&alt=json-in-script&callback=?';
+            get_thumb: function( data ) {
+                return PROT + '//img.youtube.com/vi/'+this.id+'/default.jpg';
             },
-            get_thumb: function(data) {
-                return data.entry.media$group.media$thumbnail[2].url;
-            },
-            get_image: function(data) {
-                if ( data.entry.yt$hd ) {
-                    return PROT + '//img.youtube.com/vi/'+this.id+'/maxresdefault.jpg';
-                }
-                return data.entry.media$group.media$thumbnail[3].url;
-            }
+            get_image: function( data ) {
+                return PROT + '//img.youtube.com/vi/'+this.id+'/hqdefault.jpg';            }
         },
         vimeo: {
             reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
@@ -182,13 +175,19 @@ var doc    = window.document,
 
         $.extend( this, _video[type] );
 
-        $.getJSON( this.getUrl(), function(data) {
+        _videoThumbs = function(data) {
             self.data = data;
             $.each( self.readys, function( i, fn ) {
                 fn( self.data );
             });
             self.readys = [];
-        });
+        };
+
+        if ( this.hasOwnProperty('getUrl') ) {
+            $.getJSON( this.getUrl(), _videoThumbs);
+        } else {
+            window.setTimeout(_videoThumbs, 400);
+        }
 
         this.getMedia = function( type, callback, fail ) {
             fail = fail || F;
