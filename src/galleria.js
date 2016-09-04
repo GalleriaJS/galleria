@@ -1,5 +1,5 @@
 /**
- * Galleria v 1.4.4 2016-09-03
+ * Galleria v 1.4.5 2016-09-04
  * http://galleria.io
  *
  * Licensed under the MIT license
@@ -20,7 +20,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.44,
+    VERSION = 1.45,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
