@@ -1,0 +1,26 @@
+{
+  "name": "galleria.js",
+  "version": "1.4.3",
+  "title": "Responsive JavaScript Image Gallery",
+  "description": "A free JavaScript image gallery framework that simplifies the process of creating beautiful image galleries for the web and mobile devices.",
+  "homepage": "https://galleria.io",
+  "keywords": [
+    "gallery",
+    "jQuery"
+  ],
+  "contributors": [
+    {"name": "David Hellsing", "url": "http://aino.com", "email": "david@aino.com"},
+    {"name": "Frank Ludwig", "url": "http://wib.io", "email": "frank@wib.io"}
+  ],
+  "author": "David Hellsing <david@aino.com> (http://aino.com)",
+
+  "main": "./src/galleria.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/worseisbetter/galleria.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/worseisbetter/galleria/issues"
+  }
+}
