@@ -1,9 +1,9 @@
 /**
- * Galleria v 1.4.2 2014-08-07
+ * Galleria v 1.4.3 2016-09-03
  * http://galleria.io
  *
  * Licensed under the MIT license
- * https://raw.github.com/aino/galleria/master/LICENSE
+ * https://raw.github.com/worseisbetter/galleria/master/LICENSE
  *
  */
 
@@ -20,7 +20,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.41,
+    VERSION = 1.43,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -1141,7 +1141,7 @@ $win.on( 'orientationchange', function() {
 
     @example var gallery = new Galleria();
 
-    @author http://aino.se
+    @author http://wib.io
 
     @requires jQuery
 

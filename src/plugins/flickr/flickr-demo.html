@@ -38,24 +38,25 @@
 
         <div id="galleria"></div>
 
-        <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>.</p>
+        <p class="cred">Made by <a href="http://galleria.io">Galleria</a>.</p>
         <a href="#" id="close">cloase</a>
     </div>
     <script>
+    $(function() {
+        // Load the classic theme
+        Galleria.loadTheme('../../themes/classic/galleria.classic.js');
 
-    // Load the classic theme
-    Galleria.loadTheme('../../themes/classic/galleria.classic.js');
+        // Initialize Galleria
+        Galleria.run('#galleria', {
 
-    // Initialize Galleria
-    Galleria.run('#galleria', {
+            // search flickr for "galleria"
+            flickr: 'search:galleria',
 
-        // search flickr for "galleria"
-        flickr: 'search:galleria',
-        
-        flickrOptions: {
-            // sort by interestingness
-            sort: 'interestingness-desc'
-        }
+            flickrOptions: {
+                // sort by interestingness
+                sort: 'interestingness-desc'
+            }
+        });
     });
     </script>
     </body>

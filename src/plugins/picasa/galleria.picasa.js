@@ -1,9 +1,9 @@
 /**
- * Galleria Picasa Plugin 2012-04-04
+ * Galleria Picasa Plugin 2016-09-03
  * http://galleria.io
  *
  * Licensed under the MIT license
- * https://raw.github.com/aino/galleria/master/LICENSE
+ * https://raw.github.com/worseisbetter/galleria/master/LICENSE
  *
  */
 
@@ -23,7 +23,7 @@ var PATH = Galleria.utils.getScriptPath();
 
     @example var picasa = new Galleria.Picasa();
 
-    @author http://aino.se
+    @author http://wib.io
 
     @requires jQuery
     @requires Galleria

@@ -1,9 +1,9 @@
 /**
- * Galleria History Plugin 2012-04-04
+ * Galleria History Plugin 2016-09-03
  * http://galleria.io
  *
  * Licensed under the MIT license
- * https://raw.github.com/aino/galleria/master/LICENSE
+ * https://raw.github.com/worseisbetter/galleria/master/LICENSE
  *
  */
 

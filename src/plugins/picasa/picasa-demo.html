@@ -38,18 +38,18 @@
 
         <div id="galleria"></div>
 
-        <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>.</p>
+        <p class="cred">Made by <a href="http://galleria.io">Galleria</a>.</p>
     </div>
     <script>
+    $(function() {
+        // Load the classic theme
+        Galleria.loadTheme('../../themes/classic/galleria.classic.js');
 
-    // Load the classic theme
-    Galleria.loadTheme('../../themes/classic/galleria.classic.js');
-
-    Galleria.run('#galleria', {
-        // The user & album. This example fetches the album "Demo" from the user "galleriajs"
-        picasa: 'useralbum:galleriajs/Demo'
+        Galleria.run('#galleria', {
+            // The user & album. This example fetches the album "Demo" from the user "galleriajs"
+            picasa: 'useralbum:galleriajs/Demo'
+        });
     });
-
     </script>
     </body>
 </html>

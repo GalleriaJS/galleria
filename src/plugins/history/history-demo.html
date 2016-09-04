@@ -84,17 +84,17 @@
             </a>
         </div>
 
-        <p class="cred">Made by <a href="http://galleria.aino.se">Galleria</a>.</p>
+        <p class="cred">Made by <a href="http://galleria.io">Galleria</a>.</p>
     </div>
 
     <script>
+    $(function() {
+        // Load the classic theme
+        Galleria.loadTheme('../../themes/classic/galleria.classic.js');
 
-    // Load the classic theme
-    Galleria.loadTheme('../../themes/classic/galleria.classic.js');
-
-    // Initialize Galleria
-    Galleria.run('#galleria');
-
+        // Initialize Galleria
+        Galleria.run('#galleria');
+    });
     </script>
     </body>
 </html>
