@@ -7,21 +7,33 @@
   "keywords": [
     "gallery",
     "thumbnails",
-    "lightbox",
+    "photo",
     "image",
+    "lightbox",
     "youtube",
-    "vimeo",
-    "jQuery"
+    "vimeo"
   ],
   "contributors": [
-    {"name": "David Hellsing", "url": "http://aino.com", "email": "david@aino.com"},
-    {"name": "Frank Ludwig", "url": "http://wib.io", "email": "frank@wib.io"}
+    {
+      "name": "David Hellsing",
+      "url": "http://aino.com",
+      "email": "david@aino.com"
+    },
+    {
+      "name": "Frank Ludwig",
+      "url": "http://wib.io",
+      "email": "frank@wib.io"
+    }
   ],
-  "author": "Frank Ludwig <frank@wib.io> (http://wib.io)",
+  "author": {
+    "name": "worse is better UG",
+    "url": "http://wib.io",
+    "email": "hello@wib.io"
+  },
   "dependencies": {
     "jquery": ">=1.9.0"
   },
-  "main": "./src/galleria.js",
+  "main": "./dist/galleria.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/worseisbetter/galleria.git"
@@ -32,5 +44,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^1.0.2",
+    "grunt-contrib-uglify": "^2.0.0"
   }
 }
