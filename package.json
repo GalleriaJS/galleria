@@ -6,14 +6,21 @@
   "homepage": "https://galleria.io",
   "keywords": [
     "gallery",
+    "thumbnails",
+    "lightbox",
+    "image",
+    "youtube",
+    "vimeo",
     "jQuery"
   ],
   "contributors": [
     {"name": "David Hellsing", "url": "http://aino.com", "email": "david@aino.com"},
     {"name": "Frank Ludwig", "url": "http://wib.io", "email": "frank@wib.io"}
   ],
-  "author": "David Hellsing <david@aino.com> (http://aino.com)",
-
+  "author": "Frank Ludwig <frank@wib.io> (http://wib.io)",
+  "dependencies": {
+    "jquery": ">=1.9.0"
+  },
   "main": "./src/galleria.js",
   "repository": {
     "type": "git",
@@ -22,5 +29,8 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/worseisbetter/galleria/issues"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
