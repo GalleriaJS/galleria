@@ -15,3 +15,32 @@ Documentation
 =============
 
 http://docs.galleria.io
+
+Installation
+============
+
+npm
+---
+::
+
+	$ npm install galleria
+
+https://www.npmjs.com/package/galleria
+
+
+bower
+-----
+::
+
+	$ bower install galleria
+
+http://bower.io/search/?q=galleria
+
+
+CDN
+---
+::
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.4.5/galleria.min.js"></script>
+
+https://cdnjs.com/libraries/galleria
