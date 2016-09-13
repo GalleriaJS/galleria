@@ -1,6 +1,6 @@
 {
   "name": "galleria",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "title": "Responsive JavaScript Image Gallery",
   "description": "A free JavaScript image gallery framework that simplifies the process of creating beautiful image galleries for the web and mobile devices.",
   "homepage": "https://galleria.io",
@@ -50,6 +50,7 @@
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^1.0.2",
-    "grunt-contrib-uglify": "^2.0.0"
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-text-replace": "^0.4.0"
   }
 }

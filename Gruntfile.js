@@ -35,15 +35,26 @@ module.exports = function (grunt) {
         },
 
         cssmin: {
-            target: {
+            dist: {
                 files: {
                     'dist/themes/classic/<%= pkg.name %>.classic.min.css': ['src/themes/classic/<%= pkg.name %>.classic.css']
                 }
             }
         },
 
+        replace: {
+            dist: {
+                src: ['src/themes/classic/classic-demo-cdn.html'],
+                overwrite: true,
+                replacements: [{
+                    from: /\/libs\/galleria\/[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}\//g,
+                    to: '\/libs/galleria/<%= pkg.version %>/'
+                }]
+            }
+        },
+
         copy: {
-            main: {
+            dist: {
                 files: [{
                     expand: true,
                     cwd: 'src/',
@@ -52,14 +63,16 @@ module.exports = function (grunt) {
                 }]
             }
         }
+
     });
 
+    grunt.loadNpmTasks('grunt-text-replace');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Default task(s).
-    grunt.registerTask('default', ['clean', 'uglify', 'cssmin', 'copy']);
+    grunt.registerTask('default', ['clean', 'uglify', 'cssmin', 'replace', 'copy']);
 
 };
