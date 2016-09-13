@@ -5690,7 +5690,7 @@ Galleria.addTheme = function( theme ) {
     }
 
     var css = false,
-        reg;
+        reg, reg2;
 
     if ( typeof theme.css === 'string' ) {
 
@@ -5724,8 +5724,8 @@ Galleria.addTheme = function( theme ) {
                     $('script').each(function (i, script) {
                         // look for the theme script
                         reg = new RegExp('galleria\\.' + theme.name.toLowerCase() + '\\.');
-                        if (reg.test(script.src)) {
-
+                        reg2 = new RegExp('galleria\\.io\\/theme\\/' + theme.name.toLowerCase() + '\\/js');
+                        if (reg.test(script.src) || reg2.test(script.src)) {
                             // we have a match
                             css = script.src.replace(/[^\/]*$/, '') + theme.css;
 
