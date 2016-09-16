@@ -5724,7 +5724,7 @@ Galleria.addTheme = function( theme ) {
                     $('script').each(function (i, script) {
                         // look for the theme script
                         reg = new RegExp('galleria\\.' + theme.name.toLowerCase() + '\\.');
-                        reg2 = new RegExp('galleria\\.io\\/theme\\/' + theme.name.toLowerCase() + '\\/js');
+                        reg2 = new RegExp('galleria\\.io\\/theme\\/' + theme.name.toLowerCase() + '\\/(\\d*\\.*)?(\\d*\\.*)?(\\d*\\/)?js');
                         if (reg.test(script.src) || reg2.test(script.src)) {
                             // we have a match
                             css = script.src.replace(/[^\/]*$/, '') + theme.css;
