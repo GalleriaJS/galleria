@@ -1,5 +1,5 @@
 /**
- * Galleria v1.4.6 2016-09-13
+ * Galleria v1.4.7 2016-09-17
  * http://galleria.io
  *
  * Copyright (c) 2010 - 2016 worse is better UG
@@ -21,7 +21,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.46,
+    VERSION = 1.47,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -5724,7 +5724,7 @@ Galleria.addTheme = function( theme ) {
                     $('script').each(function (i, script) {
                         // look for the theme script
                         reg = new RegExp('galleria\\.' + theme.name.toLowerCase() + '\\.');
-                        reg2 = new RegExp('galleria\\.io\\/theme\\/' + theme.name.toLowerCase() + '\\/js');
+                        reg2 = new RegExp('galleria\\.io\\/theme\\/' + theme.name.toLowerCase() + '\\/(\\d*\\.*)?(\\d*\\.*)?(\\d*\\/)?js');
                         if (reg.test(script.src) || reg2.test(script.src)) {
                             // we have a match
                             css = script.src.replace(/[^\/]*$/, '') + theme.css;
