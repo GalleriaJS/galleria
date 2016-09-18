@@ -6157,11 +6157,18 @@ Galleria.Picture.prototype = {
     */
 
     preload: function( src ) {
-        $( new Image() ).load((function(src, cache) {
-            return function() {
-                cache[ src ] = src;
-            };
-        }( src, this.cache ))).attr( 'src', src );
+        // Create a new Image; register a callback for onload
+        // that adds an entry in the Galleria.Picture cache 
+        // indicating that src is already loaded; then set
+        // the 'src' attribute to actually start loading.
+        $( new Image() ).load(function() {
+            // Add to cache since loading of src has completed
+            Galleria.Picture.prototype.cache[ src ] = 1;
+            // Clear out the 'src' attribute when done to work around a mobile Safari 
+            // bug that results in a memory leak if an Image object's 'src' is
+            // left referencing an image.
+            this.src = '';
+        }).attr( 'src', src );
     },
 
     /**
@@ -6314,6 +6321,9 @@ Galleria.Picture.prototype = {
                 };
             }( this, callback, src ));
 
+        // http://stackoverflow.com/a/3993689/5299483 - clear out 'src' attribute
+        // to free mobile Safari memory
+        $container.find('img').attr('src', '');
         // remove any previous images
         $container.find( 'iframe,img' ).remove();
 
