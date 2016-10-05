@@ -5780,7 +5780,7 @@ Galleria.loadTheme = function( src, options ) {
         err;
 
     // start listening for the timeout onload
-    $( window ).load( function() {
+    $( window ).on( 'load' , function() {
         if ( !loaded ) {
             // give it another 20 seconds
             err = window.setTimeout(function() {
@@ -6157,7 +6157,7 @@ Galleria.Picture.prototype = {
     */
 
     preload: function( src ) {
-        $( new Image() ).load((function(src, cache) {
+        $( new Image() ).on( 'load' , (function(src, cache) {
             return function() {
                 cache[ src ] = src;
             };
@@ -6201,7 +6201,7 @@ Galleria.Picture.prototype = {
 
             this.container.appendChild( this.image );
 
-            $('#'+id).load( (function( self, callback ) {
+            $('#'+id).on( 'load' , (function( self, callback ) {
                 return function() {
                     window.setTimeout(function() {
                         $( self.image ).css( 'visibility', 'visible' );
@@ -6298,7 +6298,7 @@ Galleria.Picture.prototype = {
                                 },
                                 error: function() {
                                     if ( !resort ) {
-                                        $(new Image()).load( onload ).attr( 'src', img.src );
+                                        $(new Image()).on( 'load' , onload ).attr( 'src', img.src );
                                         resort = true;
                                     } else {
                                         Galleria.raise('Could not extract width/height from image: ' + img.src +
@@ -6329,7 +6329,7 @@ Galleria.Picture.prototype = {
         });
 
         // begin load and insert in cache when done
-        $image.load( onload ).on( 'error', onerror ).attr( 'src', src );
+        $image.on( 'load' , onload ).on( 'error', onerror ).attr( 'src', src );
 
         // return the container
         return this.container;
