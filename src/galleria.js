@@ -1,5 +1,5 @@
 /**
- * Galleria v1.5.0 2016-12-07
+ * Galleria v1.5.1 2016-12-08
  * http://galleria.io
  *
  * Copyright (c) 2010 - 2016 worse is better UG
@@ -21,7 +21,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.50,
+    VERSION = 1.51,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
