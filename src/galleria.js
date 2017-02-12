@@ -1,5 +1,5 @@
 /**
- * Galleria v1.5.2 2017-01-13
+ * Galleria v1.5.3 2017-02-13
  * http://galleria.io
  *
  * Copyright (c) 2010 - 2016 worse is better UG
@@ -21,7 +21,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.52,
+    VERSION = 1.53,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -5681,6 +5681,11 @@ Galleria.addTheme = function( theme ) {
     // make sure we have a name
     if ( !theme.name ) {
         Galleria.raise('No theme name specified');
+    }
+
+    // make sure it's compatible
+    if ( !theme.version || parseInt(Galleria.version*10) > parseInt(theme.version*10) ) {
+        Galleria.raise('This version of Galleria requires '+theme.name+' theme version '+Galleria.version.toFixed(1)+' or later', true);
     }
 
     if ( typeof theme.defaults !== 'object' ) {
