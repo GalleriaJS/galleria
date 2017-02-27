@@ -37,14 +37,15 @@ module.exports = function (grunt) {
         cssmin: {
             dist: {
                 files: {
-                    'dist/themes/classic/<%= pkg.name %>.classic.min.css': ['src/themes/classic/<%= pkg.name %>.classic.css']
+                    'dist/themes/classic/<%= pkg.name %>.classic.min.css': ['src/themes/classic/<%= pkg.name %>.classic.css'],
+                    'dist/themes/fullscreen/<%= pkg.name %>.fullscreen.min.css': ['src/themes/fullscreen/<%= pkg.name %>.fullscreen.css']
                 }
             }
         },
 
         replace: {
             dist: {
-                src: ['src/themes/classic/classic-demo-cdn.html', 'README.rst'],
+                src: ['src/themes/classic/classic-demo-cdn.html', 'src/themes/classic/fullscreen-demo-cdn.html', 'README.rst'],
                 overwrite: true,
                 replacements: [{
                     from: /\/libs\/galleria\/[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}\//g,
