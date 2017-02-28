@@ -41,6 +41,6 @@ CDN
 ---
 ::
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.5.4/galleria.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.5.5/galleria.min.js"></script>
 
 https://cdnjs.com/libraries/galleria
