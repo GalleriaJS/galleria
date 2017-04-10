@@ -14,7 +14,7 @@
 
 Galleria.addTheme({
     name: 'fullscreen',
-    version: '1.5.4',
+    version: 1.5,
     author: 'Galleria',
     css: 'galleria.fullscreen.css',
     // begin site script
