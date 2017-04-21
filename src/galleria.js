@@ -4023,7 +4023,7 @@ Galleria.prototype = {
         this.clearTimer();
         Utils.removeFromArray( _instances, this );
         Utils.removeFromArray( _galleries, this );
-        if ( Galleria._waiters.length ) {
+        if ( Galleria._waiters !== undefined && Galleria._waiters.length ) {
             $.each( Galleria._waiters, function( i, w ) {
                 if ( w ) window.clearTimeout( w );
             });
