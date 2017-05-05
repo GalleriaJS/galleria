@@ -1317,10 +1317,16 @@ Galleria = function() {
         update: function() {
             var w = 0,
                 h = 0,
-                hooks = [0];
+                hooks = [0],
+                tumbWidth = 0,
+                tumbCnt = self.$( 'thumbnails-container' ),
+                tumbList = self.$( 'thumbnails-list' ),
+                tumbCntWidth = tumbCnt.width(),
+                tumbListWidth = tumbList.width();
 
             $.each( self._thumbnails, function( i, thumb ) {
                 if ( thumb.ready ) {
+                    tumbWidth = thumb.outerWidth;
                     w += thumb.outerWidth || $( thumb.container ).outerWidth( true );
                     // Due to a bug in jquery, outerwidth() returns the floor of the actual outerwidth,
                     // if the browser is zoom to a value other than 100%. height() returns the floating point value.
@@ -1339,15 +1345,14 @@ Galleria = function() {
 
             carousel.max = w;
             carousel.hooks = hooks;
-            carousel.width = self.$( 'thumbnails-list' ).width();
+            carousel.width = tumbListWidth;
             carousel.setClasses();
 
-            self.$( 'thumbnails-container' ).toggleClass( 'galleria-carousel', w > carousel.width );
+            tumbCnt.toggleClass( 'galleria-carousel', w > carousel.width );
 
             // one extra calculation
-            carousel.width = self.$( 'thumbnails-list' ).width();
-
-            // todo: fix so the carousel moves to the left
+            var offset =tumbCntWidth*Math.ceil(tumbCntWidth/tumbListWidth)-w;
+            carousel.width = tumbListWidth+offset-tumbWidth;
         },
 
         bindControls: function() {
