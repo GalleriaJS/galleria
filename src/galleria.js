@@ -1336,6 +1336,10 @@ Galleria = function() {
                 width: w,
                 height: h
             });
+            
+            if(self.$( 'thumbnails-container' ).width() >=  w) {
+              self.$( 'thumbnails' ).css('width', '100%');
+            }
 
             carousel.max = w;
             carousel.hooks = hooks;
