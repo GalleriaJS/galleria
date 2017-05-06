@@ -1088,7 +1088,7 @@ $.event.special['click:fast'] = {
         }).on('touchstart.fast', function(e) {
             window.clearTimeout($(this).data('timer'));
             $(this).data('clickstate', {
-                touched: true, 
+                touched: true,
                 touchdown: true,
                 coords: getCoords(e.originalEvent),
                 evObj: e
@@ -1096,9 +1096,9 @@ $.event.special['click:fast'] = {
         }).on('touchmove.fast', function(e) {
             var coords = getCoords(e.originalEvent),
                 state = $(this).data('clickstate'),
-                distance = Math.max( 
-                    Math.abs(state.coords.x - coords.x), 
-                    Math.abs(state.coords.y - coords.y) 
+                distance = Math.max(
+                    Math.abs(state.coords.x - coords.x),
+                    Math.abs(state.coords.y - coords.y)
                 );
             if ( distance > 6 ) {
                 $(this).data('clickstate', $.extend(state, {
@@ -2758,7 +2758,7 @@ Galleria.prototype = {
 
             // legacy patch
             if( s === false || s == 'disabled' ) { return false; }
-            
+
             return !!Galleria.TOUCH;
 
         }( options.swipe ));
@@ -3566,12 +3566,14 @@ Galleria.prototype = {
                     }
                 },
                 thumbload = $( thumb.container ).data( 'thumbload' );
-            if ( thumb.video ) {
-                thumbload.call( self, thumb, callback );
-            } else {
-                thumb.load( data.src , function( thumb ) {
-                    thumbload.call( self, thumb, callback );
-                });
+            if (thumbload) {
+              if ( thumb.video ) {
+                  thumbload.call( self, thumb, callback );
+              } else {
+                  thumb.load( data.src , function( thumb ) {
+                      thumbload.call( self, thumb, callback );
+                  });
+              }
             }
         });
 
