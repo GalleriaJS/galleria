@@ -1,5 +1,5 @@
 /**
- * Galleria v1.5.6 2017-04-08
+ * Galleria v1.5.7 2017-05-10
  * http://galleria.io
  *
  * Copyright (c) 2010 - 2016 worse is better UG
@@ -21,7 +21,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.56,
+    VERSION = 1.57,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -31,6 +31,10 @@ var doc    = window.document,
     M = Math,
     F = function(){},
     FALSE = function() { return false; },
+    MOBILE = !(
+        ( window.screen.width > 1279 && window.devicePixelRatio == 1 ) || // there are not so many mobile devices with more than 1280px and pixelRatio equal to 1 (i.e. retina displays are equal to 2...)
+        ( window.screen.width > 1000 && window.innerWidth < (window.screen.width * .9) ) // this checks in the end if a user is using a resized browser window which is not common on mobile devices
+    ),
     IE = (function() {
 
         var v = 3,
@@ -1088,7 +1092,7 @@ $.event.special['click:fast'] = {
         }).on('touchstart.fast', function(e) {
             window.clearTimeout($(this).data('timer'));
             $(this).data('clickstate', {
-                touched: true, 
+                touched: true,
                 touchdown: true,
                 coords: getCoords(e.originalEvent),
                 evObj: e
@@ -1096,9 +1100,9 @@ $.event.special['click:fast'] = {
         }).on('touchmove.fast', function(e) {
             var coords = getCoords(e.originalEvent),
                 state = $(this).data('clickstate'),
-                distance = Math.max( 
-                    Math.abs(state.coords.x - coords.x), 
-                    Math.abs(state.coords.y - coords.y) 
+                distance = Math.max(
+                    Math.abs(state.coords.x - coords.x),
+                    Math.abs(state.coords.y - coords.y)
                 );
             if ( distance > 6 ) {
                 $(this).data('clickstate', $.extend(state, {
@@ -2758,7 +2762,7 @@ Galleria.prototype = {
 
             // legacy patch
             if( s === false || s == 'disabled' ) { return false; }
-            
+
             return !!Galleria.TOUCH;
 
         }( options.swipe ));
@@ -3566,12 +3570,14 @@ Galleria.prototype = {
                     }
                 },
                 thumbload = $( thumb.container ).data( 'thumbload' );
-            if ( thumb.video ) {
-                thumbload.call( self, thumb, callback );
-            } else {
-                thumb.load( data.src , function( thumb ) {
-                    thumbload.call( self, thumb, callback );
-                });
+            if (thumbload) {
+              if ( thumb.video ) {
+                  thumbload.call( self, thumb, callback );
+              } else {
+                  thumb.load( data.src , function( thumb ) {
+                      thumbload.call( self, thumb, callback );
+                  });
+              }
             }
         });
 
@@ -4023,7 +4029,7 @@ Galleria.prototype = {
         this.clearTimer();
         Utils.removeFromArray( _instances, this );
         Utils.removeFromArray( _galleries, this );
-        if ( Galleria._waiters.length ) {
+        if ( Galleria._waiters !== undefined && Galleria._waiters.length ) {
             $.each( Galleria._waiters, function( i, w ) {
                 if ( w ) window.clearTimeout( w );
             });
@@ -5655,7 +5661,7 @@ $.extend( Galleria, {
     IPHONE:  /iphone/.test( NAV ),
     IPAD:    /ipad/.test( NAV ),
     ANDROID: /android/.test( NAV ),
-    TOUCH:   ('ontouchstart' in doc)
+    TOUCH:   ( 'ontouchstart' in doc ) && MOBILE // rule out false positives on Win10
 
 });
 
