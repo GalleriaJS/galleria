@@ -2044,14 +2044,14 @@ Galleria = function() {
             elem.data('idle', {
                 from: $.extend( extract, from ),
                 to: to,
-                complete: true,
-                busy: false
+                complete: true
             });
 
             if ( !hide ) {
                 idle.addTimer();
             } else {
                 elem.css( to );
+                elem.data('idle').complete = false;
             }
             idle.trunk.push(elem);
         },
@@ -2083,7 +2083,7 @@ Galleria = function() {
 
         removeEvent : function() {
             idle.bound = false;
-            self.$('container').on( 'mousemove click', idle.showAll );
+            self.$('container').off( 'mousemove click', idle.showAll );
             if ( self._options.idleMode == 'hover' ) {
                 self.$('container').off( 'mouseleave', idle.hide );
             }
@@ -2116,17 +2116,14 @@ Galleria = function() {
                     return;
                 }
 
-                elem.data('idle').complete = false;
+                data.complete = false;
 
                 Utils.animate( elem, data.to, {
-                    duration: self._options.idleSpeed,
-                    complete: function() {
-                        if ( i == len-1 ) {
-                            idle.active = false;
-                        }
-                    }
+                    duration: self._options.idleSpeed
                 });
             });
+
+            idle.active = false;
         },
 
         showAll : function() {
@@ -2136,27 +2133,24 @@ Galleria = function() {
             $.each( idle.trunk, function( i, elem ) {
                 idle.show( elem );
             });
+
+            idle.active = true;
         },
 
         show: function(elem) {
 
             var data = elem.data('idle');
 
-            if ( !idle.active || ( !data.busy && !data.complete ) ) {
+            if ( !idle.active || !data.complete ) {
 
-                data.busy = true;
+                data.complete = true;
 
                 self.trigger( Galleria.IDLE_EXIT );
 
                 self.clearTimer( 'idle' );
 
                 Utils.animate( elem, data.from, {
-                    duration: self._options.idleSpeed/2,
-                    complete: function() {
-                        idle.active = true;
-                        $(elem).data('idle').busy = false;
-                        $(elem).data('idle').complete = true;
-                    }
+                    duration: self._options.idleSpeed/2
                 });
 
             }
