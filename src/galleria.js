@@ -3423,6 +3423,7 @@ Galleria.prototype = {
 
             // get source from thumb or image
             src = data.thumb || data.image;
+            alt = data.title || data.description;
 
             if ( ( o.thumbnails === true || optval == 'lazy' ) && ( data.thumb || data.image ) ) {
 
@@ -3454,7 +3455,8 @@ Galleria.prototype = {
                     width  : Utils.parseValue( getStyle( 'width' ) ),
                     height : Utils.parseValue( getStyle( 'height' ) ),
                     order  : i,
-                    src    : src
+                    src    : src,
+                    alt    : alt
                 };
 
                 // grab & reset size for smoother thumbnail loads
@@ -6340,7 +6342,7 @@ Galleria.Picture.prototype = {
         });
 
         // begin load and insert in cache when done
-        $image.on( 'load', onload ).on( 'error', onerror ).attr( 'src', src );
+        $image.on( 'load', onload ).on( 'error', onerror ).attr( 'src', src ).attr('alt', alt);
 
         // return the container
         return this.container;
