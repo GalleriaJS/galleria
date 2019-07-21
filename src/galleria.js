@@ -358,10 +358,19 @@ var doc    = window.document,
                 return protoArray.slice.call(obj, 0);
             },
 
-            create : function( className, nodeName ) {
+            create : function( className, nodeName, attributes ) {
                 nodeName = nodeName || 'div';
                 var elem = doc.createElement( nodeName );
                 elem.className = className;
+
+                // attributes f.ex "role" for accessibility support
+                if (attributes) {
+                    for (var attrName in attributes) {
+                        if (attributes.hasOwnProperty(attrName)) {
+                            elem.setAttribute(attrName, attributes[attrName]);
+                        }
+                    }
+                }
                 return elem;
             },
 
@@ -1202,11 +1211,13 @@ Galleria = function() {
     this._id = parseInt(M.random()*10000, 10);
 
     // add some elements
-    var divs =  'container stage images image-nav image-nav-left image-nav-right ' +
+    var divs =  'container stage images image-nav ' +
                 'info info-text info-title info-description ' +
-                'thumbnails thumbnails-list thumbnails-container thumb-nav-left thumb-nav-right ' +
+                'thumbnails thumbnails-list thumbnails-container ' +
                 'loader counter tooltip',
-        spans = 'current total';
+        spans = 'current total',
+        buttons = 'image-nav-left image-nav-right ' +
+                'thumb-nav-left thumb-nav-right ';
 
     $.each( divs.split(' '), function( i, elemId ) {
         self._dom[ elemId ] = Utils.create( 'galleria-' + elemId );
@@ -1214,6 +1225,12 @@ Galleria = function() {
 
     $.each( spans.split(' '), function( i, elemId ) {
         self._dom[ elemId ] = Utils.create( 'galleria-' + elemId, 'span' );
+    });
+
+    $.each( buttons.split(' '), function( i, elemId ) {
+        self._dom[ elemId ] = Utils.create( 'galleria-' + elemId, 'button', {
+            role: 'button'
+        });
     });
 
     // the internal keyboard object
@@ -2870,7 +2887,7 @@ Galleria.prototype = {
             'info' :
                 ['info-text'],
             'image-nav' :
-                ['image-nav-right', 'image-nav-left'],
+                ['image-nav-left', 'image-nav-right'],
             'stage' :
                 ['images', 'loader', 'counter', 'image-nav'],
             'thumbnails-list' :
@@ -3427,7 +3444,7 @@ Galleria.prototype = {
             if ( ( o.thumbnails === true || optval == 'lazy' ) && ( data.thumb || data.image ) ) {
 
                 // add a new Picture instance
-                thumb = new Galleria.Picture(i);
+                thumb = new Galleria.Picture(i, true);
 
                 // save the index
                 thumb.index = i;
@@ -3488,7 +3505,7 @@ Galleria.prototype = {
             // create empty spans if thumbnails is set to 'empty'
             } else if ( ( data.iframe && optval !== null ) || optval === 'empty' || optval === 'numbers' ) {
                 thumb = {
-                    container: Utils.create( 'galleria-image' ),
+                    container: Utils.create( 'galleria-image', 'button', { role: 'button' }),
                     image: Utils.create( 'img', 'span' ),
                     ready: true,
                     data: {
@@ -6097,7 +6114,7 @@ Galleria.requires = function( version, msg ) {
     @param {number} [id] Optional id to keep track of instances
 */
 
-Galleria.Picture = function( id ) {
+Galleria.Picture = function( id, asButton ) {
 
     // save the id
     this.id = id || null;
@@ -6106,7 +6123,11 @@ Galleria.Picture = function( id ) {
     this.image = null;
 
     // Create a new container
-    this.container = Utils.create('galleria-image');
+    if (asButton) {
+        this.container = Utils.create('galleria-image', 'button', { role: 'button' });
+    } else {
+        this.container = Utils.create('galleria-image');
+    }
 
     // add container styles
     $( this.container ).css({
