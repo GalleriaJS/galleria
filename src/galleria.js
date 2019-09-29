@@ -128,7 +128,7 @@ var doc    = window.document,
                 return PROT + '//img.youtube.com/vi/'+this.id+'/default.jpg';
             },
             get_image: function( data ) {
-                return PROT + '//img.youtube.com/vi/'+this.id+'/hqdefault.jpg';            }
+                return PROT + '//img.youtube.com/vi/'+this.id+'/maxresdefault.jpg';            }
         },
         vimeo: {
             reg: /https?:\/\/(?:www\.)?(vimeo\.com)\/(?:hd#)?([0-9]+)/i,
