@@ -4029,6 +4029,7 @@ Galleria.prototype = {
         this.clearTimer();
         Utils.removeFromArray( _instances, this );
         Utils.removeFromArray( _galleries, this );
+        _video._inst = [];
         if ( Galleria._waiters !== undefined && Galleria._waiters.length ) {
             $.each( Galleria._waiters, function( i, w ) {
                 if ( w ) window.clearTimeout( w );
