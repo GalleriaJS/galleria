@@ -1866,8 +1866,14 @@ Galleria = function() {
                             var image = self._controls.getActive().image;
                             if ( image ) {
                                 $( image ).width( big.image.width ).height( big.image.height )
-                                    .attr( 'style', $( big.image ).attr('style') )
-                                    .attr( 'src', big.image.src );
+                                    .attr( 'style', $( big.image ).attr('style') );
+                                if (big.image.src.srcset) {
+                                    $( image ).attr( 'srcset', big.image.src.srcset );
+                                }
+                                if (big.image.src.sizes) {
+                                    $( image ).attr( 'sizes', big.image.src.sizes );
+                                }
+                                $( image ).attr( 'src', big.image.src );
                             }
                         }
                     });
@@ -3873,22 +3879,37 @@ Galleria.prototype = {
                 } else if( href && elem.hasClass('iframe') ) {
                     data.iframe = href;
                 } else {
-                    data.image = data.big = href;
+                    data.image = href;
                 }
 
                 if ( rel ) {
                     data.big = rel;
                 }
 
-                // alternative extraction from HTML5 data attribute, added in 1.2.7
-                $.each( 'big title description link layer image'.split(' '), function( i, val ) {
+                data.imagesrcset = parent.data( 'srcset' );
+                data.imagesizes = parent.data( 'sizes' );
+                data.thumbsizes = elem.attr( 'sizes' );
+                data.thumbsrcset = elem.attr( 'srcset' );
+
+                // alternative extraction from HTML5 data attribute
+                $.each( 'big bigsrcset bigsizes title description link layer image imagesrcset imagesizes'.split(' '), function( i, val ) {
                     if ( elem.data(val) ) {
                         data[ val ] = elem.data(val).toString();
                     }
                 });
 
+                if (elem.data('srcset')) {
+                    data.imagesrcset = elem.data('srcset');
+                }
+
+                if (elem.data('sizes')) {
+                    data.imagesizes = elem.data('sizes');
+                }
+
                 if ( !data.big ) {
                     data.big = data.image;
+                    data.bigsrcset = data.imagesrcset;
+                    data.bigsizes = data.imagesizes;
                 }
 
                 // mix default extractions with the hrefs and config
@@ -3949,6 +3970,15 @@ Galleria.prototype = {
         $.each( this._data, function( i, data ) {
 
             current = self._data[ i ];
+
+            // q&d hack to attach srcset & sizes to src
+            $.each( 'big image thumb'.split(' '), function( i, val ) {
+                if ( data[ val] ) {
+                    data[val] = new String(data[val]);
+                    data[val].srcset = data [val + 'srcset'];
+                    data[val].sizes = data [val + 'sizes'];
+                }
+            });
 
             // copy image as thumb if no thumb exists
             if ( 'thumb' in data === false ) {
@@ -6169,11 +6199,22 @@ Galleria.Picture.prototype = {
     */
 
     preload: function( src ) {
-        $( new Image() ).on( 'load', (function(src, cache) {
+        var $image = $( new Image() ).on( 'load', (function(src, cache) {
             return function() {
                 cache[ src ] = src;
             };
-        }( src, this.cache ))).attr( 'src', src );
+        }( src, this.cache )));
+
+        // due to a bug in safari, need to set srcset first
+        if (src.srcset) {
+            $image.attr( 'srcset', src.srcset );
+        }
+
+        if (src.sizes) {
+            $image.attr( 'sizes', src.sizes );
+        }
+
+        $image.attr( 'src', src );
     },
 
     /**
@@ -6341,7 +6382,14 @@ Galleria.Picture.prototype = {
         });
 
         // begin load and insert in cache when done
-        $image.on( 'load', onload ).on( 'error', onerror ).attr( 'src', src );
+        $image.on( 'load', onload ).on( 'error', onerror );
+        if (src.srcset) {
+            $image.attr( 'srcset', src.srcset );
+        }
+        if (src.sizes) {
+            $image.attr( 'sizes', src.sizes );
+        }
+        $image.attr( 'src', src );
 
         // return the container
         return this.container;
