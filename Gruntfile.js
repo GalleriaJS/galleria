@@ -28,7 +28,8 @@ module.exports = function (grunt) {
                     'dist/<%= pkg.name %>.min.js': ['src/<%= pkg.name %>.js'],
                     'dist/plugins/flickr/<%= pkg.name %>.flickr.min.js': ['src/plugins/flickr/<%= pkg.name %>.flickr.js'],
                     'dist/plugins/history/<%= pkg.name %>.history.min.js': ['src/plugins/history/<%= pkg.name %>.history.js'],
-                    'dist/themes/classic/<%= pkg.name %>.classic.min.js': ['src/themes/classic/<%= pkg.name %>.classic.js']
+                    'dist/themes/classic/<%= pkg.name %>.classic.min.js': ['src/themes/classic/<%= pkg.name %>.classic.js'],
+                    'dist/themes/fullscreen/<%= pkg.name %>.fullscreen.min.js': ['src/themes/fullscreen/<%= pkg.name %>.fullscreen.js']
                     }
             }
         },
