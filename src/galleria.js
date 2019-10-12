@@ -8,7 +8,25 @@
  *
  */
 
-(function( $, window, Galleria, undef ) {
+( function( window, factory ) {
+    if ( typeof define == 'function' && define.amd ) {
+        define( [ 'jquery' ], function( jQuery ) {
+            return factory( window, jQuery );
+        });
+    } else if ( typeof module == 'object' && module.exports ) {
+        module.exports = factory(
+            window,
+            require('jquery')
+        );
+    } else {
+        // browser global
+        window.Galleria = factory(
+            window,
+            window.jQuery
+        );
+    }
+
+}( window, function factory( window, $, Galleria, undef ) {
 
 /*global jQuery, navigator, Image, module, define */
 
@@ -16,6 +34,7 @@
 var doc    = window.document,
     $doc   = $( doc ),
     $win   = $( window ),
+    jQuery = $,
 
 // native prototypes
     protoArray = Array.prototype,
@@ -6964,16 +6983,7 @@ $.fn.galleria = function( options ) {
 
 };
 
-// export as AMD or CommonJS
-if ( typeof module === "object" && module && typeof module.exports === "object" ) {
-    module.exports = Galleria;
-} else {
-    window.Galleria = Galleria;
-    if ( typeof define === "function" && define.amd ) {
-        define( "galleria", ['jquery'], function() { return Galleria; } );
-    }
-}
-
 // phew
+return Galleria;
 
-}( jQuery, this ) );
+}));
