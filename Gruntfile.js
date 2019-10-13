@@ -45,7 +45,7 @@ module.exports = function (grunt) {
 
         replace: {
             dist: {
-                src: ['src/themes/classic/classic-demo-cdn.html', 'src/themes/classic/fullscreen-demo-cdn.html', 'README.rst'],
+                src: ['src/themes/*/demo-cdn.html', 'README.rst'],
                 overwrite: true,
                 replacements: [{
                     from: /\/libs\/galleria\/[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}\//g,
