@@ -1,8 +1,8 @@
 /**
- * Galleria Classic Theme 2017-02-27
+ * Galleria Classic Theme 2019-10-13
  * http://galleria.io
  *
- * Copyright (c) 2010 - 2017 worse is better UG
+ * Copyright (c) 2010 - 2019 worse is better UG
  * Licensed 2017-02-27 under the MIT license
  * https://raw.github.com/worseisbetter/galleria/master/LICENSE
  *
@@ -30,7 +30,7 @@
 
     Galleria.addTheme({
         name: 'fullscreen',
-        version: '1.5.4',
+        version: '1.6',
         author: 'Galleria',
         css: 'galleria.fullscreen.css',
         // begin site script

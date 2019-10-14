@@ -1,8 +1,8 @@
 /**
- * Galleria History Plugin 2016-09-03
+ * Galleria History Plugin 2019-10-13
  * http://galleria.io
  *
- * Copyright (c) 2010 - 2017 worse is better UG
+ * Copyright (c) 2010 - 2019 worse is better UG
  * Licensed under the MIT license
  * https://raw.github.com/worseisbetter/galleria/master/LICENSE
  *

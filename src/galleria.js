@@ -1,8 +1,8 @@
 /**
- * Galleria v1.5.7 2017-05-10
+ * Galleria v1.6.0 2019-10-13
  * http://galleria.io
  *
- * Copyright (c) 2010 - 2016 worse is better UG
+ * Copyright (c) 2010 - 2019 worse is better UG
  * Licensed under the MIT license
  * https://raw.github.com/worseisbetter/galleria/master/LICENSE
  *
@@ -40,7 +40,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.57,
+    VERSION = 1.60,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,

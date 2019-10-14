@@ -1,14 +1,32 @@
 /**
- * Galleria History Plugin 2016-09-03
+ * Galleria History Plugin 2019-10-13
  * http://galleria.io
  *
- * Copyright (c) 2010 - 2017 worse is better UG
+ * Copyright (c) 2010 - 2019 worse is better UG
  * Licensed under the MIT license
  * https://raw.github.com/worseisbetter/galleria/master/LICENSE
  *
  */
 
-(function( $, window ) {
+( function( window, factory ) {
+    if ( typeof define == 'function' && define.amd ) {
+        define( ['../galleria', 'jquery' ], function( Galleria, jQuery ) {
+            return factory( window, Galleria, jQuery );
+        });
+    } else if ( typeof module == 'object' && module.exports ) {
+        module.exports = factory(
+            window,
+            require('galleria'),
+            require('jquery')
+        );
+    } else {
+        factory(
+            window,
+            window.Galleria,
+            window.jQuery
+        );
+    }
+}( window, function factory( window, Galleria, $ ) {
 
 /*global jQuery, Galleria, window */
 
@@ -143,5 +161,6 @@ Galleria.History = (function() {
     };
 }());
 
-}( jQuery, this ));
+return Galleria;
+}));
 

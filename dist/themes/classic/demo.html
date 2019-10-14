@@ -3,9 +3,6 @@
     <head>
         <meta charset="utf-8">
         <title>Galleria Classic Theme</title>
-
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.6.0/themes/fullscreen/galleria.classic.min.css" />
-
         <style>
 
             /* Demo styles */
@@ -22,6 +19,14 @@
             #galleria{height:320px}
 
         </style>
+
+        <!-- load jQuery -->
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.js"></script> -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
+
+        <!-- load Galleria -->
+        <script src="../../galleria.js"></script>
+
     </head>
 <body>
     <div class="content">
@@ -89,16 +94,14 @@
         <p class="cred">Made by <a href="https://galleria.io">Galleria</a>.</p>
     </div>
 
-    <!-- load jQuery -->
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script> -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
-    <!-- load Galleria -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.6.0/galleria.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.6.0/themes/classic/galleria.classic.min.js"></script>
     <script>
-        $(function() {
-            Galleria.run('#galleria');
-        });
+    $(function() {
+        // Load the classic theme
+        Galleria.loadTheme('galleria.classic.js');
+
+        // Initialize Galleria
+        Galleria.run('#galleria');
+    });
     </script>
     </body>
 </html>
