@@ -1,6 +1,8 @@
 module.exports = function (grunt) {
     "use strict";
 
+    var assets  = require('postcss-assets');
+
     grunt.initConfig({
 
         pkg: grunt.file.readJSON('package.json'),
@@ -11,8 +13,6 @@ module.exports = function (grunt) {
         ' *\n' +
         ' * Copyright (c) 2010 - <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>\n' +
         ' * Licensed under the <%= pkg.license %> License.\n' +
-        ' * https://raw.github.com/worseisbetter/galleria/master/LICENSE\n' +
-        ' *\n' +
         ' */\n\n',
 
         clean: {
@@ -28,28 +28,24 @@ module.exports = function (grunt) {
                     'dist/<%= pkg.name %>.min.js': ['src/<%= pkg.name %>.js'],
                     'dist/plugins/flickr/<%= pkg.name %>.flickr.min.js': ['src/plugins/flickr/<%= pkg.name %>.flickr.js'],
                     'dist/plugins/history/<%= pkg.name %>.history.min.js': ['src/plugins/history/<%= pkg.name %>.history.js'],
-                    'dist/themes/classic/<%= pkg.name %>.classic.min.js': ['src/themes/classic/<%= pkg.name %>.classic.js'],
-                    'dist/themes/fullscreen/<%= pkg.name %>.fullscreen.min.js': ['src/themes/fullscreen/<%= pkg.name %>.fullscreen.js']
-                    }
-            }
-        },
-
-        cssmin: {
-            dist: {
-                files: {
-                    'dist/themes/classic/<%= pkg.name %>.classic.min.css': ['src/themes/classic/<%= pkg.name %>.classic.css'],
-                    'dist/themes/fullscreen/<%= pkg.name %>.fullscreen.min.css': ['src/themes/fullscreen/<%= pkg.name %>.fullscreen.css']
                 }
             }
         },
 
         replace: {
             dist: {
-                src: ['src/themes/*/demo-cdn.html', 'README.rst'],
-                overwrite: true,
-                replacements: [{
-                    from: /\/libs\/galleria\/[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}\//g,
-                    to: '\/libs/galleria/<%= pkg.version %>/'
+                options: {
+                    patterns: [
+                        {
+                            match: /\/libs\/galleria\/[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}\//g,
+                            replacement: '\/libs/galleria/<%= pkg.version %>/'
+                        }
+                    ],
+                    usePrefix: false,
+                },
+                files: [{
+                    expand: true,
+                    src: ['src/themes/*/demo-cdn.html', 'README.rst']
                 }]
             }
         },
@@ -59,7 +55,7 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: 'src/',
-                    src: ['**/*'],
+                    src: ['**/*.html', '**/*.js'],
                     dest: 'dist'
                 }]
             }
@@ -67,13 +63,70 @@ module.exports = function (grunt) {
 
     });
 
-    grunt.loadNpmTasks('grunt-text-replace');
+    var themes = ['azur', 'folio', 'fullscreen', 'miniml', 'twelve', 'classic'];
+    themes.forEach(function(name) {
+
+        grunt.config(['uglify', name], {
+            options: {
+                banner: '<%= banner %>'
+            },
+
+            files: [{
+                src: 'src/themes/' + name + '/galleria.' + name + '.js',
+                dest: 'dist/themes/' + name + '/galleria.' + name + '.min.js'
+            }]
+        });
+
+        grunt.config(['postcss', name], {
+            options: {
+                processors: [
+                    assets()
+                ]
+            },
+            files: [{
+                src: 'src/themes/' + name + '/galleria-inline.' + name + '.css',
+                dest: 'dist/themes/' + name + '/galleria.' + name + '.css'
+            }]
+        });
+
+        grunt.config(['cssmin', name], {
+            files: [{
+                src: 'dist/themes/' + name + '/galleria.' + name + '.css',
+                dest: 'dist/themes/' + name + '/galleria.' + name + '.min.css'
+            }]
+        });
+
+    });
+
+    grunt.config(['replace', 'inline'], {
+        options: {
+            patterns: [
+                {
+                    match: 'url(',
+                    replacement: 'inline('
+                }
+            ],
+            usePrefix: false,
+        },
+        files: [{
+            expand: true,
+            cwd: 'src/',
+            src: ['themes/*/galleria.*.css'],
+            dest: 'src/',
+            rename: function(destBase, destPath) {
+                return destBase+destPath.replace('galleria.', 'galleria-inline.');
+            }
+        }]
+    });
+
+    grunt.loadNpmTasks('grunt-replace');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-postcss');
 
     // Default task(s).
-    grunt.registerTask('default', ['clean', 'uglify', 'cssmin', 'replace', 'copy']);
+    grunt.registerTask('default', ['clean', 'replace', 'uglify', 'postcss', 'cssmin', 'copy']);
 
 };

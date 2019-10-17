@@ -1,11 +1,9 @@
 /**
- * Galleria Classic Theme 2019-10-13
- * http://galleria.io
+ * Galleria Classic Theme
+ *
  *
  * Copyright (c) 2010 - 2019 worse is better UG
- * Licensed under the MIT license
- * https://raw.github.com/worseisbetter/galleria/master/LICENSE
- *
+ * Licensed under the MIT License.
  */
 
 ( function( window, factory ) {

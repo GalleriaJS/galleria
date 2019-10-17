@@ -12,13 +12,13 @@ Info, demos, docs and everything else: https://galleria.io
 Documentation
 =============
 
-https://docs.galleria.io
+https://galleria.io/docs
 
 
 FAQ
 =============
 
-https://docs.galleria.io/references/faq.html
+https://galleria.io/docs/references/faq.html
 
 
 Installation
@@ -46,6 +46,6 @@ CDN
 ---
 ::
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.6.0/galleria.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.6.1/galleria.min.js"></script>
 
 https://cdnjs.com/libraries/galleria

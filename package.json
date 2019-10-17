@@ -1,9 +1,8 @@
 {
   "name": "galleria",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "title": "Responsive JavaScript Image Gallery",
   "description": "A free JavaScript image gallery framework that simplifies the process of creating beautiful image galleries for the web and mobile devices.",
-  "homepage": "https://galleria.io",
   "keywords": [
     "gallery",
     "thumbnails",
@@ -31,6 +30,7 @@
     "email": "hello@wib.io"
   },
   "dependencies": {
+    "grunt-postcss": "^0.9.0",
     "jquery": ">=1.9.0"
   },
   "main": "./dist/galleria.js",
@@ -51,6 +51,7 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^1.0.2",
     "grunt-contrib-uglify": "^2.0.0",
-    "grunt-text-replace": "^0.4.0"
+    "grunt-replace": "^1.0.1",
+    "postcss-assets": "^5.0.0"
   }
 }

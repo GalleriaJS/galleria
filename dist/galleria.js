@@ -1,10 +1,8 @@
 /**
- * Galleria v1.6.0 2019-10-13
- * http://galleria.io
+ * Galleria v1.6.1
  *
  * Copyright (c) 2010 - 2019 worse is better UG
  * Licensed under the MIT license
- * https://raw.github.com/worseisbetter/galleria/master/LICENSE
  *
  */
 
@@ -40,7 +38,7 @@ var doc    = window.document,
     protoArray = Array.prototype,
 
 // internal constants
-    VERSION = 1.60,
+    VERSION = 1.61,
     DEBUG = true,
     TIMEOUT = 30000,
     DUMMY = false,
@@ -904,7 +902,7 @@ var doc    = window.document,
                             // If failed, tell the dev to download the latest theme
                             Galleria.raise( 'Theme CSS could not load after 20 sec. ' + ( Galleria.QUIRK ?
                                 'Your browser is in Quirks Mode, please add a correct doctype.' :
-                                'Please download the latest theme at http://galleria.io/customer/.' ), true );
+                                'Please download the latest theme.' ), true );
                         },
                         timeout: 5000
                     });
