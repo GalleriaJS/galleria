@@ -1,13 +1,10 @@
 /**
- * Galleria Flickr Plugin 2019-10-13
- * http://galleria.io
+ * Galleria Flickr Plugin
+ *
  *
  * Copyright (c) 2010 - 2019 worse is better UG
- * Licensed under the MIT license
- * https://raw.github.com/worseisbetter/galleria/master/LICENSE
- *
+ * Licensed under the MIT License.
  */
-
 
 ( function( window, factory ) {
     if ( typeof define == 'function' && define.amd ) {
@@ -42,8 +39,6 @@ var PATH = Galleria.utils.getScriptPath();
     @constructor
 
     @example var flickr = new Galleria.Flickr();
-
-    @author http://galleria.io
 
     @requires jQuery
     @requires Galleria
