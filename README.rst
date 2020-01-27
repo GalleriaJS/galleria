@@ -7,12 +7,12 @@ Galleria
 This is the open source repository for the Galleria core, themes, plugins and everything else.
 Feel free to post issues - but keep them code related please. You may also do pull requests, but make sure you include some comments and/or tests.
 
-Info, demos, docs and everything else: https://galleria.io
+Info, demos, docs and everything else: https://galleriajs.github.io/
 
 FAQ
 =============
 
-https://galleria.io/docs/references/faq.html
+https://galleriajs.github.io//docs/references/faq.html
 
 
 Installation
