@@ -42,4 +42,4 @@ CDN
 
 	<script src="https://cdn.jsdelivr.net/npm/galleria@1.6.1/dist/galleria.min.js"></script>
 
-https://cdnjs.com/libraries/galleria
+https://cdn.jsdelivr.net/npm/galleria
