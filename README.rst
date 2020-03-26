@@ -40,6 +40,6 @@ CDN
 ---
 ::
 
-	<script src="https://cdn.jsdelivr.net/npm/galleria@1.6.1/dist/galleria.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.6.1/galleria.min.js"></script>
 
-https://cdn.jsdelivr.net/npm/galleria
+https://cdnjs.com/libraries/galleria
