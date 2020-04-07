@@ -4959,6 +4959,17 @@ this.prependChild( 'info', 'myElement' );
 
                 self._layers[index].innerHTML = self.getData().layer || '';
 
+                // Set srcset in img tag for responsive retina images.
+                if (data.srcset) {
+                    $( image.image ).attr( 'srcset', data.srcset );
+                    if (image.width) {
+                        $( image.image ).attr( 'sizes', image.width+"px" );
+                    } else {
+                        // We don't know the size of the image yet, but it can't be wider than the viewport
+                        $( image.image ).attr( 'sizes', "100wv" );
+                    }
+                }
+
                 self.trigger($.extend(evObj, {
                     type: Galleria.LOADFINISH
                 }));
@@ -5204,6 +5215,12 @@ this.prependChild( 'info', 'myElement' );
             self._scaleImage( next, {
 
                 complete: function( next ) {
+
+                    // Set srcset in img tag for responsive retina images.
+                    if (data.srcset) {
+                        $( next.image ).attr( 'srcset', data.srcset );
+                        $( next.image ).attr( 'sizes', next.width+"px" );
+                    }
 
                     // toggle low quality for IE
                     if ( 'image' in active ) {
