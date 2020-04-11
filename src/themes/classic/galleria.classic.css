@@ -140,6 +140,8 @@
     left: 10px;
     z-index: 2;
     background-position: 0 46px;
+    background-color: transparent;
+    border: 0;
 }
 .galleria-theme-classic .galleria-image-nav-right {
     left: auto;
@@ -170,6 +172,8 @@
     z-index: 3;
     opacity: .8;
     filter: alpha(opacity=80);
+    background-color: transparent;
+    border: 0;
 }
 .galleria-theme-classic .galleria-thumb-nav-right {
     background-position: -578px 5px;
