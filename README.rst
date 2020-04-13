@@ -4,21 +4,42 @@ Galleria
 
 **Responsive JavaScript Image Gallery**
 
-This is the open source repository for the Galleria core, the Classic theme, plugins and everything else that comes bundled with the free download.
+This is the open source repository for the Galleria core, themes, plugins and everything else.
 Feel free to post issues - but keep them code related please. You may also do pull requests, but make sure you include some comments and/or tests.
 
-Info, demos, docs and everything else: http://galleria.io
+Info, demos, docs and everything else: https://galleriajs.github.io/
 
-Updates via twitter: http://twitter.com/galleriajs
-
-Non-code related issues and support: http://support.galleria.io
-
-Documentation
+FAQ
 =============
 
-Documentation is currently available in `reST
-<http://en.wikipedia.org/wiki/ReStructuredText>`_ format in the repository.
-
-You can build local HTML using Sphinx: http://sphinx.pocoo.org/
+https://galleriajs.github.io//docs/references/faq.html
 
 
+Installation
+============
+
+npm
+---
+::
+
+	$ npm install galleria
+
+https://www.npmjs.com/package/galleria
+
+
+bower
+-----
+::
+
+	$ bower install galleria
+
+https://bower.io/search/?q=galleria
+
+
+CDN
+---
+::
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/galleria/1.6.1/galleria.min.js"></script>
+
+https://cdnjs.com/libraries/galleria

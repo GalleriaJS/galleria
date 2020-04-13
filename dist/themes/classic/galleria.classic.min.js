@@ -1,0 +1,10 @@
+/**
+ * Galleria - v1.6.1 2019-10-17
+ * 
+ *
+ * Copyright (c) 2010 - 2019 worse is better UG
+ * Licensed under the MIT License.
+ */
+
+
+!function(a,b){"function"==typeof define&&define.amd?define(["../galleria","jquery"],function(c,d){return b(a,c,d)}):"object"==typeof module&&module.exports?module.exports=b(a,require("galleria"),require("jquery")):b(a,a.Galleria,a.jQuery)}(window,function(a,b,c){return b.addTheme({name:"classic",version:1.6,author:"Galleria",css:"galleria.classic.css",defaults:{transition:"slide",thumbCrop:"height",_toggleInfo:!0},init:function(d){b.requires(1.4,"This version of Classic theme requires Galleria 1.4 or later"),this.addElement("info-link","info-close"),this.append({info:["info-link","info-close"]});var e=this.$("info-link,info-close,info-text"),f=b.TOUCH;this.$("loader,counter").show().css("opacity",.4),f||(this.addIdleState(this.get("image-nav-left"),{left:-50}),this.addIdleState(this.get("image-nav-right"),{right:-50}),this.addIdleState(this.get("counter"),{opacity:0})),!0===d._toggleInfo?e.bind("click:fast",function(){e.toggle()}):(e.show(),this.$("info-link, info-close").hide()),this.bind("thumbnail",function(a){f?c(a.thumbTarget).css("opacity",this.getIndex()?1:.6).bind("click:fast",function(){c(this).css("opacity",1).parent().siblings().children().css("opacity",.6)}):(c(a.thumbTarget).css("opacity",.6).parent().hover(function(){c(this).not(".active").children().stop().fadeTo(100,1)},function(){c(this).not(".active").children().stop().fadeTo(400,.6)}),a.index===this.getIndex()&&c(a.thumbTarget).css("opacity",1))});var g=function(a){c(a.thumbTarget).css("opacity",1).parent().siblings().children().css("opacity",.6)};this.bind("loadstart",function(b){b.cached||this.$("loader").show().fadeTo(200,.4),a.setTimeout(function(){g(b)},f?300:0),this.$("info").toggle(this.hasInfo())}),this.bind("loadfinish",function(a){this.$("loader").fadeOut(200)})}}),b});
