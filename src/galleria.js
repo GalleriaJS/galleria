@@ -2408,9 +2408,6 @@ Galleria = function() {
                 lightbox.init();
             }
 
-            // trigger the event
-            self.trigger( Galleria.LIGHTBOX_OPEN );
-
             // temporarily attach some keys
             // save the old ones first in a cloned object
             if ( !lightbox.keymap ) {
@@ -2422,6 +2419,10 @@ Galleria = function() {
                     right: lightbox.showNext,
                     left: lightbox.showPrev
                 });
+
+                // trigger the event (can be here, as keymap is set each time lightbox opens)
+                self.trigger( Galleria.LIGHTBOX_OPEN );
+
             }
 
             $win.off('resize', lightbox.rescale );
