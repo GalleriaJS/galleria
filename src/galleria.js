@@ -2248,7 +2248,7 @@ Galleria = function() {
             if ( IE > 7 ) {
                 exs = IE < 9 ? 'background:#000;filter:alpha(opacity=0);' : 'background:rgba(0,0,0,0);';
             } else {
-                exs = 'z-index:99999';
+                exs = 'z-index:99998';
             }
 
             cssMap.nextholder += exs;
