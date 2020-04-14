@@ -2444,7 +2444,7 @@ Galleria = function() {
 
             lightbox.image.isIframe = ( data.iframe && !data.image );
 
-            $( lightbox.elems.box ).toggleClass( 'iframe', lightbox.image.isIframe );
+            $( lightbox.elems.box ).toggleClass( 'iframe', !!lightbox.image.isIframe );
 
             $( lightbox.image.container ).find( '.galleria-videoicon' ).remove();
 
