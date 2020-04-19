@@ -1368,7 +1368,10 @@ Galleria = function() {
             // one extra calculation
             carousel.width = self.$( 'thumbnails-list' ).width();
 
-            // todo: fix so the carousel moves to the left
+            // when carousel goes inactive, set default position (if it is not set already)
+            if ( w <= carousel.width && carousel.current ){
+                carousel.set(0);
+            }
         },
 
         bindControls: function() {
