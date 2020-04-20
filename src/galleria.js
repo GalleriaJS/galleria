@@ -1368,7 +1368,10 @@ Galleria = function() {
             // one extra calculation
             carousel.width = self.$( 'thumbnails-list' ).width();
 
-            // todo: fix so the carousel moves to the left
+            // when carousel goes inactive, set default position (if it is not set already)
+            if ( w <= carousel.width && carousel.current ){
+                carousel.set(0);
+            }
         },
 
         bindControls: function() {
@@ -2248,7 +2251,7 @@ Galleria = function() {
             if ( IE > 7 ) {
                 exs = IE < 9 ? 'background:#000;filter:alpha(opacity=0);' : 'background:rgba(0,0,0,0);';
             } else {
-                exs = 'z-index:99999';
+                exs = 'z-index:99998';
             }
 
             cssMap.nextholder += exs;
@@ -2408,9 +2411,6 @@ Galleria = function() {
                 lightbox.init();
             }
 
-            // trigger the event
-            self.trigger( Galleria.LIGHTBOX_OPEN );
-
             // temporarily attach some keys
             // save the old ones first in a cloned object
             if ( !lightbox.keymap ) {
@@ -2422,6 +2422,10 @@ Galleria = function() {
                     right: lightbox.showNext,
                     left: lightbox.showPrev
                 });
+
+                // trigger the event (can be here, as keymap is set each time lightbox opens)
+                self.trigger( Galleria.LIGHTBOX_OPEN );
+
             }
 
             $win.off('resize', lightbox.rescale );
@@ -2444,7 +2448,7 @@ Galleria = function() {
 
             lightbox.image.isIframe = ( data.iframe && !data.image );
 
-            $( lightbox.elems.box ).toggleClass( 'iframe', lightbox.image.isIframe );
+            $( lightbox.elems.box ).toggleClass( 'iframe', !!lightbox.image.isIframe );
 
             $( lightbox.image.container ).find( '.galleria-videoicon' ).remove();
 

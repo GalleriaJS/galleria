@@ -95,11 +95,11 @@
     cursor: pointer;
     display: none;
 }
-.galleria-theme-classic .notouch .galleria-info-close:hover{
+.galleria-theme-classic.notouch .galleria-info-close:hover{
     opacity:1;
     filter: alpha(opacity=100);
 }
-.galleria-theme-classic .touch .galleria-info-close:active{
+.galleria-theme-classic.touch .galleria-info-close:active{
     opacity:1;
     filter: alpha(opacity=100);
 }
