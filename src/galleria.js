@@ -1073,6 +1073,62 @@ var doc    = window.document,
 
                 doorslide: function(params, complete) {
                     _slide.apply( this, Utils.array( arguments ).concat( [false, true] ) );
+                },
+
+                fancy: function(params, complete) {
+                    var nextImg = $(params.next).find('img')[0];
+                    if (!this.fancyContainer) {
+                        this.fancyContainer = Utils.create( 'galleria-fancy' );
+                        $(this.fancyContainer).css({
+                            position: 'absolute',
+                            background: '#fff',
+                            top: '50%',
+                            left: '50%',
+                            width: 0,
+                            height: 0,
+                            zIndex: 0,
+                            borderRadius: '3px'
+                        });
+                        this._options.imageMargin = 5;
+                        $(nextImg).css({
+                            top: nextImg.offsetTop + 5,
+                            left: nextImg.offsetLeft + 5,
+                            width: nextImg.offsetWidth - 10,
+                            height: nextImg.offsetHeight - 10
+                        });
+                        $( '.galleria-images' ).append( this.fancyContainer );
+                    }
+                    if (nextImg) {
+                        Utils.animate(this.fancyContainer, {
+                            top: nextImg.offsetTop - 5,
+                            left: nextImg.offsetLeft - 5,
+                            width: nextImg.offsetWidth + 10,
+                            height: nextImg.offsetHeight + 10
+                        }, {
+                            duration: params.speed
+                        });
+                    }
+                    $(params.next).css({
+                        opacity: 0,
+                        left: 0,
+                        zIndex: 1
+                    });
+                    setTimeout(function() {
+                        Utils.animate(params.next, {
+                            opacity: 1
+                        },{
+                            duration: params.speed,
+                            complete: complete
+                        });
+                    }, params.speed / 2);
+                    if (params.prev) {
+                        $(params.prev).css('opacity',1).show();
+                        Utils.animate(params.prev, {
+                            opacity: 0
+                        },{
+                            duration: params.speed
+                        });
+                    }
                 }
             }
         };
@@ -4834,6 +4890,18 @@ this.prependChild( 'info', 'myElement' );
 
             if ( self._options.carousel ) {
                 self.updateCarousel();
+            }
+
+            if ( self.fancyContainer ) {
+                setTimeout(function() {
+                    var img = self._controls.getActive().image;
+                    $(self.fancyContainer).css({
+                        top: img.offsetTop - 5,
+                        left: img.offsetLeft - 5,
+                        width: img.offsetWidth + 10,
+                        height: img.offsetHeight + 10
+                    });
+                }, 16);
             }
 
             var frame = self._controls.frames[ self._controls.active ];
