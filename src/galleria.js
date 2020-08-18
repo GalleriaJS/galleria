@@ -5144,7 +5144,7 @@ this.prependChild( 'info', 'myElement' );
                     type: Galleria.IMAGE,
                     index: queue.index,
                     imageTarget: next.image,
-                    thumbTarget: thumb.image,
+                    thumbTarget: thumb ? thumb.image : null,
                     galleriaData: data
                 });
 
@@ -5176,10 +5176,12 @@ this.prependChild( 'info', 'myElement' );
         next.isIframe = data.iframe && !data.image;
 
         // add active classes
-        $( self._thumbnails[ queue.index ].container )
+        if ( self._thumbnails[ queue.index ] ) {
+            $( self._thumbnails[ queue.index ].container )
             .addClass( 'active' )
             .siblings( '.active' )
             .removeClass( 'active' );
+        }
 
         // trigger the LOADSTART event
         self.trigger( {
@@ -5188,7 +5190,7 @@ this.prependChild( 'info', 'myElement' );
             index: queue.index,
             rewind: queue.rewind,
             imageTarget: next.image,
-            thumbTarget: thumb.image,
+            thumbTarget: thumb ? thumb.image : null,
             galleriaData: data
         });
 
