@@ -1,7 +1,7 @@
 module.exports = function (grunt) {
     "use strict";
 
-    var assets  = require('postcss-assets');
+    let assets  = require('postcss-assets');
 
     grunt.initConfig({
 
@@ -63,7 +63,7 @@ module.exports = function (grunt) {
 
     });
 
-    var themes = ['azur', 'folio', 'fullscreen', 'miniml', 'twelve', 'classic'];
+    let themes = ['azur', 'folio', 'fullscreen', 'miniml', 'twelve', 'classic'];
     themes.forEach(function(name) {
 
         grunt.config(['uglify', name], {
