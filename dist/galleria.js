@@ -29,7 +29,7 @@
 /*global jQuery, navigator, Image, module, define */
 
 // some references
-var doc    = window.document,
+let doc    = window.document,
     $doc   = $( doc ),
     $win   = $( window ),
     jQuery = $,
@@ -54,7 +54,7 @@ var doc    = window.document,
     ),
     IE = (function() {
 
-        var v = 3,
+        let v = 3,
             div = doc.createElement( 'div' ),
             all = div.getElementsByTagName( 'i' );
 
@@ -82,7 +82,7 @@ var doc    = window.document,
 
     _events = (function() {
 
-        var evs = [];
+        let evs = [];
 
         $.each( _eventlist.split(' '), function( i, ev ) {
             evs.push( ev );
@@ -102,7 +102,7 @@ var doc    = window.document,
 
     _legacyOptions = function( options ) {
 
-        var n;
+        let n;
 
         if ( typeof options !== 'object' ) {
 
@@ -181,7 +181,7 @@ var doc    = window.document,
     },
     Video = function( type, id ) {
 
-        for( var i=0; i<_video._inst.length; i++ ) {
+        for( let i=0; i<_video._inst.length; i++ ) {
             if ( _video._inst[i].id === id && _video._inst[i].type == type ) {
                 return _video._inst[i];
             }
@@ -193,7 +193,7 @@ var doc    = window.document,
 
         _video._inst.push(this);
 
-        var self = this;
+        let self = this;
 
         $.extend( this, _video[type] );
 
@@ -213,8 +213,8 @@ var doc    = window.document,
 
         this.getMedia = function( type, callback, fail ) {
             fail = fail || F;
-            var self = this;
-            var success = function( data ) {
+            let self = this;
+            let success = function( data ) {
                 callback( self['get_'+type]( data ) );
             };
             try {
@@ -231,8 +231,8 @@ var doc    = window.document,
 
     // utility for testing the video URL and getting the video ID
     _videoTest = function( url ) {
-        var match;
-        for ( var v in _video ) {
+        let match;
+        for ( let v in _video ) {
             match = url && _video[v].reg && url.match( _video[v].reg );
             if( match && match.length ) {
                 return {
@@ -248,7 +248,7 @@ var doc    = window.document,
     _nativeFullscreen = {
 
         support: (function() {
-            var html = DOM().html;
+            let html = DOM().html;
             return !IFRAME && ( html.requestFullscreen || html.msRequestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen );
         }()),
 
@@ -301,7 +301,7 @@ var doc    = window.document,
                 return;
             }
 
-            var handler = function() {
+            let handler = function() {
 
                 if ( !_nativeFullscreen.instance ) {
                     return;
@@ -377,7 +377,7 @@ var doc    = window.document,
 
             create : function( className, nodeName ) {
                 nodeName = nodeName || 'div';
-                var elem = doc.createElement( nodeName );
+                let elem = doc.createElement( nodeName );
                 elem.className = className;
                 return elem;
             },
@@ -396,7 +396,7 @@ var doc    = window.document,
 
                 // the currently executing script is always the last
                 src = src || $('script:last').attr('src');
-                var slices = src.split('/');
+                let slices = src.split('/');
 
                 if (slices.length == 1) {
                     return '';
@@ -411,7 +411,7 @@ var doc    = window.document,
             animate : (function() {
 
                 // detect transition
-                var transition = (function( style ) {
+                let transition = (function( style ) {
                     var props = 'transition WebkitTransition MozTransition OTransition'.split(' '),
                         i;
 
@@ -429,7 +429,7 @@ var doc    = window.document,
                 }(( doc.body || doc.documentElement).style ));
 
                 // map transitionend event
-                var endEvent = {
+                let endEvent = {
                     MozTransition: 'transitionend',
                     OTransition: 'oTransitionEnd',
                     WebkitTransition: 'webkitTransitionEnd',
@@ -437,7 +437,7 @@ var doc    = window.document,
                 }[ transition ];
 
                 // map bezier easing conversions
-                var easings = {
+                let easings = {
                     _default: [0.25, 0.1, 0.25, 1],
                     galleria: [0.645, 0.045, 0.355, 1],
                     galleriaIn: [0.55, 0.085, 0.68, 0.53],
@@ -450,8 +450,8 @@ var doc    = window.document,
                 };
 
                 // function for setting transition css for all browsers
-                var setStyle = function( elem, value, suffix ) {
-                    var css = {};
+                let setStyle = function( elem, value, suffix ) {
+                    let css = {};
                     suffix = suffix || 'transition';
                     $.each( 'webkit moz ms o'.split(' '), function() {
                         css[ '-' + this + '-' + suffix ] = value;
@@ -460,7 +460,7 @@ var doc    = window.document,
                 };
 
                 // clear styles
-                var clearStyle = function( elem ) {
+                let clearStyle = function( elem ) {
                     setStyle( elem, 'none', 'transition' );
                     if ( Galleria.WEBKIT && Galleria.TOUCH ) {
                         setStyle( elem, 'translate3d(0,0,0)', 'transform' );
@@ -472,7 +472,7 @@ var doc    = window.document,
                 };
 
                 // various variables
-                var change, strings, easing, syntax, revert, form, css;
+                let change, strings, easing, syntax, revert, form, css;
 
                 // the actual animation method
                 return function( elem, to, options ) {
@@ -595,7 +595,7 @@ var doc    = window.document,
                 }
                 if ( IE < 9 && elem ) {
 
-                    var style = elem.style,
+                    let style = elem.style,
                         currentStyle = elem.currentStyle,
                         filter = currentStyle && currentStyle.filter || style.filter || "";
 
@@ -642,7 +642,7 @@ var doc    = window.document,
 
                 callback = callback || F;
 
-                var $elem = $(elem);
+                let $elem = $(elem);
                 elem = $elem[0];
 
                 // save the value if not exist
@@ -651,11 +651,11 @@ var doc    = window.document,
                 }
 
                 // always hide
-                var style = { opacity: 0 };
+                let style = { opacity: 0 };
 
                 if (speed) {
 
-                    var complete = IE < 9 && elem ? function() {
+                    let complete = IE < 9 && elem ? function() {
                         Utils.removeAlpha( elem );
                         elem.style.visibility = 'hidden';
                         callback.call( elem );
@@ -680,11 +680,11 @@ var doc    = window.document,
 
                 callback = callback || F;
 
-                var $elem = $(elem);
+                let $elem = $(elem);
                 elem = $elem[0];
 
                 // bring back saved opacity
-                var saved = parseFloat( $elem.data('opacity') ) || 1,
+                let saved = parseFloat( $elem.data('opacity') ) || 1,
                     style = { opacity: saved };
 
                 // animate or toggle
@@ -695,7 +695,7 @@ var doc    = window.document,
                         elem.style.visibility = 'visible';
                     }
 
-                    var complete = IE < 9 && elem ? function() {
+                    let complete = IE < 9 && elem ? function() {
                         if ( style.opacity == 1 ) {
                             Utils.removeAlpha( elem );
                         }
@@ -728,7 +728,7 @@ var doc    = window.document,
                     timeout: 3000
                 }, options);
 
-                var start = Utils.timestamp(),
+                let start = Utils.timestamp(),
                     elapsed,
                     now,
                     tid,
@@ -768,7 +768,7 @@ var doc    = window.document,
                     return;
                 }
 
-                var style = doc.createElement( 'style' );
+                let style = doc.createElement( 'style' );
                 if ( id ) {
                     style.id = id;
                 }
@@ -778,7 +778,7 @@ var doc    = window.document,
                 if ( style.styleSheet ) { // IE
                     style.styleSheet.cssText = styles;
                 } else {
-                    var cssText = doc.createTextNode( styles );
+                   let cssText = doc.createTextNode( styles );
                     style.appendChild( cssText );
                 }
             },
@@ -786,7 +786,7 @@ var doc    = window.document,
             // a loadscript method that works for local scripts
             loadScript: function( url, callback ) {
 
-                var done = false,
+                let done = false,
                     script = $('<scr'+'ipt>').attr({
                         src: url,
                         async: true
@@ -816,7 +816,7 @@ var doc    = window.document,
                 if (typeof val === 'number') {
                     return val;
                 } else if (typeof val === 'string') {
-                    var arr = val.match(/\-?\d|\./g);
+                    let arr = val.match(/\-?\d|\./g);
                     return arr && arr.constructor === Array ? arr.join('')*1 : 0;
                 } else {
                     return 0;
@@ -830,7 +830,7 @@ var doc    = window.document,
 
             loadCSS : function( href, id, callback ) {
 
-                var link,
+                let link,
                     length;
 
                 // look for manual css
@@ -870,7 +870,7 @@ var doc    = window.document,
                         id: id
                     }).get(0);
 
-                    var styles = $('link[rel="stylesheet"], style');
+                    let styles = $('link[rel="stylesheet"], style');
                     if ( styles.length ) {
                         styles.get(0).parentNode.insertBefore( link, styles[0] );
                     } else {
@@ -886,7 +886,7 @@ var doc    = window.document,
                 if ( typeof callback === 'function' ) {
 
                     // First check for dummy element (new in 1.2.8)
-                    var $loader = $('<s>').attr( 'id', 'galleria-loader' ).hide().appendTo( DOM().body );
+                    let $loader = $('<s>').attr( 'id', 'galleria-loader' ).hide().appendTo( DOM().body );
 
                     Utils.wait({
                         until: function() {
@@ -915,7 +915,7 @@ var doc    = window.document,
     // play icon
     _playIcon = function( container ) {
 
-        var css = '.galleria-videoicon{width:60px;height:60px;position:absolute;top:50%;left:50%;z-index:1;' +
+        let css = '.galleria-videoicon{width:60px;height:60px;position:absolute;top:50%;left:50%;z-index:1;' +
                   'margin:-30px 0 0 -30px;cursor:pointer;background:#000;background:rgba(0,0,0,.8);border-radius:3px;-webkit-transition:all 150ms}' +
                   '.galleria-videoicon i{width:0px;height:0px;border-style:solid;border-width:10px 0 10px 16px;display:block;' +
                   'border-color:transparent transparent transparent #ffffff;margin:20px 0 0 22px}.galleria-image:hover .galleria-videoicon{background:#000}';
@@ -929,9 +929,9 @@ var doc    = window.document,
     // the transitions holder
     _transitions = (function() {
 
-        var _slide = function(params, complete, fade, door) {
+        let _slide = function(params, complete, fade, door) {
 
-            var easing = this.getOptions('easing'),
+            let easing = this.getOptions('easing'),
                 distance = this.getStageWidth(),
                 from = { left: distance * ( params.rewind ? -1 : 1 ) },
                 to = { left: 0 };
@@ -1086,9 +1086,9 @@ $.event.special['click:fast'] = {
     propagate: true,
     add: function(handleObj) {
 
-        var getCoords = function(e) {
+        let getCoords = function(e) {
             if ( e.touches && e.touches.length ) {
-                var touch = e.touches[0];
+                let touch = e.touches[0];
                 return {
                     x: touch.pageX,
                     y: touch.pageY
@@ -1096,7 +1096,7 @@ $.event.special['click:fast'] = {
             }
         };
 
-        var def = {
+        let def = {
             touched: false,
             touchdown: false,
             coords: { x:0, y:0 },
@@ -1115,7 +1115,7 @@ $.event.special['click:fast'] = {
                 evObj: e
             });
         }).on('touchmove.fast', function(e) {
-            var coords = getCoords(e.originalEvent),
+            let coords = getCoords(e.originalEvent),
                 state = $(this).data('clickstate'),
                 distance = Math.max(
                     Math.abs(state.coords.x - coords.x),
@@ -1127,7 +1127,7 @@ $.event.special['click:fast'] = {
                 }));
             }
         }).on('touchend.fast', function(e) {
-            var $this = $(this),
+            let $this = $(this),
                 state = $this.data('clickstate');
             if(state.touchdown) {
               handleObj.handler.call(this, e);
@@ -1136,7 +1136,7 @@ $.event.special['click:fast'] = {
                 $this.data('clickstate', def);
             }, 400));
         }).on('click.fast', function(e) {
-            var state = $(this).data('clickstate');
+            let state = $(this).data('clickstate');
             if ( state.touched ) {
                 return false;
             }
@@ -1170,7 +1170,7 @@ $win.on( 'orientationchange', function() {
 
 Galleria = function() {
 
-    var self = this;
+    let self = this;
 
     // internal options
     this._options = {};
@@ -1219,7 +1219,7 @@ Galleria = function() {
     this._id = parseInt(M.random()*10000, 10);
 
     // add some elements
-    var divs =  'container stage images image-nav image-nav-left image-nav-right ' +
+    let divs =  'container stage images image-nav image-nav-left image-nav-right ' +
                 'info info-text info-title info-description ' +
                 'thumbnails thumbnails-list thumbnails-container thumb-nav-left thumb-nav-right ' +
                 'loader counter tooltip',
@@ -1235,7 +1235,7 @@ Galleria = function() {
 
     // the internal keyboard object
     // keeps reference of the keybinds and provides helper methods for binding keys
-    var keyboard = this._keyboard = {
+    let keyboard = this._keyboard = {
 
         keys : {
             'UP': 38,
@@ -1253,7 +1253,7 @@ Galleria = function() {
         bound: false,
 
         press: function(e) {
-            var key = e.keyCode || e.which;
+            let key = e.keyCode || e.which;
             if ( key in keyboard.map && typeof keyboard.map[key] === 'function' ) {
                 keyboard.map[key].call(self, e);
             }
@@ -1261,7 +1261,7 @@ Galleria = function() {
 
         attach: function(map) {
 
-            var key, up;
+            let key, up;
 
             for( key in map ) {
                 if ( map.hasOwnProperty( key ) ) {
