@@ -29,7 +29,7 @@
 /*global jQuery, navigator, Image, module, define */
 
 // some references
-var doc    = window.document,
+let doc    = window.document,
     $doc   = $( doc ),
     $win   = $( window ),
     jQuery = $,
@@ -54,7 +54,7 @@ var doc    = window.document,
     ),
     IE = (function() {
 
-        var v = 3,
+        let v = 3,
             div = doc.createElement( 'div' ),
             all = div.getElementsByTagName( 'i' );
 
@@ -82,7 +82,7 @@ var doc    = window.document,
 
     _events = (function() {
 
-        var evs = [];
+        let evs = [];
 
         $.each( _eventlist.split(' '), function( i, ev ) {
             evs.push( ev );
@@ -102,7 +102,7 @@ var doc    = window.document,
 
     _legacyOptions = function( options ) {
 
-        var n;
+        let n;
 
         if ( typeof options !== 'object' ) {
 
@@ -181,7 +181,7 @@ var doc    = window.document,
     },
     Video = function( type, id ) {
 
-        for( var i=0; i<_video._inst.length; i++ ) {
+        for( let i=0; i<_video._inst.length; i++ ) {
             if ( _video._inst[i].id === id && _video._inst[i].type == type ) {
                 return _video._inst[i];
             }
@@ -193,7 +193,7 @@ var doc    = window.document,
 
         _video._inst.push(this);
 
-        var self = this;
+        let self = this;
 
         $.extend( this, _video[type] );
 
@@ -213,8 +213,8 @@ var doc    = window.document,
 
         this.getMedia = function( type, callback, fail ) {
             fail = fail || F;
-            var self = this;
-            var success = function( data ) {
+            let self = this;
+            let success = function( data ) {
                 callback( self['get_'+type]( data ) );
             };
             try {
@@ -231,8 +231,8 @@ var doc    = window.document,
 
     // utility for testing the video URL and getting the video ID
     _videoTest = function( url ) {
-        var match;
-        for ( var v in _video ) {
+        let match;
+        for ( let v in _video ) {
             match = url && _video[v].reg && url.match( _video[v].reg );
             if( match && match.length ) {
                 return {
@@ -248,7 +248,7 @@ var doc    = window.document,
     _nativeFullscreen = {
 
         support: (function() {
-            var html = DOM().html;
+            let html = DOM().html;
             return !IFRAME && ( html.requestFullscreen || html.msRequestFullscreen || html.mozRequestFullScreen || html.webkitRequestFullScreen );
         }()),
 
@@ -301,12 +301,12 @@ var doc    = window.document,
                 return;
             }
 
-            var handler = function() {
+            let handler = function() {
 
                 if ( !_nativeFullscreen.instance ) {
                     return;
                 }
-                var fs = _nativeFullscreen.instance._fullscreen;
+                let fs = _nativeFullscreen.instance._fullscreen;
 
                 if ( doc.fullscreen || doc.mozFullScreen || doc.webkitIsFullScreen || ( doc.msFullscreenElement && doc.msFullscreenElement !== null ) ) {
                     fs._enter( _nativeFullscreen.callback );
@@ -396,7 +396,7 @@ var doc    = window.document,
 
                 // the currently executing script is always the last
                 src = src || $('script:last').attr('src');
-                var slices = src.split('/');
+                let slices = src.split('/');
 
                 if (slices.length == 1) {
                     return '';
@@ -411,8 +411,8 @@ var doc    = window.document,
             animate : (function() {
 
                 // detect transition
-                var transition = (function( style ) {
-                    var props = 'transition WebkitTransition MozTransition OTransition'.split(' '),
+                let transition = (function( style ) {
+                    let props = 'transition WebkitTransition MozTransition OTransition'.split(' '),
                         i;
 
                     // disable css3 animations in opera until stable
@@ -429,7 +429,7 @@ var doc    = window.document,
                 }(( doc.body || doc.documentElement).style ));
 
                 // map transitionend event
-                var endEvent = {
+                let endEvent = {
                     MozTransition: 'transitionend',
                     OTransition: 'oTransitionEnd',
                     WebkitTransition: 'webkitTransitionEnd',
@@ -437,7 +437,7 @@ var doc    = window.document,
                 }[ transition ];
 
                 // map bezier easing conversions
-                var easings = {
+                let easings = {
                     _default: [0.25, 0.1, 0.25, 1],
                     galleria: [0.645, 0.045, 0.355, 1],
                     galleriaIn: [0.55, 0.085, 0.68, 0.53],
